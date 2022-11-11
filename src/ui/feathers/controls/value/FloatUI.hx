@@ -8,7 +8,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import utils.MathUtil;
 import valedit.ui.IValueUI;
@@ -51,6 +51,12 @@ class FloatUI extends ValueUI
 		addChild(_input);
 	}
 	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		_label.text = _exposedValue.name;
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
@@ -59,7 +65,6 @@ class FloatUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_label.text = _exposedValue.name;
 			_input.editable = _exposedValue.isEditable;
 			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloat).precision));
 			if (controlsEnabled) controlsEnable();

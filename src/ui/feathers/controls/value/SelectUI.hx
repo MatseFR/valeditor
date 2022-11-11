@@ -8,7 +8,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedSelect;
@@ -53,6 +53,25 @@ class SelectUI extends ValueUI
 		addChild(_list);
 	}
 	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_label.text = _exposedValue.name;
+		_collection.removeAll();
+		var choiceList:Array<String> = cast(_exposedValue, ExposedSelect).choiceList;
+		var valueList:Array<Dynamic> = cast(_exposedValue, ExposedSelect).valueList;
+		var count:Int = choiceList.length;
+		for (i in 0...count)
+		{
+			//if (valueList[i] == _exposedValue.value)
+			//{
+				//selectedIndex = i;
+			//}
+			_collection.add({text:choiceList[i], value:valueList[i]});
+		}
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
@@ -61,25 +80,15 @@ class SelectUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_label.text = _exposedValue.name;
-			_collection.removeAll();
-			var selectedIndex:Int = -1;
-			var choiceList:Array<String> = cast(_exposedValue, ExposedSelect).choiceList;
-			var valueList:Array<Dynamic> = cast(_exposedValue, ExposedSelect).valueList;
-			var count:Int = choiceList.length;
-			for (i in 0...count)
-			{
-				if (valueList[i] == _exposedValue.value)
-				{
-					selectedIndex = i;
-				}
-				_collection.add({text:choiceList[i], value:valueList[i]});
-			}
 			
-			if (selectedIndex != -1)
-			{
-				_list.selectedIndex = selectedIndex;
-			}
+			//var selectedIndex:Int = -1;
+			//
+			//
+			//if (selectedIndex != -1)
+			//{
+				//_list.selectedIndex = selectedIndex;
+			//}
+			_list.selectedIndex = cast(_exposedValue, ExposedSelect).valueList.indexOf(_exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
 	}

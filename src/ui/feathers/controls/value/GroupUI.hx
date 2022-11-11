@@ -7,7 +7,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LayoutGroupVariant;
 import ui.feathers.variant.ToggleButtonVariant;
 import valedit.ExposedValue;
@@ -80,46 +80,57 @@ class GroupUI extends ValueUI implements IGroupUI
 		_valueGroup.addChild(cast control);
 	}
 	
+	public function removeExposedControl(control:IValueUI):Void
+	{
+		_controls.remove(control);
+		_valueGroup.removeChild(cast control);
+	}
+	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_topButton.text = _group.name;
+		
+		if (_group.isCollapsable)
+		{
+			_topButton.icon = _arrowRight;
+			_topButton.selectedIcon = _arrowDown;
+			
+			if (_group.isCollapsedDefault)
+			{
+				_topButton.selected = false;
+				if (_valueGroup.parent != null)
+				{
+					removeChild(_valueGroup);
+				}
+			}
+			else
+			{
+				_topButton.selected = true;
+				if (_valueGroup.parent == null)
+				{
+					addChild(_valueGroup);
+				}
+			}
+		}
+		else
+		{
+			_topButton.icon = null;
+			_topButton.selectedIcon = null;
+			if (_valueGroup.parent == null)
+			{
+				addChild(_valueGroup);
+			}
+		}
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
 		
 		if (_initialized && _group != null)
 		{
-			_topButton.text = _group.name;
-			
-			if (_group.isCollapsable)
-			{
-				_topButton.icon = _arrowRight;
-				_topButton.selectedIcon = _arrowDown;
-				
-				if (_group.isCollapsedDefault)
-				{
-					_topButton.selected = false;
-					if (_valueGroup.parent != null)
-					{
-						removeChild(_valueGroup);
-					}
-				}
-				else
-				{
-					_topButton.selected = true;
-					if (_valueGroup.parent == null)
-					{
-						addChild(_valueGroup);
-					}
-				}
-			}
-			else
-			{
-				_topButton.icon = null;
-				_topButton.selectedIcon = null;
-				if (_valueGroup.parent == null)
-				{
-					addChild(_valueGroup);
-				}
-			}
-			
 			for (control in _controls)
 			{
 				if (control == exceptControl) continue;

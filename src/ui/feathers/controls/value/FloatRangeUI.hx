@@ -8,7 +8,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import utils.MathUtil;
 import valedit.ui.IValueUI;
@@ -57,6 +57,15 @@ class FloatRangeUI extends ValueUI
 		addChild(_input);
 	}
 	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_label.text = _exposedValue.name;
+		_slider.minimum = cast(_exposedValue, ExposedFloatRange).min;
+		_slider.maximum = cast(_exposedValue, ExposedFloatRange).max;
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
@@ -65,9 +74,6 @@ class FloatRangeUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_label.text = _exposedValue.name;
-			_slider.minimum = cast(_exposedValue, ExposedFloatRange).min;
-			_slider.maximum = cast(_exposedValue, ExposedFloatRange).max;
 			_slider.value = _exposedValue.value;
 			_slider.enabled = _exposedValue.isEditable;
 			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloatRange).precision));

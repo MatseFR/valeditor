@@ -7,7 +7,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import valedit.ui.IValueUI;
 
@@ -48,6 +48,13 @@ class BoolUI extends ValueUI
 		addChild(_check);
 	}
 	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_label.text = _exposedValue.name;
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
@@ -56,7 +63,6 @@ class BoolUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_label.text = _exposedValue.name;
 			_check.enabled = _exposedValue.isEditable;
 			_check.selected = _exposedValue.value;
 			if (controlsEnabled) controlsEnable();

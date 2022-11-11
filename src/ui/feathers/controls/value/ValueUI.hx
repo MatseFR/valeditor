@@ -1,8 +1,9 @@
-package ui.feathers;
+package ui.feathers.controls.value;
 
 import feathers.controls.LayoutGroup;
 import openfl.events.Event;
 import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 
 /**
@@ -18,9 +19,10 @@ class ValueUI extends LayoutGroup implements IValueUI
 	private function set_exposedValue(value:ExposedValue):ExposedValue
 	{
 		if (_exposedValue == value) return value;
-		if (_exposedValue != null) _exposedValue.removeEventListener(Event.CHANGE, onValueChange);
+		if (_exposedValue != null) _exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
 		_exposedValue = value;
-		if (_exposedValue != null) _exposedValue.addEventListener(Event.CHANGE, onValueChange);
+		if (_exposedValue != null) _exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+		initExposedValue();
 		updateExposedValue();
 		return _exposedValue;
 	}
@@ -60,14 +62,25 @@ class ValueUI extends LayoutGroup implements IValueUI
 		_controlsEnabled = true;
 	}
 	
+	public function initExposedValue():Void
+	{
+		
+	}
+	
+	public function initExposedValueObject():Void
+	{
+		updateExposedValue();
+	}
+	
 	public function updateExposedValue(exceptControl:IValueUI = null):Void
 	{
 		
 	}
 	
-	private function onValueChange(evt:Event):Void
+	private function onValueObjectChange(evt:Event):Void
 	{
-		updateExposedValue();
+		//updateExposedValue();
+		initExposedValueObject();
 	}
 	
 }

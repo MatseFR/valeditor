@@ -7,7 +7,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedString;
@@ -41,13 +41,17 @@ class StringUI extends ValueUI
 		this.layout = hLayout;
 		
 		_label = new Label();
-		//_label.layoutData = new HorizontalLayoutData(25);
 		_label.variant = LabelVariant.VALUE_NAME;
 		addChild(_label);
 		
 		_input = new TextInput();
 		_input.layoutData = new HorizontalLayoutData(100);
 		addChild(_input);
+	}
+	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 

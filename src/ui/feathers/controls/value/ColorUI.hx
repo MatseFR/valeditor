@@ -14,7 +14,7 @@ import feathers.layout.VerticalLayout;
 import feathers.skins.RectangleSkin;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.ValueUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
 import utils.ColorUtil;
@@ -82,7 +82,6 @@ class ColorUI extends ValueUI
 		addChild(_previewGroup);
 		
 		_label = new Label();
-		//_label.layoutData = new HorizontalLayoutData(25);
 		_label.variant = LabelVariant.VALUE_NAME;
 		_previewGroup.addChild(_label);
 		
@@ -126,7 +125,7 @@ class ColorUI extends ValueUI
 		_redGroup.addChild(_redLabel);
 		
 		_redSlider = new HSlider();
-		_redSlider.layoutData = new HorizontalLayoutData(50);
+		_redSlider.layoutData = new HorizontalLayoutData(75);
 		_redSlider.minimum = 0;
 		_redSlider.maximum = 255;
 		_redSlider.step = 1;
@@ -134,7 +133,7 @@ class ColorUI extends ValueUI
 		_redGroup.addChild(_redSlider);
 		
 		_redInput = new TextInput();
-		_redInput.layoutData = new HorizontalLayoutData(50);
+		_redInput.layoutData = new HorizontalLayoutData(25);
 		_redInput.restrict = "0123456789";
 		_redInput.maxChars = 3;
 		_redInput.text = "255";
@@ -154,7 +153,7 @@ class ColorUI extends ValueUI
 		_greenGroup.addChild(_greenLabel);
 		
 		_greenSlider = new HSlider();
-		_greenSlider.layoutData = new HorizontalLayoutData(50);
+		_greenSlider.layoutData = new HorizontalLayoutData(75);
 		_greenSlider.minimum = 0;
 		_greenSlider.maximum = 255;
 		_greenSlider.step = 1;
@@ -162,7 +161,7 @@ class ColorUI extends ValueUI
 		_greenGroup.addChild(_greenSlider);
 		
 		_greenInput = new TextInput();
-		_greenInput.layoutData = new HorizontalLayoutData(50);
+		_greenInput.layoutData = new HorizontalLayoutData(25);
 		_greenInput.restrict = "0123456789";
 		_greenInput.maxChars = 3;
 		_greenInput.text = "255";
@@ -182,7 +181,7 @@ class ColorUI extends ValueUI
 		_blueGroup.addChild(_blueLabel);
 		
 		_blueSlider = new HSlider();
-		_blueSlider.layoutData = new HorizontalLayoutData(50);
+		_blueSlider.layoutData = new HorizontalLayoutData(75);
 		_blueSlider.minimum = 0;
 		_blueSlider.maximum = 255;
 		_blueSlider.step = 1;
@@ -190,11 +189,18 @@ class ColorUI extends ValueUI
 		_blueGroup.addChild(_blueSlider);
 		
 		_blueInput = new TextInput();
-		_blueInput.layoutData = new HorizontalLayoutData(50);
+		_blueInput.layoutData = new HorizontalLayoutData(25);
 		_blueInput.restrict = "0123456789";
 		_blueInput.maxChars = 3;
 		_blueInput.text = "255";
 		_blueGroup.addChild(_blueInput);
+	}
+	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_label.text = _exposedValue.name;
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -203,7 +209,6 @@ class ColorUI extends ValueUI
 		
 		if (_initialized && _exposedValue != null)
 		{
-			_label.text = _exposedValue.name;
 			colorUpdate();
 		}
 	}
@@ -211,14 +216,15 @@ class ColorUI extends ValueUI
 	private function colorUpdate():Void
 	{
 		controlsDisable();
-		_previewSkin.fill = FillStyle.SolidColor(_exposedValue.value, 1);
-		_hexInput.text = ColorUtil.RGBtoHexString(_exposedValue.value);
-		_redInput.text = Std.string(ColorUtil.getRed(_exposedValue.value));
-		_redSlider.value = ColorUtil.getRed(_exposedValue.value);
-		_greenInput.text = Std.string(ColorUtil.getGreen(_exposedValue.value));
-		_greenSlider.value = ColorUtil.getGreen(_exposedValue.value);
-		_blueInput.text = Std.string(ColorUtil.getBlue(_exposedValue.value));
-		_blueSlider.value = ColorUtil.getBlue(_exposedValue.value);
+		var value:Int = _exposedValue.value;
+		_previewSkin.fill = FillStyle.SolidColor(value, 1);
+		_hexInput.text = ColorUtil.RGBtoHexString(value);
+		_redInput.text = Std.string(ColorUtil.getRed(value));
+		_redSlider.value = ColorUtil.getRed(value);
+		_greenInput.text = Std.string(ColorUtil.getGreen(value));
+		_greenSlider.value = ColorUtil.getGreen(value);
+		_blueInput.text = Std.string(ColorUtil.getBlue(value));
+		_blueSlider.value = ColorUtil.getBlue(value);
 		controlsEnable();
 	}
 	

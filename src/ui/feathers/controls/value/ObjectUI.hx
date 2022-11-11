@@ -1,8 +1,6 @@
 package ui.feathers.controls.value;
 
 import feathers.controls.LayoutGroup;
-import feathers.controls.ToggleButton;
-import feathers.core.InvalidationFlag;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
@@ -10,14 +8,14 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.ValueUI;
 import ui.feathers.controls.ToggleLayoutGroup;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
-import ui.feathers.variant.ToggleButtonVariant;
 import valedit.ExposedValue;
 import valedit.ValEdit;
 import valedit.ui.IValueUI;
+import valedit.value.ExposedObject;
 
 /**
  * ...
@@ -30,23 +28,26 @@ class ObjectUI extends ValueUI
 	{
 		if (value == null)
 		{
+			_exposedObject = null;
 			ValEdit.edit(null, _valueGroup);
 		}
 		else
 		{
+			_exposedObject = cast value;
 			ValEdit.edit(value.value, _valueGroup, value);
 		}
 		return super.set_exposedValue(value);
 	}
 	
-	//private var _topButton:ToggleButton;
+	private var _exposedObject:ExposedObject;
+	
 	private var _topButton:ToggleLayoutGroup;
 	private var _arrowDown:LayoutGroup;
 	private var _arrowRight:LayoutGroup;
 	
 	private var _bottomGroup:LayoutGroup;
 	private var _trailGroup:LayoutGroup;
-	private var _valueGroup:LayoutGroup;
+	private var _valueGroup:ValueContainer;
 	
 	/**
 	   
@@ -91,7 +92,7 @@ class ObjectUI extends ValueUI
 		_trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
 		_bottomGroup.addChild(_trailGroup);
 		
-		_valueGroup = new LayoutGroup();
+		_valueGroup = new ValueContainer();
 		_valueGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
@@ -113,14 +114,35 @@ class ObjectUI extends ValueUI
 		_trailGroup.height = _valueGroup.height;
 	}
 	
+	override public function initExposedValue():Void 
+	{
+		super.initExposedValue();
+		
+		_topButton.text = _exposedValue.name;
+		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+	}
+	
+	override public function initExposedValueObject():Void 
+	{
+		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+		super.initExposedValueObject();
+	}
+	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
 	{
 		super.updateExposedValue(exceptControl);
 		
 		if (_initialized && _exposedValue != null)
 		{
-			_topButton.text = _exposedValue.name;
-			ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+			if (_exposedObject.storeValue)
+			{
+				_exposedObject.reloadObject();
+			}
+			else
+			{
+				_valueGroup.updateExposedValues();
+			}
+			//_valueGroup.updateExposedValues();
 		}
 	}
 	
@@ -142,7 +164,6 @@ class ObjectUI extends ValueUI
 	{
 		if (_topButton.selected)
 		{
-			//this.setInvalid(InvalidationFlag.SIZE);
 			addChild(_bottomGroup);
 		}
 		else
