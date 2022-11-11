@@ -4,12 +4,14 @@ import feathers.controls.Check;
 import feathers.controls.Label;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
-import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
+import valedit.value.ExposedBool;
 
 /**
  * ...
@@ -17,6 +19,21 @@ import valedit.ui.IValueUI;
  */
 class BoolUI extends ValueUI 
 {
+	//override function set_exposedValue(value:ExposedValue):ExposedValue 
+	//{
+		//if (value == null)
+		//{
+			//_boolValue = null;
+		//}
+		//else
+		//{
+			//_boolValue = cast value;
+		//}
+		//return super.set_exposedValue(value);
+	//}
+	//
+	//private var _boolValue:ExposedBool;
+	
 	private var _label:Label;
 	private var _check:Check;
 	
@@ -40,7 +57,6 @@ class BoolUI extends ValueUI
 		this.layout = hLayout;
 		
 		_label = new Label();
-		//_label.layoutData = new HorizontalLayoutData(25);
 		_label.variant = LabelVariant.VALUE_NAME;
 		addChild(_label);
 		
@@ -51,8 +67,8 @@ class BoolUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		
 		_label.text = _exposedValue.name;
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -63,10 +79,22 @@ class BoolUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_check.enabled = _exposedValue.isEditable;
 			_check.selected = _exposedValue.value;
 			if (controlsEnabled) controlsEnable();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_label.enabled = _exposedValue.isEditable;
+		_check.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void 

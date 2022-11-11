@@ -9,6 +9,8 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedString;
 
@@ -18,6 +20,21 @@ import valedit.value.ExposedString;
  */
 class StringUI extends ValueUI 
 {
+	override function set_exposedValue(value:ExposedValue):ExposedValue 
+	{
+		if (value == null)
+		{
+			_stringValue = null;
+		}
+		else
+		{
+			_stringValue = cast value;
+		}
+		return super.set_exposedValue(value);
+	}
+	
+	private var _stringValue:ExposedString;
+	
 	private var _label:Label;
 	private var _input:TextInput;
 	
@@ -38,6 +55,7 @@ class StringUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
 		_label = new Label();
@@ -52,6 +70,10 @@ class StringUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		_label.text = _exposedValue.name;
+		_input.restrict = _stringValue.restrict;
+		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _stringValue.inputPercentWidth;
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -62,12 +84,20 @@ class StringUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_label.text = _exposedValue.name;
-			_input.editable = _exposedValue.isEditable;
-			_input.restrict = cast(_exposedValue, ExposedString).restrict;
 			_input.text = _exposedValue.value;
 			if (controlsEnabled) controlsEnable();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		_input.editable = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void

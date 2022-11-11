@@ -11,8 +11,11 @@ import ui.feathers.Spacing;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import utils.MathUtil;
+import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloat;
+import valedit.value.NumericMode;
 
 /**
  * ...
@@ -20,6 +23,21 @@ import valedit.value.ExposedFloat;
  */
 class FloatUI extends ValueUI 
 {
+	override function set_exposedValue(value:ExposedValue):ExposedValue 
+	{
+		if (value == null)
+		{
+			_floatValue = null;
+		}
+		else
+		{
+			_floatValue = cast value;
+		}
+		return super.set_exposedValue(value);
+	}
+	
+	private var _floatValue:ExposedFloat;
+	
 	private var _label:Label;
 	private var _input:TextInput;
 	
@@ -40,6 +58,7 @@ class FloatUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
 		_label = new Label();
@@ -47,7 +66,7 @@ class FloatUI extends ValueUI
 		addChild(_label);
 		
 		_input = new TextInput();
-		_input.restrict = "0123456789.";
+		_input.layoutData = new HorizontalLayoutData(100);
 		addChild(_input);
 	}
 	
@@ -55,6 +74,16 @@ class FloatUI extends ValueUI
 	{
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
+		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _floatValue.inputPercentWidth;
+		switch (_floatValue.numericMode)
+		{
+			case NumericMode.Positive :
+				_input.restrict = "0123456789.";
+			
+			default :
+				_input.restrict = "0123456789.-";
+		}
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -65,10 +94,22 @@ class FloatUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_input.editable = _exposedValue.isEditable;
 			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloat).precision));
 			if (controlsEnabled) controlsEnable();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_label.enabled = _exposedValue.isEditable;
+		_input.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void

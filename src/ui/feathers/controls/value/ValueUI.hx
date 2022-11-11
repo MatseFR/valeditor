@@ -19,9 +19,17 @@ class ValueUI extends LayoutGroup implements IValueUI
 	private function set_exposedValue(value:ExposedValue):ExposedValue
 	{
 		if (_exposedValue == value) return value;
-		if (_exposedValue != null) _exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+		if (_exposedValue != null) 
+		{
+			_exposedValue.removeEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
+			_exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+		}
 		_exposedValue = value;
-		if (_exposedValue != null) _exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+		if (_exposedValue != null)
+		{
+			_exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
+			_exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+		}
 		initExposedValue();
 		updateExposedValue();
 		return _exposedValue;
@@ -67,20 +75,25 @@ class ValueUI extends LayoutGroup implements IValueUI
 		
 	}
 	
-	public function initExposedValueObject():Void
-	{
-		updateExposedValue();
-	}
+	//public function initExposedValueObject():Void
+	//{
+		//updateExposedValue();
+	//}
 	
 	public function updateExposedValue(exceptControl:IValueUI = null):Void
 	{
 		
 	}
 	
-	private function onValueObjectChange(evt:Event):Void
+	private function onValueEditableChange(evt:ValueEvent):Void
 	{
-		//updateExposedValue();
-		initExposedValueObject();
+		
+	}
+	
+	private function onValueObjectChange(evt:ValueEvent):Void
+	{
+		//initExposedValueObject();
+		updateExposedValue();
 	}
 	
 }

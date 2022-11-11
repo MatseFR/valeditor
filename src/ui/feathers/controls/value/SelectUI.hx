@@ -10,6 +10,8 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedSelect;
 
@@ -19,6 +21,21 @@ import valedit.value.ExposedSelect;
  */
 class SelectUI extends ValueUI 
 {
+	override function set_exposedValue(value:ExposedValue):ExposedValue 
+	{
+		if (value == null)
+		{
+			_select = null;
+		}
+		else
+		{
+			_select = cast value;
+		}
+		return super.set_exposedValue(value);
+	}
+	
+	private var _select:ExposedSelect;
+	
 	private var _label:Label;
 	private var _list:PopUpListView;
 	private var _collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>();
@@ -40,10 +57,10 @@ class SelectUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
 		_label = new Label();
-		//_label.layoutData = new HorizontalLayoutData(25);
 		_label.variant = LabelVariant.VALUE_NAME;
 		addChild(_label);
 		
@@ -58,18 +75,14 @@ class SelectUI extends ValueUI
 		super.initExposedValue();
 		
 		_label.text = _exposedValue.name;
+		cast(_list.layoutData, HorizontalLayoutData).percentWidth = _select.listPercentWidth;
 		_collection.removeAll();
-		var choiceList:Array<String> = cast(_exposedValue, ExposedSelect).choiceList;
-		var valueList:Array<Dynamic> = cast(_exposedValue, ExposedSelect).valueList;
-		var count:Int = choiceList.length;
+		var count:Int = _select.choiceList.length;
 		for (i in 0...count)
 		{
-			//if (valueList[i] == _exposedValue.value)
-			//{
-				//selectedIndex = i;
-			//}
-			_collection.add({text:choiceList[i], value:valueList[i]});
+			_collection.add({text:_select.choiceList[i], value:_select.valueList[i]});
 		}
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -80,17 +93,22 @@ class SelectUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			
-			//var selectedIndex:Int = -1;
-			//
-			//
-			//if (selectedIndex != -1)
-			//{
-				//_list.selectedIndex = selectedIndex;
-			//}
 			_list.selectedIndex = cast(_exposedValue, ExposedSelect).valueList.indexOf(_exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_label.enabled = _exposedValue.isEditable;
+		_list.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void

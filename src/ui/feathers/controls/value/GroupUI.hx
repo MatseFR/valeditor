@@ -11,6 +11,7 @@ import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LayoutGroupVariant;
 import ui.feathers.variant.ToggleButtonVariant;
 import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IGroupUI;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedGroup;
@@ -123,6 +124,7 @@ class GroupUI extends ValueUI implements IGroupUI
 				addChild(_valueGroup);
 			}
 		}
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -137,6 +139,20 @@ class GroupUI extends ValueUI implements IGroupUI
 				control.updateExposedValue(exceptControl);
 			}
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_topButton.enabled = _exposedValue.isEditable;
+		_arrowDown.enabled = _exposedValue.isEditable;
+		_arrowRight.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void 

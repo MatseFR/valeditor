@@ -10,6 +10,8 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedIntRange;
 
@@ -19,6 +21,21 @@ import valedit.value.ExposedIntRange;
  */
 class IntRangeUI extends ValueUI 
 {
+	override function set_exposedValue(value:ExposedValue):ExposedValue 
+	{
+		if (value == null)
+		{
+			_intRange = null;
+		}
+		else
+		{
+			_intRange = cast value;
+		}
+		return super.set_exposedValue(value);
+	}
+	
+	private var _intRange:ExposedIntRange;
+	
 	private var _label:Label;
 	private var _slider:HSlider;
 	private var _input:TextInput;
@@ -40,19 +57,19 @@ class IntRangeUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
 		_label = new Label();
-		//_label.layoutData = new HorizontalLayoutData(25);
 		_label.variant = LabelVariant.VALUE_NAME;
 		addChild(_label);
 		
 		_slider = new HSlider();
-		_slider.layoutData = new HorizontalLayoutData(50);
+		_slider.layoutData = new HorizontalLayoutData(60);
 		addChild(_slider);
 		
 		_input = new TextInput();
-		_input.layoutData = new HorizontalLayoutData(50);
+		_input.layoutData = new HorizontalLayoutData(40);
 		addChild(_input);
 	}
 	
@@ -60,8 +77,19 @@ class IntRangeUI extends ValueUI
 	{
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
-		_slider.minimum = cast(_exposedValue, ExposedIntRange).min;
-		_slider.maximum = cast(_exposedValue, ExposedIntRange).max;
+		_slider.minimum = _intRange.min;
+		_slider.maximum = _intRange.max;
+		cast(_slider.layoutData, HorizontalLayoutData).percentWidth = _intRange.sliderPercentWidth;
+		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _intRange.inputPercentWidth;
+		if (_intRange.min < 0)
+		{
+			_input.restrict = "0123456789-";
+		}
+		else
+		{
+			_input.restrict = "0123456789";
+		}
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -73,11 +101,23 @@ class IntRangeUI extends ValueUI
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
 			_slider.value = _exposedValue.value;
-			_slider.enabled = _exposedValue.isEditable;
 			_input.text = Std.string(_exposedValue.value);
-			_input.enabled = _exposedValue.isEditable;
 			if (controlsEnabled) controlsEnable();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_label.enabled = _exposedValue.isEditable;
+		_slider.enabled = _exposedValue.isEditable;
+		_input.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void

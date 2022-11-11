@@ -14,6 +14,7 @@ import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
 import valedit.ExposedValue;
 import valedit.ValEdit;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObject;
 
@@ -120,12 +121,7 @@ class ObjectUI extends ValueUI
 		
 		_topButton.text = _exposedValue.name;
 		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
-	}
-	
-	override public function initExposedValueObject():Void 
-	{
-		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
-		super.initExposedValueObject();
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -142,8 +138,26 @@ class ObjectUI extends ValueUI
 			{
 				_valueGroup.updateExposedValues();
 			}
-			//_valueGroup.updateExposedValues();
 		}
+	}
+	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_trailGroup.enabled = _exposedValue.isEditable;
+		_valueGroup.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
+	}
+	
+	override function onValueObjectChange(evt:ValueEvent):Void 
+	{
+		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+		super.onValueObjectChange(evt);
 	}
 	
 	override function controlsDisable():Void 

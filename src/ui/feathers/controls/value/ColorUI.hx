@@ -18,6 +18,7 @@ import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
 import utils.ColorUtil;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 
 /**
@@ -70,6 +71,7 @@ class ColorUI extends ValueUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
+		vLayout.paddingRight = Padding.VALUE;
 		this.layout = vLayout;
 		
 		// Preview
@@ -87,7 +89,6 @@ class ColorUI extends ValueUI
 		
 		_preview = new LayoutGroup();
 		_preview.variant = LayoutGroupVariant.COLOR_PREVIEW;
-		//_preview.width = _preview.height = 32;
 		_previewSkin = new RectangleSkin(FillStyle.SolidColor(0xffffff, 1), LineStyle.SolidColor(2, 0x000000, 1));
 		_preview.backgroundSkin = _previewSkin;
 		_previewGroup.addChild(_preview);
@@ -199,8 +200,8 @@ class ColorUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		
 		_label.text = _exposedValue.name;
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -213,9 +214,31 @@ class ColorUI extends ValueUI
 		}
 	}
 	
+	private function updateEditable():Void
+	{
+		this.enabled = _exposedValue.isEditable;
+		_label.enabled = _exposedValue.isEditable;
+		_preview.enabled = _exposedValue.isEditable;
+		_hexLabel.enabled = _exposedValue.isEditable;
+		_hexInput.enabled = _exposedValue.isEditable;
+		_redLabel.enabled = _exposedValue.isEditable;
+		_redSlider.enabled = _exposedValue.isEditable;
+		_redInput.enabled = _exposedValue.isEditable;
+		_greenLabel.enabled = _exposedValue.isEditable;
+		_greenSlider.enabled = _exposedValue.isEditable;
+		_greenInput.enabled = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
+	}
+	
 	private function colorUpdate():Void
 	{
-		controlsDisable();
+		var controlsEnabled:Bool = _controlsEnabled;
+		if (controlsEnabled) controlsDisable();
 		var value:Int = _exposedValue.value;
 		_previewSkin.fill = FillStyle.SolidColor(value, 1);
 		_hexInput.text = ColorUtil.RGBtoHexString(value);
@@ -225,7 +248,7 @@ class ColorUI extends ValueUI
 		_greenSlider.value = ColorUtil.getGreen(value);
 		_blueInput.text = Std.string(ColorUtil.getBlue(value));
 		_blueSlider.value = ColorUtil.getBlue(value);
-		controlsEnable();
+		if (controlsEnabled) controlsEnable();
 	}
 	
 	override function controlsDisable():Void
