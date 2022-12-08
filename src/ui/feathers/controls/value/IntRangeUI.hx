@@ -79,6 +79,8 @@ class IntRangeUI extends ValueUI
 		_label.text = _exposedValue.name;
 		_slider.minimum = _intRange.min;
 		_slider.maximum = _intRange.max;
+		_slider.step = _intRange.step;
+		_slider.snapInterval = _intRange.step;
 		cast(_slider.layoutData, HorizontalLayoutData).percentWidth = _intRange.sliderPercentWidth;
 		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _intRange.inputPercentWidth;
 		if (_intRange.min < 0)

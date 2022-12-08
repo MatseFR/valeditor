@@ -17,7 +17,7 @@ class MathUtil
 
 		@since 1.0.0
 	**/
-	inline static public function roundToPrecision(number:Float, precision:Int = 0):Float {
+	static public function roundToPrecision(number:Float, precision:Int = 0):Float {
 		var decimalPlaces = Math.pow(10, precision);
 		return Math.fround(decimalPlaces * number) / decimalPlaces;
 	}

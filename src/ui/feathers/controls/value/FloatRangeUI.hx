@@ -82,6 +82,8 @@ class FloatRangeUI extends ValueUI
 		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _floatRange.inputPercentWidth;
 		_slider.minimum = _floatRange.min;
 		_slider.maximum = _floatRange.max;
+		_slider.step = _floatRange.step;
+		_slider.snapInterval = _floatRange.step;
 		if (_floatRange.min < 0)
 		{
 			_input.restrict = "0123456789.-";
@@ -102,7 +104,7 @@ class FloatRangeUI extends ValueUI
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
 			_slider.value = _exposedValue.value;
-			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloatRange).precision));
+			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, _floatRange.precision));
 			if (controlsEnabled) controlsEnable();
 		}
 	}

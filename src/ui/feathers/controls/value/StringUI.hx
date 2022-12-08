@@ -72,6 +72,7 @@ class StringUI extends ValueUI
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
 		_input.restrict = _stringValue.restrict;
+		_input.maxChars = _stringValue.maxChars;
 		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _stringValue.inputPercentWidth;
 		updateEditable();
 	}

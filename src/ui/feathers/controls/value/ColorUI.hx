@@ -4,6 +4,7 @@ import feathers.controls.HSlider;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
+import feathers.events.StyleProviderEvent;
 import feathers.graphics.FillStyle;
 import feathers.graphics.LineStyle;
 import feathers.layout.HorizontalAlign;
@@ -30,6 +31,7 @@ class ColorUI extends ValueUI
 	private var _previewGroup:LayoutGroup;
 	private var _label:Label;
 	private var _preview:LayoutGroup;
+	private var _previewColor:LayoutGroup;
 	private var _previewSkin:RectangleSkin;
 	
 	private var _hexGroup:LayoutGroup;
@@ -88,10 +90,14 @@ class ColorUI extends ValueUI
 		_previewGroup.addChild(_label);
 		
 		_preview = new LayoutGroup();
-		_preview.variant = LayoutGroupVariant.COLOR_PREVIEW;
-		_previewSkin = new RectangleSkin(FillStyle.SolidColor(0xffffff, 1), LineStyle.SolidColor(2, 0x000000, 1));
-		_preview.backgroundSkin = _previewSkin;
+		_preview.variant = LayoutGroupVariant.COLOR_PREVIEW_CONTAINER;
 		_previewGroup.addChild(_preview);
+		
+		_previewColor = new LayoutGroup();
+		_previewColor.variant = LayoutGroupVariant.COLOR_PREVIEW;
+		_previewSkin = new RectangleSkin(FillStyle.SolidColor(0xffffff));
+		_previewColor.backgroundSkin = _previewSkin;
+		_preview.addChild(_previewColor);
 		
 		// Hexa
 		_hexGroup = new LayoutGroup();
@@ -208,7 +214,7 @@ class ColorUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (_exposedValue != null)
 		{
 			colorUpdate();
 		}
@@ -240,7 +246,7 @@ class ColorUI extends ValueUI
 		var controlsEnabled:Bool = _controlsEnabled;
 		if (controlsEnabled) controlsDisable();
 		var value:Int = _exposedValue.value;
-		_previewSkin.fill = FillStyle.SolidColor(value, 1);
+		_previewSkin.fill = FillStyle.SolidColor(value);
 		_hexInput.text = ColorUtil.RGBtoHexString(value);
 		_redInput.text = Std.string(ColorUtil.getRed(value));
 		_redSlider.value = ColorUtil.getRed(value);

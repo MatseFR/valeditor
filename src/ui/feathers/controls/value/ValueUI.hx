@@ -75,11 +75,6 @@ class ValueUI extends LayoutGroup implements IValueUI
 		
 	}
 	
-	//public function initExposedValueObject():Void
-	//{
-		//updateExposedValue();
-	//}
-	
 	public function updateExposedValue(exceptControl:IValueUI = null):Void
 	{
 		
@@ -92,7 +87,6 @@ class ValueUI extends LayoutGroup implements IValueUI
 	
 	private function onValueObjectChange(evt:ValueEvent):Void
 	{
-		//initExposedValueObject();
 		updateExposedValue();
 	}
 	

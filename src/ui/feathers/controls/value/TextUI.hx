@@ -1,45 +1,33 @@
 package ui.feathers.controls.value;
-
 import feathers.controls.Label;
-import feathers.controls.TextInput;
+import feathers.controls.TextArea;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import ui.feathers.Spacing;
-import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
-import utils.MathUtil;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
-import valedit.value.ExposedFloat;
-import valedit.value.NumericMode;
+import valedit.value.ExposedText;
 
 /**
  * ...
  * @author Matse
  */
-class FloatUI extends ValueUI 
+class TextUI extends ValueUI 
 {
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		//if (value == null)
-		//{
-			//_floatValue = null;
-		//}
-		//else
-		//{
-			_floatValue = cast value;
-		//}
+		_textValue = cast value;
 		return super.set_exposedValue(value);
 	}
 	
-	private var _floatValue:ExposedFloat;
+	private var _textValue:ExposedText;
 	
 	private var _label:Label;
-	private var _input:TextInput;
+	private var _textArea:TextArea;
 	
 	/**
 	   
@@ -56,7 +44,7 @@ class FloatUI extends ValueUI
 		
 		var hLayout:HorizontalLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.DEFAULT;
 		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
@@ -65,24 +53,17 @@ class FloatUI extends ValueUI
 		_label.variant = LabelVariant.VALUE_NAME;
 		addChild(_label);
 		
-		_input = new TextInput();
-		_input.layoutData = new HorizontalLayoutData(100);
-		addChild(_input);
+		_textArea = new TextArea();
+		_textArea.layoutData = new HorizontalLayoutData(100);
+		addChild(_textArea);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
-		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _floatValue.inputPercentWidth;
-		switch (_floatValue.numericMode)
-		{
-			case NumericMode.Positive :
-				_input.restrict = "0123456789.";
-			
-			default :
-				_input.restrict = "0123456789.-";
-		}
+		_textArea.restrict = _textValue.restrict;
+		_textArea.maxChars = _textValue.maxChars;
 		updateEditable();
 	}
 	
@@ -94,16 +75,14 @@ class FloatUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloat).precision));
+			_textArea.text = _exposedValue.value;
 			if (controlsEnabled) controlsEnable();
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_input.enabled = _exposedValue.isEditable;
+		_textArea.editable = _exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -116,19 +95,19 @@ class FloatUI extends ValueUI
 	{
 		if (!_controlsEnabled) return;
 		super.controlsDisable();
-		_input.removeEventListener(Event.CHANGE, onInputChange);
+		_textArea.removeEventListener(Event.CHANGE, onInputChange);
 	}
 	
 	override function controlsEnable():Void
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_input.addEventListener(Event.CHANGE, onInputChange);
+		_textArea.addEventListener(Event.CHANGE, onInputChange);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
-		_exposedValue.value = MathUtil.roundToPrecision(Std.parseFloat(_input.text), cast(_exposedValue, ExposedFloat).precision);
+		_exposedValue.value = _textArea.text;
 	}
 	
 }

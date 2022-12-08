@@ -8,10 +8,8 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
-import valedit.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
-import valedit.value.ExposedBool;
 
 /**
  * ...
@@ -19,21 +17,6 @@ import valedit.value.ExposedBool;
  */
 class BoolUI extends ValueUI 
 {
-	//override function set_exposedValue(value:ExposedValue):ExposedValue 
-	//{
-		//if (value == null)
-		//{
-			//_boolValue = null;
-		//}
-		//else
-		//{
-			//_boolValue = cast value;
-		//}
-		//return super.set_exposedValue(value);
-	//}
-	//
-	//private var _boolValue:ExposedBool;
-	
 	private var _label:Label;
 	private var _check:Check;
 	

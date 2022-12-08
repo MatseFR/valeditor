@@ -1,6 +1,7 @@
 package ui.feathers.theme.components;
 import feathers.controls.Label;
 import feathers.style.ClassVariantStyleProvider;
+import openfl.text.TextFormatAlign;
 import ui.feathers.theme.ValEditorTheme;
 import ui.feathers.variant.LabelVariant;
 
@@ -21,32 +22,37 @@ class LabelStyles
 	{
 		LabelStyles.theme = theme;
 		var styleProvider:ClassVariantStyleProvider = theme.styleProvider;
-		styleProvider.setStyleFunction(Label, LabelVariant.GROUP_NAME, group_name);
+		styleProvider.setStyleFunction(Label, LabelVariant.NOTE, note);
 		styleProvider.setStyleFunction(Label, LabelVariant.OBJECT_NAME, object_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.SUBVALUE_NAME, subValue_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.VALUE_NAME, value_name);
 	}
 	
-	static private function group_name(label:Label):Void
+	static private function note(label:Label):Void
 	{
-		label.textFormat = theme.getTextFormat_group();
+		label.textFormat = theme.getTextFormat_small_note(TextFormatAlign.JUSTIFY);
+		label.textFormat.italic = true;
+		label.wordWrap = true;
 	}
 	
 	static private function object_name(label:Label):Void
 	{
-		label.textFormat = theme.getTextFormat_object();
+		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
+		label.textFormat.bold = true;
+		label.wordWrap = true;
 	}
 	
 	static private function subValue_name(label:Label):Void
 	{
-		label.textFormat = theme.getTextFormat_subValue();
+		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
 		label.width = UIConfig.VALUE_NAME_WIDTH;
 		label.wordWrap = true;
 	}
 	
 	static private function value_name(label:Label):Void
 	{
-		label.textFormat = theme.getTextFormat_value();
+		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
+		label.textFormat.bold = true;
 		label.width = UIConfig.VALUE_NAME_WIDTH;
 		label.wordWrap = true;
 	}

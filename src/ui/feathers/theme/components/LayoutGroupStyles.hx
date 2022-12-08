@@ -1,10 +1,17 @@
 package ui.feathers.theme.components;
 import feathers.controls.LayoutGroup;
+import feathers.graphics.FillStyle;
+import feathers.layout.HorizontalAlign;
+import feathers.layout.HorizontalLayout;
 import feathers.layout.RelativePosition;
+import feathers.layout.VerticalAlign;
+import feathers.skins.HorizontalLineSkin;
 import feathers.skins.RectangleSkin;
 import feathers.skins.TriangleSkin;
 import feathers.skins.VerticalLineSkin;
 import feathers.style.ClassVariantStyleProvider;
+import ui.feathers.controls.value.SeparatorUI;
+import ui.feathers.controls.value.SpacingUI;
 import ui.feathers.theme.ValEditorTheme;
 import ui.feathers.variant.LayoutGroupVariant;
 
@@ -31,8 +38,12 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_RIGHT_OBJECT, arrow_right_object);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW, color_preview);
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW_CONTAINER, color_preview_container);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.OBJECT_TRAIL, object_trail);
+		
+		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
+		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_GROUP_CONTENT, toggleGroup_content);
 	}
@@ -75,25 +86,45 @@ class LayoutGroupStyles
 	
 	static private function color_preview(group:LayoutGroup):Void
 	{
-		group.width = group.height = 32;
+		group.width = group.height = 30;
+	}
+	
+	static private function color_preview_container(group:LayoutGroup):Void
+	{
+		var skin:RectangleSkin = new RectangleSkin();
+		skin.border = theme.getContrastBorder();
+		skin.width = skin.height = 32;
+		group.backgroundSkin = skin;
+		
+		var hLayout:HorizontalLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.CENTER;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		group.layout = hLayout;
 	}
 	
 	static private function object_trail(group:LayoutGroup):Void
 	{
 		var skin:VerticalLineSkin = new VerticalLineSkin(null, theme.getThemeBorder(2));
+		skin.width = Spacing.DEFAULT * 2;
 		group.backgroundSkin = skin;
-		group.width = 16;
+	}
+	
+	static private function separatorUI(separator:SeparatorUI):Void
+	{
+		var skin:HorizontalLineSkin = new HorizontalLineSkin(null, theme.getContrastBorderLight());
+		skin.height = Spacing.DEFAULT * 2;
+		separator.separator.backgroundSkin = skin;
+		separator.paddingLeft = separator.paddingRight = Spacing.DEFAULT * 4;
+	}
+	
+	static private function spacingUI(spacing:SpacingUI):Void
+	{
+		spacing.height = 16;
 	}
 	
 	static private function toggleGroup_content(group:LayoutGroup):Void
 	{
 		group.width = UIConfig.VALUE_NAME_WIDTH;
-	}
-	
-	static private function value(group:LayoutGroup):Void
-	{
-		var skin:RectangleSkin = new RectangleSkin();
-		group.backgroundSkin = skin;
 	}
 	
 }

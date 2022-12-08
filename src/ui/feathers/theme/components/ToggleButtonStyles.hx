@@ -35,8 +35,8 @@ class ToggleButtonStyles
 		skin.selectedFill = theme.getThemeFill();
 		skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
 		skin.setFillForState(ToggleButtonState.HOVER(true), theme.getThemeFillLight());
-		skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFillDark());
-		skin.setFillForState(ToggleButtonState.DOWN(true), theme.getThemeFillDark());
+		skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+		skin.setFillForState(ToggleButtonState.DOWN(true), theme.getThemeFill());
 		skin.border = theme.getLightBorderDarker();
 		skin.selectedBorder = theme.getThemeBorderDark();
 		skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getLightBorderDark());
@@ -49,7 +49,8 @@ class ToggleButtonStyles
 		btn.gap = Spacing.DEFAULT;
 		btn.setPadding(Padding.TOGGLE);
 		btn.horizontalAlign = HorizontalAlign.LEFT;
-		btn.textFormat = theme.getTextFormat_group();
+		btn.textFormat = theme.getTextFormat();
+		btn.textFormat.bold = true;
 	}
 	
 }
