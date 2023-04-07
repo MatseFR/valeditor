@@ -4,13 +4,13 @@ import ui.feathers.theme.components.LabelStyles;
 import ui.feathers.theme.components.LayoutGroupStyles;
 import ui.feathers.theme.components.ToggleButtonStyles;
 import ui.feathers.theme.components.ToggleLayoutGroupStyles;
-import ui.feathers.theme.flatcolor.FlatColorTheme;
+import ui.feathers.theme.simple.SimpleTheme;
 
 /**
  * ...
  * @author Matse
  */
-class ValEditorTheme extends FlatColorTheme
+class ValEditorTheme extends SimpleTheme
 {
 	
 	/**

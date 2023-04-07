@@ -1,10 +1,10 @@
 {
 	"name": "valeditor",
-	"url": "https://github.com/openfl/starling",
-	"license": "BSD",
+	"url": "https://github.com/MatseFR/valeditor",
+	"license": "MIT",
 	"tags": [ "openfl", "flash", "air", "js", "web", "cpp" ],
 	"description": "UI system for valedit and base editor",
-	"version": "1.0.0",
+	"version": "0.0.1",
 	"releasenote": "initial release",
 	"contributors": [ "matse" ],
 	"dependencies": {
