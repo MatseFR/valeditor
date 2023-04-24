@@ -25,7 +25,6 @@ class EditView extends LayoutGroup
 	public function new() 
 	{
 		super();
-		
 	}
 	
 	override function initialize():Void 

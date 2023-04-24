@@ -1,5 +1,7 @@
 package ui.feathers;
+import ui.feathers.controls.value.BitmapUI;
 import ui.feathers.controls.value.BoolUI;
+import ui.feathers.controls.value.ByteArrayUI;
 import ui.feathers.controls.value.ColorReadOnlyUI;
 import ui.feathers.controls.value.ColorUI;
 import ui.feathers.controls.value.FloatRangeUI;
@@ -12,9 +14,14 @@ import ui.feathers.controls.value.NameUI;
 import ui.feathers.controls.value.ObjectUI;
 import ui.feathers.controls.value.SelectUI;
 import ui.feathers.controls.value.SeparatorUI;
+import ui.feathers.controls.value.SoundUI;
 import ui.feathers.controls.value.SpacingUI;
+#if starling
+import ui.feathers.controls.value.starling.StarlingTextureUI;
+#end
 import ui.feathers.controls.value.StringUI;
 import ui.feathers.controls.value.NoteUI;
+import ui.feathers.controls.value.TextAssetUI;
 import ui.feathers.controls.value.TextUI;
 import valedit.ui.IValueUI;
 
@@ -24,6 +31,14 @@ import valedit.ui.IValueUI;
  */
 class FeathersFactories 
 {
+	/**
+	   
+	   @return
+	**/
+	static public function exposedBitmap():IValueUI
+	{
+		return new BitmapUI();
+	}
 	
 	/**
 	   
@@ -32,6 +47,15 @@ class FeathersFactories
 	static public function exposedBool():IValueUI
 	{
 		return new BoolUI();
+	}
+	
+	/**
+	   
+	   @return
+	**/
+	static public function exposedByteArray():IValueUI
+	{
+		return new ByteArrayUI();
 	}
 	
 	/**
@@ -155,6 +179,15 @@ class FeathersFactories
 	   
 	   @return
 	**/
+	static public function exposedSound():IValueUI
+	{
+		return new SoundUI();
+	}
+	
+	/**
+	   
+	   @return
+	**/
 	static public function exposedSpacing():IValueUI
 	{
 		return new SpacingUI();
@@ -177,5 +210,21 @@ class FeathersFactories
 	{
 		return new TextUI();
 	}
+	
+	/**
+	   
+	   @return
+	**/
+	static public function exposedTextAsset():IValueUI
+	{
+		return new TextAssetUI();
+	}
+	
+	#if starling
+	static public function exposedStarlingTexture():IValueUI
+	{
+		return new StarlingTextureUI();
+	}
+	#end
 	
 }

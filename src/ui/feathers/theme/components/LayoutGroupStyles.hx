@@ -40,6 +40,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW, color_preview);
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW_CONTAINER, color_preview_container);
 		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ITEM_PREVIEW, item_preview);
+		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.OBJECT_TRAIL, object_trail);
 		
 		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
@@ -95,6 +97,16 @@ class LayoutGroupStyles
 		skin.border = theme.getContrastBorder();
 		skin.width = skin.height = 32;
 		group.backgroundSkin = skin;
+		
+		var hLayout:HorizontalLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.CENTER;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		group.layout = hLayout;
+	}
+	
+	static private function item_preview(group:LayoutGroup):Void
+	{
+		group.width = group.height = UIConfig.ASSET_PREVIEW_SIZE;
 		
 		var hLayout:HorizontalLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;

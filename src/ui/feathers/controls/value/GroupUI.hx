@@ -5,6 +5,7 @@ import feathers.controls.ToggleButton;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import openfl.events.Event;
 import ui.feathers.Spacing;
 import ui.feathers.controls.value.ValueUI;
@@ -79,6 +80,28 @@ class GroupUI extends ValueUI implements IGroupUI
 	{
 		_controls.push(control);
 		_valueGroup.addChild(cast control);
+	}
+	
+	public function addExposedControlAfter(control:IValueUI, afterControl:IValueUI):Void
+	{
+		var index:Int = _controls.indexOf(afterControl);
+		if (index == -1)
+		{
+			throw new Error("GroupUI.addExposedControlAfter ::: afterControl cannot be found");
+		}
+		_controls.insert(index + 1, control);
+		_valueGroup.addChildAt(cast control, index + 1);
+	}
+	
+	public function addExposedControlBefore(control:IValueUI, beforeControl:IValueUI):Void
+	{
+		var index:Int = _controls.indexOf(beforeControl);
+		if (index == -1)
+		{
+			throw new Error("GroupUI.addExposedControlBefore ::: beforeControl cannot be found");
+		}
+		_controls.insert(index, control);
+		_valueGroup.addChildAt(cast control, index);
 	}
 	
 	public function removeExposedControl(control:IValueUI):Void

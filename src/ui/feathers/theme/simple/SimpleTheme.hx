@@ -758,26 +758,6 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		return new TextFormat(this._fontName, this._fontSizeSmall, this.contrastColorLight, null, null, null, null, null, align);
 	}
-	
-	//public function getTextFormat_group(align:TextFormatAlign = LEFT):TextFormat
-	//{
-		//return new TextFormat(this.fontName, this.fontSizeGroup, this.contrastColor, true, null, null, null, null, align);
-	//}
-	//
-	//public function getTextFormat_object(align:TextFormatAlign = RIGHT):TextFormat
-	//{
-		//return new TextFormat(this.fontName, this.fontSizeValue, this.contrastColor, true, null, null, null, null, align);
-	//}
-	//
-	//public function getTextFormat_subValue(align:TextFormatAlign = RIGHT):TextFormat
-	//{
-		//return new TextFormat(this.fontName, this.fontSizeValue, this.contrastColor, null, null, null, null, null, align);
-	//}
-	//
-	//public function getTextFormat_value(align:TextFormatAlign = RIGHT):TextFormat
-	//{
-		//return new TextFormat(this.fontName, this.fontSizeValue, this.contrastColor, true, null, null, null, null, align);
-	//}
 	//####################################################################################################
 	//\TextFormat
 	//####################################################################################################
