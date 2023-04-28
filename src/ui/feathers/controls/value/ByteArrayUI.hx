@@ -157,7 +157,7 @@ class ByteArrayUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showBinaryAssets(assetSelected);
+		FeathersWindows.showBinaryAssets(assetSelected, null, "Select ByteArray asset");
 	}
 	
 	private function assetSelected(asset:BinaryAsset):Void

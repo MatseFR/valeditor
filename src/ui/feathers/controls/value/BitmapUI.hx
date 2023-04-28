@@ -186,7 +186,7 @@ class BitmapUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showBitmapAssets(assetSelected);
+		FeathersWindows.showBitmapAssets(assetSelected, null, "Select Bitmap asset");
 	}
 	
 	private function assetSelected(asset:BitmapAsset):Void

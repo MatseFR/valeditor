@@ -1,10 +1,11 @@
-package ui.feathers.window;
+package ui.feathers.window.asset;
 
 import feathers.data.ListViewItemState;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.display.BitmapData;
 import openfl.net.FileFilter;
 import ui.feathers.renderers.BitmapAssetItemRenderer;
+import ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
 import valedit.asset.BitmapAsset;
 #if desktop

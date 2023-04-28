@@ -1,4 +1,5 @@
-package ui.feathers.window;
+package ui.feathers.window.asset;
+import ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
 import feathers.data.ListViewItemState;
 import feathers.utils.DisplayObjectRecycler;

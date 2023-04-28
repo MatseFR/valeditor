@@ -10,6 +10,7 @@ import openfl.events.Event;
 import ui.feathers.Spacing;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import ui.feathers.variant.TextInputVariant;
 import utils.MathUtil;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
@@ -66,6 +67,7 @@ class FloatUI extends ValueUI
 		addChild(_label);
 		
 		_input = new TextInput();
+		_input.variant = TextInputVariant.NUMERIC;
 		_input.layoutData = new HorizontalLayoutData(100);
 		addChild(_input);
 	}

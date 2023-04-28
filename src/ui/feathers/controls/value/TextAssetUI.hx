@@ -151,7 +151,7 @@ class TextAssetUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showTextAssets(assetSelected);
+		FeathersWindows.showTextAssets(assetSelected, null, "Select Text asset");
 	}
 	
 	private function assetSelected(asset:TextAsset):Void

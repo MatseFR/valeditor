@@ -1,4 +1,4 @@
-package ui.feathers.window.starling;
+package ui.feathers.window.asset.starling;
 import feathers.controls.Button;
 import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;

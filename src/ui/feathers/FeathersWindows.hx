@@ -1,20 +1,21 @@
 package ui.feathers;
 import feathers.core.PopUpManager;
 import openfl.Lib;
-import ui.feathers.window.BinaryAssetsWindow;
-import ui.feathers.window.BitmapAssetsWindow;
-import ui.feathers.window.ObjectEditWindow;
-import ui.feathers.window.SoundAssetsWindow;
-import ui.feathers.window.TextAssetsWindow;
+import ui.feathers.window.asset.AssetBrowser;
+import ui.feathers.window.asset.BinaryAssetsWindow;
+import ui.feathers.window.asset.BitmapAssetsWindow;
+import ui.feathers.window.asset.ObjectEditWindow;
+import ui.feathers.window.asset.SoundAssetsWindow;
+import ui.feathers.window.asset.TextAssetsWindow;
 import valedit.asset.BinaryAsset;
 import valedit.asset.BitmapAsset;
 import valedit.asset.SoundAsset;
 import valedit.asset.TextAsset;
 #if starling
 import valedit.asset.starling.StarlingAtlasAsset;
-import ui.feathers.window.starling.StarlingAtlasAssetsWindow;
+import ui.feathers.window.asset.starling.StarlingAtlasAssetsWindow;
 import valedit.asset.starling.StarlingTextureAsset;
-import ui.feathers.window.starling.StarlingTextureAssetsWindow;
+import ui.feathers.window.asset.starling.StarlingTextureAssetsWindow;
 #end
 
 /**
@@ -24,6 +25,8 @@ import ui.feathers.window.starling.StarlingTextureAssetsWindow;
 class FeathersWindows 
 {
 	// Assets
+	static private var _assetBrowser:AssetBrowser;
+	
 	static private var _binaryAssets:BinaryAssetsWindow;
 	static private var _bitmapAssets:BitmapAssetsWindow;
 	static private var _soundAssets:SoundAssetsWindow;
@@ -35,6 +38,19 @@ class FeathersWindows
 	
 	// Edit
 	static private var _objectEdit:ObjectEditWindow;
+	
+	static public function showAssetBrowser():Void
+	{
+		if (_assetBrowser == null)
+		{
+			_assetBrowser = new AssetBrowser();
+		}
+		
+		_assetBrowser.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2;
+		_assetBrowser.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		PopUpManager.addPopUp(_assetBrowser, Lib.current.stage);
+	}
 	
 	static public function showBinaryAssets(?selectionCallback:BinaryAsset->Void, ?cancelCallback:Void->Void, title:String = "Binary assets"):Void
 	{

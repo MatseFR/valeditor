@@ -9,15 +9,14 @@ import ui.feathers.theme.ValEditorTheme;
  * ...
  * @author Matse
  */
-@:access(ui.feathers.theme.ValEditorTheme)
 class ToggleLayoutGroupStyles 
 {
 	static private var theme:ValEditorTheme;
 	
-	static public function initialize(theme:ValEditorTheme):Void
+	static public function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
 		ToggleLayoutGroupStyles.theme = theme;
-		var styleProvider:ClassVariantStyleProvider = theme.styleProvider;
+		
 		styleProvider.setStyleFunction(ToggleLayoutGroup, null, default_style);
 	}
 	

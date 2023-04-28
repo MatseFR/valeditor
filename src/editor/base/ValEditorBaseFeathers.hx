@@ -36,7 +36,10 @@ import valedit.value.ExposedSelect;
 import valedit.value.ExposedSeparator;
 import valedit.value.ExposedSound;
 import valedit.value.ExposedSpacing;
-import valedit.value.ExposedStarlingTexture;
+#if starling
+import valedit.value.starling.ExposedStarlingAtlas;
+import valedit.value.starling.ExposedStarlingTexture;
+#end
 import valedit.value.ExposedString;
 import valedit.value.ExposedText;
 import valedit.value.ExposedTextAsset;
@@ -125,6 +128,7 @@ class ValEditorBaseFeathers extends Application
 		ValEdit.registerUIClass(ExposedTextAsset, FeathersFactories.exposedTextAsset);
 		
 		#if starling
+		ValEdit.registerUIClass(ExposedStarlingAtlas, FeathersFactories.exposedStarlingAtlas);
 		ValEdit.registerUIClass(ExposedStarlingTexture, FeathersFactories.exposedStarlingTexture);
 		#end
 	}

@@ -1,4 +1,4 @@
-package ui.feathers.window;
+package ui.feathers.window.asset;
 
 import feathers.controls.Button;
 import feathers.controls.Label;
@@ -63,6 +63,22 @@ class AssetsWindow<T> extends Panel
 		return this._filesEnabled = value;
 	}
 	
+	public var headerEnabled(get, set):Bool;
+	private var _headerEnabled:Bool = true;
+	private function get_headerEnabled():Bool { return this._headerEnabled; }
+	private function set_headerEnabled(value:Bool):Bool
+	{
+		return this._headerEnabled = value;
+	}
+	
+	public var removeEnabled(get, set):Bool;
+	private var _removeEnabled:Bool = false;
+	private function get_removeEnabled():Bool { return this._removeEnabled; }
+	private function set_removeEnabled(value:Bool):Bool
+	{
+		return this._removeEnabled = value;
+	}
+	
 	public var selectionCallback(get, set):T->Void;
 	private var _selectionCallback:T->Void;
 	private function get_selectionCallback():T->Void { return this._selectionCallback; }
@@ -77,7 +93,7 @@ class AssetsWindow<T> extends Panel
 	private function set_title(value:String):String
 	{
 		if (value == null) value = "";
-		if (_initialized)
+		if (_titleLabel != null)
 		{
 			_titleLabel.text = value;
 		}
@@ -95,6 +111,7 @@ class AssetsWindow<T> extends Panel
 	private var _addFolderButton:Button;
 	#end
 	private var _cancelButton:Button;
+	private var _removeButton:Button;
 	
 	private var _buttonList:Array<Button> = new Array<Button>();
 	
@@ -126,17 +143,20 @@ class AssetsWindow<T> extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		_headerGroup = new LayoutGroup();
-		_headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		_headerGroup.layout = hLayout;
-		this.header = _headerGroup;
-		
-		_titleLabel = new Label(this._title);
-		_headerGroup.addChild(_titleLabel);
+		if (_headerEnabled)
+		{
+			_headerGroup = new LayoutGroup();
+			_headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+			hLayout = new HorizontalLayout();
+			hLayout.horizontalAlign = HorizontalAlign.CENTER;
+			hLayout.verticalAlign = VerticalAlign.MIDDLE;
+			hLayout.setPadding(Padding.DEFAULT);
+			_headerGroup.layout = hLayout;
+			this.header = _headerGroup;
+			
+			_titleLabel = new Label(this._title);
+			_headerGroup.addChild(_titleLabel);
+		}
 		
 		_footerGroup = new LayoutGroup();
 		_footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
@@ -171,12 +191,21 @@ class AssetsWindow<T> extends Panel
 		}
 		_buttonList.push(_cancelButton);
 		
+		if (_removeEnabled)
+		{
+			_removeButton = new Button("remove selected");
+			_removeButton.enabled = false;
+			_footerGroup.addChild(_removeButton);
+			//_buttonList.push(_removeButton);
+		}
+		
 		_assetList = new ListView();
 		_assetList.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		listLayout = new TiledRowsListLayout();
 		listLayout.setPadding(Padding.DEFAULT);
 		listLayout.setGap(Spacing.DEFAULT);
 		_assetList.layout = listLayout;
+		_assetList.allowMultipleSelection = _removeEnabled;
 		addChild(_assetList);
 		
 		//controlsEnable();
@@ -202,6 +231,7 @@ class AssetsWindow<T> extends Panel
 		_addFolderButton.removeEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
 		if (_cancelButton != null) _cancelButton.removeEventListener(TriggerEvent.TRIGGER, onCancelButton);
+		if (_removeButton != null) _removeButton.removeEventListener(TriggerEvent.TRIGGER, onRemoveButton);
 		_controlsEnabled = false;
 	}
 	
@@ -214,6 +244,7 @@ class AssetsWindow<T> extends Panel
 		_addFolderButton.addEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
 		if (_cancelButton != null) _cancelButton.addEventListener(TriggerEvent.TRIGGER, onCancelButton);
+		if (_removeButton != null) _removeButton.addEventListener(TriggerEvent.TRIGGER, onRemoveButton);
 		_controlsEnabled = true;
 	}
 	
@@ -224,6 +255,7 @@ class AssetsWindow<T> extends Panel
 		{
 			btn.enabled = false;
 		}
+		if (_removeButton != null) _removeButton.enabled = false;
 	}
 	
 	private function enableUI():Void
@@ -233,6 +265,7 @@ class AssetsWindow<T> extends Panel
 		{
 			btn.enabled = true;
 		}
+		if (_removeButton != null) _removeButton.enabled = _assetList.selectedIndices.length != 0;
 	}
 	
 	private function onSelectionChange(evt:Event):Void
@@ -244,6 +277,10 @@ class AssetsWindow<T> extends Panel
 		if (this._closeOnSelection)
 		{
 			PopUpManager.removePopUp(this);
+		}
+		if (_removeButton != null)
+		{
+			_removeButton.enabled = _assetList.selectedIndices.length != 0;
 		}
 	}
 	
@@ -301,6 +338,11 @@ class AssetsWindow<T> extends Panel
 	{
 		PopUpManager.removePopUp(this);
 		if (_cancelCallback != null) _cancelCallback();
+	}
+	
+	private function onRemoveButton(evt:TriggerEvent):Void
+	{
+		
 	}
 	
 }

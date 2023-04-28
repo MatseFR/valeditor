@@ -23,6 +23,7 @@ import ui.feathers.controls.value.StringUI;
 import ui.feathers.controls.value.NoteUI;
 import ui.feathers.controls.value.TextAssetUI;
 import ui.feathers.controls.value.TextUI;
+import ui.feathers.controls.value.starling.StarlingAtlasUI;
 import valedit.ui.IValueUI;
 
 /**
@@ -221,6 +222,11 @@ class FeathersFactories
 	}
 	
 	#if starling
+	static public function exposedStarlingAtlas():IValueUI
+	{
+		return new StarlingAtlasUI();
+	}
+	
 	static public function exposedStarlingTexture():IValueUI
 	{
 		return new StarlingTextureUI();

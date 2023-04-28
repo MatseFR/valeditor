@@ -12,7 +12,6 @@ import ui.feathers.variant.ToggleButtonVariant;
  * ...
  * @author Matse
  */
-@:access(ui.feathers.theme.ValEditorTheme)
 class ToggleButtonStyles 
 {
 	static private var theme:ValEditorTheme;
@@ -21,10 +20,10 @@ class ToggleButtonStyles
 	   
 	   @param	theme
 	**/
-	public static function initialize(theme:ValEditorTheme):Void
+	public static function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
 		ToggleButtonStyles.theme = theme;
-		var styleProvider:ClassVariantStyleProvider = theme.styleProvider;
+		
 		styleProvider.setStyleFunction(ToggleButton, ToggleButtonVariant.GROUP_HEADER, group);
 	}
 	

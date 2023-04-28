@@ -1,4 +1,4 @@
-package ui.feathers.window;
+package ui.feathers.window.asset;
 
 import feathers.controls.Button;
 import feathers.controls.Label;

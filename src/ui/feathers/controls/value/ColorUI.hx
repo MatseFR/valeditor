@@ -16,6 +16,7 @@ import ui.feathers.Spacing;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
+import ui.feathers.variant.TextInputVariant;
 import utils.ColorUtil;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
@@ -111,6 +112,8 @@ class ColorUI extends ValueUI
 		_hexGroup.addChild(_hexLabel);
 		
 		_hexInput = new TextInput();
+		_hexInput.variant = TextInputVariant.NUMERIC;
+		_hexInput.layoutData = new HorizontalLayoutData(100);
 		_hexInput.restrict = "0123456789abcdef";
 		_hexInput.maxChars = 6;
 		_hexInput.text = "ffffff";
@@ -138,6 +141,7 @@ class ColorUI extends ValueUI
 		_redGroup.addChild(_redSlider);
 		
 		_redInput = new TextInput();
+		_redInput.variant = TextInputVariant.NUMERIC;
 		_redInput.layoutData = new HorizontalLayoutData(25);
 		_redInput.restrict = "0123456789";
 		_redInput.maxChars = 3;
@@ -166,6 +170,7 @@ class ColorUI extends ValueUI
 		_greenGroup.addChild(_greenSlider);
 		
 		_greenInput = new TextInput();
+		_greenInput.variant = TextInputVariant.NUMERIC;
 		_greenInput.layoutData = new HorizontalLayoutData(25);
 		_greenInput.restrict = "0123456789";
 		_greenInput.maxChars = 3;
@@ -194,6 +199,7 @@ class ColorUI extends ValueUI
 		_blueGroup.addChild(_blueSlider);
 		
 		_blueInput = new TextInput();
+		_blueInput.variant = TextInputVariant.NUMERIC;
 		_blueInput.layoutData = new HorizontalLayoutData(25);
 		_blueInput.restrict = "0123456789";
 		_blueInput.maxChars = 3;

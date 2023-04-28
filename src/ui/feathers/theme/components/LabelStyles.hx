@@ -18,10 +18,10 @@ class LabelStyles
 	   
 	   @param	theme
 	**/
-	static public function initialize(theme:ValEditorTheme):Void
+	static public function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
 		LabelStyles.theme = theme;
-		var styleProvider:ClassVariantStyleProvider = theme.styleProvider;
+		
 		styleProvider.setStyleFunction(Label, LabelVariant.NOTE, note);
 		styleProvider.setStyleFunction(Label, LabelVariant.OBJECT_NAME, object_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.SUBVALUE_NAME, subValue_name);
@@ -45,7 +45,9 @@ class LabelStyles
 	static private function subValue_name(label:Label):Void
 	{
 		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
-		label.width = UIConfig.VALUE_NAME_WIDTH;
+		//label.width = UIConfig.VALUE_NAME_WIDTH;
+		label.minWidth = UIConfig.VALUE_NAME_MIN_WIDTH;
+		label.maxWidth = UIConfig.VALUE_NAME_MAX_WIDTH;
 		label.wordWrap = true;
 	}
 	
@@ -53,7 +55,9 @@ class LabelStyles
 	{
 		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
 		label.textFormat.bold = true;
-		label.width = UIConfig.VALUE_NAME_WIDTH;
+		//label.width = UIConfig.VALUE_NAME_WIDTH;
+		label.minWidth = UIConfig.VALUE_NAME_MIN_WIDTH;
+		label.maxWidth = UIConfig.VALUE_NAME_MAX_WIDTH;
 		label.wordWrap = true;
 	}
 	

@@ -26,10 +26,10 @@ class StarlingAtlasAssetItemRenderer extends LayoutGroupItemRenderer
 		
 		if (value != null)
 		{
-			_preview.bitmapData = value.bitmapAsset.content;
-			var scale:Float = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
+			_preview.bitmapData = value.bitmapAsset.preview;
+			//var scale:Float = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
 			
-			_preview.scaleX = _preview.scaleY = scale;
+			//_preview.scaleX = _preview.scaleY = scale;
 			_previewGroup.setInvalid();
 			
 			_nameLabel.text = value.name;

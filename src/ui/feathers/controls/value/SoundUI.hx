@@ -179,7 +179,7 @@ class SoundUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showSoundAssets(assetSelected);
+		FeathersWindows.showSoundAssets(assetSelected, null, "Select sound asset");
 	}
 	
 	private function assetSelected(asset:SoundAsset):Void

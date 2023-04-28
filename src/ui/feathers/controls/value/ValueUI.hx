@@ -10,6 +10,7 @@ import valedit.ui.IValueUI;
  * ...
  * @author Matse
  */
+@:styleContext
 class ValueUI extends LayoutGroup implements IValueUI
 {
 	public var exposedValue(get, set):ExposedValue;

@@ -9,6 +9,7 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
+import ui.feathers.variant.TextInputVariant;
 import valedit.ExposedValue;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedInt;
@@ -63,6 +64,7 @@ class IntUI extends ValueUI
 		addChild(_label);
 		
 		_input = new TextInput();
+		_input.variant = TextInputVariant.NUMERIC;
 		_input.layoutData = new HorizontalLayoutData(100);
 		addChild(_input);
 	}

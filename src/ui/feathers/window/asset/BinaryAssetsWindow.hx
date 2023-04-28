@@ -1,8 +1,9 @@
-package ui.feathers.window;
+package ui.feathers.window.asset;
 import feathers.data.ListViewItemState;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.utils.ByteArray;
 import ui.feathers.renderers.BinaryAssetItemRenderer;
+import ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
 import valedit.asset.BinaryAsset;
 #if desktop

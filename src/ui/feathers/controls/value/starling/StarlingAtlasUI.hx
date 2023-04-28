@@ -1,4 +1,5 @@
 package ui.feathers.controls.value.starling;
+
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
@@ -8,16 +9,12 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import feathers.utils.ScaleUtil;
 import openfl.display.Bitmap;
-import starling.textures.SubTexture;
-import starling.textures.Texture;
-import ui.feathers.FeathersWindows;
-import ui.feathers.Padding;
-import ui.feathers.Spacing;
+import starling.textures.TextureAtlas;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import valedit.asset.AssetLib;
-import valedit.asset.starling.StarlingTextureAsset;
+import valedit.asset.starling.StarlingAtlasAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 
@@ -25,7 +22,7 @@ import valedit.ui.IValueUI;
  * ...
  * @author Matse
  */
-class StarlingTextureUI extends ValueUI 
+class StarlingAtlasUI extends ValueUI 
 {
 	private var _label:Label;
 	
@@ -77,7 +74,7 @@ class StarlingTextureUI extends ValueUI
 		addChild(_contentGroup);
 		
 		_previewGroup = new LayoutGroup();
-		_previewGroup.maxHeight = UIConfig.ASSET_PREVIEW_SIZE;
+		//_previewGroup.maxHeight = UIConfig.ASSET_PREVIEW_SIZE;
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.CENTER;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
@@ -129,10 +126,10 @@ class StarlingTextureUI extends ValueUI
 		{
 			var controlsEnabled:Bool = _controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			var value:Texture = _exposedValue.value;
+			var value:TextureAtlas = _exposedValue.value;
 			if (value != null)
 			{
-				assetUpdate(AssetLib.getStarlingTextureAssetFromTexture(value));
+				assetUpdate(AssetLib.getStarlingAtlasAssetFromAtlas(value));
 			}
 			else
 			{
@@ -182,16 +179,16 @@ class StarlingTextureUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showStarlingTextureAssetsWindow(assetSelected, null, "Select Texture asset");
+		FeathersWindows.showStarlingAtlasAssetsWindow(assetSelected, null, "Select Atlas asset");
 	}
 	
-	private function assetSelected(asset:StarlingTextureAsset):Void
+	private function assetSelected(asset:StarlingAtlasAsset):Void
 	{
 		_exposedValue.value = asset;
 		assetUpdate(asset);
 	}
 	
-	private function assetUpdate(asset:StarlingTextureAsset):Void
+	private function assetUpdate(asset:StarlingAtlasAsset):Void
 	{
 		if (asset == null)
 		{
@@ -204,37 +201,20 @@ class StarlingTextureUI extends ValueUI
 		{
 			_nameLabel.text = asset.name;
 			_pathLabel.text = asset.path;
-			_sizeLabel.text = asset.content.width + "x" + asset.content.height;
+			_sizeLabel.text = asset.content.texture.width + "x" + asset.content.texture.height;
 			previewUpdate(asset);
 		}
 	}
 	
-	private function previewUpdate(asset:StarlingTextureAsset):Void
+	private function previewUpdate(asset:StarlingAtlasAsset):Void
 	{
 		if (asset == null)
 		{
 			_preview.bitmapData = null;
-			_preview.scrollRect = null;
 		}
 		else
 		{
-			var scale:Float;
-			_preview.scaleX = _preview.scaleY = 1;
-			_preview.bitmapData = asset.bitmapAsset.content;
-			if (Std.isOfType(asset.content, SubTexture))
-			{
-				var sub:SubTexture = cast asset.content;
-				_preview.scrollRect = sub.region;
-				_preview.width = _preview.scrollRect.width;
-				_preview.height = _preview.scrollRect.height;
-				scale = ScaleUtil.scaleToFit(_preview.scrollRect.width, _preview.scrollRect.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			}
-			else
-			{
-				_preview.scrollRect = null;
-				scale = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			}
-			_preview.scaleX = _preview.scaleY = scale;
+			_preview.bitmapData = asset.bitmapAsset.preview;
 		}
 		_previewGroup.setInvalid();
 	}

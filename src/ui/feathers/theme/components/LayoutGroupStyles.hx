@@ -1,6 +1,5 @@
 package ui.feathers.theme.components;
 import feathers.controls.LayoutGroup;
-import feathers.graphics.FillStyle;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.RelativePosition;
@@ -12,6 +11,7 @@ import feathers.skins.VerticalLineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import ui.feathers.controls.value.SeparatorUI;
 import ui.feathers.controls.value.SpacingUI;
+import ui.feathers.controls.value.ValueUI;
 import ui.feathers.theme.ValEditorTheme;
 import ui.feathers.variant.LayoutGroupVariant;
 
@@ -19,7 +19,6 @@ import ui.feathers.variant.LayoutGroupVariant;
  * ...
  * @author Matse
  */
-@:access(ui.feathers.theme.ValEditorTheme)
 class LayoutGroupStyles 
 {
 	static private var theme:ValEditorTheme;
@@ -28,10 +27,10 @@ class LayoutGroupStyles
 	   
 	   @param	theme
 	**/
-	static public function initialize(theme:ValEditorTheme):Void
+	static public function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
 		LayoutGroupStyles.theme = theme;
-		var styleProvider:ClassVariantStyleProvider = theme.styleProvider;
+		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_DOWN_GROUP, arrow_down_group);
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_DOWN_OBJECT, arrow_down_object);
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_RIGHT_GROUP, arrow_right_group);
@@ -48,6 +47,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_GROUP_CONTENT, toggleGroup_content);
+		
+		styleProvider.setStyleFunction(ValueUI, null, valueUI);
 	}
 	
 	static private function arrow_down_group(group:LayoutGroup):Void
@@ -136,7 +137,14 @@ class LayoutGroupStyles
 	
 	static private function toggleGroup_content(group:LayoutGroup):Void
 	{
-		group.width = UIConfig.VALUE_NAME_WIDTH;
+		//group.width = UIConfig.VALUE_NAME_WIDTH;
+		//trace("pouet");
+	}
+	
+	static private function valueUI(value:ValueUI):Void
+	{
+		value.minWidth = UIConfig.VALUE_MIN_WIDTH;
+		value.maxWidth = UIConfig.VALUE_MAX_WIDTH;
 	}
 	
 }
