@@ -144,6 +144,7 @@ class ObjectUI extends ValueUI
 	private function updateEditable():Void
 	{
 		this.enabled = _exposedValue.isEditable;
+		_topButton.enabled = _exposedValue.isEditable;
 		_trailGroup.enabled = _exposedValue.isEditable;
 		_valueGroup.enabled = _exposedValue.isEditable;
 	}
