@@ -66,12 +66,11 @@ class IntRangeUI extends ValueUI
 		addChild(_label);
 		
 		_slider = new HSlider();
-		_slider.layoutData = new HorizontalLayoutData(60);
+		_slider.layoutData = new HorizontalLayoutData(100);
 		addChild(_slider);
 		
 		_input = new TextInput();
-		_input.variant = TextInputVariant.NUMERIC;
-		_input.layoutData = new HorizontalLayoutData(40);
+		_input.variant = TextInputVariant.NUMERIC_MEDIUM;
 		addChild(_input);
 	}
 	
@@ -83,8 +82,7 @@ class IntRangeUI extends ValueUI
 		_slider.maximum = _intRange.max;
 		_slider.step = _intRange.step;
 		_slider.snapInterval = _intRange.step;
-		cast(_slider.layoutData, HorizontalLayoutData).percentWidth = _intRange.sliderPercentWidth;
-		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _intRange.inputPercentWidth;
+		_input.variant = _intRange.inputVariant;
 		if (_intRange.min < 0)
 		{
 			_input.restrict = "0123456789-";

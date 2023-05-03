@@ -112,8 +112,7 @@ class ColorUI extends ValueUI
 		_hexGroup.addChild(_hexLabel);
 		
 		_hexInput = new TextInput();
-		_hexInput.variant = TextInputVariant.NUMERIC;
-		_hexInput.layoutData = new HorizontalLayoutData(100);
+		_hexInput.variant = TextInputVariant.FULL_WIDTH;
 		_hexInput.restrict = "0123456789abcdef";
 		_hexInput.maxChars = 6;
 		_hexInput.text = "ffffff";
@@ -133,7 +132,7 @@ class ColorUI extends ValueUI
 		_redGroup.addChild(_redLabel);
 		
 		_redSlider = new HSlider();
-		_redSlider.layoutData = new HorizontalLayoutData(75);
+		_redSlider.layoutData = new HorizontalLayoutData(100);
 		_redSlider.minimum = 0;
 		_redSlider.maximum = 255;
 		_redSlider.step = 1;
@@ -141,8 +140,7 @@ class ColorUI extends ValueUI
 		_redGroup.addChild(_redSlider);
 		
 		_redInput = new TextInput();
-		_redInput.variant = TextInputVariant.NUMERIC;
-		_redInput.layoutData = new HorizontalLayoutData(25);
+		_redInput.variant = TextInputVariant.NUMERIC_SMALL;
 		_redInput.restrict = "0123456789";
 		_redInput.maxChars = 3;
 		_redInput.text = "255";
@@ -162,7 +160,7 @@ class ColorUI extends ValueUI
 		_greenGroup.addChild(_greenLabel);
 		
 		_greenSlider = new HSlider();
-		_greenSlider.layoutData = new HorizontalLayoutData(75);
+		_greenSlider.layoutData = new HorizontalLayoutData(100);
 		_greenSlider.minimum = 0;
 		_greenSlider.maximum = 255;
 		_greenSlider.step = 1;
@@ -170,8 +168,7 @@ class ColorUI extends ValueUI
 		_greenGroup.addChild(_greenSlider);
 		
 		_greenInput = new TextInput();
-		_greenInput.variant = TextInputVariant.NUMERIC;
-		_greenInput.layoutData = new HorizontalLayoutData(25);
+		_greenInput.variant = TextInputVariant.NUMERIC_SMALL;
 		_greenInput.restrict = "0123456789";
 		_greenInput.maxChars = 3;
 		_greenInput.text = "255";
@@ -191,7 +188,7 @@ class ColorUI extends ValueUI
 		_blueGroup.addChild(_blueLabel);
 		
 		_blueSlider = new HSlider();
-		_blueSlider.layoutData = new HorizontalLayoutData(75);
+		_blueSlider.layoutData = new HorizontalLayoutData(100);
 		_blueSlider.minimum = 0;
 		_blueSlider.maximum = 255;
 		_blueSlider.step = 1;
@@ -199,8 +196,7 @@ class ColorUI extends ValueUI
 		_blueGroup.addChild(_blueSlider);
 		
 		_blueInput = new TextInput();
-		_blueInput.variant = TextInputVariant.NUMERIC;
-		_blueInput.layoutData = new HorizontalLayoutData(25);
+		_blueInput.variant = TextInputVariant.NUMERIC_SMALL;
 		_blueInput.restrict = "0123456789";
 		_blueInput.maxChars = 3;
 		_blueInput.text = "255";

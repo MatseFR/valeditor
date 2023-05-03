@@ -64,8 +64,7 @@ class IntUI extends ValueUI
 		addChild(_label);
 		
 		_input = new TextInput();
-		_input.variant = TextInputVariant.NUMERIC;
-		_input.layoutData = new HorizontalLayoutData(100);
+		_input.variant = TextInputVariant.FULL_WIDTH;
 		addChild(_input);
 	}
 	
@@ -74,7 +73,7 @@ class IntUI extends ValueUI
 		super.initExposedValue();
 		
 		_label.text = _exposedValue.name;
-		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _intValue.inputPercentWidth;
+		_input.variant = _intValue.inputVariant;
 		switch (_intValue.numericMode)
 		{
 			case NumericMode.Positive :

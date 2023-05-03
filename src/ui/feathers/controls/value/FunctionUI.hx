@@ -2,8 +2,8 @@ package ui.feathers.controls.value;
 import feathers.controls.Button;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
-import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
+import feathers.layout.VerticalLayout;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.value.ExposedFunction;
@@ -37,12 +37,12 @@ class FunctionUI extends ValueUI
 	{
 		super.initialize();
 		
-		var hLayout:HorizontalLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.paddingTop = hLayout.paddingBottom = Padding.DEFAULT;
-		hLayout.paddingLeft = hLayout.paddingRight = Padding.DEFAULT * 2;
-		this.layout = hLayout;
+		var vLayout:VerticalLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.paddingBottom = vLayout.paddingTop = Padding.DEFAULT;
+		vLayout.paddingLeft = vLayout.paddingRight = Padding.VALUE;
+		this.layout = vLayout;
 		
 		_button = new Button();
 		addChild(_button);

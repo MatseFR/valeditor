@@ -71,8 +71,6 @@ class StarlingTextureUI extends ValueUI
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
-		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingRight = Padding.VALUE;
 		_contentGroup.layout = vLayout;
 		addChild(_contentGroup);
 		
@@ -214,27 +212,10 @@ class StarlingTextureUI extends ValueUI
 		if (asset == null)
 		{
 			_preview.bitmapData = null;
-			_preview.scrollRect = null;
 		}
 		else
 		{
-			var scale:Float;
-			_preview.scaleX = _preview.scaleY = 1;
-			_preview.bitmapData = asset.bitmapAsset.content;
-			if (Std.isOfType(asset.content, SubTexture))
-			{
-				var sub:SubTexture = cast asset.content;
-				_preview.scrollRect = sub.region;
-				_preview.width = _preview.scrollRect.width;
-				_preview.height = _preview.scrollRect.height;
-				scale = ScaleUtil.scaleToFit(_preview.scrollRect.width, _preview.scrollRect.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			}
-			else
-			{
-				_preview.scrollRect = null;
-				scale = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			}
-			_preview.scaleX = _preview.scaleY = scale;
+			_preview.bitmapData = asset.preview;
 		}
 		_previewGroup.setInvalid();
 	}

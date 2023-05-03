@@ -67,12 +67,11 @@ class FloatRangeUI extends ValueUI
 		addChild(_label);
 		
 		_slider = new HSlider();
-		_slider.layoutData = new HorizontalLayoutData(50);
+		_slider.layoutData = new HorizontalLayoutData(100);
 		addChild(_slider);
 		
 		_input = new TextInput();
-		_input.variant = TextInputVariant.NUMERIC;
-		_input.layoutData = new HorizontalLayoutData(50);
+		_input.variant = TextInputVariant.NUMERIC_MEDIUM;
 		addChild(_input);
 	}
 	
@@ -80,8 +79,7 @@ class FloatRangeUI extends ValueUI
 	{
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
-		cast(_slider.layoutData, HorizontalLayoutData).percentWidth = _floatRange.sliderPercentWidth;
-		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _floatRange.inputPercentWidth;
+		_input.variant = _floatRange.inputVariant;
 		_slider.minimum = _floatRange.min;
 		_slider.maximum = _floatRange.max;
 		_slider.step = _floatRange.step;

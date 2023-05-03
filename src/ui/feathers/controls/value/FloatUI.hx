@@ -4,7 +4,6 @@ import feathers.controls.Label;
 import feathers.controls.TextInput;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
-import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import ui.feathers.Spacing;
@@ -67,8 +66,7 @@ class FloatUI extends ValueUI
 		addChild(_label);
 		
 		_input = new TextInput();
-		_input.variant = TextInputVariant.NUMERIC;
-		_input.layoutData = new HorizontalLayoutData(100);
+		_input.variant = TextInputVariant.FULL_WIDTH;
 		addChild(_input);
 	}
 	
@@ -76,7 +74,7 @@ class FloatUI extends ValueUI
 	{
 		super.initExposedValue();
 		_label.text = _exposedValue.name;
-		cast(_input.layoutData, HorizontalLayoutData).percentWidth = _floatValue.inputPercentWidth;
+		_input.variant = _floatValue.inputVariant;
 		switch (_floatValue.numericMode)
 		{
 			case NumericMode.Positive :

@@ -69,12 +69,10 @@ class StarlingAtlasUI extends ValueUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingRight = Padding.VALUE;
 		_contentGroup.layout = vLayout;
 		addChild(_contentGroup);
 		
 		_previewGroup = new LayoutGroup();
-		//_previewGroup.maxHeight = UIConfig.ASSET_PREVIEW_SIZE;
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.CENTER;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
@@ -214,7 +212,7 @@ class StarlingAtlasUI extends ValueUI
 		}
 		else
 		{
-			_preview.bitmapData = asset.bitmapAsset.preview;
+			_preview.bitmapData = asset.preview;
 		}
 		_previewGroup.setInvalid();
 	}

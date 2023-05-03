@@ -70,7 +70,6 @@ class BitmapUI extends ValueUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingRight = Padding.VALUE;
 		_contentGroup.layout = vLayout;
 		addChild(_contentGroup);
 		
