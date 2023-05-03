@@ -1,7 +1,6 @@
 package ui.feathers.renderers;
 
 import feathers.controls.Label;
-import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
@@ -11,7 +10,7 @@ import valedit.asset.BinaryAsset;
  * ...
  * @author Matse
  */
-class BinaryAssetItemRenderer extends LayoutGroupItemRenderer 
+class BinaryAssetItemRenderer extends AssetItemRenderer 
 {
 	public var asset(get, set):BinaryAsset;
 	private var _asset:BinaryAsset;
@@ -45,6 +44,7 @@ class BinaryAssetItemRenderer extends LayoutGroupItemRenderer
 		this.layout = vLayout;
 		
 		_nameLabel = new Label();
+		_nameLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_nameLabel);
 	}
 	

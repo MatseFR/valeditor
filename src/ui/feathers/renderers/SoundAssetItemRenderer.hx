@@ -2,7 +2,6 @@ package ui.feathers.renderers;
 
 import feathers.controls.Button;
 import feathers.controls.Label;
-import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
@@ -17,7 +16,7 @@ import valedit.asset.SoundAsset;
  * ...
  * @author Matse
  */
-class SoundAssetItemRenderer extends LayoutGroupItemRenderer 
+class SoundAssetItemRenderer extends AssetItemRenderer 
 {
 	public var asset(get, set):SoundAsset;
 	private var _asset:SoundAsset;
@@ -61,9 +60,11 @@ class SoundAssetItemRenderer extends LayoutGroupItemRenderer
 		this.layout = vLayout;
 		
 		_nameLabel = new Label();
+		_nameLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_nameLabel);
 		
 		_durationLabel = new Label();
+		_durationLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_durationLabel);
 		
 		_playButton = new Button("play", onPlayButton);

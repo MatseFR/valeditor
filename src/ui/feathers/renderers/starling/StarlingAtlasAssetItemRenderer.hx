@@ -2,12 +2,11 @@ package ui.feathers.renderers.starling;
 
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
-import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import feathers.utils.ScaleUtil;
 import openfl.display.Bitmap;
+import ui.feathers.renderers.AssetItemRenderer;
 import ui.feathers.variant.LayoutGroupVariant;
 import valedit.asset.starling.StarlingAtlasAsset;
 
@@ -15,7 +14,7 @@ import valedit.asset.starling.StarlingAtlasAsset;
  * ...
  * @author Matse
  */
-class StarlingAtlasAssetItemRenderer extends LayoutGroupItemRenderer 
+class StarlingAtlasAssetItemRenderer extends AssetItemRenderer 
 {
 	public var asset(get, set):StarlingAtlasAsset;
 	private var _asset:StarlingAtlasAsset;
@@ -26,10 +25,7 @@ class StarlingAtlasAssetItemRenderer extends LayoutGroupItemRenderer
 		
 		if (value != null)
 		{
-			_preview.bitmapData = value.bitmapAsset.preview;
-			//var scale:Float = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			
-			//_preview.scaleX = _preview.scaleY = scale;
+			_preview.bitmapData = value.preview;
 			_previewGroup.setInvalid();
 			
 			_nameLabel.text = value.name;
@@ -67,9 +63,11 @@ class StarlingAtlasAssetItemRenderer extends LayoutGroupItemRenderer
 		_previewGroup.addChild(_preview);
 		
 		_nameLabel = new Label();
+		_nameLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_nameLabel);
 		
 		_sizeLabel = new Label();
+		_sizeLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_sizeLabel);
 	}
 	

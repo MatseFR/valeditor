@@ -1,7 +1,6 @@
 package ui.feathers.renderers;
 
 import feathers.controls.Label;
-import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
@@ -11,7 +10,7 @@ import valedit.asset.TextAsset;
  * ...
  * @author Matse
  */
-class TextAssetItemRenderer extends LayoutGroupItemRenderer 
+class TextAssetItemRenderer extends AssetItemRenderer
 {
 	public var asset(get, set):TextAsset;
 	private var _asset:TextAsset;
@@ -27,15 +26,15 @@ class TextAssetItemRenderer extends LayoutGroupItemRenderer
 		
 		return this._asset = value;
 	}
-	
+
 	private var _nameLabel:Label;
-	
-	public function new() 
+
+	public function new()
 	{
 		super();
 	}
-	
-	override function initialize():Void 
+
+	override function initialize():Void
 	{
 		super.initialize();
 		
@@ -45,7 +44,8 @@ class TextAssetItemRenderer extends LayoutGroupItemRenderer
 		this.layout = vLayout;
 		
 		_nameLabel = new Label();
+		_nameLabel.variant = Label.VARIANT_DETAIL;
 		addChild(_nameLabel);
 	}
-	
+
 }
