@@ -24,11 +24,27 @@ class EditView extends LayoutGroup
 {
 	static public inline var ID:String = "edit-view";
 	
-	private var _box:HDividedBox;
+	public var assetMenuCallback(get, set):String->Void;
+	private var _assetMenuCallback:String->Void;
+	private function get_assetMenuCallback():String->Void { return this._assetMenuCallback; }
+	private function set_assetMenuCallback(value:String->Void):String->Void
+	{
+		return this._assetMenuCallback = value;
+	}
+	
+	public var fileMenuCallback(get, set):String->Void;
+	private var _fileMenuCallback:String->Void;
+	private function get_fileMenuCallback():String->Void { return this._fileMenuCallback; }
+	private function set_fileMenuCallback(value:String->Void):String->Void
+	{
+		return this._fileMenuCallback = value;
+	}
 	
 	public var valEditContainer(default, null):ScrollContainer;
 	public var topBar(default, null):LayoutGroup;
 	public var stageArea(default, null):LayoutGroup;
+	
+	private var _box:HDividedBox;
 	
 	private var _fileMenu:PopUpListView;
 	private var _fileMenuCollection:ArrayCollection<Dynamic>;
@@ -65,6 +81,8 @@ class EditView extends LayoutGroup
 		_fileMenuCollection.add({text:"New", id:"new"});
 		_fileMenuCollection.add({text:"Save", id:"save"});
 		_fileMenuCollection.add({text:"Save As", id:"save as"});
+		_fileMenuCollection.add({text:"Load", id:"load"});
+		_fileMenuCollection.add({text:"export simple JSON", id:"export simple json"});
 		
 		_fileMenu = new PopUpListView(_fileMenuCollection, onFileMenuChange);
 		_fileMenu.prompt = "File";
@@ -93,19 +111,15 @@ class EditView extends LayoutGroup
 		addChild(_box);
 		
 		stageArea = new LayoutGroup();
-		//stageArea.layoutData = new AnchorLayoutData(new Anchor(0, topBar), new Anchor(0, valEditContainer), 0, 0);
 		_box.addChild(stageArea);
 		
 		valEditContainer = new ScrollContainer();
-		//valEditContainer.width = 500;
-		//valEditContainer.minWidth = 250;
 		valEditContainer.minWidth = UIConfig.VALUE_MIN_WIDTH;
 		valEditContainer.maxWidth = UIConfig.VALUE_MAX_WIDTH;
 		valEditContainer.width = UIConfig.VALUE_MIN_WIDTH + (UIConfig.VALUE_MAX_WIDTH - UIConfig.VALUE_MIN_WIDTH) / 2;
 		valEditContainer.scrollPolicyX = ScrollPolicy.OFF;
 		valEditContainer.scrollPolicyY = ScrollPolicy.ON;
 		valEditContainer.fixedScrollBars = true;
-		//valEditContainer.layoutData = new AnchorLayoutData(new Anchor(0, topBar), 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -117,31 +131,30 @@ class EditView extends LayoutGroup
 	
 	private function onAssetMenuChange(evt:Event):Void
 	{
-		if (_assetMenu.selectedIndex == -1) return;
+		if (this._assetMenu.selectedIndex == -1) return;
 		
-		var id:String = _assetMenu.selectedItem.id;
+		var id:String = this._assetMenu.selectedItem.id;
 		
-		switch (id)
+		this._assetMenu.selectedIndex = -1;
+		
+		if (this._assetMenuCallback != null)
 		{
-			case "browser" :
-				FeathersWindows.showAssetBrowser();
+			this._assetMenuCallback(id);
 		}
-		
-		_assetMenu.selectedIndex = -1;
 	}
 	
 	private function onFileMenuChange(evt:Event):Void
 	{
-		if (_fileMenu.selectedIndex == -1) return;
+		if (this._fileMenu.selectedIndex == -1) return;
 		
-		var id:String = _fileMenu.selectedItem.id;
+		var id:String = this._fileMenu.selectedItem.id;
 		
-		switch (id)
+		this._fileMenu.selectedIndex = -1;
+		
+		if (this._fileMenuCallback != null)
 		{
-			
+			this._fileMenuCallback(id);
 		}
-		
-		_fileMenu.selectedIndex = -1;
 	}
 	
 }

@@ -84,7 +84,7 @@ class AssetBrowser extends Panel
 		//this.footer = _footerGroup;
 		
 		_closeButton = new Button("Close", onCloseButton);
-		_closeButton.layoutData = AnchorLayoutData.middleRight();
+		_closeButton.layoutData = AnchorLayoutData.middleRight(0, Padding.DEFAULT);
 		_headerGroup.addChild(_closeButton);
 		
 		hLayout = new HorizontalLayout();

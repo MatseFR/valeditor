@@ -190,7 +190,6 @@ class BitmapUI extends ValueUI
 	
 	private function assetSelected(asset:BitmapAsset):Void
 	{
-		//trace("assetSelected");
 		_exposedValue.value = asset;
 		assetUpdate(asset);
 	}

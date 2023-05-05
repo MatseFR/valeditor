@@ -45,6 +45,15 @@ class FeathersFactories
 	   
 	   @return
 	**/
+	static public function exposedBitmapData():IValueUI
+	{
+		return new BitmapUI();
+	}
+	
+	/**
+	   
+	   @return
+	**/
 	static public function exposedBool():IValueUI
 	{
 		return new BoolUI();

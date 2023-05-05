@@ -1,32 +1,26 @@
 package editor.base;
 
-import valedit.asset.AssetLib;
 import feathers.controls.Application;
 import feathers.controls.navigators.StackItem;
 import feathers.controls.navigators.StackNavigator;
 import feathers.style.Theme;
-import openfl.display.StageScaleMode;
-import valedit.data.openfl.display.DisplayData;
-import valedit.data.openfl.geom.GeomData;
 import openfl.display.Sprite;
-import openfl.geom.ColorTransform;
-import openfl.geom.Matrix;
-import openfl.geom.Point;
-import openfl.geom.Rectangle;
-import openfl.geom.Transform;
+import openfl.display.StageScaleMode;
 import ui.feathers.FeathersFactories;
 import ui.feathers.theme.ValEditorTheme;
 import ui.feathers.view.EditView;
-import valedit.value.ExposedBitmap;
-import valedit.value.ExposedByteArray;
-import valedit.value.ExposedColorReadOnly;
-import valedit.value.ExposedFunction;
-import valedit.value.ExposedGroup;
 import valedit.ValEdit;
+import valedit.asset.AssetLib;
+import valedit.value.ExposedBitmap;
+import valedit.value.ExposedBitmapData;
 import valedit.value.ExposedBool;
+import valedit.value.ExposedByteArray;
 import valedit.value.ExposedColor;
+import valedit.value.ExposedColorReadOnly;
 import valedit.value.ExposedFloat;
 import valedit.value.ExposedFloatRange;
+import valedit.value.ExposedFunction;
+import valedit.value.ExposedGroup;
 import valedit.value.ExposedInt;
 import valedit.value.ExposedIntRange;
 import valedit.value.ExposedName;
@@ -106,6 +100,7 @@ class ValEditorBaseFeathers extends Application
 	private function initUI():Void
 	{
 		ValEdit.registerUIClass(ExposedBitmap, FeathersFactories.exposedBitmap);
+		ValEdit.registerUIClass(ExposedBitmapData, FeathersFactories.exposedBitmapData);
 		ValEdit.registerUIClass(ExposedBool, FeathersFactories.exposedBool);
 		ValEdit.registerUIClass(ExposedByteArray, FeathersFactories.exposedByteArray);
 		ValEdit.registerUIClass(ExposedColor, FeathersFactories.exposedColor);
