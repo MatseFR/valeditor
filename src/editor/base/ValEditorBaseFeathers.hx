@@ -30,13 +30,15 @@ import valedit.value.ExposedSelect;
 import valedit.value.ExposedSeparator;
 import valedit.value.ExposedSound;
 import valedit.value.ExposedSpacing;
-#if starling
-import valedit.value.starling.ExposedStarlingAtlas;
-import valedit.value.starling.ExposedStarlingTexture;
-#end
 import valedit.value.ExposedString;
 import valedit.value.ExposedText;
 import valedit.value.ExposedTextAsset;
+
+#if starling
+import starling.core.Starling;
+import valedit.value.starling.ExposedStarlingAtlas;
+import valedit.value.starling.ExposedStarlingTexture;
+#end
 
 /**
  * ...
@@ -45,6 +47,9 @@ import valedit.value.ExposedTextAsset;
 class ValEditorBaseFeathers extends Application 
 {
 	public var scene(default, null):Sprite;
+	#if starling
+	public var starlingScene(default, null):starling.display.Sprite;
+	#end
 	public var screenNavigator(default, null):StackNavigator;
 	public var theme(default, null):ValEditorTheme;
 	public var editView(default, null):EditView;
@@ -70,6 +75,11 @@ class ValEditorBaseFeathers extends Application
 		
 		scene = new Sprite();
 		addChild(scene);
+		
+		#if starling
+		starlingScene = new starling.display.Sprite();
+		Starling.current.stage.addChild(starlingScene);
+		#end
 		
 		theme = new ValEditorTheme();
 		Theme.setTheme(theme);
