@@ -1,4 +1,4 @@
-package utils.file;
+package utils.file.asset;
 import haxe.io.Path;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;

@@ -8,10 +8,10 @@ import valedit.asset.AssetLib;
 import valedit.asset.BinaryAsset;
 #if desktop
 import openfl.filesystem.File;
-import utils.file.BinaryFilesLoaderDesktop;
+import utils.file.asset.BinaryFilesLoaderDesktop;
 #else
 import openfl.net.FileReference;
-import utils.file.BinaryFilesLoader;
+import utils.file.asset.BinaryFilesLoader;
 #end
 
 /**

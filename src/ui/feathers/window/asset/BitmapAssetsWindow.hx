@@ -10,10 +10,10 @@ import valedit.asset.AssetLib;
 import valedit.asset.BitmapAsset;
 #if desktop
 import openfl.filesystem.File;
-import utils.file.ImageFilesLoaderDesktop;
+import utils.file.asset.BitmapFilesLoaderDesktop;
 #else
 import openfl.net.FileReference;
-import utils.file.ImageFilesLoader;
+import utils.file.asset.BitmapFilesLoader;
 #end
 
 /**
@@ -23,9 +23,9 @@ import utils.file.ImageFilesLoader;
 class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 {	
 	#if desktop
-	private var _imageLoader:ImageFilesLoaderDesktop = new ImageFilesLoaderDesktop();
+	private var _imageLoader:BitmapFilesLoaderDesktop = new BitmapFilesLoaderDesktop();
 	#else
-	private var _imageLoader:ImageFilesLoader = new ImageFilesLoader();
+	private var _imageLoader:BitmapFilesLoader = new BitmapFilesLoader();
 	#end
 	
 	public function new() 

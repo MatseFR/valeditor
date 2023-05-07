@@ -18,7 +18,7 @@ import openfl.events.Event;
 import openfl.net.FileFilter;
 #if desktop
 import utils.file.FilesOpenerDesktop;
-import utils.file.FolderOpener;
+import utils.file.FolderOpenerDesktop;
 import openfl.filesystem.File;
 #else
 import utils.file.FilesOpener;
@@ -121,7 +121,7 @@ class AssetsWindow<T> extends Panel
 	#if desktop
 	private var _fileOpener:FilesOpenerDesktop = new FilesOpenerDesktop();
 	private var _fileDialogTitle:String = "Select file(s)";
-	private var _folderOpener:FolderOpener = new FolderOpener();
+	private var _folderOpener:FolderOpenerDesktop = new FolderOpenerDesktop();
 	private var _folderDialogTitle:String = "Select folder";
 	#else
 	private var _fileOpener:FilesOpener = new FilesOpener();

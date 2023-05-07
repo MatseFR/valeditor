@@ -8,10 +8,10 @@ import openfl.net.FileFilter;
 import ui.feathers.renderers.SoundAssetItemRenderer;
 #if desktop
 import openfl.filesystem.File;
-import utils.file.SoundFilesLoaderDesktop;
+import utils.file.asset.SoundFilesLoaderDesktop;
 #else
 import openfl.net.FileReference;
-import utils.file.SoundFilesLoader;
+import utils.file.asset.SoundFilesLoader;
 #end
 import valedit.asset.SoundAsset;
 

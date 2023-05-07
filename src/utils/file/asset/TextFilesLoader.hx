@@ -1,5 +1,4 @@
-package utils.file;
-import openfl.display.BitmapData;
+package utils.file.asset;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileReference;
@@ -8,24 +7,24 @@ import openfl.net.FileReference;
  * ...
  * @author Matse
  */
-class ImageFilesLoader 
+class TextFilesLoader 
 {
 	private var _files:Array<FileReference>;
 	private var _fileIndex:Int;
 	private var _fileCurrent:FileReference;
 	
-	private var _imageCallback:String->BitmapData->Void;
+	private var _textCallback:String->String->Void;
 	private var _completeCallback:Void->Void;
-	
+
 	public function new() 
 	{
 		
 	}
 	
-	public function start(files:Array<FileReference>, imageCallback:String->BitmapData->Void, completeCallback:Void->Void):Void
+	public function start(files:Array<FileReference>, textCallback:String->String->Void, completeCallback:Void->Void):Void
 	{
 		_files = files;
-		_imageCallback = imageCallback;
+		_textCallback = textCallback;
 		_completeCallback = completeCallback;
 		
 		_fileIndex = -1;
@@ -47,7 +46,7 @@ class ImageFilesLoader
 			var completeCallback:Void->Void = _completeCallback;
 			_files = null;
 			_fileCurrent = null;
-			_imageCallback = null;
+			_textCallback = null;
 			_completeCallback = null;
 			
 			completeCallback();
@@ -59,7 +58,10 @@ class ImageFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		BitmapData.loadFromBytes(_fileCurrent.data).onComplete(onImageLoadComplete).onError(onImageLoadError);
+		var str:String = _fileCurrent.data.readUTFBytes(_fileCurrent.data.bytesAvailable);
+		_textCallback(_fileCurrent.name, str);
+		
+		nextFile();
 	}
 	
 	private function onFileLoadError(evt:IOErrorEvent):Void
@@ -67,21 +69,7 @@ class ImageFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		trace("ImageFilesLoader failed to load " + _fileCurrent.name);
-		
-		nextFile();
-	}
-	
-	private function onImageLoadComplete(bmd:BitmapData):Void
-	{
-		_imageCallback(_fileCurrent.name, bmd);
-		nextFile();
-	}
-	
-	private function onImageLoadError(error:Dynamic):Void
-	{
-		trace("ImageFilesLoader failed to load " + _fileCurrent.name);
-		nextFile();
+		trace("TextFilesLoader failed to load " + _fileCurrent.name);
 	}
 	
 }

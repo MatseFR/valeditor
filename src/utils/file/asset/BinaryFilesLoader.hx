@@ -1,19 +1,20 @@
-package utils.file;
+package utils.file.asset;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileReference;
+import openfl.utils.ByteArray;
 
 /**
  * ...
  * @author Matse
  */
-class TextFilesLoader 
+class BinaryFilesLoader 
 {
 	private var _files:Array<FileReference>;
 	private var _fileIndex:Int;
-	private var _fileCurrent:FileReference;
+	private var _fileCurrent:FileReference;	
 	
-	private var _textCallback:String->String->Void;
+	private var _binaryCallback:String->ByteArray->Void;
 	private var _completeCallback:Void->Void;
 
 	public function new() 
@@ -21,10 +22,10 @@ class TextFilesLoader
 		
 	}
 	
-	public function start(files:Array<FileReference>, textCallback:String->String->Void, completeCallback:Void->Void):Void
+	public function start(files:Array<FileReference>, binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
 	{
 		_files = files;
-		_textCallback = textCallback;
+		_binaryCallback = binaryCallback;
 		_completeCallback = completeCallback;
 		
 		_fileIndex = -1;
@@ -46,7 +47,7 @@ class TextFilesLoader
 			var completeCallback:Void->Void = _completeCallback;
 			_files = null;
 			_fileCurrent = null;
-			_textCallback = null;
+			_binaryCallback = null;
 			_completeCallback = null;
 			
 			completeCallback();
@@ -58,9 +59,7 @@ class TextFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		var str:String = _fileCurrent.data.readUTFBytes(_fileCurrent.data.bytesAvailable);
-		_textCallback(_fileCurrent.name, str);
-		
+		_binaryCallback(_fileCurrent.name, _fileCurrent.data);
 		nextFile();
 	}
 	
@@ -69,7 +68,8 @@ class TextFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		trace("TextFilesLoader failed to load " + _fileCurrent.name);
+		trace("BinaryFilesLoader failed to load " + _fileCurrent.name);
+		nextFile();
 	}
 	
 }

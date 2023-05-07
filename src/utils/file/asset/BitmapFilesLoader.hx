@@ -1,31 +1,31 @@
-package utils.file;
+package utils.file.asset;
+import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileReference;
-import openfl.utils.ByteArray;
 
 /**
  * ...
  * @author Matse
  */
-class BinaryFilesLoader 
+class BitmapFilesLoader 
 {
 	private var _files:Array<FileReference>;
 	private var _fileIndex:Int;
-	private var _fileCurrent:FileReference;	
+	private var _fileCurrent:FileReference;
 	
-	private var _binaryCallback:String->ByteArray->Void;
+	private var _imageCallback:String->BitmapData->Void;
 	private var _completeCallback:Void->Void;
-
+	
 	public function new() 
 	{
 		
 	}
 	
-	public function start(files:Array<FileReference>, binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
+	public function start(files:Array<FileReference>, imageCallback:String->BitmapData->Void, completeCallback:Void->Void):Void
 	{
 		_files = files;
-		_binaryCallback = binaryCallback;
+		_imageCallback = imageCallback;
 		_completeCallback = completeCallback;
 		
 		_fileIndex = -1;
@@ -47,7 +47,7 @@ class BinaryFilesLoader
 			var completeCallback:Void->Void = _completeCallback;
 			_files = null;
 			_fileCurrent = null;
-			_binaryCallback = null;
+			_imageCallback = null;
 			_completeCallback = null;
 			
 			completeCallback();
@@ -59,8 +59,7 @@ class BinaryFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		_binaryCallback(_fileCurrent.name, _fileCurrent.data);
-		nextFile();
+		BitmapData.loadFromBytes(_fileCurrent.data).onComplete(onImageLoadComplete).onError(onImageLoadError);
 	}
 	
 	private function onFileLoadError(evt:IOErrorEvent):Void
@@ -68,7 +67,20 @@ class BinaryFilesLoader
 		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		trace("BinaryFilesLoader failed to load " + _fileCurrent.name);
+		trace("ImageFilesLoader failed to load " + _fileCurrent.name);
+		
+		nextFile();
+	}
+	
+	private function onImageLoadComplete(bmd:BitmapData):Void
+	{
+		_imageCallback(_fileCurrent.name, bmd);
+		nextFile();
+	}
+	
+	private function onImageLoadError(error:Dynamic):Void
+	{
+		trace("ImageFilesLoader failed to load " + _fileCurrent.name);
 		nextFile();
 	}
 	

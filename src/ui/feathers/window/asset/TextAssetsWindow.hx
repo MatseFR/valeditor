@@ -8,10 +8,10 @@ import valedit.asset.AssetLib;
 import valedit.asset.TextAsset;
 #if desktop
 import openfl.filesystem.File;
-import utils.file.TextFilesLoaderDesktop;
+import utils.file.asset.TextFilesLoaderDesktop;
 #else
 import openfl.net.FileReference;
-import utils.file.TextFilesLoader;
+import utils.file.asset.TextFilesLoader;
 #end
 
 /**

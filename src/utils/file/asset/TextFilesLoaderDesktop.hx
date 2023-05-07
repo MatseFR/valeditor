@@ -1,4 +1,4 @@
-package utils.file;
+package utils.file.asset;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;

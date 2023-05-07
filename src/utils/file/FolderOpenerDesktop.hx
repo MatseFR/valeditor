@@ -6,7 +6,7 @@ import openfl.filesystem.File;
  * ...
  * @author Matse
  */
-class FolderOpener 
+class FolderOpenerDesktop 
 {
 	private var _file:File;
 	private var _extensionList:Array<String>;
