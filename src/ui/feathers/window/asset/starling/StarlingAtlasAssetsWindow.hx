@@ -82,4 +82,12 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		_atlasLoader.start(atlasLoadComplete, enableUI, enableUI);
 	}
 	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeStarlingAtlas(item);
+		}
+	}
 }

@@ -1,4 +1,5 @@
 package ui.feathers.window.asset;
+import feathers.events.TriggerEvent;
 import ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
 import feathers.data.ListViewItemState;
@@ -85,5 +86,14 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		_soundLoader.start(files, soundLoadComplete, enableUI);
 	}
 	#end
+	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeSound(item);
+		}
+	}
 	
 }

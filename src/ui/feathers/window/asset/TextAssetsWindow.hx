@@ -1,5 +1,6 @@
 package ui.feathers.window.asset;
 import feathers.data.ListViewItemState;
+import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.net.FileFilter;
 import ui.feathers.renderers.TextAssetItemRenderer;
@@ -79,5 +80,14 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		_textLoader.start(files, textLoadComplete, enableUI);
 	}
 	#end
+	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeText(item);
+		}
+	}
 	
 }

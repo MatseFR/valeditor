@@ -1,6 +1,7 @@
 package ui.feathers.window.asset;
 
 import feathers.data.ListViewItemState;
+import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.display.BitmapData;
 import openfl.net.FileFilter;
@@ -81,5 +82,14 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		_imageLoader.start(files, bitmapDataLoadComplete, enableUI);
 	}
 	#end
+	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeBitmap(item);
+		}
+	}
 	
 }

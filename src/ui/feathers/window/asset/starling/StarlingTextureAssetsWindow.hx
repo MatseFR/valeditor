@@ -101,4 +101,13 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		_textureLoader.start(textureLoadComplete, enableUI, enableUI);
 	}
 	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeStarlingTexture(item);
+		}
+	}
+	
 }

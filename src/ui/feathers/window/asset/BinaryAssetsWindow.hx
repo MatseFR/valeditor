@@ -1,5 +1,6 @@
 package ui.feathers.window.asset;
 import feathers.data.ListViewItemState;
+import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.utils.ByteArray;
 import ui.feathers.renderers.BinaryAssetItemRenderer;
@@ -79,5 +80,14 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		_binaryLoader.start(files, binaryLoadComplete, enableUI);
 	}
 	#end
+	
+	override function onRemoveButton(evt:TriggerEvent):Void 
+	{
+		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
+		for (item in items)
+		{
+			AssetLib.removeBinary(item);
+		}
+	}
 	
 }
