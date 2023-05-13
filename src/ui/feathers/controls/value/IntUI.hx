@@ -11,6 +11,7 @@ import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.TextInputVariant;
 import valedit.ExposedValue;
+import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedInt;
 import valedit.value.NumericMode;
@@ -82,6 +83,7 @@ class IntUI extends ValueUI
 			default :
 				_input.restrict = "0123456789-";
 		}
+		updateEditable();
 	}
 	
 	override public function updateExposedValue(exceptControl:IValueUI = null):Void 
@@ -102,6 +104,12 @@ class IntUI extends ValueUI
 		this.enabled = _exposedValue.isEditable;
 		_label.enabled = _exposedValue.isEditable;
 		_input.editable = _exposedValue.isEditable;
+	}
+	
+	override function onValueEditableChange(evt:ValueEvent):Void 
+	{
+		super.onValueEditableChange(evt);
+		updateEditable();
 	}
 	
 	override function controlsDisable():Void

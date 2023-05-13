@@ -16,4 +16,9 @@ class UIConfig
 	static public var VALUE_MIN_WIDTH:Float = 300;
 	static public var VALUE_MAX_WIDTH:Float = 500;
 	
+	static public var LEFT_MIN_WIDTH:Float = 100;
+	static public var LEFT_MAX_WIDTH:Float = 500;
+	
+	static public var CENTER_MIN_WIDTH:Float = 100;
+	
 }

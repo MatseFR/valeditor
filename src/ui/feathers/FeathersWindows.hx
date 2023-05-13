@@ -1,10 +1,12 @@
 package ui.feathers;
 import feathers.core.PopUpManager;
 import openfl.Lib;
+import ui.feathers.window.ObjectCreationWindow;
+import ui.feathers.window.ObjectSelectWindow;
 import ui.feathers.window.asset.AssetBrowser;
 import ui.feathers.window.asset.BinaryAssetsWindow;
 import ui.feathers.window.asset.BitmapAssetsWindow;
-import ui.feathers.window.asset.ObjectEditWindow;
+import ui.feathers.window.ObjectEditWindow;
 import ui.feathers.window.asset.SoundAssetsWindow;
 import ui.feathers.window.asset.TextAssetsWindow;
 import valedit.asset.BinaryAsset;
@@ -36,8 +38,9 @@ class FeathersWindows
 	static private var _starlingTextureAssets:StarlingTextureAssetsWindow;
 	#end
 	
-	// Edit
+	static private var _objectCreate:ObjectCreationWindow;
 	static private var _objectEdit:ObjectEditWindow;
+	static private var _objectSelect:ObjectSelectWindow;
 	
 	static public function showAssetBrowser():Void
 	{
@@ -174,6 +177,24 @@ class FeathersWindows
 	}
 	#end
 	
+	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, title:String = "Create Object"):Void
+	{
+		if (_objectCreate == null)
+		{
+			_objectCreate = new ObjectCreationWindow();
+		}
+		
+		_objectCreate.title = title;
+		_objectCreate.confirmCallback = confirmCallback;
+		_objectCreate.cancelCallback = cancelCallback;
+		_objectCreate.reset(allowedClassNames);
+		
+		_objectCreate.width = Lib.current.stage.stageWidth / 2;
+		_objectCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		PopUpManager.addPopUp(_objectCreate, Lib.current.stage);
+	}
+	
 	static public function showObjectEditWindow(object:Dynamic, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void, ?title:String):Void
 	{
 		if (_objectEdit == null)
@@ -190,6 +211,24 @@ class FeathersWindows
 		_objectEdit.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
 		
 		PopUpManager.addPopUp(_objectEdit, Lib.current.stage);
+	}
+	
+	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, title:String = "Select Object"):Void
+	{
+		if (_objectSelect == null)
+		{
+			_objectSelect = new ObjectSelectWindow();
+		}
+		
+		_objectSelect.title = title;
+		_objectSelect.cancelCallback = cancelCallback;
+		_objectSelect.confirmCallback = confirmCallback;
+		_objectSelect.reset(allowedClassNames);
+		
+		_objectSelect.width = Lib.current.stage.stageWidth / 2;
+		_objectSelect.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		PopUpManager.addPopUp(_objectSelect, Lib.current.stage);
 	}
 	
 }

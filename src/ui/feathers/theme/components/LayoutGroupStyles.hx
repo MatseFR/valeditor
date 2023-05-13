@@ -36,6 +36,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_RIGHT_GROUP, arrow_right_group);
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ARROW_RIGHT_OBJECT, arrow_right_object);
 		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.CONTENT, content);
+		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW, color_preview);
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW_CONTAINER, color_preview_container);
 		
@@ -46,7 +48,7 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
 		
-		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_GROUP_CONTENT, toggleGroup_content);
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT, toggleCustom_content);
 		
 		styleProvider.setStyleFunction(ValueUI, null, valueUI);
 	}
@@ -105,6 +107,16 @@ class LayoutGroupStyles
 		group.layout = hLayout;
 	}
 	
+	static private function content(group:LayoutGroup):Void
+	{
+		if (group.backgroundSkin == null)
+		{
+			var backgroundSkin = new RectangleSkin();
+			backgroundSkin.fill = theme.getLightFill();
+			group.backgroundSkin = backgroundSkin;
+		}
+	}
+	
 	static private function item_preview(group:LayoutGroup):Void
 	{
 		group.width = group.height = UIConfig.ASSET_PREVIEW_SIZE;
@@ -135,7 +147,7 @@ class LayoutGroupStyles
 		spacing.height = 16;
 	}
 	
-	static private function toggleGroup_content(group:LayoutGroup):Void
+	static private function toggleCustom_content(group:LayoutGroup):Void
 	{
 		//group.width = UIConfig.VALUE_NAME_WIDTH;
 		//trace("pouet");

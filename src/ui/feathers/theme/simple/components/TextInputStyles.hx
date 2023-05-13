@@ -52,11 +52,11 @@ class TextInputStyles
 				input.paddingLeft = 10.0;
 			});
 		}
-		if (styleProvider.getStyleFunction(TextCallout, TextInput.CHILD_VARIANT_ERROR_CALLOUT) == null) {
-			styleProvider.setStyleFunction(TextCallout, TextInput.CHILD_VARIANT_ERROR_CALLOUT, function(callout:TextCallout):Void {
-				styleProvider.getStyleFunction(TextCallout, TextCallout.VARIANT_DANGER)(callout);
-			});
-		}
+		//if (styleProvider.getStyleFunction(TextCallout, TextInput.CHILD_VARIANT_ERROR_CALLOUT) == null) {
+			//styleProvider.setStyleFunction(TextCallout, TextInput.CHILD_VARIANT_ERROR_CALLOUT, function(callout:TextCallout):Void {
+				//styleProvider.getStyleFunction(TextCallout, TextCallout.VARIANT_DANGER)(callout);
+			//});
+		//}
 	}
 	
 	

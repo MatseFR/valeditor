@@ -8,7 +8,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.controls.ToggleLayoutGroup;
+import ui.feathers.controls.ToggleCustom;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
@@ -42,7 +42,7 @@ class ObjectUI extends ValueUI
 	
 	private var _exposedObject:ExposedObject;
 	
-	private var _topButton:ToggleLayoutGroup;
+	private var _topButton:ToggleCustom;
 	private var _arrowDown:LayoutGroup;
 	private var _arrowRight:LayoutGroup;
 	
@@ -71,7 +71,7 @@ class ObjectUI extends ValueUI
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_topButton = new ToggleLayoutGroup();
+		_topButton = new ToggleCustom();
 		_topButton.labelVariant = LabelVariant.OBJECT_NAME;
 		addChild(_topButton);
 		

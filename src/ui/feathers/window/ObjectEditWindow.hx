@@ -1,4 +1,4 @@
-package ui.feathers.window.asset;
+package ui.feathers.window;
 
 import feathers.controls.Button;
 import feathers.controls.Label;
@@ -47,7 +47,7 @@ class ObjectEditWindow extends Panel
 	private function get_editObject():Dynamic { return this._editObject; }
 	private function set_editObject(value:Dynamic):Dynamic
 	{
-		if (_initialized)
+		if (this._initialized)
 		{
 			ValEdit.edit(value, this._contentGroup);
 		}
@@ -60,9 +60,9 @@ class ObjectEditWindow extends Panel
 	private function set_title(value:String):String
 	{
 		if (value == null) value = "";
-		if (_initialized)
+		if (this._initialized)
 		{
-			_titleLabel.text = value;
+			this._titleLabel.text = value;
 		}
 		return this._title = value;
 	}
@@ -90,17 +90,17 @@ class ObjectEditWindow extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		_headerGroup = new LayoutGroup();
-		_headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._headerGroup = new LayoutGroup();
+		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.setPadding(Padding.DEFAULT);
-		_headerGroup.layout = hLayout;
+		this._headerGroup.layout = hLayout;
 		this.header = _headerGroup;
 		
-		_titleLabel = new Label(this._title);
-		_headerGroup.addChild(_titleLabel);
+		this._titleLabel = new Label(this._title);
+		this._headerGroup.addChild(_titleLabel);
 		
 		_footerGroup = new LayoutGroup();
 		_footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;

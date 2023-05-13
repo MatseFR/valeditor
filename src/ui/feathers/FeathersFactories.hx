@@ -11,6 +11,7 @@ import ui.feathers.controls.value.GroupUI;
 import ui.feathers.controls.value.IntRangeUI;
 import ui.feathers.controls.value.IntUI;
 import ui.feathers.controls.value.NameUI;
+import ui.feathers.controls.value.ObjectReferenceUI;
 import ui.feathers.controls.value.ObjectUI;
 import ui.feathers.controls.value.SelectUI;
 import ui.feathers.controls.value.SeparatorUI;
@@ -165,6 +166,15 @@ class FeathersFactories
 	static public function exposedObject():IValueUI
 	{
 		return new ObjectUI();
+	}
+	
+	/**
+	   
+	   @return
+	**/
+	static public function exposedObjectReference():IValueUI
+	{
+		return new ObjectReferenceUI();
 	}
 	
 	/**

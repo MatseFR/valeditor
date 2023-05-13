@@ -26,6 +26,7 @@ import valedit.value.ExposedIntRange;
 import valedit.value.ExposedName;
 import valedit.value.ExposedNote;
 import valedit.value.ExposedObject;
+import valedit.value.ExposedObjectReference;
 import valedit.value.ExposedSelect;
 import valedit.value.ExposedSeparator;
 import valedit.value.ExposedSound;
@@ -52,7 +53,6 @@ class ValEditorBaseFeathers extends Application
 	#end
 	public var screenNavigator(default, null):StackNavigator;
 	public var theme(default, null):ValEditorTheme;
-	public var editView(default, null):EditView;
 	
 	/**
 	   
@@ -89,19 +89,8 @@ class ValEditorBaseFeathers extends Application
 	
 	private function ready():Void
 	{
-		var item:StackItem;
-		
 		screenNavigator = new StackNavigator();
 		addChild(screenNavigator);
-		
-		editView = new EditView();
-		editView.initializeNow();
-		ValEdit.uiContainerDefault = editView.valEditContainer;
-		
-		item = StackItem.withDisplayObject(EditView.ID, editView);
-		screenNavigator.addItem(item);
-		
-		screenNavigator.pushItem(EditView.ID);
 	}
 	
 	/**
@@ -124,6 +113,7 @@ class ValEditorBaseFeathers extends Application
 		ValEdit.registerUIClass(ExposedName, FeathersFactories.exposedName);
 		ValEdit.registerUIClass(ExposedNote, FeathersFactories.exposedNote);
 		ValEdit.registerUIClass(ExposedObject, FeathersFactories.exposedObject);
+		ValEdit.registerUIClass(ExposedObjectReference, FeathersFactories.exposedObjectReference);
 		ValEdit.registerUIClass(ExposedSelect, FeathersFactories.exposedSelect);
 		ValEdit.registerUIClass(ExposedSeparator, FeathersFactories.exposedSeparator);
 		ValEdit.registerUIClass(ExposedSound, FeathersFactories.exposedSound);

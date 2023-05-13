@@ -13,7 +13,6 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
-import ui.feathers.FeathersWindows;
 import ui.feathers.Spacing;
 
 /**

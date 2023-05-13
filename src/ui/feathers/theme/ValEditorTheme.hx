@@ -5,6 +5,7 @@ import ui.feathers.theme.components.LabelStyles;
 import ui.feathers.theme.components.LayoutGroupStyles;
 import ui.feathers.theme.components.TextInputStyles;
 import ui.feathers.theme.components.ToggleButtonStyles;
+import ui.feathers.theme.components.ToggleCustomStyles;
 import ui.feathers.theme.components.ToggleLayoutGroupStyles;
 import ui.feathers.theme.simple.SimpleTheme;
 
@@ -29,6 +30,7 @@ class ValEditorTheme extends SimpleTheme
 		LayoutGroupStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
+		ToggleCustomStyles.initialize(this, this.styleProvider);
 		ToggleLayoutGroupStyles.initialize(this, this.styleProvider);
 	}
 	

@@ -9,7 +9,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.controls.ToggleLayoutGroup;
+import ui.feathers.controls.ToggleCustom;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
 import valedit.ExposedValue;
@@ -34,7 +34,7 @@ class FunctionUI extends ValueUI
 	
 	private var _button:Button;
 	
-	private var _parameterGroup:ToggleLayoutGroup;
+	private var _parameterGroup:ToggleCustom;
 	private var _arrowDown:LayoutGroup;
 	private var _arrowRight:LayoutGroup;
 	
@@ -67,7 +67,7 @@ class FunctionUI extends ValueUI
 		_button = new Button();
 		addChild(_button);
 		
-		_parameterGroup = new ToggleLayoutGroup();
+		_parameterGroup = new ToggleCustom();
 		_parameterGroup.labelVariant = LabelVariant.OBJECT_NAME;
 		_parameterGroup.text = "Parameters";
 		
