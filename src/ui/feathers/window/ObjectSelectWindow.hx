@@ -18,10 +18,8 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import ui.feathers.Padding;
-import ui.feathers.Spacing;
 import utils.ArraySort;
 import valedit.ValEdit;
-import valedit.ValEditClass;
 import valedit.ValEditObject;
 
 /**
@@ -75,7 +73,9 @@ class ObjectSelectWindow extends Panel
 	private var _objectGroup:LayoutGroup;
 	private var _objectLabel:Label;
 	private var _objectList:ListView;
-	//private var _objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
+	private var _objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
+	
+	private var _excludeObjects:Array<Dynamic>;
 	
 	public function new() 
 	{
@@ -151,6 +151,7 @@ class ObjectSelectWindow extends Panel
 		{
 			return item.name;
 		};
+		this._objectList.dataProvider = this._objectCollection;
 		this._objectGroup.addChild(this._objectList);
 	}
 	
@@ -160,6 +161,18 @@ class ObjectSelectWindow extends Panel
 		this._classList.resize(0);
 		var selectedItem:String = this._classPicker.selectedItem;
 		this._classCollection.array = null;
+		
+		this._objectCollection.removeAll();
+		this._excludeObjects = excludeObjects;
+		if (this._excludeObjects != null && this._excludeObjects.length != 0)
+		{
+			this._objectCollection.filterFunction = filterObject;
+		}
+		else
+		{
+			this._objectCollection.filterFunction = null;
+		}
+		
 		if (allowedClassNames != null && allowedClassNames.length != 0)
 		{
 			for (allowedName in allowedClassNames)
@@ -177,7 +190,6 @@ class ObjectSelectWindow extends Panel
 		else
 		{
 			// allow all classes
-			//this._classCollection.removeAll();
 			this._classCollection.addAll(ValEdit.classCollection);
 		}
 		this._classList.sort(ArraySort.alphabetical);
@@ -195,15 +207,10 @@ class ObjectSelectWindow extends Panel
 	
 	private function onClassChange(evt:Event):Void
 	{
-		//this._objectCollection.removeAll();
+		this._objectCollection.removeAll();
 		if (this._classPicker.selectedItem != null)
 		{
-			//var classNames:Array<String> = ValEdit.getClassListForBaseClass(this._classPicker.selectedItem);
-			this._objectList.dataProvider = ValEdit.getObjectCollectionForClassName(this._classPicker.selectedItem);
-		}
-		else
-		{
-			this._objectList.dataProvider = null;
+			this._objectCollection.addAll(ValEdit.getObjectCollectionForClassName(this._classPicker.selectedItem));
 		}
 	}
 	
@@ -222,6 +229,11 @@ class ObjectSelectWindow extends Panel
 	{
 		PopUpManager.removePopUp(this);
 		this._confirmCallback(this._objectList.selectedItem);
+	}
+	
+	private function filterObject(object:ValEditObject):Bool
+	{
+		return this._excludeObjects.indexOf(object.object) == -1;
 	}
 	
 }
