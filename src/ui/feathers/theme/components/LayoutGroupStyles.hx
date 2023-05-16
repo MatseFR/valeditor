@@ -7,6 +7,7 @@ import feathers.layout.VerticalAlign;
 import feathers.skins.HorizontalLineSkin;
 import feathers.skins.RectangleSkin;
 import feathers.skins.TriangleSkin;
+import feathers.skins.UnderlineSkin;
 import feathers.skins.VerticalLineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import ui.feathers.controls.value.SeparatorUI;
@@ -42,6 +43,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.COLOR_PREVIEW_CONTAINER, color_preview_container);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.ITEM_PREVIEW, item_preview);
+		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.MENU_BAR, menu_bar);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.OBJECT_TRAIL, object_trail);
 		
@@ -125,6 +128,15 @@ class LayoutGroupStyles
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		group.layout = hLayout;
+	}
+	
+	static private function menu_bar(group:LayoutGroup):Void
+	{
+		if (group.backgroundSkin == null)
+		{
+			var backgroundSkin = new UnderlineSkin(theme.getLightFill(), theme.getLightBorderDark());
+			group.backgroundSkin = backgroundSkin;
+		}
 	}
 	
 	static private function object_trail(group:LayoutGroup):Void

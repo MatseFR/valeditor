@@ -213,7 +213,7 @@ class FeathersWindows
 		PopUpManager.addPopUp(_objectEdit, Lib.current.stage);
 	}
 	
-	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, title:String = "Select Object"):Void
+	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, excludeObjects:Array<Dynamic> = null, title:String = "Select Object"):Void
 	{
 		if (_objectSelect == null)
 		{
@@ -223,7 +223,7 @@ class FeathersWindows
 		_objectSelect.title = title;
 		_objectSelect.cancelCallback = cancelCallback;
 		_objectSelect.confirmCallback = confirmCallback;
-		_objectSelect.reset(allowedClassNames);
+		_objectSelect.reset(allowedClassNames, excludeObjects);
 		
 		_objectSelect.width = Lib.current.stage.stageWidth / 2;
 		_objectSelect.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;

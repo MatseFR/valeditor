@@ -2,7 +2,6 @@ package ui.feathers.controls;
 
 import feathers.controls.Button;
 import feathers.controls.LayoutGroup;
-import feathers.controls.ScrollContainer;
 import feathers.controls.TreeView;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
@@ -10,7 +9,6 @@ import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
-import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.FeathersWindows;
 import ui.feathers.Padding;
@@ -61,6 +59,7 @@ class ObjectLibrary extends LayoutGroup
 		this._footer.addChild(this._objectRemoveButton);
 		
 		this._tree = new TreeView(ValEdit.objectCollection, onTreeChange);
+		this._tree.variant = TreeView.VARIANT_BORDERLESS;
 		this._tree.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		this._tree.itemToText = (item:Dynamic) -> item.data.name;
 		addChild(this._tree);

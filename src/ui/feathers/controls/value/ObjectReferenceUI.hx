@@ -14,6 +14,7 @@ import ui.feathers.Spacing;
 import ui.feathers.variant.LabelVariant;
 import valedit.ExposedValue;
 import valedit.ValEdit;
+import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObjectReference;
@@ -115,7 +116,15 @@ class ObjectReferenceUI extends ValueUI
 		
 		if (_initialized && _exposedValue != null)
 		{
-			_nameLabel.text = ValEdit.getObjectName(_exposedValue.value);
+			var object:Dynamic = _exposedValue.value;
+			if (object != null)
+			{
+				_nameLabel.text = ValEdit.getObjectName(object);
+			}
+			else
+			{
+				_nameLabel.text = "";
+			}
 		}
 	}
 	
@@ -158,13 +167,29 @@ class ObjectReferenceUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showObjectSelectWindow(objectSelected, null, this._objectReferenceValue.classList);
+		var excludeObjects:Array<Dynamic>;
+		if (this._objectReferenceValue.allowSelfReference)
+		{
+			excludeObjects = null;
+		}
+		else
+		{
+			excludeObjects = [this._objectReferenceValue.object];
+		}
+		FeathersWindows.showObjectSelectWindow(objectSelected, null, this._objectReferenceValue.classList, excludeObjects);
 	}
 	
 	private function objectSelected(object:Dynamic):Void
 	{
 		this._exposedValue.value = object;
-		this._nameLabel.text = ValEdit.getObjectName(object);
+		if (Std.isOfType(object, ValEditObject))
+		{
+			this._nameLabel.text = cast(object, ValEditObject).name;
+		}
+		else
+		{
+			this._nameLabel.text = ValEdit.getObjectName(object);
+		}
 	}
 	
 }

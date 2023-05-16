@@ -9,15 +9,20 @@ import feathers.controls.Panel;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
+import feathers.layout.AnchorLayout;
+import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import ui.feathers.Padding;
 import ui.feathers.Spacing;
+import utils.ArraySort;
 import valedit.ValEdit;
 import valedit.ValEditClass;
+import valedit.ValEditObject;
 
 /**
  * ...
@@ -65,13 +70,13 @@ class ObjectSelectWindow extends Panel
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
 	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _classList:Array<String> = new Array<String>();
 	
 	private var _objectGroup:LayoutGroup;
 	private var _objectLabel:Label;
 	private var _objectList:ListView;
+	//private var _objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	
-	private var _valEditClass:ValEditClass;
-
 	public function new() 
 	{
 		super();
@@ -107,21 +112,18 @@ class ObjectSelectWindow extends Panel
 		this.footer = this._footerGroup;
 		
 		this._confirmButton = new Button("confirm", onConfirmButton);
+		this._confirmButton.enabled = false;
 		this._footerGroup.addChild(this._confirmButton);
 		
 		this._cancelButton = new Button("cancel", onCancelButton);
 		this._footerGroup.addChild(this._cancelButton);
 		
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.CENTER;
-		vLayout.verticalAlign = VerticalAlign.MIDDLE;
-		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.setPadding(Padding.DEFAULT);
-		this.layout = vLayout;
+		this.layout = new AnchorLayout();
 		
 		this._classGroup = new LayoutGroup();
+		this._classGroup.layoutData = new AnchorLayoutData(Padding.DEFAULT * 2, Padding.DEFAULT * 2, null, Padding.DEFAULT * 2);
 		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.LEFT;
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this._classGroup.layout = vLayout;
 		addChild(this._classGroup);
@@ -130,12 +132,12 @@ class ObjectSelectWindow extends Panel
 		this._classGroup.addChild(this._classLabel);
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
-		//this._classPicker.itemToText
 		this._classGroup.addChild(this._classPicker);
 		
 		this._objectGroup = new LayoutGroup();
+		this._objectGroup.layoutData = new AnchorLayoutData(new Anchor(Padding.DEFAULT * 2, this._classGroup), Padding.DEFAULT * 2, Padding.DEFAULT * 2, Padding.DEFAULT * 2);
 		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.LEFT;
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this._objectGroup.layout = vLayout;
 		addChild(this._objectGroup);
@@ -144,6 +146,7 @@ class ObjectSelectWindow extends Panel
 		this._objectGroup.addChild(this._objectLabel);
 		
 		this._objectList = new ListView(null, onObjectChange);
+		this._objectList.layoutData = new VerticalLayoutData(100, 100);
 		this._objectList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
@@ -151,31 +154,55 @@ class ObjectSelectWindow extends Panel
 		this._objectGroup.addChild(this._objectList);
 	}
 	
-	public function reset(allowedClassNames:Array<String> = null):Void
+	public function reset(allowedClassNames:Array<String> = null, excludeObjects:Array<Dynamic> = null):Void
 	{
-		if (allowedClassNames != null)
+		var classNames:Array<String>;
+		this._classList.resize(0);
+		var selectedItem:String = this._classPicker.selectedItem;
+		this._classCollection.array = null;
+		if (allowedClassNames != null && allowedClassNames.length != 0)
 		{
-			this._classCollection.array = allowedClassNames;
+			for (allowedName in allowedClassNames)
+			{
+				classNames = ValEdit.getClassListForBaseClass(allowedName);
+				for (className in classNames)
+				{
+					if (this._classList.indexOf(className) == -1)
+					{
+						this._classList.push(className);
+					}
+				}
+			}
 		}
 		else
 		{
 			// allow all classes
-			this._classCollection.removeAll();
+			//this._classCollection.removeAll();
 			this._classCollection.addAll(ValEdit.classCollection);
+		}
+		this._classList.sort(ArraySort.alphabetical);
+		this._classCollection.array = this._classList;
+		if (selectedItem != null)
+		{
+			var index:Int = this._classCollection.indexOf(selectedItem);
+			this._classPicker.selectedIndex = index;
+		}
+		if (this._classPicker.selectedIndex == -1 && this._classCollection.length != 0)
+		{
+			this._classPicker.selectedIndex = 0;
 		}
 	}
 	
 	private function onClassChange(evt:Event):Void
 	{
+		//this._objectCollection.removeAll();
 		if (this._classPicker.selectedItem != null)
 		{
-			//this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
-			//this._objectList.dataProvider = this._valEditClass.objectCollection;
+			//var classNames:Array<String> = ValEdit.getClassListForBaseClass(this._classPicker.selectedItem);
 			this._objectList.dataProvider = ValEdit.getObjectCollectionForClassName(this._classPicker.selectedItem);
 		}
 		else
 		{
-			//this._valEditClass = null;
 			this._objectList.dataProvider = null;
 		}
 	}
@@ -194,7 +221,7 @@ class ObjectSelectWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		PopUpManager.removePopUp(this);
-		this._confirmCallback(null);
+		this._confirmCallback(this._objectList.selectedItem);
 	}
 	
 }

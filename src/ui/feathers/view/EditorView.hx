@@ -14,12 +14,12 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
-import ui.UIConfig;
 import ui.feathers.Spacing;
 import ui.feathers.controls.ObjectInfo;
 import ui.feathers.controls.ObjectLibrary;
 import ui.feathers.controls.ToggleLayoutGroup;
 import ui.feathers.variant.LayoutGroupVariant;
+import ui.feathers.variant.ToggleButtonVariant;
 
 /**
  * ...
@@ -29,30 +29,10 @@ class EditorView extends LayoutGroup
 {
 	static public inline var ID:String = "editor-view";
 	
-	public var assetMenuCallback(get, set):String->Void;
-	private var _assetMenuCallback:String->Void;
-	private function get_assetMenuCallback():String->Void { return this._assetMenuCallback; }
-	private function set_assetMenuCallback(value:String->Void):String->Void
-	{
-		return this._assetMenuCallback = value;
-	}
-	
-	public var fileMenuCallback(get, set):String->Void;
-	private var _fileMenuCallback:String->Void;
-	private function get_fileMenuCallback():String->Void { return this._fileMenuCallback; }
-	private function set_fileMenuCallback(value:String->Void):String->Void
-	{
-		return this._fileMenuCallback = value;
-	}
-	
 	public var editContainer(get, never):ScrollContainer;
 	private function get_editContainer():ScrollContainer { return this._editContainer; }
 	
 	private var _menuBar:LayoutGroup;
-	private var _fileMenu:PopUpListView;
-	private var _fileMenuCollection:ArrayCollection<Dynamic>;
-	private var _assetMenu:PopUpListView;
-	private var _assetMenuCollection:ArrayCollection<Dynamic>;
 	
 	private var _mainBox:HDividedBox;
 	private var _leftBox:LayoutGroup;
@@ -72,10 +52,76 @@ class EditorView extends LayoutGroup
 	private var _propertiesGroup:ToggleLayoutGroup;
 	private var _editContainer:ScrollContainer;
 	
+	// menus
+	private var _menuCallbacks:Map<String, Dynamic->Void> = new Map<String, Dynamic->Void>();
+	private var _menuCollections:Map<String, ArrayCollection<Dynamic>> = new Map<String, ArrayCollection<Dynamic>>();
+	private var _menuIDList:Array<String> = new Array<String>();
+	private var _menuIDToItemToEnabled:Map<String, Dynamic->Bool> = new Map<String, Dynamic->Bool>();
+	private var _menuIDToItemToText:Map<String, Dynamic->String> = new Map<String, Dynamic->String>();
+	private var _menuIDToText:Map<String, String> = new Map<String, String>();
+	
 	public function new() 
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, ?items:Array<Dynamic>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
+	{
+		this._menuIDList.push(menuID);
+		this._menuIDToText.set(menuID, menuText);
+		this._menuCallbacks.set(menuID, callback);
+		if (itemToText != null)
+		{
+			this._menuIDToItemToText.set(menuID, itemToText);
+		}
+		if (itemToEnabled != null)
+		{
+			this._menuIDToItemToEnabled.set(menuID, itemToEnabled);
+		}
+		
+		var collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>(items);
+		this._menuCollections.set(menuID, collection);
+		
+		if (this._initialized)
+		{
+			createMenu(menuID);
+		}
+	}
+	
+	public function addMenuItem(menuID:String, item:Dynamic):Void
+	{
+		_menuCollections.get(menuID).add(item);
+	}
+	
+	private function createMenu(menuID:String):Void
+	{
+		var itemToEnabled:Dynamic->Bool;
+		var itemToText:Dynamic->String;
+		var collection:ArrayCollection<Dynamic> = this._menuCollections.get(menuID);
+		var menu:PopUpListView = new PopUpListView(collection, onMenuChange);
+		menu.name = menuID;
+		menu.prompt = this._menuIDToText.get(menuID);
+		menu.selectedIndex = -1;
+		if (this._menuIDToItemToEnabled.exists(menuID))
+		{
+			itemToEnabled = this._menuIDToItemToEnabled.get(menuID);
+		}
+		else
+		{
+			itemToEnabled = defaultItemToEnabled;
+		}
+		menu.itemToEnabled = itemToEnabled;
+		if (this._menuIDToItemToText.exists(menuID))
+		{
+			itemToText = this._menuIDToItemToText.get(menuID);
+		}
+		else
+		{
+			itemToText = defaultItemToText;
+		}
+		menu.itemToText = itemToText;
+		this._menuBar.addChild(menu);
 	}
 	
 	override function initialize():Void 
@@ -89,7 +135,7 @@ class EditorView extends LayoutGroup
 		
 		// menu bar
 		this._menuBar = new LayoutGroup();
-		//this._menuBar.variant = LayoutGroupVariant.
+		this._menuBar.variant = LayoutGroupVariant.MENU_BAR;
 		this._menuBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
@@ -98,35 +144,10 @@ class EditorView extends LayoutGroup
 		this._menuBar.layout = hLayout;
 		addChild(this._menuBar);
 		
-		// file menu
-		this._fileMenuCollection = new ArrayCollection<Dynamic>();
-		this._fileMenuCollection.add({text:"New", id:"new"});
-		this._fileMenuCollection.add({text:"Save", id:"save"});
-		this._fileMenuCollection.add({text:"Save As", id:"save as"});
-		this._fileMenuCollection.add({text:"Load", id:"load"});
-		this._fileMenuCollection.add({text:"export simple JSON", id:"export simple json"});
-		
-		this._fileMenu = new PopUpListView(this._fileMenuCollection, onFileMenuChange);
-		this._fileMenu.prompt = "File";
-		this._fileMenu.selectedIndex = -1;
-		this._fileMenu.itemToText = function(item:Dynamic):String
+		for (menuID in this._menuIDList)
 		{
-			return item.text;
-		};
-		this._menuBar.addChild(this._fileMenu);
-		
-		// asset menu
-		this._assetMenuCollection = new ArrayCollection<Dynamic>();
-		this._assetMenuCollection.add({text:"Browser", id:"browser"});
-		
-		this._assetMenu = new PopUpListView(this._assetMenuCollection, onAssetMenuChange);
-		this._assetMenu.prompt = "Asset";
-		this._assetMenu.selectedIndex = -1;
-		this._assetMenu.itemToText = function(item:Dynamic):String
-		{
-			return item.text;
-		};
-		this._menuBar.addChild(this._assetMenu);
+			createMenu(menuID);
+		}
 		
 		this._mainBox = new HDividedBox();
 		this._mainBox.layoutData = new AnchorLayoutData(new Anchor(0, this._menuBar), 0, 0, 0);
@@ -145,6 +166,7 @@ class EditorView extends LayoutGroup
 		
 		// left content
 		this._objectLibGroup = new ToggleLayoutGroup();
+		this._objectLibGroup.toggleVariant = ToggleButtonVariant.PANEL;
 		this._objectLibGroup.text = "Objects";
 		this._objectLibGroup.isOpen = true;
 		this._objectLibGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
@@ -153,19 +175,20 @@ class EditorView extends LayoutGroup
 		
 		this._objectLib = new ObjectLibrary();
 		this._objectLib.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-		this._objectLib.minWidth = UIConfig.LEFT_MIN_WIDTH;
+		//this._objectLib.minWidth = UIConfig.LEFT_MIN_WIDTH;
 		//this._objectLib.maxWidth = UIConfig.LEFT_MAX_WIDTH;
 		//this._leftBox.addChild(this._objectLib);
 		this._objectLibGroup.addContent(this._objectLib);
 		
 		// center content
 		this._displayArea = new LayoutGroup();
-		this._displayArea.minWidth = UIConfig.CENTER_MIN_WIDTH;
+		//this._displayArea.minWidth = UIConfig.CENTER_MIN_WIDTH;
 		this._centerBox.addChild(this._displayArea);
 		
 		// right content
 		this._objectInfoGroup = new ToggleLayoutGroup();
 		this._objectInfoGroup.contentVariant = LayoutGroupVariant.CONTENT;
+		this._objectInfoGroup.toggleVariant = ToggleButtonVariant.PANEL;
 		this._objectInfoGroup.text = "Info";
 		this._objectInfoGroup.isOpen = true;
 		this._objectInfoGroup.layoutData = new AnchorLayoutData(0, 0, null, 0);
@@ -175,6 +198,7 @@ class EditorView extends LayoutGroup
 		this._objectInfoGroup.addContent(this._objectInfo);
 		
 		this._propertiesGroup = new ToggleLayoutGroup();
+		this._propertiesGroup.toggleVariant = ToggleButtonVariant.PANEL;
 		this._propertiesGroup.text = "Properties";
 		this._propertiesGroup.isOpen = true;
 		this._propertiesGroup.layoutData = new AnchorLayoutData(new Anchor(0, this._objectInfoGroup), 0, 0, 0);
@@ -199,32 +223,24 @@ class EditorView extends LayoutGroup
 		this._propertiesGroup.addContent(this._editContainer);
 	}
 	
-	private function onAssetMenuChange(evt:Event):Void
+	private function defaultItemToEnabled(item:Dynamic):Bool
 	{
-		if (this._assetMenu.selectedIndex == -1) return;
-		
-		var id:String = this._assetMenu.selectedItem.id;
-		
-		this._assetMenu.selectedIndex = -1;
-		
-		if (this._assetMenuCallback != null)
-		{
-			this._assetMenuCallback(id);
-		}
+		return true;
 	}
 	
-	private function onFileMenuChange(evt:Event):Void
+	private function defaultItemToText(item:Dynamic):String
 	{
-		if (this._fileMenu.selectedIndex == -1) return;
-		
-		var id:String = this._fileMenu.selectedItem.id;
-		
-		this._fileMenu.selectedIndex = -1;
-		
-		if (this._fileMenuCallback != null)
-		{
-			this._fileMenuCallback(id);
-		}
+		return item.text;
+	}
+	
+	private function onMenuChange(evt:Event):Void
+	{
+		var menu:PopUpListView = cast evt.target;
+		if (menu.selectedIndex == -1) return;
+		var item:Dynamic = menu.selectedItem;
+		menu.selectedIndex = -1;
+		var callback:Dynamic->Void = this._menuCallbacks.get(menu.name);
+		if (callback != null) callback(item);
 	}
 	
 }

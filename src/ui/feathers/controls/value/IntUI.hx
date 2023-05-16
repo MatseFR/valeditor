@@ -81,7 +81,7 @@ class IntUI extends ValueUI
 				_input.restrict = "0123456789";
 			
 			default :
-				_input.restrict = "0123456789-";
+				_input.restrict = "-0123456789";
 		}
 		updateEditable();
 	}

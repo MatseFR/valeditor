@@ -5,6 +5,7 @@ import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
+import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
 import feathers.controls.TextInputState;
 import feathers.core.PopUpManager;
@@ -14,9 +15,11 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import ui.feathers.Padding;
 import ui.feathers.Spacing;
+import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 
@@ -71,7 +74,12 @@ class ObjectCreationWindow extends Panel
 	private var _nameLabel:Label;
 	private var _nameInput:TextInput;
 	
+	private var _constructorGroup:LayoutGroup;
+	private var _constructorLabel:Label;
+	private var _constructorContainer:ScrollContainer;
+	
 	private var _valEditClass:ValEditClass;
+	private var _constructorCollection:ExposedCollection;
 
 	public function new() 
 	{
@@ -120,6 +128,7 @@ class ObjectCreationWindow extends Panel
 		vLayout.setPadding(Padding.DEFAULT * 2);
 		this.layout = vLayout;
 		
+		// class
 		this._classGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
@@ -133,6 +142,7 @@ class ObjectCreationWindow extends Panel
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
 		this._classGroup.addChild(this._classPicker);
 		
+		// name
 		this._nameGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
@@ -145,12 +155,34 @@ class ObjectCreationWindow extends Panel
 		
 		this._nameInput = new TextInput("", null, onNameInputChange);
 		this._nameGroup.addChild(this._nameInput);
+		
+		// constructor
+		this._constructorGroup = new LayoutGroup();
+		this._constructorGroup.layoutData = new VerticalLayoutData(100, 100);
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		this._constructorGroup.layout = vLayout;
+		addChild(this._constructorGroup);
+		
+		this._constructorLabel = new Label("Constructor values");
+		this._constructorGroup.addChild(this._constructorLabel);
+		
+		this._constructorContainer = new ScrollContainer();
+		this._constructorContainer.layoutData = new VerticalLayoutData(100, 100);
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.gap = Spacing.VERTICAL_GAP;
+		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
+		this._constructorContainer.layout = vLayout;
+		this._constructorGroup.addChild(this._constructorContainer);
 	}
 	
 	public function reset(allowedClassNames:Array<String> = null):Void
 	{
 		var selectedItem:String = this._classPicker.selectedItem;
-		if (allowedClassNames != null)
+		if (allowedClassNames != null && allowedClassNames.length != 0)
 		{
 			this._classCollection.array = allowedClassNames;
 		}
@@ -199,9 +231,12 @@ class ObjectCreationWindow extends Panel
 		if (this._classPicker.selectedItem != null)
 		{
 			this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
+			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else
 		{
+			ValEdit.editConstructor(null, this._constructorContainer);
+			this._constructorCollection = null;
 			this._valEditClass = null;
 		}
 		checkValid();
@@ -216,8 +251,10 @@ class ObjectCreationWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		var name:String = null;
+		var params:Array<Dynamic> = null;
 		if (this._nameInput.text != "") name = this._nameInput.text;
-		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, name);
+		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
+		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, name, params);
 		PopUpManager.removePopUp(this);
 		if (this._confirmCallback != null) this._confirmCallback(object);
 	}
