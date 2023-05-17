@@ -2,6 +2,8 @@ package ui.feathers.window;
 
 import feathers.controls.Button;
 import feathers.controls.ComboBox;
+import feathers.controls.GridView;
+import feathers.controls.GridViewColumn;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
@@ -72,7 +74,7 @@ class ObjectSelectWindow extends Panel
 	
 	private var _objectGroup:LayoutGroup;
 	private var _objectLabel:Label;
-	private var _objectList:ListView;
+	private var _objectGrid:GridView;
 	private var _objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	
 	private var _excludeObjects:Array<Dynamic>;
@@ -145,14 +147,14 @@ class ObjectSelectWindow extends Panel
 		this._objectLabel = new Label("Select Object");
 		this._objectGroup.addChild(this._objectLabel);
 		
-		this._objectList = new ListView(null, onObjectChange);
-		this._objectList.layoutData = new VerticalLayoutData(100, 100);
-		this._objectList.itemToText = function(item:Dynamic):String
-		{
-			return item.name;
-		};
-		this._objectList.dataProvider = this._objectCollection;
-		this._objectGroup.addChild(this._objectList);
+		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
+			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("class", (item)->item.className)
+		]);
+		
+		this._objectGrid = new GridView(this._objectCollection, columns, onObjectChange);
+		this._objectGrid.layoutData = new VerticalLayoutData(100, 100);
+		this._objectGroup.addChild(this._objectGrid);
 	}
 	
 	public function reset(allowedClassNames:Array<String> = null, excludeObjects:Array<Dynamic> = null):Void
@@ -216,7 +218,7 @@ class ObjectSelectWindow extends Panel
 	
 	private function onObjectChange(evt:Event):Void
 	{
-		this._confirmButton.enabled = this._objectList.selectedItem != null;
+		this._confirmButton.enabled = this._objectGrid.selectedItem != null;
 	}
 	
 	private function onCancelButton(evt:TriggerEvent):Void
@@ -228,7 +230,7 @@ class ObjectSelectWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		PopUpManager.removePopUp(this);
-		this._confirmCallback(this._objectList.selectedItem);
+		this._confirmCallback(this._objectGrid.selectedItem);
 	}
 	
 	private function filterObject(object:ValEditObject):Bool
