@@ -1,8 +1,10 @@
 package ui.feathers.controls;
 
 import feathers.controls.Button;
+import feathers.controls.GridView;
+import feathers.controls.GridViewColumn;
 import feathers.controls.LayoutGroup;
-import feathers.controls.TreeView;
+import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -21,7 +23,7 @@ import valedit.ValEdit;
  */
 class ObjectLibrary extends LayoutGroup 
 {
-	private var _tree:TreeView;
+	private var _grid:GridView;
 	private var _footer:LayoutGroup;
 	
 	private var _objectAddButton:Button;
@@ -58,11 +60,16 @@ class ObjectLibrary extends LayoutGroup
 		this._objectRemoveButton.enabled = false;
 		this._footer.addChild(this._objectRemoveButton);
 		
-		this._tree = new TreeView(ValEdit.objectCollection, onTreeChange);
-		this._tree.variant = TreeView.VARIANT_BORDERLESS;
-		this._tree.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
-		this._tree.itemToText = (item:Dynamic) -> item.data.name;
-		addChild(this._tree);
+		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
+			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("class", (item)->item.className)
+		]);
+		
+		this._grid = new GridView(ValEdit.objectCollection, columns, onGridChange);
+		this._grid.resizableColumns = true;
+		this._grid.sortableColumns = true;
+		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
+		addChild(this._grid);
 	}
 	
 	private function onObjectAddButton(evt:TriggerEvent):Void
@@ -72,14 +79,14 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onObjectRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEdit.destroyObject(this._tree.selectedItem.data.object);
+		ValEdit.destroyObject(this._grid.selectedItem.object);
 	}
 	
-	private function onTreeChange(evt:Event):Void
+	private function onGridChange(evt:Event):Void
 	{
-		if (this._tree.selectedItem != null && this._tree.selectedItem.data.object != null)
+		if (this._grid.selectedItem != null)
 		{
-			ValEdit.edit(this._tree.selectedItem.data.object);
+			ValEdit.edit(this._grid.selectedItem.object);
 			this._objectRemoveButton.enabled = true;
 		}
 		else
