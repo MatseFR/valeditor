@@ -7,12 +7,12 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
-import feathers.controls.TextInputState;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
+import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
@@ -65,6 +65,13 @@ class ObjectCreationWindow extends Panel
 	private var _confirmButton:Button;
 	private var _cancelButton:Button;
 	
+	private var _categoryGroup:LayoutGroup;
+	private var _categoryLabel:Label;
+	private var _categoryControlsGroup:LayoutGroup;
+	private var _categoryPicker:ComboBox;
+	private var _categoryClearButton:Button;
+	private var _categoryCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
@@ -94,6 +101,7 @@ class ObjectCreationWindow extends Panel
 		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
 		
+		// header
 		this._headerGroup = new LayoutGroup();
 		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
 		hLayout = new HorizontalLayout();
@@ -106,6 +114,7 @@ class ObjectCreationWindow extends Panel
 		this._titleLabel = new Label(this._title);
 		this._headerGroup.addChild(_titleLabel);
 		
+		// footer
 		this._footerGroup = new LayoutGroup();
 		this._footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
 		hLayout = new HorizontalLayout();
@@ -127,6 +136,33 @@ class ObjectCreationWindow extends Panel
 		vLayout.gap = Spacing.DEFAULT;
 		vLayout.setPadding(Padding.DEFAULT * 2);
 		this.layout = vLayout;
+		
+		// category
+		this._categoryGroup = new LayoutGroup();
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		this._categoryGroup.layout = vLayout;
+		addChild(this._categoryGroup);
+		
+		this._categoryLabel = new Label("Category");
+		this._categoryGroup.addChild(this._categoryLabel);
+		
+		this._categoryControlsGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		this._categoryControlsGroup.layout = hLayout;
+		addChild(this._categoryControlsGroup);
+		
+		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
+		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
+		this._categoryControlsGroup.addChild(this._categoryPicker);
+		
+		this._categoryClearButton = new Button("X", onCategoryClear);
+		this._categoryClearButton.enabled = false;
+		this._categoryControlsGroup.addChild(this._categoryClearButton);
 		
 		// class
 		this._classGroup = new LayoutGroup();
@@ -179,7 +215,7 @@ class ObjectCreationWindow extends Panel
 		this._constructorGroup.addChild(this._constructorContainer);
 	}
 	
-	public function reset(allowedClassNames:Array<String> = null):Void
+	public function reset(?allowedClassNames:Array<String>, ?allowedCategories:Array<String>):Void
 	{
 		var selectedItem:String = this._classPicker.selectedItem;
 		if (allowedClassNames != null && allowedClassNames.length != 0)
@@ -224,6 +260,25 @@ class ObjectCreationWindow extends Panel
 			this._nameInput.errorString = null;
 		}
 		this._confirmButton.enabled = isValid;
+	}
+	
+	private function onCategoryChange(evt:Event):Void
+	{
+		if (_categoryPicker.selectedItem != null)
+		{
+			
+			_categoryClearButton.enabled = true;
+		}
+		else
+		{
+			
+			_categoryClearButton.enabled = false;
+		}
+	}
+	
+	private function onCategoryClear(evt:TriggerEvent):Void
+	{
+		this._categoryPicker.selectedIndex = -1;
 	}
 	
 	private function onClassChange(evt:Event):Void
