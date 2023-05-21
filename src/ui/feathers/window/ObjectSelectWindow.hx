@@ -6,7 +6,6 @@ import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
-import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;

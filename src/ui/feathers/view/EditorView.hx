@@ -6,6 +6,8 @@ import feathers.controls.PopUpListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
 import feathers.controls.VDividedBox;
+import feathers.controls.navigators.TabItem;
+import feathers.controls.navigators.TabNavigator;
 import feathers.data.ArrayCollection;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -15,8 +17,9 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
-import ui.feathers.controls.ObjectInfo;
+import ui.feathers.controls.SelectionInfo;
 import ui.feathers.controls.ObjectLibrary;
+import ui.feathers.controls.TemplateLibrary;
 import ui.feathers.controls.ToggleLayoutGroup;
 import ui.feathers.variant.LayoutGroupVariant;
 import ui.feathers.variant.ToggleButtonVariant;
@@ -41,14 +44,16 @@ class EditorView extends LayoutGroup
 	
 	// left content
 	private var _objectLibGroup:ToggleLayoutGroup;
+	private var _libNavigator:TabNavigator;
 	private var _objectLib:ObjectLibrary;
+	private var _templateLib:TemplateLibrary;
 	
 	// center content
 	private var _displayArea:LayoutGroup;
 	
 	// right content
 	private var _objectInfoGroup:ToggleLayoutGroup;
-	private var _objectInfo:ObjectInfo;
+	private var _objectInfo:SelectionInfo;
 	private var _propertiesGroup:ToggleLayoutGroup;
 	private var _editContainer:ScrollContainer;
 	
@@ -154,6 +159,7 @@ class EditorView extends LayoutGroup
 		addChild(this._mainBox);
 		
 		this._leftBox = new LayoutGroup();
+		this._leftBox.minWidth = UIConfig.LEFT_MIN_WIDTH;
 		this._leftBox.layout = new AnchorLayout();
 		this._mainBox.addChild(this._leftBox);
 		
@@ -161,27 +167,41 @@ class EditorView extends LayoutGroup
 		this._mainBox.addChild(this._centerBox);
 		
 		this._rightBox = new LayoutGroup();
+		this._rightBox.minWidth = UIConfig.VALUE_MIN_WIDTH;
 		this._rightBox.layout = new AnchorLayout();
 		this._mainBox.addChild(this._rightBox);
 		
 		// left content
 		this._objectLibGroup = new ToggleLayoutGroup();
 		this._objectLibGroup.toggleVariant = ToggleButtonVariant.PANEL;
-		this._objectLibGroup.text = "Objects";
+		this._objectLibGroup.contentVariant = LayoutGroupVariant.CONTENT;
+		this._objectLibGroup.text = "Library";
 		this._objectLibGroup.isOpen = true;
 		this._objectLibGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		this._objectLibGroup.contentLayout = new AnchorLayout();
 		this._leftBox.addChild(this._objectLibGroup);
 		
 		this._objectLib = new ObjectLibrary();
-		this._objectLib.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-		//this._objectLib.minWidth = UIConfig.LEFT_MIN_WIDTH;
-		//this._objectLib.maxWidth = UIConfig.LEFT_MAX_WIDTH;
-		//this._leftBox.addChild(this._objectLib);
-		this._objectLibGroup.addContent(this._objectLib);
+		this._templateLib = new TemplateLibrary();
+		
+		var views:ArrayCollection<TabItem> = new ArrayCollection<TabItem>([
+			TabItem.withDisplayObject("Objects", this._objectLib),
+			TabItem.withDisplayObject("Templates", this._templateLib)
+		]);
+		
+		this._libNavigator = new TabNavigator(views);
+		this._libNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
+		this._objectLibGroup.addContent(this._libNavigator);
+		//this._objectLib.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		////this._objectLib.minWidth = UIConfig.LEFT_MIN_WIDTH;
+		////this._objectLib.maxWidth = UIConfig.LEFT_MAX_WIDTH;
+		////this._leftBox.addChild(this._objectLib);
+		//this._objectLibGroup.addContent(this._objectLib);
+		
 		
 		// center content
 		this._displayArea = new LayoutGroup();
+		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
 		//this._displayArea.minWidth = UIConfig.CENTER_MIN_WIDTH;
 		this._centerBox.addChild(this._displayArea);
 		
@@ -194,7 +214,7 @@ class EditorView extends LayoutGroup
 		this._objectInfoGroup.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		this._rightBox.addChild(this._objectInfoGroup);
 		
-		this._objectInfo = new ObjectInfo();
+		this._objectInfo = new SelectionInfo();
 		this._objectInfoGroup.addContent(this._objectInfo);
 		
 		this._propertiesGroup = new ToggleLayoutGroup();
@@ -231,6 +251,11 @@ class EditorView extends LayoutGroup
 	private function defaultItemToText(item:Dynamic):String
 	{
 		return item.text;
+	}
+	
+	private function onDisplayAreaResize(evt:Event):Void
+	{
+		
 	}
 	
 	private function onMenuChange(evt:Event):Void
