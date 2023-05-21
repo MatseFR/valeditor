@@ -20,6 +20,7 @@ import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditClass;
+import valedit.ValEditTemplate;
 
 /**
  * ...
@@ -35,10 +36,10 @@ class TemplateCreationWindow extends Panel
 		return this._cancelCallback = value;
 	}
 	
-	public var confirmCallback(get, set):Dynamic->Void;
-	private var _confirmCallback:Dynamic->Void;
-	private function get_confirmCallback():Dynamic->Void { return this._confirmCallback; }
-	private function set_confirmCallback(value:Dynamic->Void):Dynamic->Void
+	public var confirmCallback(get, set):ValEditTemplate->Void;
+	private var _confirmCallback:ValEditTemplate->Void;
+	private function get_confirmCallback():ValEditTemplate->Void { return this._confirmCallback; }
+	private function set_confirmCallback(value:ValEditTemplate->Void):Dynamic->Void
 	{
 		return this._confirmCallback = value;
 	}
@@ -304,12 +305,22 @@ class TemplateCreationWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		var name:String = null;
-		var params:Array<Dynamic> = null;
 		if (this._nameInput.text != "") name = this._nameInput.text;
-		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
-		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, name, params);
+		
+		var constructorCollection:ExposedCollection;
+		if (this._constructorCollection != null)
+		{
+			constructorCollection = this._constructorCollection.clone(true);
+		}
+		else
+		{
+			constructorCollection = null;
+		}
+		
+		var template:ValEditTemplate = ValEdit.createTemplateWithClassName(this._valEditClass.className, name, constructorCollection);
+		
 		PopUpManager.removePopUp(this);
-		if (this._confirmCallback != null) this._confirmCallback(object);
+		if (this._confirmCallback != null) this._confirmCallback(template);
 	}
 	
 	private function onNameInputChange(evt:Event):Void

@@ -3,6 +3,7 @@ import feathers.core.PopUpManager;
 import openfl.Lib;
 import ui.feathers.window.ObjectCreationWindow;
 import ui.feathers.window.ObjectSelectWindow;
+import ui.feathers.window.TemplateCreationWindow;
 import ui.feathers.window.asset.AssetBrowser;
 import ui.feathers.window.asset.BinaryAssetsWindow;
 import ui.feathers.window.asset.BitmapAssetsWindow;
@@ -41,6 +42,8 @@ class FeathersWindows
 	static private var _objectCreate:ObjectCreationWindow;
 	static private var _objectEdit:ObjectEditWindow;
 	static private var _objectSelect:ObjectSelectWindow;
+	
+	static private var _templateCreate:TemplateCreationWindow;
 	
 	static public function showAssetBrowser():Void
 	{
@@ -177,7 +180,7 @@ class FeathersWindows
 	}
 	#end
 	
-	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, title:String = "Create Object"):Void
+	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void
 	{
 		if (_objectCreate == null)
 		{
@@ -187,7 +190,7 @@ class FeathersWindows
 		_objectCreate.title = title;
 		_objectCreate.confirmCallback = confirmCallback;
 		_objectCreate.cancelCallback = cancelCallback;
-		_objectCreate.reset(allowedClassNames);
+		_objectCreate.reset();
 		
 		_objectCreate.width = Lib.current.stage.stageWidth / 2;
 		_objectCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
@@ -213,7 +216,7 @@ class FeathersWindows
 		PopUpManager.addPopUp(_objectEdit, Lib.current.stage);
 	}
 	
-	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, allowedClassNames:Array<String> = null, excludeObjects:Array<Dynamic> = null, title:String = "Select Object"):Void
+	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, ?allowedClassNames:Array<String>, ?allowedCategories:Array<String>, ?excludeObjects:Array<Dynamic>, title:String = "Select Object"):Void
 	{
 		if (_objectSelect == null)
 		{
@@ -229,6 +232,24 @@ class FeathersWindows
 		_objectSelect.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
 		
 		PopUpManager.addPopUp(_objectSelect, Lib.current.stage);
+	}
+	
+	static public function showTemplateCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Template"):Void
+	{
+		if (_templateCreate == null)
+		{
+			_templateCreate = new TemplateCreationWindow();
+		}
+		
+		_templateCreate.title = title;
+		_templateCreate.confirmCallback = confirmCallback;
+		_templateCreate.cancelCallback = cancelCallback;
+		_templateCreate.reset();
+		
+		_templateCreate.width = Lib.current.stage.stageWidth / 2;
+		_templateCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		PopUpManager.addPopUp(_templateCreate, Lib.current.stage);
 	}
 	
 }
