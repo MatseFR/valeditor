@@ -1,5 +1,6 @@
 package ui.feathers.controls;
 
+import events.SelectionEvent;
 import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
@@ -12,6 +13,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import ui.feathers.FeathersWindows;
 import ui.feathers.Spacing;
 import valedit.ValEdit;
 
@@ -61,7 +63,7 @@ class TemplateLibrary extends LayoutGroup
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			new GridViewColumn("name", (item)->item.name),
 			new GridViewColumn("class", (item)->item.className),
-			new GridViewColumn("instances", (item)->Std.string(item.numInstances))
+			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);
 		
 		this._grid = new GridView(ValEdit.templateCollection, columns, onGridChange);
@@ -69,28 +71,43 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
+		
+		ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 	}
 	
 	private function onTemplateAddButton(evt:TriggerEvent):Void
 	{
-		
+		FeathersWindows.showTemplateCreationWindow();
 	}
 	
 	private function onTemplateRemoveButton(evt:TriggerEvent):Void
 	{
-		
+		ValEdit.destroyTemplate(this._grid.selectedItem);
 	}
 	
 	private function onGridChange(evt:Event):Void
 	{
 		if (this._grid.selectedItem != null)
 		{
-			
+			ValEdit.editTemplate(this._grid.selectedItem);
+			ValEdit.selection.object = this._grid.selectedItem;
 			this._templateRemoveButton.enabled = true;
 		}
 		else
 		{
 			this._templateRemoveButton.enabled = false;
+		}
+	}
+	
+	private function onObjectSelectionChange(evt:SelectionEvent):Void
+	{
+		if (evt.object != null)
+		{
+			this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
+		}
+		else
+		{
+			this._grid.selectedIndex = -1;
 		}
 	}
 	
