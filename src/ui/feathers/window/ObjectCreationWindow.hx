@@ -1,27 +1,22 @@
 package ui.feathers.window;
 
 import feathers.controls.Button;
-import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
-import feathers.controls.ScrollContainer;
-import feathers.controls.TextInput;
+import feathers.controls.navigators.TabItem;
+import feathers.controls.navigators.TabNavigator;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
+import feathers.layout.AnchorLayout;
+import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
-import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
-import feathers.layout.VerticalLayout;
-import feathers.layout.VerticalLayoutData;
-import openfl.events.Event;
 import ui.feathers.Padding;
-import ui.feathers.Spacing;
-import valedit.ExposedCollection;
-import valedit.ValEdit;
-import valedit.ValEditClass;
+import ui.feathers.view.ObjectCreationFromClassView;
+import ui.feathers.view.ObjectCreationFromTemplateView;
 
 /**
  * ...
@@ -65,29 +60,10 @@ class ObjectCreationWindow extends Panel
 	private var _confirmButton:Button;
 	private var _cancelButton:Button;
 	
-	private var _categoryGroup:LayoutGroup;
-	private var _categoryLabel:Label;
-	private var _categoryControlsGroup:LayoutGroup;
-	private var _categoryPicker:ComboBox;
-	private var _categoryClearButton:Button;
-	private var _categoryCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _navigator:TabNavigator;
+	private var _classView:ObjectCreationFromClassView;
+	private var _templateView:ObjectCreationFromTemplateView;
 	
-	private var _classGroup:LayoutGroup;
-	private var _classLabel:Label;
-	private var _classPicker:ComboBox;
-	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
-	
-	private var _nameGroup:LayoutGroup;
-	private var _nameLabel:Label;
-	private var _nameInput:TextInput;
-	
-	private var _constructorGroup:LayoutGroup;
-	private var _constructorLabel:Label;
-	private var _constructorContainer:ScrollContainer;
-	
-	private var _valEditClass:ValEditClass;
-	private var _constructorCollection:ExposedCollection;
-
 	public function new() 
 	{
 		super();
@@ -99,7 +75,6 @@ class ObjectCreationWindow extends Panel
 		super.initialize();
 		
 		var hLayout:HorizontalLayout;
-		var vLayout:VerticalLayout;
 		
 		// header
 		this._headerGroup = new LayoutGroup();
@@ -130,171 +105,27 @@ class ObjectCreationWindow extends Panel
 		this._cancelButton = new Button("cancel", onCancelButton);
 		this._footerGroup.addChild(this._cancelButton);
 		
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.MIDDLE;
-		vLayout.gap = Spacing.DEFAULT;
-		vLayout.setPadding(Padding.DEFAULT * 2);
-		this.layout = vLayout;
+		this.layout = new AnchorLayout();
 		
-		// category
-		this._categoryGroup = new LayoutGroup();
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._categoryGroup.layout = vLayout;
-		addChild(this._categoryGroup);
+		this._classView = new ObjectCreationFromClassView();
+		this._classView.confirmButton = this._confirmButton;
+		this._templateView = new ObjectCreationFromTemplateView();
+		this._templateView.confirmButton = this._confirmButton;
 		
-		this._categoryLabel = new Label("Category");
-		this._categoryGroup.addChild(this._categoryLabel);
+		var views:ArrayCollection<TabItem> = new ArrayCollection<TabItem>([
+			TabItem.withDisplayObject("Class", this._classView),
+			TabItem.withDisplayObject("Template", this._templateView)
+		]);
 		
-		this._categoryControlsGroup = new LayoutGroup();
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.gap = Spacing.HORIZONTAL_GAP;
-		this._categoryControlsGroup.layout = hLayout;
-		addChild(this._categoryControlsGroup);
-		
-		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
-		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
-		this._categoryControlsGroup.addChild(this._categoryPicker);
-		
-		this._categoryClearButton = new Button("X", onCategoryClear);
-		this._categoryClearButton.enabled = false;
-		this._categoryControlsGroup.addChild(this._categoryClearButton);
-		
-		// class
-		this._classGroup = new LayoutGroup();
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._classGroup.layout = vLayout;
-		addChild(this._classGroup);
-		
-		this._classLabel = new Label("Object Class");
-		this._classGroup.addChild(this._classLabel);
-		
-		this._classPicker = new ComboBox(this._classCollection, onClassChange);
-		this._classGroup.addChild(this._classPicker);
-		
-		// name
-		this._nameGroup = new LayoutGroup();
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._nameGroup.layout = vLayout;
-		addChild(this._nameGroup);
-		
-		this._nameLabel = new Label("Object Name (optionnal)");
-		this._nameGroup.addChild(this._nameLabel);
-		
-		this._nameInput = new TextInput("", null, onNameInputChange);
-		this._nameGroup.addChild(this._nameInput);
-		
-		// constructor
-		this._constructorGroup = new LayoutGroup();
-		this._constructorGroup.layoutData = new VerticalLayoutData(100, 100);
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._constructorGroup.layout = vLayout;
-		addChild(this._constructorGroup);
-		
-		this._constructorLabel = new Label("Constructor values");
-		this._constructorGroup.addChild(this._constructorLabel);
-		
-		this._constructorContainer = new ScrollContainer();
-		this._constructorContainer.layoutData = new VerticalLayoutData(100, 100);
-		vLayout = new VerticalLayout();
-		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
-		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
-		this._constructorContainer.layout = vLayout;
-		this._constructorGroup.addChild(this._constructorContainer);
+		this._navigator = new TabNavigator(views);
+		this._navigator.layoutData = new AnchorLayoutData(Padding.DEFAULT * 2, Padding.DEFAULT * 2, Padding.DEFAULT * 2, Padding.DEFAULT * 2);
+		addChild(this._navigator);
 	}
 	
-	public function reset(?allowedClassNames:Array<String>, ?allowedCategories:Array<String>):Void
+	public function reset():Void
 	{
-		var selectedItem:String = this._classPicker.selectedItem;
-		if (allowedClassNames != null && allowedClassNames.length != 0)
-		{
-			this._classCollection.array = allowedClassNames;
-		}
-		else
-		{
-			// allow all classes
-			this._classCollection.removeAll();
-			this._classCollection.addAll(ValEdit.classCollection);
-		}
-		if (selectedItem != null)
-		{
-			var index:Int = this._classCollection.indexOf(selectedItem);
-			this._classPicker.selectedIndex = index;
-		}
-		checkValid();
-	}
-	
-	private function checkValid():Void
-	{
-		var isValid:Bool = true;
-		if (this._valEditClass == null)
-		{
-			isValid = false;
-		}
-		else if (this._nameInput.text != "")
-		{
-			if (this._valEditClass.objectNameExists(this._nameInput.text))
-			{
-				isValid = false;
-				this._nameInput.errorString = "name already in use";
-			}
-			else
-			{
-				this._nameInput.errorString = null;
-			}
-		}
-		else
-		{
-			this._nameInput.errorString = null;
-		}
-		this._confirmButton.enabled = isValid;
-	}
-	
-	private function onCategoryChange(evt:Event):Void
-	{
-		if (_categoryPicker.selectedItem != null)
-		{
-			
-			_categoryClearButton.enabled = true;
-		}
-		else
-		{
-			
-			_categoryClearButton.enabled = false;
-		}
-	}
-	
-	private function onCategoryClear(evt:TriggerEvent):Void
-	{
-		this._categoryPicker.selectedIndex = -1;
-	}
-	
-	private function onClassChange(evt:Event):Void
-	{
-		if (this._classPicker.selectedItem != null)
-		{
-			this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
-			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
-		}
-		else
-		{
-			ValEdit.editConstructor(null, this._constructorContainer);
-			this._constructorCollection = null;
-			this._valEditClass = null;
-		}
-		checkValid();
+		this._classView.reset();
+		this._templateView.reset();
 	}
 	
 	private function onCancelButton(evt:TriggerEvent):Void
@@ -305,18 +136,17 @@ class ObjectCreationWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		var name:String = null;
-		var params:Array<Dynamic> = null;
-		if (this._nameInput.text != "") name = this._nameInput.text;
-		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
-		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, name, params);
+		var object:Dynamic;
+		if (this._navigator.activeItemView == this._classView)
+		{
+			object = this._classView.confirm();
+		}
+		else //if (this._navigator.activeItemView == this._templateView)
+		{
+			object = this._templateView.confirm();
+		}
 		PopUpManager.removePopUp(this);
 		if (this._confirmCallback != null) this._confirmCallback(object);
-	}
-	
-	private function onNameInputChange(evt:Event):Void
-	{
-		checkValid();
 	}
 	
 }
