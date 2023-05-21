@@ -1,5 +1,6 @@
 package ui.feathers.controls;
 
+import events.SelectionEvent;
 import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
@@ -70,6 +71,8 @@ class ObjectLibrary extends LayoutGroup
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
+		
+		ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 	}
 	
 	private function onObjectAddButton(evt:TriggerEvent):Void
@@ -87,11 +90,24 @@ class ObjectLibrary extends LayoutGroup
 		if (this._grid.selectedItem != null)
 		{
 			ValEdit.edit(this._grid.selectedItem.object);
+			ValEdit.selection.object = this._grid.selectedItem;
 			this._objectRemoveButton.enabled = true;
 		}
 		else
 		{
 			this._objectRemoveButton.enabled = false;
+		}
+	}
+	
+	private function onObjectSelectionChange(evt:SelectionEvent):Void
+	{
+		if (evt.object != null)
+		{
+			this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
+		}
+		else
+		{
+			this._grid.selectedIndex = -1;
 		}
 	}
 	
