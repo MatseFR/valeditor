@@ -1,9 +1,11 @@
 package ui.feathers.controls.value;
 
+import feathers.controls.Button;
 import feathers.controls.HSlider;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
+import feathers.events.TriggerEvent;
 import feathers.graphics.FillStyle;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -13,6 +15,7 @@ import feathers.layout.VerticalLayout;
 import feathers.skins.RectangleSkin;
 import openfl.events.Event;
 import ui.feathers.Spacing;
+import ui.feathers.controls.ValueWedge;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.LayoutGroupVariant;
@@ -52,6 +55,10 @@ class ColorUI extends ValueUI
 	private var _blueSlider:HSlider;
 	private var _blueInput:TextInput;
 	
+	private var _nullGroup:LayoutGroup;
+	private var _wedge:ValueWedge;
+	private var _nullButton:Button;
+	
 	/**
 	   
 	**/
@@ -76,137 +83,167 @@ class ColorUI extends ValueUI
 		this.layout = vLayout;
 		
 		// Preview
-		_previewGroup = new LayoutGroup();
+		this._previewGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		_previewGroup.layout = hLayout;
-		addChild(_previewGroup);
+		this._previewGroup.layout = hLayout;
+		addChild(this._previewGroup);
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		_previewGroup.addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		this._previewGroup.addChild(this._label);
 		
-		_preview = new LayoutGroup();
-		_preview.variant = LayoutGroupVariant.COLOR_PREVIEW_CONTAINER;
-		_previewGroup.addChild(_preview);
+		this._preview = new LayoutGroup();
+		this._preview.variant = LayoutGroupVariant.COLOR_PREVIEW_CONTAINER;
+		this._previewGroup.addChild(this._preview);
 		
-		_previewColor = new LayoutGroup();
-		_previewColor.variant = LayoutGroupVariant.COLOR_PREVIEW;
-		_previewSkin = new RectangleSkin(FillStyle.SolidColor(0xffffff));
-		_previewColor.backgroundSkin = _previewSkin;
-		_preview.addChild(_previewColor);
+		this._previewColor = new LayoutGroup();
+		this._previewColor.variant = LayoutGroupVariant.COLOR_PREVIEW;
+		this._previewSkin = new RectangleSkin(FillStyle.SolidColor(0xffffff));
+		this._previewColor.backgroundSkin = this._previewSkin;
+		this._preview.addChild(this._previewColor);
 		
 		// Hexa
-		_hexGroup = new LayoutGroup();
+		this._hexGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		_hexGroup.layout = hLayout;
-		addChild(_hexGroup);
+		this._hexGroup.layout = hLayout;
+		addChild(this._hexGroup);
 		
-		_hexLabel = new Label("hexa");
-		_hexLabel.variant = LabelVariant.SUBVALUE_NAME;
-		_hexGroup.addChild(_hexLabel);
+		this._hexLabel = new Label("hexa");
+		this._hexLabel.variant = LabelVariant.SUBVALUE_NAME;
+		this._hexGroup.addChild(this._hexLabel);
 		
-		_hexInput = new TextInput();
-		_hexInput.variant = TextInputVariant.FULL_WIDTH;
-		_hexInput.restrict = "0123456789abcdef";
-		_hexInput.maxChars = 6;
-		_hexInput.text = "ffffff";
-		_hexGroup.addChild(_hexInput);
+		this._hexInput = new TextInput();
+		this._hexInput.variant = TextInputVariant.FULL_WIDTH;
+		this._hexInput.restrict = "0123456789abcdef";
+		this._hexInput.maxChars = 6;
+		this._hexInput.text = "ffffff";
+		this._hexInput.prompt = "null";
+		this._hexGroup.addChild(this._hexInput);
 		
 		// Red
-		_redGroup = new LayoutGroup();
+		this._redGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		_redGroup.layout = hLayout;
-		addChild(_redGroup);
+		this._redGroup.layout = hLayout;
+		addChild(this._redGroup);
 		
-		_redLabel = new Label("red");
-		_redLabel.variant = LabelVariant.SUBVALUE_NAME;
-		_redGroup.addChild(_redLabel);
+		this._redLabel = new Label("red");
+		this._redLabel.variant = LabelVariant.SUBVALUE_NAME;
+		this._redGroup.addChild(this._redLabel);
 		
-		_redSlider = new HSlider();
-		_redSlider.layoutData = new HorizontalLayoutData(100);
-		_redSlider.minimum = 0;
-		_redSlider.maximum = 255;
-		_redSlider.step = 1;
-		_redSlider.value = 255;
-		_redGroup.addChild(_redSlider);
+		this._redSlider = new HSlider();
+		this._redSlider.layoutData = new HorizontalLayoutData(100);
+		this._redSlider.minimum = 0;
+		this._redSlider.maximum = 255;
+		this._redSlider.step = 1;
+		this._redSlider.value = 255;
+		this._redGroup.addChild(_redSlider);
 		
-		_redInput = new TextInput();
-		_redInput.variant = TextInputVariant.NUMERIC_SMALL;
-		_redInput.restrict = "0123456789";
-		_redInput.maxChars = 3;
-		_redInput.text = "255";
-		_redGroup.addChild(_redInput);
+		this._redInput = new TextInput();
+		this._redInput.variant = TextInputVariant.NUMERIC_SMALL;
+		this._redInput.restrict = "0123456789";
+		this._redInput.maxChars = 3;
+		this._redInput.text = "255";
+		this._redGroup.addChild(this._redInput);
 		
 		// Green
-		_greenGroup = new LayoutGroup();
+		this._greenGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		_greenGroup.layout = hLayout;
-		addChild(_greenGroup);
+		this._greenGroup.layout = hLayout;
+		addChild(this._greenGroup);
 		
-		_greenLabel = new Label("green");
-		_greenLabel.variant = LabelVariant.SUBVALUE_NAME;
-		_greenGroup.addChild(_greenLabel);
+		this._greenLabel = new Label("green");
+		this._greenLabel.variant = LabelVariant.SUBVALUE_NAME;
+		this._greenGroup.addChild(this._greenLabel);
 		
-		_greenSlider = new HSlider();
-		_greenSlider.layoutData = new HorizontalLayoutData(100);
-		_greenSlider.minimum = 0;
-		_greenSlider.maximum = 255;
-		_greenSlider.step = 1;
-		_greenSlider.value = 255;
-		_greenGroup.addChild(_greenSlider);
+		this._greenSlider = new HSlider();
+		this._greenSlider.layoutData = new HorizontalLayoutData(100);
+		this._greenSlider.minimum = 0;
+		this._greenSlider.maximum = 255;
+		this._greenSlider.step = 1;
+		this._greenSlider.value = 255;
+		this._greenGroup.addChild(this._greenSlider);
 		
-		_greenInput = new TextInput();
-		_greenInput.variant = TextInputVariant.NUMERIC_SMALL;
-		_greenInput.restrict = "0123456789";
-		_greenInput.maxChars = 3;
-		_greenInput.text = "255";
-		_greenGroup.addChild(_greenInput);
+		this._greenInput = new TextInput();
+		this._greenInput.variant = TextInputVariant.NUMERIC_SMALL;
+		this._greenInput.restrict = "0123456789";
+		this._greenInput.maxChars = 3;
+		this._greenInput.text = "255";
+		this._greenGroup.addChild(this._greenInput);
 		
 		// Blue
-		_blueGroup = new LayoutGroup();
+		this._blueGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		_blueGroup.layout = hLayout;
-		addChild(_blueGroup);
+		this._blueGroup.layout = hLayout;
+		addChild(this._blueGroup);
 		
-		_blueLabel = new Label("blue");
-		_blueLabel.variant = LabelVariant.SUBVALUE_NAME;
-		_blueGroup.addChild(_blueLabel);
+		this._blueLabel = new Label("blue");
+		this._blueLabel.variant = LabelVariant.SUBVALUE_NAME;
+		this._blueGroup.addChild(this._blueLabel);
 		
-		_blueSlider = new HSlider();
-		_blueSlider.layoutData = new HorizontalLayoutData(100);
-		_blueSlider.minimum = 0;
-		_blueSlider.maximum = 255;
-		_blueSlider.step = 1;
-		_blueSlider.value = 255;
-		_blueGroup.addChild(_blueSlider);
+		this._blueSlider = new HSlider();
+		this._blueSlider.layoutData = new HorizontalLayoutData(100);
+		this._blueSlider.minimum = 0;
+		this._blueSlider.maximum = 255;
+		this._blueSlider.step = 1;
+		this._blueSlider.value = 255;
+		this._blueGroup.addChild(this._blueSlider);
 		
-		_blueInput = new TextInput();
-		_blueInput.variant = TextInputVariant.NUMERIC_SMALL;
-		_blueInput.restrict = "0123456789";
-		_blueInput.maxChars = 3;
-		_blueInput.text = "255";
-		_blueGroup.addChild(_blueInput);
+		this._blueInput = new TextInput();
+		this._blueInput.variant = TextInputVariant.NUMERIC_SMALL;
+		this._blueInput.restrict = "0123456789";
+		this._blueInput.maxChars = 3;
+		this._blueInput.text = "255";
+		this._blueGroup.addChild(this._blueInput);
+		
+		this._nullGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
+		this._nullGroup.layout = hLayout;
+		
+		this._wedge = new ValueWedge();
+		this._nullGroup.addChild(this._wedge);
+		
+		this._nullButton = new Button("set to null");
+		this._nullButton.layoutData = new HorizontalLayoutData(100);
+		this._nullGroup.addChild(this._nullButton);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_label.text = _exposedValue.name;
+		this._label.text = this._exposedValue.name;
+		if (this._exposedValue.isNullable)
+		{
+			if (this._nullGroup.parent == null)
+			{
+				addChild(this._nullGroup);
+			}
+		}
+		else
+		{
+			if (this._nullGroup.parent != null)
+			{
+				removeChild(this._nullGroup);
+			}
+		}
 		updateEditable();
 	}
 	
@@ -214,7 +251,7 @@ class ColorUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_exposedValue != null)
+		if (this._exposedValue != null)
 		{
 			colorUpdate();
 		}
@@ -222,17 +259,18 @@ class ColorUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_preview.enabled = _exposedValue.isEditable;
-		_hexLabel.enabled = _exposedValue.isEditable;
-		_hexInput.enabled = _exposedValue.isEditable;
-		_redLabel.enabled = _exposedValue.isEditable;
-		_redSlider.enabled = _exposedValue.isEditable;
-		_redInput.enabled = _exposedValue.isEditable;
-		_greenLabel.enabled = _exposedValue.isEditable;
-		_greenSlider.enabled = _exposedValue.isEditable;
-		_greenInput.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._preview.enabled = this._exposedValue.isEditable;
+		this._hexLabel.enabled = this._exposedValue.isEditable;
+		this._hexInput.enabled = this._exposedValue.isEditable;
+		this._redLabel.enabled = this._exposedValue.isEditable;
+		this._redSlider.enabled = this._exposedValue.isEditable;
+		this._redInput.enabled = this._exposedValue.isEditable;
+		this._greenLabel.enabled = this._exposedValue.isEditable;
+		this._greenSlider.enabled = this._exposedValue.isEditable;
+		this._greenInput.enabled = this._exposedValue.isEditable;
+		this._nullButton.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -243,85 +281,101 @@ class ColorUI extends ValueUI
 	
 	private function colorUpdate():Void
 	{
-		var controlsEnabled:Bool = _controlsEnabled;
+		var controlsEnabled:Bool = this._controlsEnabled;
 		if (controlsEnabled) controlsDisable();
-		var value:Int = _exposedValue.value;
-		_previewSkin.fill = FillStyle.SolidColor(value);
-		_hexInput.text = ColorUtil.RGBtoHexString(value);
-		_redInput.text = Std.string(ColorUtil.getRed(value));
-		_redSlider.value = ColorUtil.getRed(value);
-		_greenInput.text = Std.string(ColorUtil.getGreen(value));
-		_greenSlider.value = ColorUtil.getGreen(value);
-		_blueInput.text = Std.string(ColorUtil.getBlue(value));
-		_blueSlider.value = ColorUtil.getBlue(value);
+		if (this._exposedValue.value == null)
+		{
+			this._previewSkin.fill = FillStyle.None;
+			this._hexInput.text = "";
+		}
+		else
+		{
+			var value:Int = this._exposedValue.value;
+			this._previewSkin.fill = FillStyle.SolidColor(value);
+			this._hexInput.text = ColorUtil.RGBtoHexString(value);
+			this._redInput.text = Std.string(ColorUtil.getRed(value));
+			this._redSlider.value = ColorUtil.getRed(value);
+			this._greenInput.text = Std.string(ColorUtil.getGreen(value));
+			this._greenSlider.value = ColorUtil.getGreen(value);
+			this._blueInput.text = Std.string(ColorUtil.getBlue(value));
+			this._blueSlider.value = ColorUtil.getBlue(value);
+		}
 		if (controlsEnabled) controlsEnable();
 	}
 	
 	override function controlsDisable():Void
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_hexInput.removeEventListener(Event.CHANGE, onHexInputChange);
-		_redSlider.removeEventListener(Event.CHANGE, onRedSliderChange);
-		_redInput.removeEventListener(Event.CHANGE, onRedInputChange);
-		_greenSlider.removeEventListener(Event.CHANGE, onGreenSliderChange);
-		_greenInput.removeEventListener(Event.CHANGE, onGreenInputChange);
-		_blueSlider.removeEventListener(Event.CHANGE, onBlueSliderChange);
-		_blueInput.removeEventListener(Event.CHANGE, onBlueInputChange);
+		this._hexInput.removeEventListener(Event.CHANGE, onHexInputChange);
+		this._redSlider.removeEventListener(Event.CHANGE, onRedSliderChange);
+		this._redInput.removeEventListener(Event.CHANGE, onRedInputChange);
+		this._greenSlider.removeEventListener(Event.CHANGE, onGreenSliderChange);
+		this._greenInput.removeEventListener(Event.CHANGE, onGreenInputChange);
+		this._blueSlider.removeEventListener(Event.CHANGE, onBlueSliderChange);
+		this._blueInput.removeEventListener(Event.CHANGE, onBlueInputChange);
+		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	override function controlsEnable():Void
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_hexInput.addEventListener(Event.CHANGE, onHexInputChange);
-		_redSlider.addEventListener(Event.CHANGE, onRedSliderChange);
-		_redInput.addEventListener(Event.CHANGE, onRedInputChange);
-		_greenSlider.addEventListener(Event.CHANGE, onGreenSliderChange);
-		_greenInput.addEventListener(Event.CHANGE, onGreenInputChange);
-		_blueSlider.addEventListener(Event.CHANGE, onBlueSliderChange);
-		_blueInput.addEventListener(Event.CHANGE, onBlueInputChange);
+		this._hexInput.addEventListener(Event.CHANGE, onHexInputChange);
+		this._redSlider.addEventListener(Event.CHANGE, onRedSliderChange);
+		this._redInput.addEventListener(Event.CHANGE, onRedInputChange);
+		this._greenSlider.addEventListener(Event.CHANGE, onGreenSliderChange);
+		this._greenInput.addEventListener(Event.CHANGE, onGreenInputChange);
+		this._blueSlider.addEventListener(Event.CHANGE, onBlueSliderChange);
+		this._blueInput.addEventListener(Event.CHANGE, onBlueInputChange);
+		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onHexInputChange(evt:Event):Void
 	{
-		_exposedValue.value = Std.parseInt("0x" + _hexInput.text);
+		this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
 		colorUpdate();
 	}
 	
 	private function onRedSliderChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setRed(_exposedValue.value, Std.int(_redSlider.value));
+		this._exposedValue.value = ColorUtil.setRed(this._exposedValue.value, Std.int(this._redSlider.value));
 		colorUpdate();
 	}
 	
 	private function onRedInputChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setRed(_exposedValue.value, Std.parseInt(_redInput.text));
+		this._exposedValue.value = ColorUtil.setRed(this._exposedValue.value, Std.parseInt(this._redInput.text));
 		colorUpdate();
 	}
 	
 	private function onGreenSliderChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setGreen(_exposedValue.value, Std.int(_greenSlider.value));
+		this._exposedValue.value = ColorUtil.setGreen(this._exposedValue.value, Std.int(this._greenSlider.value));
 		colorUpdate();
 	}
 	
 	private function onGreenInputChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setGreen(_exposedValue.value, Std.parseInt(_greenInput.text));
+		this._exposedValue.value = ColorUtil.setGreen(this._exposedValue.value, Std.parseInt(this._greenInput.text));
 		colorUpdate();
 	}
 	
 	private function onBlueSliderChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setBlue(_exposedValue.value, Std.int(_blueSlider.value));
+		this._exposedValue.value = ColorUtil.setBlue(this._exposedValue.value, Std.int(this._blueSlider.value));
 		colorUpdate();
 	}
 	
 	private function onBlueInputChange(evt:Event):Void
 	{
-		_exposedValue.value = ColorUtil.setBlue(_exposedValue.value, Std.parseInt(_blueInput.text));
+		this._exposedValue.value = ColorUtil.setBlue(this._exposedValue.value, Std.parseInt(this._blueInput.text));
+		colorUpdate();
+	}
+	
+	private function onNullButton(evt:TriggerEvent):Void
+	{
+		this._exposedValue.value = null;
 		colorUpdate();
 	}
 	

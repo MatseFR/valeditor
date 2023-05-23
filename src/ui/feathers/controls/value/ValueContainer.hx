@@ -24,35 +24,35 @@ class ValueContainer extends LayoutGroup implements IGroupUI
 	
 	public function addExposedControl(control:IValueUI):Void 
 	{
-		_controls.push(control);
+		this._controls.push(control);
 		addChild(cast control);
 	}
 	
 	public function addExposedControlAfter(control:IValueUI, afterControl:IValueUI):Void
 	{
-		var index:Int = _controls.indexOf(afterControl);
+		var index:Int = this._controls.indexOf(afterControl);
 		if (index == -1)
 		{
 			throw new Error("ValueContainer.addExposedControlAfter ::: afterControl cannot be found");
 		}
-		_controls.insert(index + 1, control);
+		this._controls.insert(index + 1, control);
 		addChildAt(cast control, index + 1);
 	}
 	
 	public function addExposedControlBefore(control:IValueUI, beforeControl:IValueUI):Void
 	{
-		var index:Int = _controls.indexOf(beforeControl);
+		var index:Int = this._controls.indexOf(beforeControl);
 		if (index == -1)
 		{
 			throw new Error("ValueContainer.addExposedControlBefore ::: beforeControl cannot be found");
 		}
-		_controls.insert(index, control);
+		this._controls.insert(index, control);
 		addChildAt(cast control, index);
 	}
 	
 	public function removeExposedControl(control:IValueUI):Void 
 	{
-		_controls.remove(control);
+		this._controls.remove(control);
 		removeChild(cast control);
 	}
 	

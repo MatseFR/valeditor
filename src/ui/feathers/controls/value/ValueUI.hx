@@ -19,32 +19,28 @@ class ValueUI extends LayoutGroup implements IValueUI
 	private function get_exposedValue():ExposedValue { return _exposedValue; }
 	private function set_exposedValue(value:ExposedValue):ExposedValue
 	{
-		if (_exposedValue == value) return value;
-		if (_exposedValue != null) 
+		if (this._exposedValue == value) return value;
+		if (this._exposedValue != null) 
 		{
-			_exposedValue.removeEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
-			_exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+			this._exposedValue.removeEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
+			this._exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
 		}
-		_exposedValue = value;
-		if (_exposedValue != null)
+		this._exposedValue = value;
+		if (this._exposedValue != null)
 		{
-			_exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
-			_exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+			this._exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
+			this._exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
 		}
 		initExposedValue();
 		updateExposedValue();
-		return _exposedValue;
+		return this._exposedValue;
 	}
 	
 	private var _controlsEnabled:Bool = false;
 	
-	/**
-	   
-	**/
 	public function new() 
 	{
 		super();
-		
 	}
 	
 	override function layoutGroup_addedToStageHandler(event:Event):Void 
@@ -63,12 +59,12 @@ class ValueUI extends LayoutGroup implements IValueUI
 	
 	private function controlsDisable():Void
 	{
-		_controlsEnabled = false;
+		this._controlsEnabled = false;
 	}
 	
 	private function controlsEnable():Void
 	{
-		_controlsEnabled = true;
+		this._controlsEnabled = true;
 	}
 	
 	public function initExposedValue():Void

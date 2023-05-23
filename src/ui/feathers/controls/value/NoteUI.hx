@@ -16,7 +16,7 @@ class NoteUI extends ValueUI
 {
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		_textValue = cast value;
+		this._textValue = cast value;
 		return super.set_exposedValue(value);
 	}
 	
@@ -44,19 +44,19 @@ class NoteUI extends ValueUI
 		hLayout.paddingLeft = hLayout.paddingRight = Padding.DEFAULT * 2;
 		this.layout = hLayout;
 		
-		_label = new Label();
-		_label.wordWrap = true;
-		_label.layoutData = new HorizontalLayoutData(100);
-		_label.variant = LabelVariant.NOTE;
-		addChild(_label);
+		this._label = new Label();
+		this._label.wordWrap = true;
+		this._label.layoutData = new HorizontalLayoutData(100);
+		this._label.variant = LabelVariant.NOTE;
+		addChild(this._label);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		
-		_label.text = _textValue.text;
-		cast(_label.layoutData, HorizontalLayoutData).percentWidth = _textValue.textPercentWidth;
+		this._label.text = this._textValue.text;
+		cast(this._label.layoutData, HorizontalLayoutData).percentWidth = this._textValue.textPercentWidth;
 	}
 	
 }

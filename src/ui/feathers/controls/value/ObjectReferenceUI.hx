@@ -31,11 +31,11 @@ class ObjectReferenceUI extends ValueUI
 	{
 		if (value == null)
 		{
-			_objectReferenceValue = null;
+			this._objectReferenceValue = null;
 		}
 		else
 		{
-			_objectReferenceValue = cast value;
+			this._objectReferenceValue = cast value;
 		}
 		return super.set_exposedValue(value);
 	}
@@ -70,43 +70,43 @@ class ObjectReferenceUI extends ValueUI
 		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		addChild(this._label);
 		
-		_contentGroup = new LayoutGroup();
-		_contentGroup.layoutData = new HorizontalLayoutData(100);
+		this._contentGroup = new LayoutGroup();
+		this._contentGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		_contentGroup.layout = vLayout;
-		addChild(_contentGroup);
+		this._contentGroup.layout = vLayout;
+		addChild(this._contentGroup);
 		
-		_nameLabel = new Label();
-		_contentGroup.addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._contentGroup.addChild(this._nameLabel);
 		
-		_buttonGroup = new LayoutGroup();
+		this._buttonGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
-		_buttonGroup.layout = hLayout;
-		_contentGroup.addChild(_buttonGroup);
+		this._buttonGroup.layout = hLayout;
+		this._contentGroup.addChild(this._buttonGroup);
 		
-		_loadButton = new Button("set");
-		_loadButton.layoutData = new HorizontalLayoutData(50);
-		_buttonGroup.addChild(_loadButton);
+		this._loadButton = new Button("set");
+		this._loadButton.layoutData = new HorizontalLayoutData(50);
+		this._buttonGroup.addChild(this._loadButton);
 		
-		_clearButton = new Button("clear");
-		_clearButton.layoutData = new HorizontalLayoutData(50);
-		_buttonGroup.addChild(_clearButton);
+		this._clearButton = new Button("clear");
+		this._clearButton.layoutData = new HorizontalLayoutData(50);
+		this._buttonGroup.addChild(this._clearButton);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		
-		_label.text = _exposedValue.name;
+		this._label.text = this._exposedValue.name;
 		updateEditable();
 	}
 	
@@ -114,27 +114,27 @@ class ObjectReferenceUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			var object:Dynamic = _exposedValue.value;
+			var object:Dynamic = this._exposedValue.value;
 			if (object != null)
 			{
-				_nameLabel.text = ValEdit.getObjectName(object);
+				this._nameLabel.text = ValEdit.getObjectName(object);
 			}
 			else
 			{
-				_nameLabel.text = "";
+				this._nameLabel.text = "";
 			}
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_nameLabel.enabled = _exposedValue.isEditable;
-		_loadButton.enabled = _exposedValue.isEditable;
-		_clearButton.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._nameLabel.enabled = this._exposedValue.isEditable;
+		this._loadButton.enabled = this._exposedValue.isEditable;
+		this._clearButton.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -145,18 +145,18 @@ class ObjectReferenceUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_loadButton.removeEventListener(TriggerEvent.TRIGGER, onLoadButton);
-		_clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
+		this._loadButton.removeEventListener(TriggerEvent.TRIGGER, onLoadButton);
+		this._clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
 	
 	override function controlsEnable():Void 
 	{
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		_loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
-		_clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
+		this._loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
+		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
 	
 	private function onClearButton(evt:TriggerEvent):Void

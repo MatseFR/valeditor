@@ -32,15 +32,15 @@ class NameUI extends ValueUI
 		hLayout.gap = Spacing.DEFAULT;
 		this.layout = hLayout;
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		addChild(this._label);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_label.text = _exposedValue.name;
+		this._label.text = _exposedValue.name;
 	}
 	
 }

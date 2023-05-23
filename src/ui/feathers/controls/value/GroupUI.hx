@@ -58,17 +58,17 @@ class GroupUI extends ValueUI implements IGroupUI
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		this.layout = vLayout;
 		
-		_topButton = new ToggleButton();
-		_topButton.variant = ToggleButtonVariant.GROUP_HEADER;
-		addChild(_topButton);
+		this._topButton = new ToggleButton();
+		this._topButton.variant = ToggleButtonVariant.GROUP_HEADER;
+		addChild(this._topButton);
 		
-		_arrowDown = new LayoutGroup();
-		_arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_GROUP;
+		this._arrowDown = new LayoutGroup();
+		this._arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_GROUP;
 		
-		_arrowRight = new LayoutGroup();
-		_arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_GROUP;
+		this._arrowRight = new LayoutGroup();
+		this._arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_GROUP;
 		
-		_valueGroup = new LayoutGroup();
+		this._valueGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -78,73 +78,73 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	public function addExposedControl(control:IValueUI):Void
 	{
-		_controls.push(control);
-		_valueGroup.addChild(cast control);
+		this._controls.push(control);
+		this._valueGroup.addChild(cast control);
 	}
 	
 	public function addExposedControlAfter(control:IValueUI, afterControl:IValueUI):Void
 	{
-		var index:Int = _controls.indexOf(afterControl);
+		var index:Int = this._controls.indexOf(afterControl);
 		if (index == -1)
 		{
 			throw new Error("GroupUI.addExposedControlAfter ::: afterControl cannot be found");
 		}
-		_controls.insert(index + 1, control);
-		_valueGroup.addChildAt(cast control, index + 1);
+		this._controls.insert(index + 1, control);
+		this._valueGroup.addChildAt(cast control, index + 1);
 	}
 	
 	public function addExposedControlBefore(control:IValueUI, beforeControl:IValueUI):Void
 	{
-		var index:Int = _controls.indexOf(beforeControl);
+		var index:Int = this._controls.indexOf(beforeControl);
 		if (index == -1)
 		{
 			throw new Error("GroupUI.addExposedControlBefore ::: beforeControl cannot be found");
 		}
-		_controls.insert(index, control);
-		_valueGroup.addChildAt(cast control, index);
+		this._controls.insert(index, control);
+		this._valueGroup.addChildAt(cast control, index);
 	}
 	
 	public function removeExposedControl(control:IValueUI):Void
 	{
-		_controls.remove(control);
-		_valueGroup.removeChild(cast control);
+		this._controls.remove(control);
+		this._valueGroup.removeChild(cast control);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		
-		_topButton.text = _group.name;
+		this._topButton.text = this._group.name;
 		
-		if (_group.isCollapsable)
+		if (this._group.isCollapsable)
 		{
-			_topButton.icon = _arrowRight;
-			_topButton.selectedIcon = _arrowDown;
+			this._topButton.icon = _arrowRight;
+			this._topButton.selectedIcon = _arrowDown;
 			
-			if (_group.isCollapsedDefault)
+			if (this._group.isCollapsedDefault)
 			{
-				_topButton.selected = false;
-				if (_valueGroup.parent != null)
+				this._topButton.selected = false;
+				if (this._valueGroup.parent != null)
 				{
-					removeChild(_valueGroup);
+					removeChild(this._valueGroup);
 				}
 			}
 			else
 			{
-				_topButton.selected = true;
-				if (_valueGroup.parent == null)
+				this._topButton.selected = true;
+				if (this._valueGroup.parent == null)
 				{
-					addChild(_valueGroup);
+					addChild(this._valueGroup);
 				}
 			}
 		}
 		else
 		{
-			_topButton.icon = null;
-			_topButton.selectedIcon = null;
-			if (_valueGroup.parent == null)
+			this._topButton.icon = null;
+			this._topButton.selectedIcon = null;
+			if (this._valueGroup.parent == null)
 			{
-				addChild(_valueGroup);
+				addChild(this._valueGroup);
 			}
 		}
 		updateEditable();
@@ -154,9 +154,9 @@ class GroupUI extends ValueUI implements IGroupUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _group != null)
+		if (this._initialized && this._group != null)
 		{
-			for (control in _controls)
+			for (control in this._controls)
 			{
 				if (control == exceptControl) continue;
 				control.updateExposedValue(exceptControl);
@@ -166,10 +166,10 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_topButton.enabled = _exposedValue.isEditable;
-		_arrowDown.enabled = _exposedValue.isEditable;
-		_arrowRight.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._topButton.enabled = this._exposedValue.isEditable;
+		this._arrowDown.enabled = this._exposedValue.isEditable;
+		this._arrowRight.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -180,29 +180,29 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_topButton.removeEventListener(Event.CHANGE, onTopButtonChange);
+		this._topButton.removeEventListener(Event.CHANGE, onTopButtonChange);
 	}
 	
 	override function controlsEnable():Void 
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_topButton.addEventListener(Event.CHANGE, onTopButtonChange);
+		this._topButton.addEventListener(Event.CHANGE, onTopButtonChange);
 	}
 	
 	private function onTopButtonChange(evt:Event):Void
 	{
-		if (_group != null && !_group.isCollapsable) return;
+		if (this._group != null && !this._group.isCollapsable) return;
 		
-		if (_topButton.selected)
+		if (this._topButton.selected)
 		{
-			addChild(_valueGroup);
+			addChild(this._valueGroup);
 		}
 		else
 		{
-			removeChild(_valueGroup);
+			removeChild(this._valueGroup);
 		}
 	}
 	

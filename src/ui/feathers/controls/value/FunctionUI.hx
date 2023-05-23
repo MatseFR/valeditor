@@ -64,71 +64,71 @@ class FunctionUI extends ValueUI
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.VALUE;
 		this.layout = vLayout;
 		
-		_button = new Button();
-		addChild(_button);
+		this._button = new Button();
+		addChild(this._button);
 		
-		_parameterGroup = new ToggleCustom();
-		_parameterGroup.labelVariant = LabelVariant.OBJECT_NAME;
-		_parameterGroup.text = "Parameters";
+		this._parameterGroup = new ToggleCustom();
+		this._parameterGroup.labelVariant = LabelVariant.OBJECT_NAME;
+		this._parameterGroup.text = "Parameters";
 		
-		_arrowDown = new LayoutGroup();
-		_arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_OBJECT;
-		_parameterGroup.selectedIcon = _arrowDown;
+		this._arrowDown = new LayoutGroup();
+		this._arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_OBJECT;
+		this._parameterGroup.selectedIcon = this._arrowDown;
 		
-		_arrowRight = new LayoutGroup();
-		_arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_OBJECT;
-		_parameterGroup.icon = _arrowRight;
+		this._arrowRight = new LayoutGroup();
+		this._arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_OBJECT;
+		this._parameterGroup.icon = this._arrowRight;
 		
-		_bottomGroup = new LayoutGroup();
+		this._bottomGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
-		_bottomGroup.layout = hLayout;
+		this._bottomGroup.layout = hLayout;
 		
-		_trailGroup = new LayoutGroup();
-		_trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
-		_bottomGroup.addChild(_trailGroup);
+		this._trailGroup = new LayoutGroup();
+		this._trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
+		this._bottomGroup.addChild(this._trailGroup);
 		
-		_valueGroup = new ValueContainer();
-		_valueGroup.layoutData = new HorizontalLayoutData(100);
+		this._valueGroup = new ValueContainer();
+		this._valueGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingTop = Spacing.VERTICAL_GAP;
-		_valueGroup.layout = vLayout;
-		_bottomGroup.addChild(_valueGroup);
+		this._valueGroup.layout = vLayout;
+		_bottomGroup.addChild(this._valueGroup);
 		
-		_valueGroup.addEventListener(Event.RESIZE, onParametersResize);
+		this._valueGroup.addEventListener(Event.RESIZE, onParametersResize);
 	}
 	
 	private function onParametersResize(evt:Event):Void
 	{
-		_trailGroup.height = _valueGroup.height;
+		this._trailGroup.height = this._valueGroup.height;
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_button.text = _func.name;
+		this._button.text = this._func.name;
 		
-		var exposedValues:Array<ExposedValue> = _func.getExposedValueParameters();
+		var exposedValues:Array<ExposedValue> = this._func.getExposedValueParameters();
 		if (exposedValues.length != 0)
 		{
 			var uiControl:IValueUI;
 			for (exposedValue in exposedValues)
 			{
 				uiControl = ValEdit.toUIControl(exposedValue);
-				_valueGroup.addChild(cast uiControl);
+				this._valueGroup.addChild(cast uiControl);
 			}
-			addChild(_parameterGroup);
+			addChild(this._parameterGroup);
 		}
 		else
 		{
-			if (_parameterGroup.parent != null)
+			if (this._parameterGroup.parent != null)
 			{
-				_parameterGroup.removeChildren();
-				removeChild(_parameterGroup);
+				this._parameterGroup.removeChildren();
+				removeChild(this._parameterGroup);
 			}
 		}
 		
@@ -137,11 +137,11 @@ class FunctionUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_button.enabled = _exposedValue.isEditable;
-		_parameterGroup.enabled = _exposedValue.isEditable;
-		_trailGroup.enabled = _exposedValue.isEditable;
-		_valueGroup.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._button.enabled = this._exposedValue.isEditable;
+		this._parameterGroup.enabled = this._exposedValue.isEditable;
+		this._trailGroup.enabled = this._exposedValue.isEditable;
+		this._valueGroup.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -152,34 +152,34 @@ class FunctionUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_button.removeEventListener(TriggerEvent.TRIGGER, onButton);
-		_parameterGroup.removeEventListener(Event.CHANGE, onParameterGroupChange);
+		this._button.removeEventListener(TriggerEvent.TRIGGER, onButton);
+		this._parameterGroup.removeEventListener(Event.CHANGE, onParameterGroupChange);
 	}
 	
 	override function controlsEnable():Void 
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_button.addEventListener(TriggerEvent.TRIGGER, onButton);
-		_parameterGroup.addEventListener(Event.CHANGE, onParameterGroupChange);
+		this._button.addEventListener(TriggerEvent.TRIGGER, onButton);
+		this._parameterGroup.addEventListener(Event.CHANGE, onParameterGroupChange);
 	}
 	
 	private function onButton(evt:TriggerEvent):Void
 	{
-		_func.execute();
+		this._func.execute();
 	}
 	
 	private function onParameterGroupChange(evt:Event):Void
 	{
-		if (_parameterGroup.selected)
+		if (this._parameterGroup.selected)
 		{
-			addChild(_bottomGroup);
+			addChild(this._bottomGroup);
 		}
 		else
 		{
-			removeChild(_bottomGroup);
+			removeChild(this._bottomGroup);
 		}
 	}
 	

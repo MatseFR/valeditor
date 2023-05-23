@@ -60,9 +60,9 @@ class SeparatorUI extends ValueUI
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
 		this.layout = vLayout;
 		
-		separator = new LayoutGroup();
-		separator.layoutData = VerticalLayoutData.fillVertical();
-		addChild(separator);
+		this.separator = new LayoutGroup();
+		this.separator.layoutData = VerticalLayoutData.fillVertical();
+		addChild(this.separator);
 	}
 	
 }

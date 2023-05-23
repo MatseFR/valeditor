@@ -29,13 +29,13 @@ class ObjectUI extends ValueUI
 	{
 		if (value == null)
 		{
-			_exposedObject = null;
-			ValEdit.edit(null, _valueGroup);
+			this._exposedObject = null;
+			ValEdit.edit(null, this._valueGroup);
 		}
 		else
 		{
-			_exposedObject = cast value;
-			ValEdit.edit(value.value, _valueGroup, value);
+			this._exposedObject = cast value;
+			ValEdit.edit(value.value, this._valueGroup, value);
 		}
 		return super.set_exposedValue(value);
 	}
@@ -71,39 +71,39 @@ class ObjectUI extends ValueUI
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_topButton = new ToggleCustom();
-		_topButton.labelVariant = LabelVariant.OBJECT_NAME;
-		addChild(_topButton);
+		this._topButton = new ToggleCustom();
+		this._topButton.labelVariant = LabelVariant.OBJECT_NAME;
+		addChild(this._topButton);
 		
-		_arrowDown = new LayoutGroup();
-		_arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_OBJECT;
-		_topButton.selectedIcon = _arrowDown;
+		this._arrowDown = new LayoutGroup();
+		this._arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_OBJECT;
+		this._topButton.selectedIcon = this._arrowDown;
 		
-		_arrowRight = new LayoutGroup();
-		_arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_OBJECT;
-		_topButton.icon = _arrowRight;
+		this._arrowRight = new LayoutGroup();
+		this._arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_OBJECT;
+		this._topButton.icon = this._arrowRight;
 		
-		_bottomGroup = new LayoutGroup();
+		this._bottomGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
-		_bottomGroup.layout = hLayout;
+		this._bottomGroup.layout = hLayout;
 		
-		_trailGroup = new LayoutGroup();
-		_trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
-		_bottomGroup.addChild(_trailGroup);
+		this._trailGroup = new LayoutGroup();
+		this._trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
+		this._bottomGroup.addChild(this._trailGroup);
 		
-		_valueGroup = new ValueContainer();
-		_valueGroup.layoutData = new HorizontalLayoutData(100);
+		this._valueGroup = new ValueContainer();
+		this._valueGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingTop = Spacing.VERTICAL_GAP;
-		_valueGroup.layout = vLayout;
-		_bottomGroup.addChild(_valueGroup);
+		this._valueGroup.layout = vLayout;
+		this._bottomGroup.addChild(this._valueGroup);
 		
-		_valueGroup.addEventListener(Event.RESIZE, onContentResize);
+		this._valueGroup.addEventListener(Event.RESIZE, onContentResize);
 	}
 	
 	/**
@@ -112,15 +112,15 @@ class ObjectUI extends ValueUI
 	**/
 	private function onContentResize(evt:Event):Void
 	{
-		_trailGroup.height = _valueGroup.height;
+		this._trailGroup.height = this._valueGroup.height;
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		
-		_topButton.text = _exposedValue.name;
-		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+		this._topButton.text = this._exposedValue.name;
+		ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
 		updateEditable();
 	}
 	
@@ -128,25 +128,25 @@ class ObjectUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			if (_exposedObject.storeValue)
+			if (this._exposedObject.storeValue)
 			{
-				_exposedObject.reloadObject();
+				this._exposedObject.reloadObject();
 			}
 			else
 			{
-				_valueGroup.updateExposedValues();
+				this._valueGroup.updateExposedValues();
 			}
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_topButton.enabled = _exposedValue.isEditable;
-		_trailGroup.enabled = _exposedValue.isEditable;
-		_valueGroup.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._topButton.enabled = this._exposedValue.isEditable;
+		this._trailGroup.enabled = this._exposedValue.isEditable;
+		this._valueGroup.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -157,33 +157,33 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		ValEdit.edit(_exposedValue.value, _valueGroup, _exposedValue);
+		ValEdit.edit(this._exposedValue.value, this._valueGroup, this._exposedValue);
 		super.onValueObjectChange(evt);
 	}
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_topButton.removeEventListener(Event.CHANGE, onTopButtonChange);
+		this._topButton.removeEventListener(Event.CHANGE, onTopButtonChange);
 	}
 	
 	override function controlsEnable():Void 
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_topButton.addEventListener(Event.CHANGE, onTopButtonChange);
+		this._topButton.addEventListener(Event.CHANGE, onTopButtonChange);
 	}
 	
 	private function onTopButtonChange(evt:Event):Void
 	{
-		if (_topButton.selected)
+		if (this._topButton.selected)
 		{
-			addChild(_bottomGroup);
+			addChild(this._bottomGroup);
 		}
 		else
 		{
-			removeChild(_bottomGroup);
+			removeChild(this._bottomGroup);
 		}
 	}
 	

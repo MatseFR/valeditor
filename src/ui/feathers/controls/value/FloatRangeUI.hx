@@ -1,12 +1,16 @@
 package ui.feathers.controls.value;
 
+import feathers.controls.Button;
 import feathers.controls.HSlider;
 import feathers.controls.Label;
+import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
+import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
+import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
@@ -27,20 +31,25 @@ class FloatRangeUI extends ValueUI
 	{
 		if (value == null)
 		{
-			_floatRange = null;
+			this._floatRange = null;
 		}
 		else
 		{
-			_floatRange = cast value;
+			this._floatRange = cast value;
 		}
 		return super.set_exposedValue(value);
 	}
 	
 	private var _floatRange:ExposedFloatRange;
 	
+	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
 	private var _slider:HSlider;
 	private var _input:TextInput;
+	
+	private var _nullGroup:LayoutGroup;
+	private var _wedge:ValueWedge;
+	private var _nullButton:Button;
 	
 	/**
 	   
@@ -55,42 +64,84 @@ class FloatRangeUI extends ValueUI
 	{
 		super.initialize();
 		
-		var hLayout:HorizontalLayout = new HorizontalLayout();
+		var hLayout:HorizontalLayout;
+		var vLayout:VerticalLayout;
+		
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.gap = Spacing.MINIMAL;
+		vLayout.paddingRight = Padding.VALUE;
+		this.layout = vLayout;
+		
+		this._mainGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
 		hLayout.paddingRight = Padding.VALUE;
-		this.layout = hLayout;
+		this._mainGroup.layout = hLayout;
+		addChild(this._mainGroup);
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		this._mainGroup.addChild(this._label);
 		
-		_slider = new HSlider();
-		_slider.layoutData = new HorizontalLayoutData(100);
-		addChild(_slider);
+		this._slider = new HSlider();
+		this._slider.layoutData = new HorizontalLayoutData(100);
+		this._mainGroup.addChild(this._slider);
 		
-		_input = new TextInput();
-		_input.variant = TextInputVariant.NUMERIC_MEDIUM;
-		addChild(_input);
+		this._input = new TextInput();
+		this._input.variant = TextInputVariant.NUMERIC_MEDIUM;
+		this._input.prompt = "null";
+		this._mainGroup.addChild(this._input);
+		
+		this._nullGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
+		this._nullGroup.layout = hLayout;
+		
+		this._wedge = new ValueWedge();
+		this._nullGroup.addChild(this._wedge);
+		
+		this._nullButton = new Button("set to null");
+		this._nullButton.layoutData = new HorizontalLayoutData(100);
+		this._nullGroup.addChild(this._nullButton);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_label.text = _exposedValue.name;
-		_input.variant = _floatRange.inputVariant;
-		_slider.minimum = _floatRange.min;
-		_slider.maximum = _floatRange.max;
-		_slider.step = _floatRange.step;
-		_slider.snapInterval = _floatRange.step;
-		if (_floatRange.min < 0)
+		this._label.text = this._exposedValue.name;
+		this._input.variant = this._floatRange.inputVariant;
+		this._slider.minimum = this._floatRange.min;
+		this._slider.maximum = this._floatRange.max;
+		this._slider.step = this._floatRange.step;
+		this._slider.snapInterval = this._floatRange.step;
+		if (this._floatRange.min < 0)
 		{
-			_input.restrict = "0123456789.-";
+			this._input.restrict = "-0123456789.";
 		}
 		else
 		{
-			_input.restrict = "0123456789.";
+			this._input.restrict = "0123456789.";
+		}
+		if (this._exposedValue.isNullable)
+		{
+			if (this._nullGroup.parent == null)
+			{
+				addChild(this._nullGroup);
+			}
+		}
+		else
+		{
+			if (this._nullGroup.parent != null)
+			{
+				removeChild(this._nullGroup);
+			}
 		}
 		updateEditable();
 	}
@@ -99,22 +150,30 @@ class FloatRangeUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			var controlsEnabled:Bool = _controlsEnabled;
+			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_slider.value = _exposedValue.value;
-			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, _floatRange.precision));
+			if (this._exposedValue.value == null)
+			{
+				this._input.text = "";
+			}
+			else
+			{
+				this._slider.value = this._exposedValue.value;
+				this._input.text = Std.string(MathUtil.roundToPrecision(this._exposedValue.value, this._floatRange.precision));
+			}
 			if (controlsEnabled) controlsEnable();
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_slider.enabled = _exposedValue.isEditable;
-		_input.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._slider.enabled = this._exposedValue.isEditable;
+		this._input.enabled = this._exposedValue.isEditable;
+		this._nullButton.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -125,30 +184,39 @@ class FloatRangeUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_slider.removeEventListener(Event.CHANGE, onSliderChange);
-		_input.removeEventListener(Event.CHANGE, onInputChange);
+		this._slider.removeEventListener(Event.CHANGE, onSliderChange);
+		this._input.removeEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	override function controlsEnable():Void
 	{
 		if (_controlsEnabled) return;
 		super.controlsEnable();
-		_slider.addEventListener(Event.CHANGE, onSliderChange);
-		_input.addEventListener(Event.CHANGE, onInputChange);
+		this._slider.addEventListener(Event.CHANGE, onSliderChange);
+		this._input.addEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
-		_exposedValue.value = MathUtil.roundToPrecision(Std.parseFloat(_input.text), cast(_exposedValue, ExposedFloatRange).precision);
-		_slider.value = MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloatRange).precision);
+		if (this._input.text == "") return;
+		this._exposedValue.value = MathUtil.roundToPrecision(Std.parseFloat(this._input.text), this._floatRange.precision);
+		this._slider.value = MathUtil.roundToPrecision(this._exposedValue.value, this._floatRange.precision);
 	}
 	
 	private function onSliderChange(evt:Event):Void
 	{
-		_exposedValue.value = MathUtil.roundToPrecision(_slider.value, cast(_exposedValue, ExposedFloatRange).precision);
-		_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloatRange).precision));
+		this._exposedValue.value = MathUtil.roundToPrecision(this._slider.value, this._floatRange.precision);
+		this._input.text = Std.string(MathUtil.roundToPrecision(this._exposedValue.value, this._floatRange.precision));
+	}
+	
+	private function onNullButton(evt:TriggerEvent):Void
+	{
+		this._exposedValue.value = null;
+		this._input.text = "";
 	}
 	
 }

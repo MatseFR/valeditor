@@ -1,12 +1,18 @@
 package ui.feathers.controls.value;
 
+import feathers.controls.Button;
 import feathers.controls.Label;
+import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
+import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
+import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
+import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.Spacing;
+import ui.feathers.controls.ValueWedge;
 import ui.feathers.controls.value.ValueUI;
 import ui.feathers.variant.LabelVariant;
 import ui.feathers.variant.TextInputVariant;
@@ -31,15 +37,20 @@ class FloatUI extends ValueUI
 		//}
 		//else
 		//{
-			_floatValue = cast value;
+			this._floatValue = cast value;
 		//}
 		return super.set_exposedValue(value);
 	}
 	
 	private var _floatValue:ExposedFloat;
 	
+	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
 	private var _input:TextInput;
+	
+	private var _nullGroup:LayoutGroup;
+	private var _wedge:ValueWedge;
+	private var _nullButton:Button;
 	
 	/**
 	   
@@ -54,34 +65,77 @@ class FloatUI extends ValueUI
 	{
 		super.initialize();
 		
-		var hLayout:HorizontalLayout = new HorizontalLayout();
+		var hLayout:HorizontalLayout;
+		var vLayout:VerticalLayout;
+		
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.gap = Spacing.MINIMAL;
+		vLayout.paddingRight = Padding.VALUE;
+		this.layout = vLayout;
+		
+		this._mainGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
 		hLayout.paddingRight = Padding.VALUE;
-		this.layout = hLayout;
+		this._mainGroup.layout = hLayout;
+		addChild(this._mainGroup);
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		this._mainGroup.addChild(this._label);
 		
-		_input = new TextInput();
-		_input.variant = TextInputVariant.FULL_WIDTH;
-		addChild(_input);
+		this._input = new TextInput();
+		this._input.variant = TextInputVariant.FULL_WIDTH;
+		this._input.prompt = "null";
+		this._mainGroup.addChild(this._input);
+		
+		this._nullGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
+		this._nullGroup.layout = hLayout;
+		
+		this._wedge = new ValueWedge();
+		this._nullGroup.addChild(this._wedge);
+		
+		this._nullButton = new Button("set to null");
+		this._nullButton.layoutData = new HorizontalLayoutData(100);
+		this._nullGroup.addChild(this._nullButton);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_label.text = _exposedValue.name;
-		_input.variant = _floatValue.inputVariant;
-		switch (_floatValue.numericMode)
+		
+		this._label.text = this._exposedValue.name;
+		this._input.variant = this._floatValue.inputVariant;
+		switch (this._floatValue.numericMode)
 		{
 			case NumericMode.Positive :
-				_input.restrict = "0123456789.";
+				this._input.restrict = "0123456789.";
 			
 			default :
-				_input.restrict = "-0123456789.";
+				this._input.restrict = "-0123456789.";
+		}
+		if (this._exposedValue.isNullable)
+		{
+			if (this._nullGroup.parent == null)
+			{
+				addChild(this._nullGroup);
+			}
+		}
+		else
+		{
+			if (this._nullGroup.parent != null)
+			{
+				removeChild(this._nullGroup);
+			}
 		}
 		updateEditable();
 	}
@@ -90,20 +144,28 @@ class FloatUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			var controlsEnabled:Bool = _controlsEnabled;
+			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_input.text = Std.string(MathUtil.roundToPrecision(_exposedValue.value, cast(_exposedValue, ExposedFloat).precision));
+			if (this._exposedValue.value == null)
+			{
+				this._input.text = "";
+			}
+			else
+			{
+				this._input.text = Std.string(MathUtil.roundToPrecision(this._exposedValue.value, this._floatValue.precision));
+			}
 			if (controlsEnabled) controlsEnable();
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_input.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._input.enabled = this._exposedValue.isEditable;
+		this._nullButton.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -114,21 +176,30 @@ class FloatUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_input.removeEventListener(Event.CHANGE, onInputChange);
+		this._input.removeEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	override function controlsEnable():Void
 	{
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		_input.addEventListener(Event.CHANGE, onInputChange);
+		this._input.addEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
-		_exposedValue.value = MathUtil.roundToPrecision(Std.parseFloat(_input.text), cast(_exposedValue, ExposedFloat).precision);
+		if (this._input.text == "") return;
+		this._exposedValue.value = MathUtil.roundToPrecision(Std.parseFloat(this._input.text), this._floatValue.precision);
+	}
+	
+	private function onNullButton(evt:TriggerEvent):Void
+	{
+		this._exposedValue.value = null;
+		this._input.text = "";
 	}
 	
 }

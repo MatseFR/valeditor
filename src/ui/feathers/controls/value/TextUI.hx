@@ -1,10 +1,14 @@
 package ui.feathers.controls.value;
+import feathers.controls.Button;
 import feathers.controls.Label;
+import feathers.controls.LayoutGroup;
 import feathers.controls.TextArea;
+import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
+import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import ui.feathers.variant.LabelVariant;
 import valedit.ExposedValue;
@@ -20,14 +24,19 @@ class TextUI extends ValueUI
 {
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		_textValue = cast value;
+		this._textValue = cast value;
 		return super.set_exposedValue(value);
 	}
 	
 	private var _textValue:ExposedText;
 	
+	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
 	private var _textArea:TextArea;
+	
+	private var _nullGroup:LayoutGroup;
+	private var _wedge:ValueWedge;
+	private var _nullButton:Button;
 	
 	/**
 	   
@@ -42,28 +51,70 @@ class TextUI extends ValueUI
 	{
 		super.initialize();
 		
-		var hLayout:HorizontalLayout = new HorizontalLayout();
+		var hLayout:HorizontalLayout;
+		var vLayout:VerticalLayout;
+		
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.gap = Spacing.MINIMAL;
+		vLayout.paddingRight = Padding.VALUE;
+		this.layout = vLayout;
+		
+		this._mainGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.DEFAULT;
 		hLayout.paddingRight = Padding.VALUE;
-		this.layout = hLayout;
+		this._mainGroup.layout = hLayout;
+		addChild(this._mainGroup);
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		this._mainGroup.addChild(this._label);
 		
-		_textArea = new TextArea();
-		_textArea.layoutData = new HorizontalLayoutData(100);
-		addChild(_textArea);
+		this._textArea = new TextArea();
+		this._textArea.layoutData = new HorizontalLayoutData(100);
+		this._mainGroup.addChild(this._textArea);
+		
+		this._nullGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.DEFAULT;
+		hLayout.paddingRight = Padding.VALUE;
+		this._nullGroup.layout = hLayout;
+		
+		this._wedge = new ValueWedge();
+		this._nullGroup.addChild(this._wedge);
+		
+		this._nullButton = new Button("set to null");
+		this._nullButton.layoutData = new HorizontalLayoutData(100);
+		this._nullGroup.addChild(this._nullButton);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		_label.text = _exposedValue.name;
-		_textArea.restrict = _textValue.restrict;
-		_textArea.maxChars = _textValue.maxChars;
+		
+		this._label.text = this._exposedValue.name;
+		this._textArea.restrict = this._textValue.restrict;
+		this._textArea.maxChars = this._textValue.maxChars;
+		if (this._exposedValue.isNullable)
+		{
+			if (this._nullGroup.parent == null)
+			{
+				addChild(this._nullGroup);
+			}
+		}
+		else
+		{
+			if (this._nullGroup.parent != null)
+			{
+				removeChild(this._nullGroup);
+			}
+		}
 		updateEditable();
 	}
 	
@@ -71,18 +122,19 @@ class TextUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			var controlsEnabled:Bool = _controlsEnabled;
+			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_textArea.text = _exposedValue.value;
+			this._textArea.text = this._exposedValue.value;
 			if (controlsEnabled) controlsEnable();
 		}
 	}
 	
 	private function updateEditable():Void
 	{
-		_textArea.editable = _exposedValue.isEditable;
+		this._textArea.enabled = this._exposedValue.isEditable;
+		this._nullButton.enabled = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -93,21 +145,29 @@ class TextUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_textArea.removeEventListener(Event.CHANGE, onInputChange);
+		this._textArea.removeEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	override function controlsEnable():Void
 	{
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		_textArea.addEventListener(Event.CHANGE, onInputChange);
+		this._textArea.addEventListener(Event.CHANGE, onInputChange);
+		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
-		_exposedValue.value = _textArea.text;
+		this._exposedValue.value = this._textArea.text;
+	}
+	
+	private function onNullButton(evt:TriggerEvent):Void
+	{
+		this._textArea.text = "";
+		this._exposedValue.value = null;
 	}
 	
 }

@@ -11,7 +11,6 @@ class SpacingUI extends ValueUI
 	public function new() 
 	{
 		super();
-		
 	}
 	
 }
