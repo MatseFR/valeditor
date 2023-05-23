@@ -288,7 +288,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	private function onCategoryChange(evt:Event):Void
 	{
-		this._categoryClearButton.enabled = this._categoryPicker.selectedItem != null;
+		this._categoryClearButton.enabled = this._categoryPicker.selectedIndex != -1;
 		updateClassCollection();
 		//updateTemplateCollection();
 	}
@@ -300,7 +300,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	private function onClassChange(evt:Event):Void
 	{
-		this._classClearButton.enabled = this._classPicker.selectedItem != null;
+		this._classClearButton.enabled = this._classPicker.selectedIndex != -1;
 		updateTemplateCollection();
 	}
 	

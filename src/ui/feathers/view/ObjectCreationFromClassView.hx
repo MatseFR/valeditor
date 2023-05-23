@@ -252,7 +252,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	
 	private function onClassChange(evt:Event):Void
 	{
-		if (this._classPicker.selectedItem != null)
+		if (this._classPicker.selectedIndex != -1)
 		{
 			this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
 			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
