@@ -76,7 +76,7 @@ class ComboUI extends ValueUI
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
 		hLayout.paddingRight = Padding.VALUE;
-		this._mainGroup = hLayout;
+		this._mainGroup.layout = hLayout;
 		addChild(this._mainGroup);
 		
 		this._label = new Label();
