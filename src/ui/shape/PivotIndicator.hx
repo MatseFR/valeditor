@@ -26,16 +26,16 @@ class PivotIndicator extends Shape
 		super();
 		this.graphics.beginFill(0xffffff, 0);
 		this.graphics.lineStyle(3, 0xffffff);
-		this.graphics.moveTo( -7, 0.5);
-		this.graphics.lineTo(7, 0.5);
-		this.graphics.moveTo(0.5, -7);
-		this.graphics.lineTo(0.5, 7);
+		this.graphics.moveTo( -5, 0.5);
+		this.graphics.lineTo(5, 0.5);
+		this.graphics.moveTo(0.5, -5);
+		this.graphics.lineTo(0.5, 5);
 		
 		this.graphics.lineStyle(1, 0x000000);
-		this.graphics.moveTo(0.5, -8);
-		this.graphics.lineTo(0.5, 8);
-		this.graphics.moveTo( -8, 0.5);
-		this.graphics.lineTo(8, 0.5);
+		this.graphics.moveTo(0.5, -6);
+		this.graphics.lineTo(0.5, 6);
+		this.graphics.moveTo( -6, 0.5);
+		this.graphics.lineTo(6, 0.5);
 		this.graphics.endFill();
 	}
 	
