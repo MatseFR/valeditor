@@ -21,4 +21,6 @@ class UIConfig
 	
 	static public var CENTER_MIN_WIDTH:Float = 100;
 	
+	static public var SELECTION_BOX_THICKNESS:Float = 2;
+	
 }
