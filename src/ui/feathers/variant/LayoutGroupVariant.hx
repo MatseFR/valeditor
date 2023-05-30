@@ -17,6 +17,7 @@ class LayoutGroupVariant
 	static public inline var ITEM_PREVIEW:String = "item-preview";
 	static public inline var MENU_BAR:String = "menu-bar";
 	static public inline var OBJECT_TRAIL:String = "object-trail";
+	//static public inline var SCENE:String = "scene";
 	static public inline var TOGGLE_CUSTOM_CONTENT:String = "toggle-custom-content";
 	static public inline var VALUE:String = "value";
 	static public inline var VALUE_CONTAINER:String = "value-container";

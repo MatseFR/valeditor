@@ -1,5 +1,6 @@
 package ui.feathers.view;
 
+import editor.MouseController;
 import feathers.controls.HDividedBox;
 import feathers.controls.LayoutGroup;
 import feathers.controls.PopUpListView;
@@ -16,6 +17,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.MouseEvent;
 import ui.feathers.Spacing;
 import ui.feathers.controls.SelectionInfo;
 import ui.feathers.controls.ObjectLibrary;
@@ -163,6 +165,9 @@ class EditorView extends LayoutGroup
 		this._leftBox.layout = new AnchorLayout();
 		this._mainBox.addChild(this._leftBox);
 		
+		this._leftBox.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverUI);
+		this._leftBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
+		
 		this._centerBox = new VDividedBox();
 		this._mainBox.addChild(this._centerBox);
 		
@@ -170,6 +175,9 @@ class EditorView extends LayoutGroup
 		this._rightBox.minWidth = UIConfig.VALUE_MIN_WIDTH;
 		this._rightBox.layout = new AnchorLayout();
 		this._mainBox.addChild(this._rightBox);
+		
+		this._rightBox.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverUI);
+		this._rightBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
 		
 		// left content
 		this._objectLibGroup = new ToggleLayoutGroup();
@@ -201,9 +209,12 @@ class EditorView extends LayoutGroup
 		
 		// center content
 		this._displayArea = new LayoutGroup();
+		//this._displayArea.variant = LayoutGroupVariant.SCENE;
 		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
 		//this._displayArea.minWidth = UIConfig.CENTER_MIN_WIDTH;
 		this._centerBox.addChild(this._displayArea);
+		
+		//this._displayArea.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverScene);
 		
 		// right content
 		this._objectInfoGroup = new ToggleLayoutGroup();
@@ -266,6 +277,18 @@ class EditorView extends LayoutGroup
 		menu.selectedIndex = -1;
 		var callback:Dynamic->Void = this._menuCallbacks.get(menu.name);
 		if (callback != null) callback(item);
+	}
+	
+	private function onMouseOutUI(evt:MouseEvent):Void
+	{
+		//trace("onMouseOutUI");
+		MouseController.isMouseOverUI = false;
+	}
+	
+	private function onMouseOverUI(evt:MouseEvent):Void
+	{
+		//trace("onMouseOverUI");
+		MouseController.isMouseOverUI = true;
 	}
 	
 }

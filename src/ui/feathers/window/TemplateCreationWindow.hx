@@ -76,9 +76,9 @@ class TemplateCreationWindow extends Panel
 	private var _classPicker:ComboBox;
 	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
 	
-	private var _nameGroup:LayoutGroup;
-	private var _nameLabel:Label;
-	private var _nameInput:TextInput;
+	private var _idGroup:LayoutGroup;
+	private var _idLabel:Label;
+	private var _idInput:TextInput;
 	
 	private var _constructorGroup:LayoutGroup;
 	private var _constructorLabel:Label;
@@ -177,19 +177,19 @@ class TemplateCreationWindow extends Panel
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
 		this._classGroup.addChild(this._classPicker);
 		
-		// name
-		this._nameGroup = new LayoutGroup();
+		// ID
+		this._idGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._nameGroup.layout = vLayout;
-		addChild(this._nameGroup);
+		this._idGroup.layout = vLayout;
+		addChild(this._idGroup);
 		
-		this._nameLabel = new Label("Object Name (optionnal)");
-		this._nameGroup.addChild(this._nameLabel);
+		this._idLabel = new Label("Object ID (optionnal)");
+		this._idGroup.addChild(this._idLabel);
 		
-		this._nameInput = new TextInput("", null, onNameInputChange);
-		this._nameGroup.addChild(this._nameInput);
+		this._idInput = new TextInput("", null, onIDInputChange);
+		this._idGroup.addChild(this._idInput);
 		
 		// constructor
 		this._constructorGroup = new LayoutGroup();
@@ -242,21 +242,21 @@ class TemplateCreationWindow extends Panel
 		{
 			isValid = false;
 		}
-		else if (this._nameInput.text != "")
+		else if (this._idInput.text != "")
 		{
-			if (this._valEditClass.objectNameExists(this._nameInput.text))
+			if (this._valEditClass.objectIDExists(this._idInput.text))
 			{
 				isValid = false;
-				this._nameInput.errorString = "name already in use";
+				this._idInput.errorString = "ID already in use";
 			}
 			else
 			{
-				this._nameInput.errorString = null;
+				this._idInput.errorString = null;
 			}
 		}
 		else
 		{
-			this._nameInput.errorString = null;
+			this._idInput.errorString = null;
 		}
 		this._confirmButton.enabled = isValid;
 	}
@@ -304,8 +304,8 @@ class TemplateCreationWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		var name:String = null;
-		if (this._nameInput.text != "") name = this._nameInput.text;
+		var id:String = null;
+		if (this._idInput.text != "") id = this._idInput.text;
 		
 		var constructorCollection:ExposedCollection;
 		if (this._constructorCollection != null)
@@ -317,13 +317,13 @@ class TemplateCreationWindow extends Panel
 			constructorCollection = null;
 		}
 		
-		var template:ValEditTemplate = ValEdit.createTemplateWithClassName(this._valEditClass.className, name, constructorCollection);
+		var template:ValEditTemplate = ValEdit.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
 		
 		PopUpManager.removePopUp(this);
 		if (this._confirmCallback != null) this._confirmCallback(template);
 	}
 	
-	private function onNameInputChange(evt:Event):Void
+	private function onIDInputChange(evt:Event):Void
 	{
 		checkValid();
 	}

@@ -8,6 +8,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import ui.feathers.Padding;
 import ui.feathers.Spacing;
 import ui.feathers.variant.LabelVariant;
@@ -35,9 +36,9 @@ class SelectionInfo extends LayoutGroup
 		return value;
 	}
 	
-	private var _nameGroup:LayoutGroup;
-	private var _nameLabel:Label;
-	private var _nameValue:Label;
+	private var _idGroup:LayoutGroup;
+	private var _idLabel:Label;
+	private var _idValue:Label;
 	
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
@@ -66,21 +67,21 @@ class SelectionInfo extends LayoutGroup
 		this.layout = vLayout;
 		
 		// name
-		this._nameGroup = new LayoutGroup();
+		this._idGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
-		this._nameGroup.layout = hLayout;
-		addChild(this._nameGroup);
+		this._idGroup.layout = hLayout;
+		addChild(this._idGroup);
 		
-		this._nameLabel = new Label("name");
-		this._nameLabel.variant = LabelVariant.VALUE_NAME;
-		this._nameGroup.addChild(this._nameLabel);
+		this._idLabel = new Label("ID");
+		this._idLabel.variant = LabelVariant.VALUE_NAME;
+		this._idGroup.addChild(this._idLabel);
 		
-		this._nameValue = new Label();
-		this._nameValue.layoutData = new HorizontalLayoutData(100);
-		this._nameGroup.addChild(this._nameValue);
+		this._idValue = new Label();
+		this._idValue.layoutData = new HorizontalLayoutData(100);
+		this._idGroup.addChild(this._idValue);
 		
 		// class
 		this._classGroup = new LayoutGroup();
@@ -124,7 +125,7 @@ class SelectionInfo extends LayoutGroup
 	{
 		if (this._object == null)
 		{
-			this._nameValue.text = "-";
+			this._idValue.text = "-";
 			this._classValue.text = "-";
 			this._typeValue.text = "-";
 		}
@@ -133,22 +134,24 @@ class SelectionInfo extends LayoutGroup
 			if (Std.isOfType(this._object, ValEditTemplate))
 			{
 				var template:ValEditTemplate = cast this._object;
-				this._nameValue.text = template.name;
+				this._idValue.text = template.id;
 				this._classValue.text = template.className;
 				this._typeValue.text = "Template";
 			}
 			else if (Std.isOfType(this._object, ValEditObject))
 			{
 				var obj:ValEditObject = cast this._object;
-				this._nameValue.text = obj.name;
+				this._idValue.text = obj.id;
 				this._classValue.text = obj.className;
 				this._typeValue.text = "Object";
 			}
 			else
 			{
-				this._nameValue.text = ValEdit.getObjectName(this._object);
-				this._classValue.text = ValEdit.getObjectClassName(this._object);
-				this._typeValue.text = "Object";
+				//this._idValue.text = ValEdit.getObjectID(this._object);
+				//this._classValue.text = ValEdit.getObjectClassName(this._object);
+				//this._typeValue.text = "Object";
+				
+				throw new Error("missing ValEditObject");
 			}
 		}
 	}

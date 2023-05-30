@@ -23,4 +23,6 @@ class UIConfig
 	
 	static public var SELECTION_BOX_THICKNESS:Float = 2;
 	
+	static public var TRANSFORM_BUTTONS_SIZE:Float = 8;
+	
 }

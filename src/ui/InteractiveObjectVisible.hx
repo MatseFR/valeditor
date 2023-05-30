@@ -4,12 +4,15 @@ import openfl.display.BitmapData;
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Matrix;
+import utils.MathUtil;
+import valedit.ValEditObject;
+import valedit.util.RegularPropertyName;
 
 /**
  * ...
  * @author Matse
  */
-class InteractiveObjectVisible extends Sprite 
+class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 {
 	static public var LINE_BMD:BitmapData;
 	
@@ -78,6 +81,7 @@ class InteractiveObjectVisible extends Sprite
 		return value;
 	}
 	
+	private var _interestMap:Map<String, Bool>;
 	private var _shape:Shape;
 	
 	public function new() 
@@ -88,8 +92,61 @@ class InteractiveObjectVisible extends Sprite
 		
 		if (!_IS_SETUP) setup();
 		
+		this._interestMap = new Map<String, Bool>();
+		this._interestMap.set(RegularPropertyName.X, true);
+		this._interestMap.set(RegularPropertyName.Y, true);
+		this._interestMap.set(RegularPropertyName.PIVOT_X, true);
+		this._interestMap.set(RegularPropertyName.PIVOT_Y, true);
+		this._interestMap.set(RegularPropertyName.ROTATION, true);
+		this._interestMap.set(RegularPropertyName.SCALE_X, true);
+		this._interestMap.set(RegularPropertyName.SCALE_Y, true);
+		this._interestMap.set(RegularPropertyName.WIDTH, true);
+		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		
 		this._shape = new Shape();
 		addChild(this._shape);
+	}
+	
+	public function hasInterestIn(regularPropertyName:String):Bool
+	{
+		return this._interestMap.exists(regularPropertyName);
+	}
+	
+	public function objectUpdate(object:ValEditObject):Void
+	{
+		this.x = object.getProperty(RegularPropertyName.X);
+		this.y = object.getProperty(RegularPropertyName.Y);
+		if (object.hasPivotProperties)
+		{
+			this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+			this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+		}
+		else
+		{
+			this.pivotX = 0;
+			this.pivotY = 0;
+		}
+		
+		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+		this.rotation = 0;
+		
+		refreshShape(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
+		
+		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+		if (object.hasRadianRotation)
+		{
+			this.rotation = rotation;
+		}
+		else
+		{
+			this.rotation = MathUtil.deg2rad(rotation);
+		}
+	}
+	
+	public function pool():Void
+	{
+		toPool(this);
 	}
 	
 	private function refreshShape(width:Float, height:Float):Void

@@ -54,9 +54,9 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	private var _templateCollection:ArrayCollection<ValEditTemplate> = new ArrayCollection<ValEditTemplate>();
 	private var _selectedTemplate:ValEditTemplate;
 	
-	private var _nameGroup:LayoutGroup;
-	private var _nameLabel:Label;
-	private var _nameInput:TextInput;
+	private var _idGroup:LayoutGroup;
+	private var _idLabel:Label;
+	private var _idInput:TextInput;
 	
 	private var _valEditClass:ValEditClass;
 
@@ -161,18 +161,18 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._templateGroup.addChild(this._templateGrid);
 		
 		// name
-		this._nameGroup = new LayoutGroup();
+		this._idGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._nameGroup.layout = vLayout;
-		addChild(this._nameGroup);
+		this._idGroup.layout = vLayout;
+		addChild(this._idGroup);
 		
-		this._nameLabel = new Label("Object Name (optionnal)");
-		this._nameGroup.addChild(this._nameLabel);
+		this._idLabel = new Label("Object ID (optionnal)");
+		this._idGroup.addChild(this._idLabel);
 		
-		this._nameInput = new TextInput("", null, onNameInputChange);
-		this._nameGroup.addChild(this._nameInput);
+		this._idInput = new TextInput("", null, onIDInputChange);
+		this._idGroup.addChild(this._idInput);
 	}
 	
 	private function onAddedToStage(evt:Event):Void
@@ -194,9 +194,9 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	public function confirm():Dynamic
 	{
-		var name:String = null;
-		if (this._nameInput.text != "") name = this._nameInput.text;
-		var object:Dynamic = ValEdit.createObjectWithTemplate(this._templateGrid.selectedItem, name);
+		var id:String = null;
+		if (this._idInput.text != "") id = this._idInput.text;
+		var object:Dynamic = ValEdit.createObjectWithTemplate(this._templateGrid.selectedItem, id);
 		return object;
 	}
 	
@@ -214,21 +214,21 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		{
 			isValid = false;
 		}
-		else if (this._nameInput.text != "")
+		else if (this._idInput.text != "")
 		{
-			if (this._valEditClass.objectNameExists(this._nameInput.text))
+			if (this._valEditClass.objectIDExists(this._idInput.text))
 			{
 				isValid = false;
-				this._nameInput.errorString = "name already in use";
+				this._idInput.errorString = "ID already in use";
 			}
 			else
 			{
-				this._nameInput.errorString = null;
+				this._idInput.errorString = null;
 			}
 		}
 		else
 		{
-			this._nameInput.errorString = null;
+			this._idInput.errorString = null;
 		}
 		this._confirmButton.enabled = isValid;
 	}
@@ -309,7 +309,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._classPicker.selectedIndex = -1;
 	}
 	
-	private function onNameInputChange(evt:Event):Void
+	private function onIDInputChange(evt:Event):Void
 	{
 		checkValid();
 	}

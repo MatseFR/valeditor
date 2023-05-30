@@ -3,7 +3,7 @@ package ui.feathers.theme;
 import ui.feathers.theme.components.AssetItemRendererStyles;
 import ui.feathers.theme.components.LabelStyles;
 import ui.feathers.theme.components.LayoutGroupStyles;
-import ui.feathers.theme.components.SelectionBoxStyles;
+import ui.feathers.theme.components.SelectionGroupStyles;
 import ui.feathers.theme.components.TextInputStyles;
 import ui.feathers.theme.components.ToggleButtonStyles;
 import ui.feathers.theme.components.ToggleCustomStyles;
@@ -30,7 +30,7 @@ class ValEditorTheme extends SimpleTheme
 		AssetItemRendererStyles.initialize(this, this.styleProvider);
 		LabelStyles.initialize(this, this.styleProvider);
 		LayoutGroupStyles.initialize(this, this.styleProvider);
-		SelectionBoxStyles.initialize(this, this.styleProvider);
+		SelectionGroupStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
 		ToggleCustomStyles.initialize(this, this.styleProvider);

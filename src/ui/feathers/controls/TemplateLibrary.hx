@@ -61,7 +61,7 @@ class TemplateLibrary extends LayoutGroup
 		this._footer.addChild(this._templateRemoveButton);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("id", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className),
 			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);

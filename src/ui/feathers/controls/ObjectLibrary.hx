@@ -62,7 +62,7 @@ class ObjectLibrary extends LayoutGroup
 		this._footer.addChild(this._objectRemoveButton);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("id", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
@@ -82,14 +82,14 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onObjectRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEdit.destroyObject(this._grid.selectedItem.object);
+		ValEdit.destroyObject(this._grid.selectedItem);
 	}
 	
 	private function onGridChange(evt:Event):Void
 	{
 		if (this._grid.selectedItem != null)
 		{
-			ValEdit.edit(this._grid.selectedItem.object);
+			ValEdit.edit(this._grid.selectedItem);
 			ValEdit.selection.object = this._grid.selectedItem;
 			this._objectRemoveButton.enabled = true;
 		}

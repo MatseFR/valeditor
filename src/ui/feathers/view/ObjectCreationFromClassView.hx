@@ -45,9 +45,9 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private var _classPicker:ComboBox;
 	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
 	
-	private var _nameGroup:LayoutGroup;
-	private var _nameLabel:Label;
-	private var _nameInput:TextInput;
+	private var _idGroup:LayoutGroup;
+	private var _idLabel:Label;
+	private var _idInput:TextInput;
 	
 	private var _constructorGroup:LayoutGroup;
 	private var _constructorLabel:Label;
@@ -123,19 +123,19 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
 		this._classGroup.addChild(this._classPicker);
 		
-		// name
-		this._nameGroup = new LayoutGroup();
+		// ID
+		this._idGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
-		this._nameGroup.layout = vLayout;
-		addChild(this._nameGroup);
+		this._idGroup.layout = vLayout;
+		addChild(this._idGroup);
 		
-		this._nameLabel = new Label("Object Name (optionnal)");
-		this._nameGroup.addChild(this._nameLabel);
+		this._idLabel = new Label("Object ID (optionnal)");
+		this._idGroup.addChild(this._idLabel);
 		
-		this._nameInput = new TextInput("", null, onNameInputChange);
-		this._nameGroup.addChild(this._nameInput);
+		this._idInput = new TextInput("", null, onIDInputChange);
+		this._idGroup.addChild(this._idInput);
 		
 		// constructor
 		this._constructorGroup = new LayoutGroup();
@@ -179,11 +179,11 @@ class ObjectCreationFromClassView extends LayoutGroup
 	
 	public function confirm():Dynamic
 	{
-		var name:String = null;
+		var id:String = null;
 		var params:Array<Dynamic> = null;
-		if (this._nameInput.text != "") name = this._nameInput.text;
+		if (this._idInput.text != "") id = this._idInput.text;
 		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
-		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, name, params);
+		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, id, params);
 		return object;
 	}
 	
@@ -200,21 +200,21 @@ class ObjectCreationFromClassView extends LayoutGroup
 		{
 			isValid = false;
 		}
-		else if (this._nameInput.text != "")
+		else if (this._idInput.text != "")
 		{
-			if (this._valEditClass.objectNameExists(this._nameInput.text))
+			if (this._valEditClass.objectIDExists(this._idInput.text))
 			{
 				isValid = false;
-				this._nameInput.errorString = "name already in use";
+				this._idInput.errorString = "ID already in use";
 			}
 			else
 			{
-				this._nameInput.errorString = null;
+				this._idInput.errorString = null;
 			}
 		}
 		else
 		{
-			this._nameInput.errorString = null;
+			this._idInput.errorString = null;
 		}
 		this._confirmButton.enabled = isValid;
 	}
@@ -266,7 +266,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		checkValid();
 	}
 	
-	private function onNameInputChange(evt:Event):Void
+	private function onIDInputChange(evt:Event):Void
 	{
 		checkValid();
 	}

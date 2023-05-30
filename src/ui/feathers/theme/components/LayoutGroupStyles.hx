@@ -1,5 +1,6 @@
 package ui.feathers.theme.components;
 import feathers.controls.LayoutGroup;
+import feathers.graphics.FillStyle;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.RelativePosition;
@@ -47,6 +48,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.MENU_BAR, menu_bar);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.OBJECT_TRAIL, object_trail);
+		
+		//styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.SCENE, scene);
 		
 		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
@@ -145,6 +148,13 @@ class LayoutGroupStyles
 		skin.width = Spacing.DEFAULT * 2;
 		group.backgroundSkin = skin;
 	}
+	
+	//static private function scene(group:LayoutGroup):Void
+	//{
+		//var skin:RectangleSkin = new RectangleSkin();
+		//skin.fill = FillStyle.SolidColor(0xff0000, 0.25);
+		//group.backgroundSkin = skin;
+	//}
 	
 	static private function separatorUI(separator:SeparatorUI):Void
 	{

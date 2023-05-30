@@ -8,6 +8,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import starling.utils.Padding;
 import ui.feathers.FeathersWindows;
 import ui.feathers.Spacing;
@@ -23,6 +24,7 @@ import valedit.value.ExposedObjectReference;
  * ...
  * @author Matse
  */
+@:access(valedit.value.ExposedObjectReference)
 class ObjectReferenceUI extends ValueUI 
 {
 	private var _objectReferenceValue:ExposedObjectReference;
@@ -44,7 +46,7 @@ class ObjectReferenceUI extends ValueUI
 	
 	private var _contentGroup:LayoutGroup;
 	
-	private var _nameLabel:Label;
+	private var _idLabel:Label;
 	
 	private var _buttonGroup:LayoutGroup;
 	private var _loadButton:Button;
@@ -83,8 +85,8 @@ class ObjectReferenceUI extends ValueUI
 		this._contentGroup.layout = vLayout;
 		addChild(this._contentGroup);
 		
-		this._nameLabel = new Label();
-		this._contentGroup.addChild(this._nameLabel);
+		this._idLabel = new Label();
+		this._contentGroup.addChild(this._idLabel);
 		
 		this._buttonGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
@@ -116,14 +118,15 @@ class ObjectReferenceUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
-			var object:Dynamic = this._exposedValue.value;
+			//var object:Dynamic = this._exposedValue.value;
+			var object:ValEditObject = this._objectReferenceValue._valEditObjectReference;
 			if (object != null)
 			{
-				this._nameLabel.text = ValEdit.getObjectName(object);
+				this._idLabel.text = object.id;//ValEdit.getObjectID(object);
 			}
 			else
 			{
-				this._nameLabel.text = "";
+				this._idLabel.text = "";
 			}
 		}
 	}
@@ -132,7 +135,7 @@ class ObjectReferenceUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._nameLabel.enabled = this._exposedValue.isEditable;
+		this._idLabel.enabled = this._exposedValue.isEditable;
 		this._loadButton.enabled = this._exposedValue.isEditable;
 		this._clearButton.enabled = this._exposedValue.isEditable;
 	}
@@ -162,7 +165,7 @@ class ObjectReferenceUI extends ValueUI
 	private function onClearButton(evt:TriggerEvent):Void
 	{
 		this._exposedValue.value = null;
-		this._nameLabel.text = "";
+		this._idLabel.text = "";
 	}
 	
 	private function onLoadButton(evt:TriggerEvent):Void
@@ -184,11 +187,13 @@ class ObjectReferenceUI extends ValueUI
 		this._exposedValue.value = object;
 		if (Std.isOfType(object, ValEditObject))
 		{
-			this._nameLabel.text = cast(object, ValEditObject).name;
+			this._idLabel.text = cast(object, ValEditObject).id;
 		}
 		else
 		{
-			this._nameLabel.text = ValEdit.getObjectName(object);
+			//this._idLabel.text = ValEdit.getObjectID(object);
+			
+			throw new Error("missing ValEditObject");
 		}
 	}
 	

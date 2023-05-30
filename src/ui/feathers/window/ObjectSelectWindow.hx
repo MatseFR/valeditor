@@ -147,7 +147,7 @@ class ObjectSelectWindow extends Panel
 		this._objectGroup.addChild(this._objectLabel);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("id", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
