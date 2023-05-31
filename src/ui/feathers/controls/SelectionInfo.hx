@@ -14,6 +14,7 @@ import ui.feathers.Spacing;
 import ui.feathers.variant.LabelVariant;
 import valedit.ValEdit;
 import valedit.ValEditObject;
+import valedit.ValEditObjectGroup;
 import valedit.ValEditTemplate;
 
 /**
@@ -144,6 +145,34 @@ class SelectionInfo extends LayoutGroup
 				this._idValue.text = obj.id;
 				this._classValue.text = obj.className;
 				this._typeValue.text = "Object";
+			}
+			else if (Std.isOfType(this._object, ValEditObjectGroup))
+			{
+				var group:ValEditObjectGroup = cast this._object;
+				this._idValue.text = group.numObjects + " objects";
+				
+				var singleClass:Bool = true;
+				var className:String = null;
+				for (valObject in group)
+				{
+					if (className == null)
+					{
+						className = valObject.className;
+					}
+					else if (valObject.className != className)
+					{
+						singleClass = false;
+						break;
+					}
+				}
+				if (singleClass)
+				{
+					this._classValue.text = className;
+				}
+				else
+				{
+					this._classValue.text = "(multiple classes)";
+				}
 			}
 			else
 			{
