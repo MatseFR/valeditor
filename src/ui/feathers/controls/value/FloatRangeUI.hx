@@ -79,7 +79,6 @@ class FloatRangeUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		hLayout.paddingRight = Padding.VALUE;
 		this._mainGroup.layout = hLayout;
 		addChild(this._mainGroup);
 		
@@ -101,7 +100,6 @@ class FloatRangeUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		hLayout.paddingRight = Padding.VALUE;
 		this._nullGroup.layout = hLayout;
 		
 		this._wedge = new ValueWedge();

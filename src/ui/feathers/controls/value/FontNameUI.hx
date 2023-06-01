@@ -78,7 +78,6 @@ class FontNameUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.DEFAULT;
-		hLayout.paddingRight = Padding.VALUE;
 		this._mainGroup.layout = hLayout;
 		addChild(this._mainGroup);
 		
@@ -95,7 +94,6 @@ class FontNameUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		hLayout.paddingRight = Padding.VALUE;
 		this._nullGroup.layout = hLayout;
 		
 		this._wedge = new ValueWedge();
