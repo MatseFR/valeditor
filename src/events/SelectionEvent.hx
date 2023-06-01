@@ -18,9 +18,6 @@ import openfl.events.IEventDispatcher;
 class SelectionEvent extends Event 
 {
 	inline static public var CHANGE:EventType<SelectionEvent> = "change";
-	inline static public var CLEARED:EventType<SelectionEvent> = "cleared";
-	inline static public var OBJECT_ADDED:EventType<SelectionEvent> = "object_added";
-	inline static public var OBJECT_REMOVED:EventType<SelectionEvent> = "object_removed";
 	
 	#if !flash
 	static private var _pool:ObjectPool<SelectionEvent> = new ObjectPool<SelectionEvent>(() -> return new SelectionEvent(null, null, false, false), (event) -> {
