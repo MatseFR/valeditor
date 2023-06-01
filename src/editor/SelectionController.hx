@@ -16,7 +16,6 @@ class SelectionController extends EventDispatcher
 	public var object(get, set):Dynamic;
 	private function get_object():Dynamic 
 	{
-		//return this._object; 
 		if (this._template != null) return this._template;
 		if (this._group.numObjects == 0) return null;
 		if (this._group.numObjects == 1) return this._group.getObjectAt(0);
@@ -24,10 +23,6 @@ class SelectionController extends EventDispatcher
 	}
 	private function set_object(value:Dynamic):Dynamic
 	{
-		//if (this._object == value) return value;
-		//this._object = value;
-		//SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this._object);
-		//return this._object;
 		if (value == null && this._template == null && this._group.numObjects == 0) return value;
 		if (this._template != null && this._template == value) return value;
 		if (this._group.numObjects == 1 && this._group.getObjectAt(0) == value) return value;
@@ -81,10 +76,31 @@ class SelectionController extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
+	public function hasObject(object:ValEditObject):Bool
+	{
+		return this._group.hasObject(object);
+	}
+	
 	public function removeObject(object:ValEditObject):Void
 	{
 		var removed:Bool = this._group.removeObject(object);
 		if (removed)
+		{
+			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+		}
+	}
+	
+	public function removeObjects(objects:Array<ValEditObject>):Void
+	{
+		var objectRemoved:Bool = false;
+		var removed:Bool;
+		for (object in objects)
+		{
+			removed = this._group.removeObject(object);
+			if (removed) objectRemoved = true;
+		}
+		
+		if (objectRemoved)
 		{
 			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 		}

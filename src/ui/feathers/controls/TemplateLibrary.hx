@@ -16,6 +16,7 @@ import openfl.events.Event;
 import ui.feathers.FeathersWindows;
 import ui.feathers.Spacing;
 import valedit.ValEdit;
+import valedit.ValEditTemplate;
 
 /**
  * ...
@@ -89,12 +90,15 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (this._grid.selectedItem != null)
 		{
-			ValEdit.editTemplate(this._grid.selectedItem);
 			ValEdit.selection.object = this._grid.selectedItem;
 			this._templateRemoveButton.enabled = true;
 		}
 		else
 		{
+			if (Std.isOfType(ValEdit.selection.object, ValEditTemplate))
+			{
+				ValEdit.selection.object = null;
+			}
 			this._templateRemoveButton.enabled = false;
 		}
 	}
