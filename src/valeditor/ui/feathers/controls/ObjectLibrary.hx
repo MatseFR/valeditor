@@ -1,5 +1,6 @@
 package valeditor.ui.feathers.controls;
 
+import valeditor.ValEditor;
 import valeditor.events.SelectionEvent;
 import feathers.controls.Button;
 import feathers.controls.GridView;
@@ -76,7 +77,7 @@ class ObjectLibrary extends LayoutGroup
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
 		
-		ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 	}
 	
 	private function onObjectAddButton(evt:TriggerEvent):Void
@@ -94,14 +95,14 @@ class ObjectLibrary extends LayoutGroup
 	{
 		if (this._grid.selectedItems.length != 0)
 		{
-			ValEdit.selection.removeEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 			
-			var selection:Dynamic = ValEdit.selection.object;
+			var selection:Dynamic = ValEditor.selection.object;
 			if (Std.isOfType(selection, ValEditObject))
 			{
 				if (this._grid.selectedItems.indexOf(selection) == -1)
 				{
-					ValEdit.selection.removeObject(selection);
+					ValEditor.selection.removeObject(selection);
 				}
 			}
 			else if (Std.isOfType(selection, ValEditObjectGroup))
@@ -117,27 +118,27 @@ class ObjectLibrary extends LayoutGroup
 				
 				if (this._objectsToRemove.length != 0)
 				{
-					ValEdit.selection.removeObjects(this._objectsToRemove);
+					ValEditor.selection.removeObjects(this._objectsToRemove);
 					this._objectsToRemove.resize(0);
 				}
 			}
 			
 			for (object in this._grid.selectedItems)
 			{
-				if (!ValEdit.selection.hasObject(object))
+				if (!ValEditor.selection.hasObject(object))
 				{
-					ValEdit.selection.addObject(object);
+					ValEditor.selection.addObject(object);
 				}
 			}
 			this._objectRemoveButton.enabled = true;
 			
-			ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 		}
 		else
 		{
-			if (!Std.isOfType(ValEdit.selection.object, ValEditTemplate))
+			if (!Std.isOfType(ValEditor.selection.object, ValEditTemplate))
 			{
-				ValEdit.selection.object = null;
+				ValEditor.selection.object = null;
 			}
 			this._objectRemoveButton.enabled = false;
 		}

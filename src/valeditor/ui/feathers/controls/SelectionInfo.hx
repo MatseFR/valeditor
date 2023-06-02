@@ -118,7 +118,7 @@ class SelectionInfo extends LayoutGroup
 		this._typeValue.layoutData = new HorizontalLayoutData(100);
 		this._typeGroup.addChild(this._typeValue);
 		
-		ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 		objectUpdate();
 	}
 	

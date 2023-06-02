@@ -74,7 +74,7 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
 		
-		ValEdit.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 	}
 	
 	private function onTemplateAddButton(evt:TriggerEvent):Void
@@ -91,14 +91,14 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (this._grid.selectedItem != null)
 		{
-			ValEdit.selection.object = this._grid.selectedItem;
+			ValEditor.selection.object = this._grid.selectedItem;
 			this._templateRemoveButton.enabled = true;
 		}
 		else
 		{
-			if (Std.isOfType(ValEdit.selection.object, ValEditTemplate))
+			if (Std.isOfType(ValEditor.selection.object, ValEditTemplate))
 			{
-				ValEdit.selection.object = null;
+				ValEditor.selection.object = null;
 			}
 			this._templateRemoveButton.enabled = false;
 		}
