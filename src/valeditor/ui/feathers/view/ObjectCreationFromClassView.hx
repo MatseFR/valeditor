@@ -17,7 +17,7 @@ import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.ValEdit;
-import valedit.ValEditClass;
+import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 
@@ -55,7 +55,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private var _constructorLabel:Label;
 	private var _constructorContainer:ScrollContainer;
 	
-	private var _valEditClass:ValEditClass;
+	private var _valEditClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
 	
 	public function new() 
@@ -98,7 +98,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this._categoryControlsGroup.layout = hLayout;
 		this._categoryGroup.addChild(this._categoryControlsGroup);
 		
-		this._categoryPicker = new ComboBox(ValEdit.categoryCollection);
+		this._categoryPicker = new ComboBox(ValEditor.categoryCollection);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
 		this._categoryPicker.selectedIndex = -1;
 		this._categoryPicker.addEventListener(Event.CHANGE, onCategoryChange);
@@ -119,7 +119,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this._classLabel = new Label("Class");
 		this._classGroup.addChild(this._classLabel);
 		
-		this._classCollection.addAll(ValEdit.classCollection);
+		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
 		this._classPicker.selectedIndex = -1;
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
@@ -179,13 +179,13 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
-	public function confirm():Dynamic
+	public function confirm():ValEditorObject
 	{
 		var id:String = null;
 		var params:Array<Dynamic> = null;
 		if (this._idInput.text != "") id = this._idInput.text;
 		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
-		var object:Dynamic = ValEdit.createObjectWithClassName(this._valEditClass.className, id, params);
+		var object:ValEditorObject = ValEditor.createObjectWithClassName(this._valEditClass.className, id, params);
 		return object;
 	}
 	
@@ -227,11 +227,11 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this._classCollection.removeAll();
 		if (this._categoryPicker.selectedItem == null)
 		{
-			this._classCollection.addAll(ValEdit.classCollection);
+			this._classCollection.addAll(ValEditor.classCollection);
 		}
 		else
 		{
-			this._classCollection.addAll(ValEdit.getClassCollectionForCategory(this._categoryPicker.selectedItem));
+			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem));
 		}
 		
 		if (selectedItem != null)
@@ -256,7 +256,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	{
 		if (this._classPicker.selectedIndex != -1)
 		{
-			this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
+			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem);
 			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else

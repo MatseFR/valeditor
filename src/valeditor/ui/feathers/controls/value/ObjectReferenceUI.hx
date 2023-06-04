@@ -118,11 +118,10 @@ class ObjectReferenceUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
-			//var object:Dynamic = this._exposedValue.value;
 			var object:ValEditObject = this._objectReferenceValue._valEditObjectReference;
 			if (object != null)
 			{
-				this._idLabel.text = object.id;//ValEdit.getObjectID(object);
+				this._idLabel.text = object.id;
 			}
 			else
 			{
@@ -191,8 +190,6 @@ class ObjectReferenceUI extends ValueUI
 		}
 		else
 		{
-			//this._idLabel.text = ValEdit.getObjectID(object);
-			
 			throw new Error("missing ValEditObject");
 		}
 	}

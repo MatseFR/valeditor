@@ -19,8 +19,7 @@ import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.ValEdit;
-import valedit.ValEditClass;
-import valedit.ValEditTemplate;
+import valeditor.ValEditorTemplate;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 
@@ -38,10 +37,10 @@ class TemplateCreationWindow extends Panel
 		return this._cancelCallback = value;
 	}
 	
-	public var confirmCallback(get, set):ValEditTemplate->Void;
-	private var _confirmCallback:ValEditTemplate->Void;
-	private function get_confirmCallback():ValEditTemplate->Void { return this._confirmCallback; }
-	private function set_confirmCallback(value:ValEditTemplate->Void):Dynamic->Void
+	public var confirmCallback(get, set):ValEditorTemplate->Void;
+	private var _confirmCallback:ValEditorTemplate->Void;
+	private function get_confirmCallback():ValEditorTemplate->Void { return this._confirmCallback; }
+	private function set_confirmCallback(value:ValEditorTemplate->Void):ValEditorTemplate->Void
 	{
 		return this._confirmCallback = value;
 	}
@@ -86,7 +85,7 @@ class TemplateCreationWindow extends Panel
 	private var _constructorLabel:Label;
 	private var _constructorContainer:ScrollContainer;
 	
-	private var _valEditClass:ValEditClass;
+	private var _valEditClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
 	
 	public function new() 
@@ -227,7 +226,7 @@ class TemplateCreationWindow extends Panel
 		{
 			// allow all classes
 			this._classCollection.removeAll();
-			this._classCollection.addAll(ValEdit.classCollection);
+			this._classCollection.addAll(ValEditor.classCollection);
 		}
 		if (selectedItem != null)
 		{
@@ -286,7 +285,7 @@ class TemplateCreationWindow extends Panel
 	{
 		if (this._classPicker.selectedItem != null)
 		{
-			this._valEditClass = ValEdit.getValEditClassByClassName(this._classPicker.selectedItem);
+			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem);
 			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else
@@ -319,7 +318,7 @@ class TemplateCreationWindow extends Panel
 			constructorCollection = null;
 		}
 		
-		var template:ValEditTemplate = ValEdit.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
+		var template:ValEditorTemplate = ValEditor.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
 		
 		PopUpManager.removePopUp(this);
 		if (this._confirmCallback != null) this._confirmCallback(template);

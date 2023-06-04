@@ -1,6 +1,5 @@
 package valeditor.ui.feathers.controls;
 
-import valeditor.events.SelectionEvent;
 import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
@@ -13,11 +12,10 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
-import valeditor.ui.feathers.Spacing;
-import valedit.ValEdit;
-import valedit.ValEditTemplate;
 import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.Spacing;
 
 /**
  * ...
@@ -68,7 +66,7 @@ class TemplateLibrary extends LayoutGroup
 			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);
 		
-		this._grid = new GridView(ValEdit.templateCollection, columns, onGridChange);
+		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
@@ -84,7 +82,7 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEdit.destroyTemplate(this._grid.selectedItem);
+		ValEditor.destroyTemplate(this._grid.selectedItem);
 	}
 	
 	private function onGridChange(evt:Event):Void
@@ -96,7 +94,7 @@ class TemplateLibrary extends LayoutGroup
 		}
 		else
 		{
-			if (Std.isOfType(ValEditor.selection.object, ValEditTemplate))
+			if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate))
 			{
 				ValEditor.selection.object = null;
 			}

@@ -74,7 +74,7 @@ class ObjectSelectWindow extends Panel
 	private var _objectGroup:LayoutGroup;
 	private var _objectLabel:Label;
 	private var _objectGrid:GridView;
-	private var _objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
+	private var _objectCollection:ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	
 	private var _excludeObjects:Array<Dynamic>;
 	
@@ -191,7 +191,7 @@ class ObjectSelectWindow extends Panel
 		else
 		{
 			// allow all classes
-			this._classCollection.addAll(ValEdit.classCollection);
+			this._classCollection.addAll(ValEditor.classCollection);
 		}
 		this._classList.sort(ArraySort.alphabetical);
 		this._classCollection.array = this._classList;
@@ -211,7 +211,7 @@ class ObjectSelectWindow extends Panel
 		this._objectCollection.removeAll();
 		if (this._classPicker.selectedItem != null)
 		{
-			this._objectCollection.addAll(ValEdit.getObjectCollectionForClassName(this._classPicker.selectedItem));
+			this._objectCollection.addAll(ValEditor.getObjectCollectionForClassName(this._classPicker.selectedItem));
 		}
 	}
 	

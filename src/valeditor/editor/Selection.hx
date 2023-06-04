@@ -9,9 +9,9 @@ import valedit.ValEditTemplate;
  * ...
  * @author Matse
  */
-class SelectionController extends EventDispatcher
+class Selection extends EventDispatcher
 {
-	private var _group:ValEditObjectGroup = new ValEditObjectGroup();
+	private var _group:ValEditorObjectGroup = new ValEditorObjectGroup();
 	
 	public var object(get, set):Dynamic;
 	private function get_object():Dynamic 
@@ -30,11 +30,11 @@ class SelectionController extends EventDispatcher
 		this._group.clear();
 		if (value != null)
 		{
-			if (Std.isOfType(value, ValEditObject))
+			if (Std.isOfType(value, ValEditorObject))
 			{
 				this._group.addObject(cast value);
 			}
-			else if (Std.isOfType(value, ValEditTemplate))
+			else if (Std.isOfType(value, ValEditorTemplate))
 			{
 				this._template = cast value;
 			}
@@ -50,14 +50,14 @@ class SelectionController extends EventDispatcher
 		return this._group.numObjects;
 	}
 	
-	private var _template:ValEditTemplate;
+	private var _template:ValEditorTemplate;
 
 	public function new() 
 	{
 		super();
 	}
 	
-	public function addObject(object:ValEditObject):Void
+	public function addObject(object:ValEditorObject):Void
 	{
 		if (object == null) return;
 		this._template = null;
@@ -65,7 +65,7 @@ class SelectionController extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function addObjects(objects:Array<ValEditObject>):Void
+	public function addObjects(objects:Array<ValEditorObject>):Void
 	{
 		if (objects == null || objects.length == 0) return;
 		this._template = null;
@@ -76,12 +76,12 @@ class SelectionController extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function hasObject(object:ValEditObject):Bool
+	public function hasObject(object:ValEditorObject):Bool
 	{
 		return this._group.hasObject(object);
 	}
 	
-	public function removeObject(object:ValEditObject):Void
+	public function removeObject(object:ValEditorObject):Void
 	{
 		var removed:Bool = this._group.removeObject(object);
 		if (removed)
@@ -90,7 +90,7 @@ class SelectionController extends EventDispatcher
 		}
 	}
 	
-	public function removeObjects(objects:Array<ValEditObject>):Void
+	public function removeObjects(objects:Array<ValEditorObject>):Void
 	{
 		var objectRemoved:Bool = false;
 		var removed:Bool;

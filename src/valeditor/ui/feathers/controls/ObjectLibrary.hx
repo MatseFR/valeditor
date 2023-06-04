@@ -1,7 +1,5 @@
 package valeditor.ui.feathers.controls;
 
-import valeditor.ValEditor;
-import valeditor.events.SelectionEvent;
 import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
@@ -14,13 +12,11 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import valeditor.ValEditor;
+import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
-import valedit.ValEdit;
-import valedit.ValEditObject;
-import valedit.ValEditObjectGroup;
-import valedit.ValEditTemplate;
 
 /**
  * ...
@@ -70,7 +66,7 @@ class ObjectLibrary extends LayoutGroup
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
-		this._grid = new GridView(ValEdit.objectCollection, columns, onGridChange);
+		this._grid = new GridView(ValEditor.objectCollection, columns, onGridChange);
 		this._grid.allowMultipleSelection = true;
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;
@@ -87,10 +83,10 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onObjectRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEdit.destroyObject(this._grid.selectedItem);
+		ValEditor.destroyObject(this._grid.selectedItem);
 	}
 	
-	private var _objectsToRemove:Array<ValEditObject> = new Array<ValEditObject>();
+	private var _objectsToRemove:Array<ValEditorObject> = new Array<ValEditorObject>();
 	private function onGridChange(evt:Event):Void
 	{
 		if (this._grid.selectedItems.length != 0)
@@ -98,16 +94,16 @@ class ObjectLibrary extends LayoutGroup
 			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 			
 			var selection:Dynamic = ValEditor.selection.object;
-			if (Std.isOfType(selection, ValEditObject))
+			if (Std.isOfType(selection, ValEditorObject))
 			{
 				if (this._grid.selectedItems.indexOf(selection) == -1)
 				{
 					ValEditor.selection.removeObject(selection);
 				}
 			}
-			else if (Std.isOfType(selection, ValEditObjectGroup))
+			else if (Std.isOfType(selection, ValEditorObjectGroup))
 			{
-				var group:ValEditObjectGroup = cast selection;
+				var group:ValEditorObjectGroup = cast selection;
 				for (object in group)
 				{
 					if (this._grid.selectedItems.indexOf(object) == -1)
@@ -136,7 +132,7 @@ class ObjectLibrary extends LayoutGroup
 		}
 		else
 		{
-			if (!Std.isOfType(ValEditor.selection.object, ValEditTemplate))
+			if (!Std.isOfType(ValEditor.selection.object, ValEditorTemplate))
 			{
 				ValEditor.selection.object = null;
 			}
@@ -148,13 +144,13 @@ class ObjectLibrary extends LayoutGroup
 	{
 		if (evt.object != null)
 		{
-			if (Std.isOfType(evt.object, ValEditObject))
+			if (Std.isOfType(evt.object, ValEditorObject))
 			{
 				this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
 			}
-			else if (Std.isOfType(evt.object, ValEditObjectGroup))
+			else if (Std.isOfType(evt.object, ValEditorObjectGroup))
 			{
-				var group:ValEditObjectGroup = cast evt.object;
+				var group:ValEditorObjectGroup = cast evt.object;
 				var selectedItems:Array<Dynamic> = [];
 				for (object in group)
 				{

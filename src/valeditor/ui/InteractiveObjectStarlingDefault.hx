@@ -1,9 +1,8 @@
 package valeditor.ui;
 
 import starling.display.Quad;
-import valeditor.utils.MathUtil;
-import valedit.ValEditObject;
 import valedit.util.RegularPropertyName;
+import valeditor.utils.MathUtil;
 
 /**
  * ...
@@ -64,7 +63,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 		return this._interestMap.exists(regularPropertyName);
 	}
 	
-	public function objectUpdate(object:ValEditObject):Void
+	public function objectUpdate(object:ValEditorObject):Void
 	{
 		this.x = object.getProperty(RegularPropertyName.X);
 		this.y = object.getProperty(RegularPropertyName.Y);

@@ -16,9 +16,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
-import valedit.ValEdit;
-import valedit.ValEditClass;
-import valedit.ValEditTemplate;
+import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 
@@ -53,14 +51,14 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	private var _templateGroup:LayoutGroup;
 	private var _templateLabel:Label;
 	private var _templateGrid:GridView;
-	private var _templateCollection:ArrayCollection<ValEditTemplate> = new ArrayCollection<ValEditTemplate>();
-	private var _selectedTemplate:ValEditTemplate;
+	private var _templateCollection:ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
+	private var _selectedTemplate:ValEditorTemplate;
 	
 	private var _idGroup:LayoutGroup;
 	private var _idLabel:Label;
 	private var _idInput:TextInput;
 	
-	private var _valEditClass:ValEditClass;
+	private var _valEditClass:ValEditorClass;
 
 	public function new() 
 	{
@@ -102,7 +100,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._categoryControlsGroup.layout = hLayout;
 		this._categoryGroup.addChild(this._categoryControlsGroup);
 		
-		this._categoryPicker = new ComboBox(ValEdit.categoryCollection, onCategoryChange);
+		this._categoryPicker = new ComboBox(ValEditor.categoryCollection, onCategoryChange);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
 		this._categoryControlsGroup.addChild(this._categoryPicker);
 		
@@ -129,7 +127,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._classControlsGroup.layout = hLayout;
 		this._classGroup.addChild(this._classControlsGroup);
 		
-		this._classCollection.addAll(ValEdit.classCollection);
+		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
 		this._classPicker.selectedIndex = -1;
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
@@ -194,11 +192,11 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
-	public function confirm():Dynamic
+	public function confirm():ValEditorObject
 	{
 		var id:String = null;
 		if (this._idInput.text != "") id = this._idInput.text;
-		var object:Dynamic = ValEdit.createObjectWithTemplate(this._templateGrid.selectedItem, id);
+		var object:ValEditorObject = ValEditor.createObjectWithTemplate(this._templateGrid.selectedItem, id);
 		return object;
 	}
 	
@@ -241,11 +239,11 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._classCollection.removeAll();
 		if (this._categoryPicker.selectedItem == null)
 		{
-			this._classCollection.addAll(ValEdit.classCollection);
+			this._classCollection.addAll(ValEditor.classCollection);
 		}
 		else
 		{
-			this._classCollection.addAll(ValEdit.getClassCollectionForCategory(this._categoryPicker.selectedItem));
+			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem));
 		}
 		
 		if (selectedItem != null)
@@ -257,27 +255,27 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	private function updateTemplateCollection():Void
 	{
-		var selectedItem:ValEditTemplate = this._templateGrid.selectedItem;
+		var selectedItem:ValEditorTemplate = this._templateGrid.selectedItem;
 		if (this._categoryPicker.selectedItem == null)
 		{
 			if (this._classPicker.selectedItem == null)
 			{
-				this._templateGrid.dataProvider = ValEdit.templateCollection;
+				this._templateGrid.dataProvider = ValEditor.templateCollection;
 			}
 			else
 			{
-				this._templateGrid.dataProvider = ValEdit.getTemplateCollectionForClassName(this._classPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForClassName(this._classPicker.selectedItem);
 			}
 		}
 		else
 		{
 			if (this._classPicker.selectedItem == null)
 			{
-				this._templateGrid.dataProvider = ValEdit.getTemplateCollectionForCategory(this._categoryPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForCategory(this._categoryPicker.selectedItem);
 			}
 			else
 			{
-				this._templateGrid.dataProvider = ValEdit.getTemplateCollectionForClassName(this._classPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForClassName(this._classPicker.selectedItem);
 			}
 		}
 		
@@ -321,7 +319,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._selectedTemplate = _templateGrid.selectedItem;
 		if (this._selectedTemplate != null)
 		{
-			this._valEditClass = ValEdit.getValEditClassByClassName(this._selectedTemplate.className);
+			this._valEditClass = ValEditor.getValEditClassByClassName(this._selectedTemplate.className);
 		}
 		else
 		{

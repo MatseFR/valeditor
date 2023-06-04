@@ -1,6 +1,5 @@
 package valeditor.ui.feathers.view;
 
-import valeditor.editor.MouseController;
 import feathers.controls.HDividedBox;
 import feathers.controls.LayoutGroup;
 import feathers.controls.PopUpListView;
@@ -296,13 +295,13 @@ class EditorView extends LayoutGroup
 	private function onMouseOutUI(evt:MouseEvent):Void
 	{
 		//trace("onMouseOutUI");
-		MouseController.isMouseOverUI = false;
+		ValEditor.isMouseOverUI = false;
 	}
 	
 	private function onMouseOverUI(evt:MouseEvent):Void
 	{
 		//trace("onMouseOverUI");
-		MouseController.isMouseOverUI = true;
+		ValEditor.isMouseOverUI = true;
 	}
 	
 	private function onResize(evt:Event):Void

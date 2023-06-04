@@ -1,5 +1,4 @@
 package valeditor.ui;
-import valedit.ValEditObject;
 
 /**
  * @author Matse
@@ -7,6 +6,6 @@ import valedit.ValEditObject;
 interface IInteractiveObject 
 {
 	function hasInterestIn(regularPropertyName:String):Bool;
-	function objectUpdate(object:ValEditObject):Void;
+	function objectUpdate(object:ValEditorObject):Void;
 	function pool():Void;
 }

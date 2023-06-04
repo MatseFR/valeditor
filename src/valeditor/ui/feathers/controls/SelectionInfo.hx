@@ -1,6 +1,5 @@
 package valeditor.ui.feathers.controls;
 
-import valeditor.events.SelectionEvent;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.layout.HorizontalAlign;
@@ -9,13 +8,10 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
+import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.ValEdit;
-import valedit.ValEditObject;
-import valedit.ValEditObjectGroup;
-import valedit.ValEditTemplate;
 
 /**
  * ...
@@ -132,23 +128,23 @@ class SelectionInfo extends LayoutGroup
 		}
 		else
 		{
-			if (Std.isOfType(this._object, ValEditTemplate))
+			if (Std.isOfType(this._object, ValEditorTemplate))
 			{
-				var template:ValEditTemplate = cast this._object;
+				var template:ValEditorTemplate = cast this._object;
 				this._idValue.text = template.id;
 				this._classValue.text = template.className;
 				this._typeValue.text = "Template";
 			}
-			else if (Std.isOfType(this._object, ValEditObject))
+			else if (Std.isOfType(this._object, ValEditorObject))
 			{
-				var obj:ValEditObject = cast this._object;
+				var obj:ValEditorObject = cast this._object;
 				this._idValue.text = obj.id;
 				this._classValue.text = obj.className;
 				this._typeValue.text = "Object";
 			}
-			else if (Std.isOfType(this._object, ValEditObjectGroup))
+			else if (Std.isOfType(this._object, ValEditorObjectGroup))
 			{
-				var group:ValEditObjectGroup = cast this._object;
+				var group:ValEditorObjectGroup = cast this._object;
 				this._idValue.text = group.numObjects + " objects";
 				
 				var singleClass:Bool = true;
@@ -176,11 +172,7 @@ class SelectionInfo extends LayoutGroup
 			}
 			else
 			{
-				//this._idValue.text = ValEdit.getObjectID(this._object);
-				//this._classValue.text = ValEdit.getObjectClassName(this._object);
-				//this._typeValue.text = "Object";
-				
-				throw new Error("missing ValEditObject");
+				throw new Error("missing ValEditorObject");
 			}
 		}
 	}
