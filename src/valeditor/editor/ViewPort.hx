@@ -39,6 +39,13 @@ class ViewPort extends EventDispatcher
 	}
 	
 	public var height(get, set):Float;
+	private function get_height():Float { return this._rect.height; }
+	private function set_height(value:Float):Float
+	{
+		if (this._rect.height == value) return value;
+		dispatchEvent(new Event(Event.CHANGE));
+		return this._rect.height = value;
+	}
 	
 	public var rect(get, set):Rectangle;
 	private var _rect:Rectangle = new Rectangle();

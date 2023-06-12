@@ -2,11 +2,13 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import haxe.ds.ObjectMap;
+import inputAction.InputAction;
+import juggler.animation.IAnimatable;
+import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.errors.Error;
-import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
@@ -19,7 +21,9 @@ import valedit.ValEditLayer;
 import valedit.ValEditObject;
 import valedit.util.RegularPropertyName;
 import valeditor.events.SelectionEvent;
+import valeditor.input.InputActionID;
 import valeditor.ui.IInteractiveObject;
+import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
 
@@ -27,7 +31,7 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorContainer extends ValEditContainer 
+class ValEditorContainer extends ValEditContainer implements IAnimatable
 {
 	public var isOpen(get, never):Bool;
 	private var _isOpen:Bool;
@@ -84,10 +88,46 @@ class ValEditorContainer extends ValEditContainer
 		return value;
 	}
 	
+	public var viewWidth(get, set):Float;
+	private var _viewWidth:Float = 0;
+	private function get_viewWidth():Float { return this._viewWidth; }
+	private function set_viewWidth(value:Float):Float
+	{
+		return this._viewWidth = value;
+	}
+	
+	public var viewHeight(get, set):Float;
+	private var _viewHeight:Float = 0;
+	private function get_viewHeight():Float { return this._viewHeight; }
+	private function set_viewHeight(value:Float):Float
+	{
+		return this._viewHeight = value;
+	}
+	
+	public var viewCenterX(get, set):Float;
+	private var _viewCenterX:Float = 0;
+	private function get_viewCenterX():Float { return this._viewCenterX; }
+	private function set_viewCenterX(value:Float):Float
+	{
+		this.cameraX = value - this._viewWidth / 2;
+		return this._viewCenterX;
+	}
+	
+	public var viewCenterY(get, set):Float;
+	private var _viewCenterY:Float = 0;
+	private function get_viewCenterY():Float { return this._viewCenterY; }
+	private function set_viewCenterY(value:Float):Float
+	{
+		this.cameraY = value - this._viewHeight / 2;
+		return this._viewCenterX;
+	}
+	
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	
 	private var _containerUI:Sprite = new Sprite();
+	private var _pivotIndicator:PivotIndicator = new PivotIndicator(UIConfig.CONTAINER_PIVOT_SIZE, UIConfig.CONTAINER_PIVOT_COLOR,
+		UIConfig.CONTAINER_PIVOT_ALPHA, UIConfig.CONTAINER_PIVOT_OUTLINE_COLOR, UIConfig.CONTAINER_PIVOT_OUTLINE_ALPHA);
 	
 	private var _interactiveObjectToValEditObject:ObjectMap<Dynamic, ValEditorObject> = new ObjectMap<Dynamic, ValEditorObject>();
 	
@@ -113,8 +153,15 @@ class ValEditorContainer extends ValEditContainer
 	public function new() 
 	{
 		super();
+		this._containerUI.addChild(this._pivotIndicator);
 		var layer:ValEditorLayer = new ValEditorLayer();
 		addLayer(layer);
+	}
+	
+	public function adjustView():Void
+	{
+		this.viewCenterX = this._viewCenterX;
+		this.viewCenterY = this._viewCenterY;
 	}
 	
 	public function makeLayerName():String
@@ -220,15 +267,12 @@ class ValEditorContainer extends ValEditContainer
 	public function open():Void
 	{
 		if (this._isOpen) return;
-		if (_containerUI == null)
-		{
-			_containerUI = new Sprite();
-		}
 		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
-		this._containerUI.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		Lib.current.stage.addEventListener(MouseEvent.CLICK, onStageMouseClick);
 		Lib.current.stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMiddleMouseDown);
+		
+		Juggler.root.add(this);
 	}
 	
 	public function close():Void
@@ -236,9 +280,10 @@ class ValEditorContainer extends ValEditContainer
 		if (!this._isOpen) return;
 		
 		ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
-		this._containerUI.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageMouseClick);
 		Lib.current.stage.removeEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMiddleMouseUp);
+		
+		Juggler.root.remove(this);
 	}
 	
 	private function onObjectMouseDown(evt:MouseEvent):Void
@@ -329,13 +374,13 @@ class ValEditorContainer extends ValEditContainer
 		if (!this._selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = null;
-			this._mouseObject.setProperty(RegularPropertyName.X, evt.stageX - this._mouseObjectOffsetX + this._cameraX);
-			this._mouseObject.setProperty(RegularPropertyName.Y, evt.stageY - this._mouseObjectOffsetY + this._cameraY);
+			this._mouseObject.setProperty(RegularPropertyName.X, evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX);
+			this._mouseObject.setProperty(RegularPropertyName.Y, evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY);
 		}
 		else
 		{
-			var moveX:Float = evt.stageX - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
-			var moveY:Float = evt.stageY - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
+			var moveX:Float = evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
+			var moveY:Float = evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 			this._selection.modifyProperty(RegularPropertyName.X, moveX);
 			this._selection.modifyProperty(RegularPropertyName.Y, moveY);
 		}
@@ -567,9 +612,122 @@ class ValEditorContainer extends ValEditContainer
 		this._middleMouseY = yLoc;
 	}
 	
-	private function onEnterFrame(evt:Event):Void
+	public function advanceTime(time:Float):Void
 	{
 		this._mouseDownOnObject = false;
+		
+		if (this._selection.numObjects != 0)
+		{
+			var action:InputAction;
+			
+			// Move down
+			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_1) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.Y, 1.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_1);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.Y, 1.0);
+				}
+			}
+			
+			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_10) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.Y, 10.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_10);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.Y, 10.0);
+				}
+			}
+			
+			// Move left
+			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_1) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.X, -1.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_1);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.X, -1.0);
+				}
+			}
+			
+			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_10) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.X, -10.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_10);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.X, -10.0);
+				}
+			}
+			
+			// Move right
+			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_1) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.X, 1.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_1);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.X, 1.0);
+				}
+			}
+			
+			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_10) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.X, 10.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_10);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.X, 10.0);
+				}
+			}
+			
+			// Move up
+			if (ValEditor.input.justDid(InputActionID.MOVE_UP_1) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.Y, -1.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_1);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.Y, -1.0);
+				}
+			}
+			
+			if (ValEditor.input.justDid(InputActionID.MOVE_UP_10) != null)
+			{
+				this._selection.modifyProperty(RegularPropertyName.Y, -10.0);
+			}
+			else
+			{
+				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_10);
+				if (action != null && action.canRepeat())
+				{
+					this._selection.modifyProperty(RegularPropertyName.Y, -10.0);
+				}
+			}
+		}
 	}
 	
 }

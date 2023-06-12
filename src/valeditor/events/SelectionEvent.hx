@@ -2,13 +2,6 @@ package valeditor.events;
 
 import openfl.events.Event;
 import openfl.events.EventType;
-#if !flash
-#if (openfl >= "9.1.0")
-import openfl.utils.ObjectPool;
-#else
-import openfl._internal.utils.ObjectPool;
-#end
-#end
 import openfl.events.IEventDispatcher;
 
 /**
@@ -20,29 +13,23 @@ class SelectionEvent extends Event
 	inline static public var CHANGE:EventType<SelectionEvent> = "change";
 	
 	#if !flash
-	static private var _pool:ObjectPool<SelectionEvent> = new ObjectPool<SelectionEvent>(() -> return new SelectionEvent(null, null, false, false), (event) -> {
-		event.target = null;
-		event.currentTarget = null;
-		event.object = null;
-		event.__preventDefault = false;
-		event.__isCanceled = false;
-		event.__isCanceledNow = false;
-	});
+	private static var _POOL:Array<SelectionEvent> = new Array<SelectionEvent>();
+	
+	private static function fromPool(type:String, object:Dynamic, bubbles:Bool, cancelable:Bool):SelectionEvent
+	{
+		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, bubbles, cancelable);
+		return new SelectionEvent(type, object, bubbles, cancelable);
+	}
 	#end
 	
 	static public function dispatch(dispatcher:IEventDispatcher, type:String, object:Dynamic, bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
-		var event:SelectionEvent = new SelectionEvent(type, object, bubbles, cancelable);
-		return dispatcher.dispatchEvent(event);
+		return dispatcher.dispatchEvent(new SelectionEvent(type, object, bubbles, cancelable));
 		#else
-		var event:SelectionEvent = _pool.get();
-		event.type = type;
-		event.object = object;
-		event.bubbles = bubbles;
-		event.cancelable = cancelable;
+		var event:SelectionEvent = fromPool(type, object, bubbles, cancelable);
 		var result:Bool = dispatcher.dispatchEvent(event);
-		_pool.release(event);
+		event.pool();
 		return result;
 		#end
 	}
@@ -57,7 +44,33 @@ class SelectionEvent extends Event
 	
 	override public function clone():Event 
 	{
+		#if flash
 		return new SelectionEvent(this.type, this.object, this.bubbles, this.cancelable);
+		#else
+		return fromPool(this.type, this.object, this.bubbles, this.cancelable);
+		#end
 	}
+	
+	#if !flash
+	public function pool():Void
+	{
+		this.object = null;
+		this.target = null;
+		this.currentTarget = null;
+		this.__preventDefault = false;
+		this.__isCanceled = false;
+		this.__isCanceledNow = false;
+		_POOL[_POOL.length] = this;
+	}
+	
+	public function setTo(type:String, object:Dynamic, bubbles:Bool = false, cancelable:Bool = false):SelectionEvent
+	{
+		this.type = type;
+		this.object = object;
+		this.bubbles = bubbles;
+		this.cancelable = cancelable;
+		return this;
+	}
+	#end
 	
 }

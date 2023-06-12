@@ -177,11 +177,11 @@ class ValEditorObject extends ValEditObject
 				{
 					this._selectionBox.objectUpdate(this);
 				}
-				
-				if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
-				{
-					this._pivotIndicator.objectUpdate(this);
-				}
+			}
+			
+			if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
+			{
+				this._pivotIndicator.objectUpdate(this);
 			}
 		}
 	}
@@ -220,11 +220,11 @@ class ValEditorObject extends ValEditObject
 				{
 					this._selectionBox.objectUpdate(this);
 				}
-				
-				if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
-				{
-					this._pivotIndicator.objectUpdate(this);
-				}
+			}
+			
+			if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
+			{
+				this._pivotIndicator.objectUpdate(this);
 			}
 		}
 	}

@@ -219,10 +219,7 @@ class EditorView extends LayoutGroup
 		// center content
 		this._displayArea = new LayoutGroup();
 		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
-		//this._displayArea.minWidth = UIConfig.CENTER_MIN_WIDTH;
 		this._centerBox.addChild(this._displayArea);
-		
-		//this._displayArea.addEventListener(MouseEvent.MOUSE_OVER, onMouseOverScene);
 		
 		// right content
 		this._objectInfoGroup = new ToggleLayoutGroup();
@@ -245,9 +242,6 @@ class EditorView extends LayoutGroup
 		this._rightBox.addChild(this._propertiesGroup);
 		
 		this._editContainer = new ScrollContainer();
-		//this._editContainer.minWidth = UIConfig.VALUE_MIN_WIDTH;
-		//this._editContainer.maxWidth = UIConfig.VALUE_MAX_WIDTH;
-		//this._editContainer.width = UIConfig.VALUE_MIN_WIDTH + (UIConfig.VALUE_MAX_WIDTH - UIConfig.VALUE_MIN_WIDTH) / 2;
 		this._editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		this._editContainer.scrollPolicyX = ScrollPolicy.OFF;
 		this._editContainer.scrollPolicyY = ScrollPolicy.ON;
@@ -258,7 +252,6 @@ class EditorView extends LayoutGroup
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
 		this._editContainer.layout = vLayout;
-		//this._rightBox.addChild(this._editContainer);
 		this._propertiesGroup.addContent(this._editContainer);
 		
 		this.addEventListener(Event.RESIZE, onResize);
@@ -276,9 +269,9 @@ class EditorView extends LayoutGroup
 	
 	private function onDisplayAreaResize(evt:Event):Void
 	{
-		//trace("onDisplayAreaResize");
 		this._pt.setTo(this._displayArea.x, this._displayArea.y);
 		var loc:Point = this._displayArea.localToGlobal(this._pt);
+		ValEditor.viewPort.update(loc.x, loc.y, this._displayArea.width, this._displayArea.height);
 		
 	}
 	
@@ -294,32 +287,17 @@ class EditorView extends LayoutGroup
 	
 	private function onMouseOutUI(evt:MouseEvent):Void
 	{
-		//trace("onMouseOutUI");
 		ValEditor.isMouseOverUI = false;
 	}
 	
 	private function onMouseOverUI(evt:MouseEvent):Void
 	{
-		//trace("onMouseOverUI");
 		ValEditor.isMouseOverUI = true;
 	}
 	
 	private function onResize(evt:Event):Void
 	{
-		//if (this._isFirstResize)
-		//{
-			//this._isFirstResize = false;
-			//var totalWidth:Float = this.width;
-			//this._leftBox.width = 250;
-			//totalWidth -= this._leftBox.width;
-			//this._rightBox.width = 300;
-			//totalWidth -= this._rightBox.width;
-			//this._centerBox.width = totalWidth;
-		//}
-		//else
-		//{
-			//
-		//}
+		// TODO : not needed ?
 	}
 	
 }

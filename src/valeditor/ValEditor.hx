@@ -1,14 +1,19 @@
 package valeditor;
 import feathers.data.ArrayCollection;
+import juggler.animation.Juggler;
+import openfl.Lib;
 import openfl.errors.Error;
+import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.ObjectType;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
-import valedit.ValEditTemplate;
 import valedit.util.RegularPropertyName;
 import valeditor.editor.Selection;
+import valeditor.editor.ViewPort;
+import inputAction.Input;
+import inputAction.controllers.KeyboardController;
 import valeditor.ui.InteractiveFactories;
 
 /**
@@ -18,11 +23,18 @@ import valeditor.ui.InteractiveFactories;
 @:access(valedit.ValEdit)
 class ValEditor 
 {
+	static public var input(default, null):Input = new Input();
+	static public var keyboardController(default, null):KeyboardController;
 	static public var selection(default, null):Selection = new Selection();
+	static public var viewPort(default, null):ViewPort = new ViewPort();
 	
 	static public var currentContainer(get, set):ValEditorContainer;
 	static private var _currentContainer:ValEditorContainer;
-	static private function get_currentContainer():ValEditorContainer { return _currentContainer; }
+	static private function get_currentContainer():ValEditorContainer
+	{
+		if (_currentContainer == null) return _rootContainer;
+		return _currentContainer;
+	}
 	static private function set_currentContainer(value:ValEditorContainer):ValEditorContainer
 	{
 		if (value == _currentContainer) return value;
@@ -36,6 +48,41 @@ class ValEditor
 			_currentContainer.open();
 		}
 		return _currentContainer;
+	}
+	
+	static public var rootContainer(get, set):ValEditorContainer;
+	static private var _rootContainer:ValEditorContainer;
+	static private function get_rootContainer():ValEditorContainer { return _rootContainer; }
+	static private function set_rootContainer(value:ValEditorContainer):ValEditorContainer
+	{
+		if (value == _rootContainer) return value;
+		if (_rootContainer != null)
+		{
+			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
+			_rootContainer.close();
+		}
+		_rootContainer = value;
+		if (_rootContainer != null)
+		{
+			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
+			_rootContainer.x = viewPort.x;
+			_rootContainer.y = viewPort.y;
+			_rootContainer.viewWidth = viewPort.width;
+			_rootContainer.viewHeight = viewPort.height;
+			_rootContainer.adjustView();
+			_rootContainer.open();
+		}
+		return _rootContainer;
+	}
+	
+	
+	static private function onViewPortChange(evt:Event):Void
+	{
+		_rootContainer.x = viewPort.x;
+		_rootContainer.y = viewPort.y;
+		_rootContainer.viewWidth = viewPort.width;
+		_rootContainer.viewHeight = viewPort.height;
+		_rootContainer.adjustView();
 	}
 	
 	static public var categoryCollection(default, null):ArrayCollection<String> = new ArrayCollection<String>();
@@ -52,6 +99,14 @@ class ValEditor
 	static private var _classToTemplateCollection:Map<String, ArrayCollection<ValEditorTemplate>> = new Map<String, ArrayCollection<ValEditorTemplate>>();
 	
 	static private var _classMap:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
+	
+	static public function init():Void
+	{
+		keyboardController = new KeyboardController(Lib.current.stage);
+		input.addController(keyboardController);
+		Juggler.start();
+		Juggler.root.add(input);
+	}
 	
 	static public function registerClass(type:Class<Dynamic>, collection:ExposedCollection, canBeCreated:Bool = true, objectType:Int = -1, ?constructorCollection:ExposedCollection, ?settings:ValEditorClassSettings, ?categoryList:Array<String>):ValEditorClass
 	{
@@ -324,9 +379,9 @@ class ValEditor
 			objCollection.add(valObject);
 		}
 		
-		if (_currentContainer != null)
+		if (currentContainer != null)
 		{
-			_currentContainer.add(valObject);
+			currentContainer.add(valObject);
 		}
 	}
 	

@@ -14,7 +14,6 @@ class ValEditorClassSettings extends ValEditClassSettings
 	public function new() 
 	{
 		super();
-		
 	}
 	
 }

@@ -25,7 +25,7 @@ class PivotIndicator extends Shape
 	
 	private var _interestMap:Map<String, Bool>;
 	
-	public function new() 
+	public function new(size:Float = 5, color:Int = 0x000000, alpha:Float = 1, outlineColor:Int = 0xffffff, outlineAlpha:Float = 1) 
 	{
 		super();
 		
@@ -35,14 +35,18 @@ class PivotIndicator extends Shape
 		this._interestMap.set(RegularPropertyName.PIVOT_X, true);
 		this._interestMap.set(RegularPropertyName.PIVOT_Y, true);
 		
-		var left:Float = -4;
-		var right:Float = 5;
-		var top:Float = -4;
-		var bottom:Float = 5;
+		//var left:Float = -4;
+		//var right:Float = 5;
+		//var top:Float = -4;
+		//var bottom:Float = 5;
+		var left:Float = -(size-1);
+		var right:Float = size;
+		var top:Float = -(size-1);
+		var bottom:Float = size;
 		
 		this.graphics.beginFill(0xffffff, 0);
 		// white lines
-		this.graphics.lineStyle(1, 0xffffff);
+		this.graphics.lineStyle(1, outlineColor, outlineAlpha);
 		this.graphics.moveTo( left, -0.5);
 		this.graphics.lineTo( -0.5, -0.5);
 		this.graphics.moveTo( -0.5, -0.5);
@@ -61,7 +65,7 @@ class PivotIndicator extends Shape
 		this.graphics.lineTo(1.5, bottom);
 		this.graphics.moveTo(1.5, bottom);
 		// black lines
-		this.graphics.lineStyle(1, 0x000000);
+		this.graphics.lineStyle(1, color, alpha);
 		this.graphics.moveTo(left, 0.5);
 		this.graphics.lineTo(right, 0.5);
 		this.graphics.moveTo(0.5, top);
