@@ -129,7 +129,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	}
 	
 	public var lightThemeColorDarkenRatio(get, set):Float;
-	private var _lightThemeColorDarkenRatio:Float = 0.1;
+	private var _lightThemeColorDarkenRatio:Float = 0.2;
 	private function get_lightThemeColorDarkenRatio():Float { return this._lightThemeColorDarkenRatio; }
 	private function set_lightThemeColorDarkenRatio(value:Float):Float
 	{
@@ -141,7 +141,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	}
 	
 	public var lightThemeColorLightenRatio(get, set):Float;
-	private var _lightThemeColorLightenRatio:Float = 0.1;
+	private var _lightThemeColorLightenRatio:Float = 0.2;
 	private function get_lightThemeColorLightenRatio():Float { return this._lightThemeColorLightenRatio; }
 	private function set_lightThemeColorLightenRatio(value:Float):Float
 	{
@@ -724,49 +724,58 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	//####################################################################################################
 	// TextFormat
 	//####################################################################################################
-	public function getTextFormat(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSize, this.contrastColor, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColor;
+		return new TextFormat(this._fontName, this._fontSize, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_disabled(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_disabled(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSize, this.contrastColorLighter, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLighter;
+		return new TextFormat(this._fontName, this._fontSize, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_note(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_note(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSize, this.contrastColorLight, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLight;
+		return new TextFormat(this._fontName, this._fontSize, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_big(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_big(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeBig, this.contrastColor, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColor;
+		return new TextFormat(this._fontName, this._fontSizeBig, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_big_disabled(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_big_disabled(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeBig, this.contrastColorLighter, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLighter;
+		return new TextFormat(this._fontName, this._fontSizeBig, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_big_note(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_big_note(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeBig, this.contrastColorLight, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLight;
+		return new TextFormat(this._fontName, this._fontSizeBig, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_small(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_small(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeSmall, this.contrastColor, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColor;
+		return new TextFormat(this._fontName, this._fontSizeSmall, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_small_disabled(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_small_disabled(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeSmall, this.contrastColorLighter, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLighter;
+		return new TextFormat(this._fontName, this._fontSizeSmall, color, null, null, null, null, null, align);
 	}
 	
-	public function getTextFormat_small_note(align:TextFormatAlign = LEFT):TextFormat
+	public function getTextFormat_small_note(align:TextFormatAlign = LEFT, ?color:Int):TextFormat
 	{
-		return new TextFormat(this._fontName, this._fontSizeSmall, this.contrastColorLight, null, null, null, null, null, align);
+		if (color == null) color = this.contrastColorLight;
+		return new TextFormat(this._fontName, this._fontSizeSmall, color, null, null, null, null, null, align);
 	}
 	//####################################################################################################
 	//\TextFormat
