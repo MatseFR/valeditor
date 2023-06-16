@@ -10,15 +10,14 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
 import starling.utils.Padding;
-import valeditor.ui.feathers.FeathersWindows;
-import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.ExposedValue;
-import valedit.ValEdit;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObjectReference;
+import valeditor.ui.feathers.FeathersWindows;
+import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...

@@ -32,14 +32,14 @@ class FloatUI extends ValueUI
 {
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		//if (value == null)
-		//{
-			//_floatValue = null;
-		//}
-		//else
-		//{
+		if (value == null)
+		{
+			this._floatValue = null;
+		}
+		else
+		{
 			this._floatValue = cast value;
-		//}
+		}
 		return super.set_exposedValue(value);
 	}
 	
