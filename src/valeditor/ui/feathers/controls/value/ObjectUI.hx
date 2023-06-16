@@ -6,7 +6,9 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import openfl.events.Event;
+import valedit.ExposedCollection;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.controls.value.ValueUI;
@@ -30,17 +32,26 @@ class ObjectUI extends ValueUI
 		if (value == null)
 		{
 			this._exposedObject = null;
+			this._objectCollection = null;
 			ValEdit.edit(null, this._valueGroup);
 		}
 		else
 		{
 			this._exposedObject = cast value;
-			ValEdit.edit(value.value, this._valueGroup, value);
+			if (this._objectCollection == null)
+			{
+				this._objectCollection = ValEdit.edit(value.value, this._valueGroup, value);
+			}
+			else
+			{
+				this._objectCollection.object = value.value;
+			}
 		}
 		return super.set_exposedValue(value);
 	}
 	
 	private var _exposedObject:ExposedObject;
+	private var _objectCollection:ExposedCollection;
 	
 	private var _topButton:ToggleCustom;
 	private var _arrowDown:LayoutGroup;
@@ -120,7 +131,15 @@ class ObjectUI extends ValueUI
 		super.initExposedValue();
 		
 		this._topButton.text = this._exposedValue.name;
-		ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
+		if (this._objectCollection == null)
+		{
+			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
+		}
+		else
+		{
+			// TODO : remove error when sure that it never happens
+			throw new Error("this should never happen ?");
+		}
 		updateEditable();
 	}
 	
