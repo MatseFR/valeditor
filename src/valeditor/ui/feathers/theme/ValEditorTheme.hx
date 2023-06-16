@@ -8,6 +8,7 @@ import valeditor.ui.feathers.theme.components.TextInputStyles;
 import valeditor.ui.feathers.theme.components.ToggleButtonStyles;
 import valeditor.ui.feathers.theme.components.ToggleCustomStyles;
 import valeditor.ui.feathers.theme.components.ToggleLayoutGroupStyles;
+import valeditor.ui.feathers.theme.components.ValueDraggerStyles;
 import valeditor.ui.feathers.theme.components.ValueWedgeStyles;
 import valeditor.ui.feathers.theme.simple.SimpleTheme;
 
@@ -35,6 +36,7 @@ class ValEditorTheme extends SimpleTheme
 		ToggleButtonStyles.initialize(this, this.styleProvider);
 		ToggleCustomStyles.initialize(this, this.styleProvider);
 		ToggleLayoutGroupStyles.initialize(this, this.styleProvider);
+		ValueDraggerStyles.initialize(this, this.styleProvider);
 		ValueWedgeStyles.initialize(this, this.styleProvider);
 	}
 	
