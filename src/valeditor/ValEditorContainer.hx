@@ -374,13 +374,17 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		if (!this._selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = null;
-			this._mouseObject.setProperty(RegularPropertyName.X, evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX);
-			this._mouseObject.setProperty(RegularPropertyName.Y, evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY);
+			//this._mouseObject.setProperty(RegularPropertyName.X, evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX);
+			//this._mouseObject.setProperty(RegularPropertyName.Y, evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY);
+			this._mouseObject.setProperty(RegularPropertyName.X, Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX);
+			this._mouseObject.setProperty(RegularPropertyName.Y, Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY);
 		}
 		else
 		{
-			var moveX:Float = evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
-			var moveY:Float = evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
+			//var moveX:Float = evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
+			//var moveY:Float = evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
+			var moveX:Float = Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
+			var moveY:Float = Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 			this._selection.modifyProperty(RegularPropertyName.X, moveX);
 			this._selection.modifyProperty(RegularPropertyName.Y, moveY);
 		}
