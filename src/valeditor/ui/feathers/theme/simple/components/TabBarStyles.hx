@@ -86,9 +86,9 @@ class TabBarStyles
 					skin.selectedFill = theme.getThemeFill();
 					skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
 					skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
-					skin.border = theme.getContrastBorderLight();
-					skin.selectedBorder = theme.getThemeBorderLight();
-					skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getThemeBorderDark());
+					skin.border = theme.getContrastBorderLighter();
+					skin.selectedBorder = theme.getContrastBorderLight();
+					skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getThemeBorderLight());
 					skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorder());
 					button.backgroundSkin = skin;
 				}
