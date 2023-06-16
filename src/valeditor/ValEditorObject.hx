@@ -154,7 +154,6 @@ class ValEditorObject extends ValEditObject
 			var value:ExposedValue = this._collection.getValue(this._realPropertyName);
 			value.valueChanged();
 			this._collection.readValues();
-			this._collection.uiCollection.update(value.uiControl);
 		}
 		
 		if (!objectOnly)
@@ -197,7 +196,6 @@ class ValEditorObject extends ValEditObject
 			var value:ExposedValue = this._collection.getValue(this._realPropertyName);
 			value.valueChanged();
 			this._collection.readValues();
-			this._collection.uiCollection.update(value.uiControl);
 		}
 		
 		if (!objectOnly)
