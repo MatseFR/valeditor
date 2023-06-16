@@ -5,11 +5,13 @@ import valeditor.ui.feathers.controls.value.ByteArrayUI;
 import valeditor.ui.feathers.controls.value.ColorReadOnlyUI;
 import valeditor.ui.feathers.controls.value.ColorUI;
 import valeditor.ui.feathers.controls.value.ComboUI;
+import valeditor.ui.feathers.controls.value.FloatDraggerUI;
 import valeditor.ui.feathers.controls.value.FloatRangeUI;
 import valeditor.ui.feathers.controls.value.FloatUI;
 import valeditor.ui.feathers.controls.value.FontNameUI;
 import valeditor.ui.feathers.controls.value.FunctionUI;
 import valeditor.ui.feathers.controls.value.GroupUI;
+import valeditor.ui.feathers.controls.value.IntDraggerUI;
 import valeditor.ui.feathers.controls.value.IntRangeUI;
 import valeditor.ui.feathers.controls.value.IntUI;
 import valeditor.ui.feathers.controls.value.NameUI;
@@ -76,6 +78,11 @@ class FeathersFactories
 		return new FloatUI();
 	}
 	
+	static public function exposedFloatDrag():IValueUI
+	{
+		return new FloatDraggerUI();
+	}
+	
 	static public function exposedFloatRange():IValueUI
 	{
 		return new FloatRangeUI();
@@ -99,6 +106,11 @@ class FeathersFactories
 	static public function exposedInt():IValueUI
 	{
 		return new IntUI();
+	}
+	
+	static public function exposedIntDrag():IValueUI
+	{
+		return new IntDraggerUI();
 	}
 	
 	static public function exposedIntRange():IValueUI
