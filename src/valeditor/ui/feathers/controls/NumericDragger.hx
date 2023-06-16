@@ -24,12 +24,12 @@ import openfl.ui.Keyboard;
  * @author Matse
  */
 @:styleContext
-class ValueDragger extends LayoutGroup implements IFocusObject
+class NumericDragger extends LayoutGroup implements IFocusObject
 {
 	static public var CHILD_VARIANT_INPUT:String = "valueDragger_input";
 	static public var CHILD_VARIANT_LABEL:String = "valueDragger_label" ;
 	
-	public var currentState(get, never):#if flash Dynamic #else ValueDraggerState #end;
+	public var currentState(get, never):#if flash Dynamic #else NumericDraggerState #end;
 	public var defaultBackgroundSkin:DisplayObject;
 	public var defaultLabelSkin:DisplayObject;
 	/** value to use when user sets the text input empty */
@@ -37,6 +37,7 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 	public var disabledTextFormat:AbstractTextFormat;
 	public var isIntValue(get, set):Bool;
 	public var liveDragging:Bool = true;
+	/** if false, input will only set the value when pressing ENTER key (default is true) */
 	public var liveInput:Bool = true;
 	public var maximum(get, set):Float;
 	public var minimum(get, set):Float;
@@ -49,8 +50,8 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 	public var textFormat:AbstractTextFormat;
 	public var value(get, set):Float;
 	
-	private var _currentState:ValueDraggerState = UP;
-	private function get_currentState():#if flash Dynamic #else ValueDraggerState #end {
+	private var _currentState:NumericDraggerState = UP;
+	private function get_currentState():#if flash Dynamic #else NumericDraggerState #end {
 		return this._currentState;
 	}
 	
@@ -187,18 +188,18 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 	private var _dragLabel:Label;
 	private var _input:TextInput;
 	
-	private var _stateToSkin:Map<ValueDraggerState, DisplayObject> = new Map();
-	private var _stateToLabelSkin:Map<ValueDraggerState, DisplayObject> = new Map();
-	private var _stateToLabelTextFormat:Map<ValueDraggerState, AbstractTextFormat> = new Map();
+	private var _stateToSkin:Map<NumericDraggerState, DisplayObject> = new Map();
+	private var _stateToLabelSkin:Map<NumericDraggerState, DisplayObject> = new Map();
+	private var _stateToLabelTextFormat:Map<NumericDraggerState, AbstractTextFormat> = new Map();
 	
 	private var _inputHasFocus:Bool;
 	
-	public function getSkinForState(state:ValueDraggerState):DisplayObject
+	public function getSkinForState(state:NumericDraggerState):DisplayObject
 	{
 		return this._stateToSkin.get(state);
 	}
 	
-	public function setSkinForState(state:ValueDraggerState, skin:DisplayObject):Void
+	public function setSkinForState(state:NumericDraggerState, skin:DisplayObject):Void
 	{
 		if (!this.setStyle("setSkinForState", state)) return;
 		
@@ -213,12 +214,12 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 		this.setInvalid(STYLES);
 	}
 	
-	public function getLabelSkinForState(state:ValueDraggerState):DisplayObject
+	public function getLabelSkinForState(state:NumericDraggerState):DisplayObject
 	{
 		return this._stateToLabelSkin.get(state);
 	}
 	
-	public function setLabelSkinForState(state:ValueDraggerState, skin:DisplayObject):Void
+	public function setLabelSkinForState(state:NumericDraggerState, skin:DisplayObject):Void
 	{
 		if (!this.setStyle("setLabelSkinForState", state)) return;
 		
@@ -233,12 +234,12 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 		this.setInvalid(STYLES);
 	}
 	
-	public function getLabelTextFormatForState(state:ValueDraggerState):AbstractTextFormat
+	public function getLabelTextFormatForState(state:NumericDraggerState):AbstractTextFormat
 	{
 		return this._stateToLabelTextFormat.get(state);
 	}
 	
-	public function setLabelTextFormatForState(state:ValueDraggerState, textFormat:AbstractTextFormat):Void
+	public function setLabelTextFormatForState(state:NumericDraggerState, textFormat:AbstractTextFormat):Void
 	{
 		if (!this.setStyle("setLabelTextFormatForState", state)) return;
 		if (textFormat == null)
@@ -256,13 +257,11 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 	{
 		super();
 		
-		//this.buttonMode = true;
 		this.tabEnabled = true;
 		this.tabChildren = false;
 		this.focusRect = null;
 	}
 	
-	@:access(feathers.controls.TextInput.textField)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -296,7 +295,7 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 			this._input.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 		}
 		this._input.initializeNow();
-		this._input.textField.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
+		this._input.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		
 		this.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
 		this.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
@@ -361,7 +360,7 @@ class ValueDragger extends LayoutGroup implements IFocusObject
 		}
 	}
 	
-	private function changeState(state:ValueDraggerState):Void
+	private function changeState(state:NumericDraggerState):Void
 	{
 		if (!this._enabled)
 		{

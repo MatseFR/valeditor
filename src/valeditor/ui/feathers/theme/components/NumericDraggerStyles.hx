@@ -8,15 +8,15 @@ import feathers.skins.RectangleSkin;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import openfl.display.BitmapData;
-import valeditor.ui.feathers.controls.ValueDragger;
-import valeditor.ui.feathers.controls.ValueDraggerState;
+import valeditor.ui.feathers.controls.NumericDragger;
+import valeditor.ui.feathers.controls.NumericDraggerState;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 
 /**
  * ...
  * @author Matse
  */
-class ValueDraggerStyles 
+class NumericDraggerStyles 
 {
 	static public var LINE_BMD_DRAG:BitmapData;
 	static public var LINE_BMD_HOVER:BitmapData;
@@ -26,7 +26,7 @@ class ValueDraggerStyles
 	
 	static public function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
-		ValueDraggerStyles.theme = theme;
+		NumericDraggerStyles.theme = theme;
 		
 		if (LINE_BMD_DRAG == null)
 		{
@@ -49,47 +49,47 @@ class ValueDraggerStyles
 			LINE_BMD_UP.setPixel32(1, 0, 0x00ff0000);
 		}
 		
-		if (styleProvider.getStyleFunction(ValueDragger, null) == null)
+		if (styleProvider.getStyleFunction(NumericDragger, null) == null)
 		{
-			styleProvider.setStyleFunction(ValueDragger, null, default_style);
+			styleProvider.setStyleFunction(NumericDragger, null, default_style);
 		}
 		
-		if (styleProvider.getStyleFunction(TextInput, ValueDragger.CHILD_VARIANT_INPUT) == null)
+		if (styleProvider.getStyleFunction(TextInput, NumericDragger.CHILD_VARIANT_INPUT) == null)
 		{
-			styleProvider.setStyleFunction(TextInput, ValueDragger.CHILD_VARIANT_INPUT, default_input_style);
+			styleProvider.setStyleFunction(TextInput, NumericDragger.CHILD_VARIANT_INPUT, default_input_style);
 		}
 		
-		if (styleProvider.getStyleFunction(Label, ValueDragger.CHILD_VARIANT_LABEL) == null)
+		if (styleProvider.getStyleFunction(Label, NumericDragger.CHILD_VARIANT_LABEL) == null)
 		{
-			styleProvider.setStyleFunction(Label, ValueDragger.CHILD_VARIANT_LABEL, default_dragLabel_style);
+			styleProvider.setStyleFunction(Label, NumericDragger.CHILD_VARIANT_LABEL, default_dragLabel_style);
 		}
 	}
 	
-	static private function default_style(value:ValueDragger):Void
+	static private function default_style(value:NumericDragger):Void
 	{
 		var labelSkin:UnderlineSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_UP, null, true);
-		value.setLabelSkinForState(ValueDraggerState.UP, labelSkin);
+		value.setLabelSkinForState(NumericDraggerState.UP, labelSkin);
 		
 		labelSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_HOVER, null, true);
-		value.setLabelSkinForState(ValueDraggerState.HOVER, labelSkin);
+		value.setLabelSkinForState(NumericDraggerState.HOVER, labelSkin);
 		
 		labelSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_DRAG, null, true);
-		value.setLabelSkinForState(ValueDraggerState.DRAG, labelSkin);
+		value.setLabelSkinForState(NumericDraggerState.DRAG, labelSkin);
 		
 		var skin:RectangleSkin = new RectangleSkin();
 		skin.fill = theme.getThemeFill();
-		value.setSkinForState(ValueDraggerState.DRAG, skin);
+		value.setSkinForState(NumericDraggerState.DRAG, skin);
 		
-		value.setLabelTextFormatForState(ValueDraggerState.UP, theme.getTextFormat(LEFT, theme.themeColorDark));
-		value.setLabelTextFormatForState(ValueDraggerState.HOVER, theme.getTextFormat(LEFT, theme.themeColor));
-		value.setLabelTextFormatForState(ValueDraggerState.DRAG, theme.getTextFormat(LEFT, theme.lightColor));
-		value.setLabelTextFormatForState(ValueDraggerState.DISABLED, theme.getTextFormat_disabled());
+		value.setLabelTextFormatForState(NumericDraggerState.UP, theme.getTextFormat(LEFT, theme.themeColorDark));
+		value.setLabelTextFormatForState(NumericDraggerState.HOVER, theme.getTextFormat(LEFT, theme.themeColor));
+		value.setLabelTextFormatForState(NumericDraggerState.DRAG, theme.getTextFormat(LEFT, theme.lightColor));
+		value.setLabelTextFormatForState(NumericDraggerState.DISABLED, theme.getTextFormat_disabled());
 	}
 	
 	static private function default_dragLabel_style(label:Label):Void

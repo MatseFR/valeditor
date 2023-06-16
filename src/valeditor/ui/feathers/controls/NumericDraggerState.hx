@@ -3,7 +3,7 @@ package valeditor.ui.feathers.controls;
 /**
  * @author Matse
  */
-enum ValueDraggerState 
+enum NumericDraggerState 
 {
 	UP;
 	

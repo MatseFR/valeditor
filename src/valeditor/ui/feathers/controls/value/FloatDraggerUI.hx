@@ -14,7 +14,7 @@ import valedit.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloatDrag;
-import valeditor.ui.feathers.controls.ValueDragger;
+import valeditor.ui.feathers.controls.NumericDragger;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.variant.LabelVariant;
 
@@ -41,7 +41,7 @@ class FloatDraggerUI extends ValueUI
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
-	private var _dragger:ValueDragger;
+	private var _dragger:NumericDragger;
 	
 	private var _nullGroup:LayoutGroup;
 	private var _wedge:ValueWedge;
@@ -82,7 +82,7 @@ class FloatDraggerUI extends ValueUI
 		this._label.variant = LabelVariant.VALUE_NAME;
 		this._mainGroup.addChild(this._label);
 		
-		this._dragger = new ValueDragger();
+		this._dragger = new NumericDragger();
 		this._mainGroup.addChild(this._dragger);
 		
 		this._nullGroup = new LayoutGroup();
