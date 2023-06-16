@@ -44,7 +44,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 	public function new() 
 	{
 		super(1, 1, 0xff0000);
-		this.alpha = 0.25;
+		this.alpha = 0;
 		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);

@@ -127,7 +127,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	private function refreshShape(width:Float, height:Float):Void
 	{
 		this._shape.graphics.clear();
-		this._shape.graphics.beginFill(0xff0000, 0.25);
+		this._shape.graphics.beginFill(0xff0000, 0);
 		this._shape.graphics.drawRect(0, 0, width, height);
 		this._shape.graphics.endFill();
 	}
