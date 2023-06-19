@@ -3,7 +3,6 @@ import feathers.controls.Label;
 import feathers.controls.TextInput;
 import feathers.controls.TextInputState;
 import feathers.graphics.LineStyle;
-import feathers.layout.HorizontalLayoutData;
 import feathers.skins.RectangleSkin;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
@@ -124,9 +123,9 @@ class NumericDraggerStyles
 		}
 		
 		input.paddingTop = 0.0;
-		input.paddingRight = 8.0;
+		input.paddingRight = 2.0;
 		input.paddingBottom = 0.0;
-		input.paddingLeft = 8.0;
+		input.paddingLeft = 2.0;
 	}
 	
 }
