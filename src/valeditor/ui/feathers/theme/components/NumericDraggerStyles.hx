@@ -64,31 +64,36 @@ class NumericDraggerStyles
 		}
 	}
 	
-	static private function default_style(value:NumericDragger):Void
+	static private function default_style(dragger:NumericDragger):Void
 	{
 		var labelSkin:UnderlineSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_UP, null, true);
-		value.setLabelSkinForState(NumericDraggerState.UP, labelSkin);
+		dragger.setLabelSkinForState(NumericDraggerState.UP, labelSkin);
 		
 		labelSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_HOVER, null, true);
-		value.setLabelSkinForState(NumericDraggerState.HOVER, labelSkin);
+		dragger.setLabelSkinForState(NumericDraggerState.HOVER, labelSkin);
 		
 		labelSkin = new UnderlineSkin();
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_DRAG, null, true);
-		value.setLabelSkinForState(NumericDraggerState.DRAG, labelSkin);
+		dragger.setLabelSkinForState(NumericDraggerState.DRAG, labelSkin);
 		
 		var skin:RectangleSkin = new RectangleSkin();
 		skin.fill = theme.getThemeFill();
-		value.setSkinForState(NumericDraggerState.DRAG, skin);
+		dragger.setSkinForState(NumericDraggerState.DRAG, skin);
 		
-		value.setLabelTextFormatForState(NumericDraggerState.UP, theme.getTextFormat(LEFT, theme.themeColorDark));
-		value.setLabelTextFormatForState(NumericDraggerState.HOVER, theme.getTextFormat(LEFT, theme.themeColor));
-		value.setLabelTextFormatForState(NumericDraggerState.DRAG, theme.getTextFormat(LEFT, theme.lightColor));
-		value.setLabelTextFormatForState(NumericDraggerState.DISABLED, theme.getTextFormat_disabled());
+		dragger.setLabelTextFormatForState(NumericDraggerState.UP, theme.getTextFormat(LEFT, theme.themeColorDark));
+		dragger.setLabelTextFormatForState(NumericDraggerState.HOVER, theme.getTextFormat(LEFT, theme.themeColor));
+		dragger.setLabelTextFormatForState(NumericDraggerState.DRAG, theme.getTextFormat(LEFT, theme.lightColor));
+		dragger.setLabelTextFormatForState(NumericDraggerState.DISABLED, theme.getTextFormat_disabled());
+		
+		dragger.dragGroupPaddingLeft = 2.0;
+		dragger.dragGroupPaddingRight = 2.0;
+		dragger.dragGroupPaddingBottom = 2.0;
+		dragger.dragGroupPaddingTop = 2.0;
 	}
 	
 	static private function default_dragLabel_style(label:Label):Void
@@ -122,9 +127,9 @@ class NumericDraggerStyles
 			input.promptTextFormat = theme.getTextFormat_note();
 		}
 		
-		input.paddingTop = 0.0;
+		input.paddingTop = 2.0;
 		input.paddingRight = 2.0;
-		input.paddingBottom = 0.0;
+		input.paddingBottom = 2.0;
 		input.paddingLeft = 2.0;
 	}
 	
