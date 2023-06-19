@@ -83,6 +83,10 @@ class FloatDraggerUI extends ValueUI
 		this._mainGroup.addChild(this._label);
 		
 		this._dragger = new NumericDragger();
+		this._dragger.layoutData = new HorizontalLayoutData(100);
+		hLayout = new HorizontalLayout();
+		this._dragger.layout = hLayout;
+		this._dragger.inputLayoutData = new HorizontalLayoutData(100);
 		this._mainGroup.addChild(this._dragger);
 		
 		this._nullGroup = new LayoutGroup();
