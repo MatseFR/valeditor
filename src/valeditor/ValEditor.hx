@@ -1,5 +1,6 @@
 package valeditor;
 import feathers.data.ArrayCollection;
+import haxe.Constraints.Function;
 import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.errors.Error;
@@ -154,53 +155,10 @@ class ValEditor
 			}
 		}
 		
-		if (collection.hasValue(RegularPropertyName.PIVOT_X))
-		{
-			v.hasPivotProperties = true;
-		}
-		else
-		{
-			if (v.proxyPropertyMap != null)
-			{
-				v.hasPivotProperties = v.proxyPropertyMap.hasPropertyRegular(RegularPropertyName.PIVOT_X);
-			}
-			else
-			{
-				v.hasPivotProperties = v.propertyMap.hasPropertyRegular(RegularPropertyName.PIVOT_X);
-			}
-		}
-		
-		if (collection.hasValue(RegularPropertyName.TRANSFORM))
-		{
-			v.hasTransformProperty = true;
-		}
-		else
-		{
-			if (v.proxyPropertyMap != null)
-			{
-				v.hasTransformProperty = v.proxyPropertyMap.hasPropertyRegular(RegularPropertyName.TRANSFORM);
-			}
-			else
-			{
-				v.hasTransformProperty = v.propertyMap.hasPropertyRegular(RegularPropertyName.TRANSFORM);
-			}
-		}
-		
-		if (collection.hasValue(RegularPropertyName.TRANSFORMATION_MATRIX))
-		{
-			v.hasTransformationMatrixProperty = true;
-		}
-		else
-		{
-			if (v.proxyPropertyMap != null)
-			{
-				v.hasTransformationMatrixProperty = v.proxyPropertyMap.hasPropertyRegular(RegularPropertyName.TRANSFORMATION_MATRIX);
-			}
-			else
-			{
-				v.hasTransformationMatrixProperty = v.propertyMap.hasPropertyRegular(RegularPropertyName.TRANSFORMATION_MATRIX);
-			}
-		}
+		v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
+		v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
+		v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
+		v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
 		
 		if (categoryList != null)
 		{
@@ -318,11 +276,14 @@ class ValEditor
 		
 		valObject.interactiveObject = valClass.interactiveFactory(valObject);
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
+		valObject.hasScaleProperties = valClass.hasScaleProperties;
 		valObject.hasTransformProperty = valClass.hasTransformProperty;
 		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
 		
 		registerObjectInternal(valObject);
+		
+		selection.object = valObject;
 		
 		return valObject;
 	}
@@ -414,6 +375,16 @@ class ValEditor
 	
 	static private function destroyObjectInternal(valObject:ValEditorObject):Void
 	{
+		if (valObject.clss.disposeFunctionName != null)
+		{
+			var func:Function = Reflect.field(valObject.realObject, valObject.clss.disposeFunctionName);
+			Reflect.callMethod(valObject.realObject, func, []);
+		}
+		else if (valObject.clss.disposeCustom != null)
+		{
+			Reflect.callMethod(valObject.clss.disposeCustom, valObject.clss.disposeCustom, [valObject.realObject]);
+		}
+		
 		unregisterObjectInternal(valObject);
 	}
 	
@@ -422,6 +393,8 @@ class ValEditor
 		ValEdit.unregisterObjectInternal(valObject);
 		
 		objectCollection.remove(valObject);
+		
+		valObject.container.remove(valObject);
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.remove(valObject);
@@ -468,6 +441,25 @@ class ValEditor
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.remove(template);
+		}
+	}
+	
+	static public function checkForClassProperty(clss:ValEditorClass, propertyName:String):Bool
+	{
+		if (clss.sourceCollection.hasValue(propertyName))
+		{
+			return true;
+		}
+		else
+		{
+			if (clss.proxyPropertyMap != null)
+			{
+				return clss.proxyPropertyMap.hasPropertyRegular(propertyName);
+			}
+			else
+			{
+				return clss.propertyMap.hasPropertyRegular(propertyName);
+			}
 		}
 	}
 	
