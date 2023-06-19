@@ -83,7 +83,11 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onObjectRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEditor.destroyObject(this._grid.selectedItem);
+		var objectsToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
+		for (object in objectsToRemove)
+		{
+			ValEditor.destroyObject(object);
+		}
 	}
 	
 	private var _objectsToRemove:Array<ValEditorObject> = new Array<ValEditorObject>();
