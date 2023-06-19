@@ -28,6 +28,16 @@ class ValEditorObject extends ValEditObject
 		return this._collection = value;
 	}
 	
+	public var container(get, set):ValEditorContainer;
+	private var _container:ValEditorContainer;
+	private function get_container():ValEditorContainer { return this._container; }
+	private function set_container(value:ValEditorContainer):ValEditorContainer
+	{
+		if (value == this._container) return value;
+		
+		return this._container = value;
+	}
+	
 	public var getBoundsFunctionName(get, set):String;
 	private var _getBoundsFunctionName:String = "getBounds";
 	private function get_getBoundsFunctionName():String { return this._getBoundsFunctionName; }
@@ -81,6 +91,7 @@ class ValEditorObject extends ValEditObject
 	}
 	
 	public var hasPivotProperties:Bool;
+	public var hasScaleProperties:Bool;
 	public var hasTransformProperty:Bool;
 	public var hasTransformationMatrixProperty:Bool;
 	public var hasRadianRotation:Bool;
