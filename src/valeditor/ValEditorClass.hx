@@ -15,6 +15,7 @@ class ValEditorClass extends ValEditClass
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 	
 	public var hasPivotProperties:Bool;
+	public var hasScaleProperties:Bool;
 	public var hasTransformProperty:Bool;
 	public var hasTransformationMatrixProperty:Bool;
 	public var hasRadianRotation:Bool;
