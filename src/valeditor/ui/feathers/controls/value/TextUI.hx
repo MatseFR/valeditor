@@ -10,6 +10,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
@@ -149,6 +150,8 @@ class TextUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._textArea.removeEventListener(Event.CHANGE, onInputChange);
+		this._textArea.removeEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
+		this._textArea.removeEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -157,12 +160,24 @@ class TextUI extends ValueUI
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._textArea.addEventListener(Event.CHANGE, onInputChange);
+		this._textArea.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
+		this._textArea.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
 		this._exposedValue.value = this._textArea.text;
+	}
+	
+	private function onInputKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onInputKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void

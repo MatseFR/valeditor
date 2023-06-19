@@ -9,6 +9,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
@@ -172,6 +173,8 @@ class IntDraggerUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._dragger.removeEventListener(Event.CHANGE, onDraggerChange);
+		this._dragger.removeEventListener(KeyboardEvent.KEY_DOWN, onDraggerKeyDown);
+		this._dragger.removeEventListener(KeyboardEvent.KEY_UP, onDraggerKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -180,12 +183,24 @@ class IntDraggerUI extends ValueUI
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._dragger.addEventListener(Event.CHANGE, onDraggerChange);
+		this._dragger.addEventListener(KeyboardEvent.KEY_DOWN, onDraggerKeyDown);
+		this._dragger.addEventListener(KeyboardEvent.KEY_UP, onDraggerKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	private function onDraggerChange(evt:Event):Void
 	{
 		this._exposedValue.value = Std.int(this._dragger.value);
+	}
+	
+	private function onDraggerKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onDraggerKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void
