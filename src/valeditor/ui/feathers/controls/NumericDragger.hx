@@ -5,7 +5,10 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
 import feathers.core.FocusManager;
 import feathers.core.IFocusObject;
+import feathers.core.InvalidationFlag;
 import feathers.events.FeathersEvent;
+import feathers.layout.HorizontalLayout;
+import feathers.layout.ILayoutData;
 import feathers.text.TextFormat;
 import feathers.text.TextFormat.AbstractTextFormat;
 import feathers.utils.ExclusivePointer;
@@ -35,6 +38,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	/** value to use when user sets the text input empty */
 	public var defaultValue(get, set):Float;
 	public var disabledTextFormat:AbstractTextFormat;
+	public var inputLayoutData(get, set):ILayoutData;
 	public var isIntValue(get, set):Bool;
 	public var liveDragging:Bool = true;
 	/** if false, input will only set the value when pressing ENTER key (default is true) */
@@ -87,6 +91,16 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			this.changeState(DISABLED);
 		}
 		return this._enabled;
+	}
+	
+	private var _inputLayoutData:ILayoutData;
+	private function get_inputLayoutData():ILayoutData { return this._inputLayoutData; }
+	private function set_inputLayoutData(value:ILayoutData):ILayoutData
+	{
+		if (this._inputLayoutData == value) return value;
+		this._inputLayoutData = value;
+		this.setInvalid(CUSTOM("inputLayoutData"));
+		return this._inputLayoutData;
 	}
 	
 	private var _isIntValue:Bool;
@@ -294,7 +308,6 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			this._input.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 			this._input.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 		}
-		this._input.initializeNow();
 		this._input.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		
 		this.addEventListener(FocusEvent.FOCUS_IN, focusInHandler);
@@ -305,9 +318,15 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	{
 		super.update();
 		
+		var inputLayoutDataInvalid = this.isInvalid(CUSTOM("inputLayoutData"));
 		var dataInvalid = this.isInvalid(DATA);
 		var stateInvalid = this.isInvalid(STATE);
 		var stylesInvalid = this.isInvalid(STYLES);
+		
+		if (inputLayoutDataInvalid)
+		{
+			this._input.layoutData = this._inputLayoutData;
+		}
 		
 		if (dataInvalid)
 		{
