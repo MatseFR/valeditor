@@ -90,6 +90,45 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 			this.pivotZ = 0;
 		}
 		
+		if (object.hasScaleProperties)
+		{
+			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+			var scaleZ:Float = object.getProperty(RegularPropertyName.SCALE_Z);
+			
+			if (scaleX < 0)
+			{
+				this.scaleX = -1;
+			}
+			else
+			{
+				this.scaleX = 1;
+			}
+			
+			if (scaleY < 0)
+			{
+				this.scaleY = -1;
+			}
+			else
+			{
+				this.scaleY = 1;
+			}
+			
+			if (scaleZ < 0)
+			{
+				this.scaleZ = -1;
+			}
+			else
+			{
+				this.scaleZ = 1;
+			}
+		}
+		else
+		{
+			this.scale = 1;
+			this.scaleZ = 1;
+		}
+		
 		var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
 		var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
 		var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);

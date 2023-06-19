@@ -126,6 +126,35 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 			this.pivotY = 0;
 		}
 		
+		if (object.hasScaleProperties)
+		{
+			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+			
+			if (scaleX < 0)
+			{
+				this.scaleX = -1;
+			}
+			else
+			{
+				this.scaleX = 1;
+			}
+			
+			if (scaleY < 0)
+			{
+				this.scaleY = -1;
+			}
+			else
+			{
+				this.scaleY = 1;
+			}
+		}
+		else
+		{
+			this.scaleX = 1;
+			this.scaleY = 1;
+		}
+		
 		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
 		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
 		this.rotation = 0;

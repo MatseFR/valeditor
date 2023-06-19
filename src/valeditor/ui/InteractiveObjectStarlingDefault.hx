@@ -23,8 +23,6 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 		_POOL.push(object);
 	}
 	
-	//public var propertyMap:PropertyMap;
-	
 	//@:setter(width)
 	override function set_width(value:Float):Float 
 	{
@@ -76,6 +74,34 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 		{
 			this.pivotX = 0;
 			this.pivotY = 0;
+		}
+		
+		if (object.hasScaleProperties)
+		{
+			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+			
+			if (scaleX < 0)
+			{
+				this.scaleX = -1;
+			}
+			else
+			{
+				this.scaleX = 1;
+			}
+			
+			if (scaleY < 0)
+			{
+				this.scaleY = -1;
+			}
+			else
+			{
+				this.scaleY = 1;
+			}
+		}
+		else
+		{
+			this.scale = 1;
 		}
 		
 		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
