@@ -208,6 +208,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		
 		var editorObject:ValEditorObject = cast object;
 		
+		editorObject.container = this;
+		
 		switch (object.objectType)
 		{
 			case ObjectType.DISPLAY_OPENFL :
@@ -238,6 +240,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		super.remove(object);
 		
 		var editorObject:ValEditorObject = cast object;
+		
+		editorObject.container = null;
 		
 		switch (object.objectType)
 		{
@@ -368,21 +372,21 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 	
 	private function onObjectMouseMove(evt:MouseEvent):Void
 	{
+		// MouseEvent.stageX/Y is incorrect sometimes, at least on flash target
+		// in the full editor it happens when mouse goes over the side panels, 
+		// no biggie but the feeling is much better using Stage.mouseX directly
+		
 		this._mouseDownWithCtrl = false;
 		this._mouseDownWithShift = false;
 		
 		if (!this._selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = null;
-			//this._mouseObject.setProperty(RegularPropertyName.X, evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX);
-			//this._mouseObject.setProperty(RegularPropertyName.Y, evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY);
 			this._mouseObject.setProperty(RegularPropertyName.X, Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX);
 			this._mouseObject.setProperty(RegularPropertyName.Y, Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY);
 		}
 		else
 		{
-			//var moveX:Float = evt.stageX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
-			//var moveY:Float = evt.stageY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 			var moveX:Float = Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
 			var moveY:Float = Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 			this._selection.modifyProperty(RegularPropertyName.X, moveX);
@@ -730,6 +734,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 				{
 					this._selection.modifyProperty(RegularPropertyName.Y, -10.0);
 				}
+			}
+			
+			// delete
+			if (ValEditor.input.justDid(InputActionID.DELETE) != null)
+			{
+				this._selection.deleteObjects();
 			}
 		}
 	}
