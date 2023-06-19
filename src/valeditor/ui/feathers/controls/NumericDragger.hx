@@ -7,8 +7,10 @@ import feathers.core.FocusManager;
 import feathers.core.IFocusObject;
 import feathers.core.InvalidationFlag;
 import feathers.events.FeathersEvent;
+import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.ILayoutData;
+import feathers.layout.VerticalAlign;
 import feathers.text.TextFormat;
 import feathers.text.TextFormat.AbstractTextFormat;
 import feathers.utils.ExclusivePointer;
@@ -38,6 +40,11 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	/** value to use when user sets the text input empty */
 	public var defaultValue(get, set):Float;
 	public var disabledTextFormat:AbstractTextFormat;
+	public var dragGroupPaddingBottom(get, set):Float;
+	public var dragGroupPaddingLeft(get, set):Float;
+	public var dragGroupPaddingRight(get, set):Float;
+	public var dragGroupPaddingTop(get, set):Float;
+	public var dragScaleFactor(get, set):Float;
 	public var inputLayoutData(get, set):ILayoutData;
 	public var isIntValue(get, set):Bool;
 	public var liveDragging:Bool = true;
@@ -45,7 +52,6 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	public var liveInput:Bool = true;
 	public var maximum(get, set):Float;
 	public var minimum(get, set):Float;
-	public var dragScaleFactor(get, set):Float;
 	/** this property exists to allow adjusting the drag to a zoom level or something similar */
 	public var secondaryDragScaleFactor(get, set):Float;
 	/** if this is not null it will be called during drag and secondaryDragScaleFactor will be ignored */
@@ -67,6 +73,46 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		this._defaultValue = value;
 		this.setInvalid(DATA);
 		return this._defaultValue;
+	}
+	
+	private var _dragGroupPaddingBottom:Float = 0.0;
+	private function get_dragGroupPaddingBottom():Float { return this._dragGroupPaddingBottom; }
+	private function set_dragGroupPaddingBottom(value:Float):Float
+	{
+		if (this._dragGroupPaddingBottom == value) return value;
+		this._dragGroupPaddingBottom = value;
+		this.setInvalid(STYLES);
+		return this._dragGroupPaddingBottom;
+	}
+	
+	private var _dragGroupPaddingLeft:Float = 0.0;
+	private function get_dragGroupPaddingLeft():Float { return this._dragGroupPaddingLeft; }
+	private function set_dragGroupPaddingLeft(value:Float):Float
+	{
+		if (this._dragGroupPaddingLeft == value) return value;
+		this._dragGroupPaddingLeft = value;
+		this.setInvalid(STYLES);
+		return this._dragGroupPaddingLeft;
+	}
+	
+	private var _dragGroupPaddingRight:Float = 0.0;
+	private function get_dragGroupPaddingRight():Float { return this._dragGroupPaddingRight; }
+	private function set_dragGroupPaddingRight(value:Float):Float
+	{
+		if (this._dragGroupPaddingRight == value) return value;
+		this._dragGroupPaddingRight = value;
+		this.setInvalid(STYLES);
+		return this._dragGroupPaddingRight;
+	}
+	
+	private var _dragGroupPaddingTop:Float = 0.0;
+	private function get_dragGroupPaddingTop():Float { return this._dragGroupPaddingTop; }
+	private function set_dragGroupPaddingTop(value:Float):Float
+	{
+		if (this._dragGroupPaddingTop == value) return value;
+		this._dragGroupPaddingTop = value;
+		this.setInvalid(STYLES);
+		return this._dragGroupPaddingTop;
 	}
 	
 	private var _dragScaleFactor:Float = 1.0;
@@ -199,6 +245,8 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private var _floatPrecision:Int = 2; // this corresponds to the default step value (0.01)
 	#end
 	
+	private var _dragGroup:LayoutGroup;
+	private var _dragGroupLayout:HorizontalLayout;
 	private var _dragLabel:Label;
 	private var _input:TextInput;
 	
@@ -267,13 +315,21 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		this.setInvalid(STYLES);
 	}
 
-	public function new() 
+	public function new(value:Float = 0.0, minimum:Float = 0.0, maximum:Float = 1.0, ?changeListener:(Event) -> Void) 
 	{
 		super();
 		
 		this.tabEnabled = true;
 		this.tabChildren = false;
 		this.focusRect = null;
+		
+		this.value = value;
+		this.minimum = minimum;
+		this.maximum = maximum;
+		if (changeListener != null)
+		{
+			this.addEventListener(Event.CHANGE, changeListener);
+		}
 	}
 	
 	override function initialize():Void 
@@ -289,6 +345,16 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			this.value = this.restrictValue(this._value);
 		}
 		
+		if (this._dragGroup == null)
+		{
+			this._dragGroup = new LayoutGroup();
+			this._dragGroupLayout = new HorizontalLayout();
+			this._dragGroupLayout.horizontalAlign = HorizontalAlign.CENTER;
+			this._dragGroupLayout.verticalAlign = VerticalAlign.MIDDLE;
+			this._dragGroup.layout = this._dragGroupLayout;
+		}
+		addChild(this._dragGroup);
+		
 		if (this._dragLabel == null)
 		{
 			this._dragLabel = new Label();
@@ -298,7 +364,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			this._dragLabel.addEventListener(MouseEvent.MOUSE_DOWN, dragLabel_mouseDownHandler);
 			this._dragLabel.addEventListener(MouseEvent.CLICK, dragLabel_clickHandler);
 		}
-		addChild(this._dragLabel);
+		this._dragGroup.addChild(this._dragLabel);
 		
 		if (this._input == null)
 		{
@@ -335,8 +401,8 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			#else
 			var str:String = Std.string(this._value);
 			#end
-			if (this._dragLabel != null) this._dragLabel.text = str;
-			if (this._input != null) this._input.text = str;
+			this._dragLabel.text = str;
+			this._input.text = str;
 			
 			// update input restrict
 			if (this._minimum < 0.0)
@@ -395,7 +461,12 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function refreshStyles():Void
 	{
-		this.backgroundSkin = getCurrentSkin();
+		this._dragGroupLayout.paddingLeft = this._dragGroupPaddingLeft;
+		this._dragGroupLayout.paddingRight = this._dragGroupPaddingRight;
+		this._dragGroupLayout.paddingBottom = this._dragGroupPaddingBottom;
+		this._dragGroupLayout.paddingTop = this._dragGroupPaddingTop;
+		
+		this._dragGroup.backgroundSkin = getCurrentSkin();
 		this._dragLabel.textFormat = getCurrentLabelTextFormat();
 		this._dragLabel.backgroundSkin = getCurrentLabelSkin();
 	}
@@ -412,9 +483,9 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		{
 			if (this._input.parent == null)
 			{
-				if (this._dragLabel.parent != null)
+				if (this._dragGroup.parent != null)
 				{
-					this.removeChild(this._dragLabel);
+					this.removeChild(this._dragGroup);
 				}
 				this.addChild(this._input);
 				if (this.focusManager != null)
@@ -431,13 +502,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		}
 		else
 		{
-			if (this._dragLabel.parent == null)
+			if (this._dragGroup.parent == null)
 			{
 				if (this._input.parent != null)
 				{
 					this.removeChild(this._input);
 				}
-				this.addChild(this._dragLabel);
+				this.addChild(this._dragGroup);
 			}
 		}
 	}
