@@ -21,14 +21,17 @@ import valeditor.ui.feathers.theme.simple.components.ComboBoxStyles;
 import valeditor.ui.feathers.theme.simple.components.GridViewStyles;
 import valeditor.ui.feathers.theme.simple.components.HScrollBarStyles;
 import valeditor.ui.feathers.theme.simple.components.HSliderStyles;
+import valeditor.ui.feathers.theme.simple.components.HeaderStyles;
 import valeditor.ui.feathers.theme.simple.components.HierarchicalItemRendererStyles;
 import valeditor.ui.feathers.theme.simple.components.ItemRendererStyles;
 import valeditor.ui.feathers.theme.simple.components.LabelStyles;
 import valeditor.ui.feathers.theme.simple.components.LayoutGroupItemRendererStyles;
 import valeditor.ui.feathers.theme.simple.components.LayoutGroupStyles;
 import valeditor.ui.feathers.theme.simple.components.ListViewStyles;
+import valeditor.ui.feathers.theme.simple.components.PanelStyles;
 import valeditor.ui.feathers.theme.simple.components.PopUpListViewStyles;
 import valeditor.ui.feathers.theme.simple.components.ScrollContainerStyles;
+import valeditor.ui.feathers.theme.simple.components.SortOrderHeaderRendererStyles;
 import valeditor.ui.feathers.theme.simple.components.TabBarStyles;
 import valeditor.ui.feathers.theme.simple.components.TextInputStyles;
 import valeditor.ui.feathers.theme.simple.components.ToggleButtonStyles;
@@ -123,8 +126,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeColor == value) return value;
 		this._lightThemeColor = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeColor;
 	}
 	
@@ -135,21 +138,57 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeColorDarkenRatio == value) return value;
 		this._lightThemeColorDarkenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeColorDarkenRatio;
 	}
 	
 	public var lightThemeColorLightenRatio(get, set):Float;
-	private var _lightThemeColorLightenRatio:Float = 0.2;
+	private var _lightThemeColorLightenRatio:Float = 0.4;
 	private function get_lightThemeColorLightenRatio():Float { return this._lightThemeColorLightenRatio; }
 	private function set_lightThemeColorLightenRatio(value:Float):Float
 	{
 		if (this._lightThemeColorLightenRatio  == value) return value;
 		this._lightThemeColorLightenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeColorLightenRatio;
+	}
+	
+	public var lightThemeAlternColor(get, set):Int;
+	private var _lightThemeAlternColor:Int = 0x647DBE;
+	private function get_lightThemeAlternColor():Int { return this._lightThemeAlternColor; }
+	private function set_lightThemeAlternColor(value:Int):Int
+	{
+		if (this._lightThemeAlternColor == value) return value;
+		this._lightThemeAlternColor = value;
+		refreshColors();
+		if (!this._darkMode) styleChanged();
+		return this._lightThemeAlternColor;
+	}
+	
+	public var lightThemeAlternColorDarkenRatio(get, set):Float;
+	private var _lightThemeAlternColorDarkenRatio:Float = 0.2;
+	private function get_lightThemeAlternColorDarkenRatio():Float { return this._lightThemeAlternColorDarkenRatio; }
+	private function set_lightThemeAlternColorDarkenRatio(value:Float):Float
+	{
+		if (this._lightThemeAlternColorDarkenRatio == value) return value;
+		this._lightThemeAlternColorDarkenRatio = value;
+		refreshColors();
+		if (!this._darkMode) styleChanged();
+		return this._lightThemeAlternColorDarkenRatio;
+	}
+	
+	public var lightThemeAlternColorLightenRatio(get, set):Float;
+	private var _lightThemeAlternColorLightenRatio:Float = 0.3;
+	private function get_lightThemeAlternColorLightenRatio():Float { return this._lightThemeAlternColorLightenRatio; }
+	private function set_lightThemeAlternColorLightenRatio(value:Float):Float
+	{
+		if (this._lightThemeAlternColorLightenRatio == value) return value;
+		this._lightThemeAlternColorLightenRatio = value;
+		refreshColors();
+		if (!this._darkMode) styleChanged();
+		return this._lightThemeAlternColorLightenRatio;
 	}
 	
 	public var lightThemeLightColor(get, set):Int;
@@ -159,32 +198,32 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this.lightThemeLightColor == value) return value;
 		this._lightThemeLightColor = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeLightColor;
 	}
 	
 	public var lightThemeLightColorDarkenRatio(get, set):Float;
-	private var _lightThemeLightColorDarkenRatio:Float = 0.1;
+	private var _lightThemeLightColorDarkenRatio:Float = 0.075;
 	private function get_lightThemeLightColorDarkenRatio():Float { return this._lightThemeLightColorDarkenRatio; }
 	private function set_lightThemeLightColorDarkenRatio(value:Float):Float
 	{
 		if (this._lightThemeLightColorDarkenRatio == value) return value;
 		this._lightThemeLightColorDarkenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeLightColorDarkenRatio;
 	}
 	
 	public var lightThemeLightColorLightenRatio(get, set):Float;
-	private var _lightThemeLightColorLightenRatio:Float = 0.1;
+	private var _lightThemeLightColorLightenRatio:Float = 0.5;
 	private function get_lightThemeLightColorLightenRatio():Float { return this._lightThemeLightColorLightenRatio; }
 	private function set_lightThemeLightColorLightenRatio(value:Float):Float
 	{
 		if (this._lightThemeLightColorLightenRatio == value) return value;
 		this._lightThemeLightColorLightenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeLightColorLightenRatio;
 	}
 	
@@ -195,8 +234,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeContrastColor == value) return value;
 		this._lightThemeContrastColor = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeContrastColor;
 	}
 	
@@ -207,20 +246,20 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeContrastColorDarkenRatio == value) return value;
 		this._lightThemeContrastColorDarkenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeContrastColorDarkenRatio;
 	}
 	
 	public var lightThemeContrastColorLightenRatio(get, set):Float;
-	private var _lightThemeContrastColorLightenRatio:Float = 0.1;
+	private var _lightThemeContrastColorLightenRatio:Float = 0.2;
 	private function get_lightThemeContrastColorLightenRatio():Float { return this._lightThemeContrastColorLightenRatio; }
 	private function set_lightThemeContrastColorLightenRatio(value:Float):Float
 	{
 		if (this._lightThemeContrastColorLightenRatio == value) return value;
 		this._lightThemeContrastColorLightenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeContrastColorLightenRatio;
 	}
 	
@@ -231,8 +270,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeDangerColor == value) return value;
 		this._lightThemeDangerColor = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeDangerColor;
 	}
 	
@@ -243,8 +282,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeDangerColorDarkenRatio == value) return value;
 		this._lightThemeDangerColorDarkenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeDangerColorDarkenRatio;
 	}
 	
@@ -255,8 +294,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeDangerColorLightenRatio == value) return value;
 		this._lightThemeDangerColorLightenRatio = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeDangerColorLightenRatio;
 	}
 	
@@ -267,8 +306,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._lightThemeFocusColor == value) return value;
 		this._lightThemeFocusColor = value;
-		this.refreshColors();
-		if (!this._darkMode) this.styleChanged();
+		refreshColors();
+		if (!this._darkMode) styleChanged();
 		return this._lightThemeFocusColor;
 	}
 	//##########################################################################################
@@ -279,39 +318,75 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	// DARK MODE
 	//##########################################################################################
 	public var darkThemeColor(get, set):Int;
-	private var _darkThemeColor:Int = 0x4f6f9f;
+	private var _darkThemeColor:Int = 0xA06432;
 	private function get_darkThemeColor():Int { return this._darkThemeColor; }
 	private function set_darkThemeColor(value:Int):Int
 	{
 		if (this._darkThemeColor == value) return value;
 		this._darkThemeColor = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeColor;
 	}
 	
 	public var darkThemeColorDarkenRatio(get, set):Float;
-	private var _darkThemeColorDarkenRatio:Float = 0.1;
+	private var _darkThemeColorDarkenRatio:Float = 0.35;
 	private function get_darkThemeColorDarkenRatio():Float { return this._darkThemeColorDarkenRatio; }
 	private function set_darkThemeColorDarkenRatio(value:Float):Float
 	{
 		if (this._darkThemeColorDarkenRatio == value) return value;
 		this._darkThemeColorDarkenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeColorDarkenRatio;
 	}
 	
 	public var darkThemeColorLightenRatio(get, set):Float;
-	private var _darkThemeColorLightenRatio:Float = 0.1;
+	private var _darkThemeColorLightenRatio:Float = 0.15;
 	private function get_darkThemeColorLightenRatio():Float { return this._darkThemeColorLightenRatio; }
 	private function set_darkThemeColorLightenRatio(value:Float):Float
 	{
 		if (this._darkThemeColorLightenRatio == value) return value;
 		this._darkThemeColorLightenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeColorLightenRatio;
+	}
+	
+	public var darkThemeAlternColor(get, set):Int;
+	private var _darkThemeAlternColor:Int = 0x73AAD2;
+	private function get_darkThemeAlternColor():Int { return this._darkThemeAlternColor; }
+	private function set_darkThemeAlternColor(value:Int):Int
+	{
+		if (this._darkThemeAlternColor == value) return value;
+		this._darkThemeAlternColor = value;
+		refreshColors();
+		if (this._darkMode) styleChanged();
+		return this._darkThemeAlternColor;
+	}
+	
+	public var darkThemeAlternColorDarkenRatio(get, set):Float;
+	private var _darkThemeAlternColorDarkenRatio:Float = 0.2;
+	private function get_darkThemeAlternColorDarkenRatio():Float { return this._darkThemeAlternColorDarkenRatio; }
+	private function set_darkThemeAlternColorDarkenRatio(value:Float):Float
+	{
+		if (this._darkThemeAlternColorDarkenRatio == value) return value;
+		this._darkThemeAlternColorDarkenRatio = value;
+		refreshColors();
+		if (this._darkMode) styleChanged();
+		return this._darkThemeAlternColorDarkenRatio;
+	}
+	
+	public var darkThemeAlternColorLightenRatio(get, set):Float;
+	private var _darkThemeAlternColorLightenRatio:Float = 0.3;
+	private function get_darkThemeAlternColorLightenRatio():Float { return this._darkThemeAlternColorLightenRatio; }
+	private function set_darkThemeAlternColorLightenRatio(value:Float):Float
+	{
+		if (this._darkThemeAlternColorLightenRatio == value) return value;
+		this._darkThemeAlternColorLightenRatio = value;
+		refreshColors();
+		if (this._darkMode) styleChanged();
+		return this._darkThemeAlternColorLightenRatio;
 	}
 	
 	public var darkThemeLightColor(get, set):Int;
@@ -321,8 +396,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeLightColor == value) return value;
 		this._darkThemeLightColor = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeLightColor;
 	}
 	
@@ -333,8 +408,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeLightColorDarkenRatio == value) return value;
 		this._darkThemeLightColorDarkenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeLightColorDarkenRatio;
 	}
 	
@@ -345,32 +420,32 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeLightColorLightenRatio == value) return value;
 		this._darkThemeLightColorLightenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeLightColorLightenRatio;
 	}
 	
 	public var darkThemeContrastColor(get, set):Int;
-	private var _darkThemeContrastColor:Int = 0xE6E6E6;//0xf8f8f8;
+	private var _darkThemeContrastColor:Int = 0xDCDCDC;//0xf8f8f8;
 	private function get_darkThemeContrastColor():Int { return this._darkThemeContrastColor; }
 	private function set_darkThemeContrastColor(value:Int):Int
 	{
 		if (this._darkThemeContrastColor == value) return value;
 		this._darkThemeContrastColor = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeContrastColor;
 	}
 	
 	public var darkThemeContrastColorDarkenRatio(get, set):Float;
-	private var _darkThemeContrastColorDarkenRatio:Float = 0.1;
+	private var _darkThemeContrastColorDarkenRatio:Float = 0.35;
 	private function get_darkThemeContrastColorDarkenRatio():Float { return this._darkThemeContrastColorDarkenRatio; }
 	private function set_darkThemeContrastColorDarkenRatio(value:Float):Float
 	{
 		if (this._darkThemeContrastColorDarkenRatio == value) return value;
 		this._darkThemeContrastColorDarkenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeContrastColorDarkenRatio;
 	}
 	
@@ -381,8 +456,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeContrastColorLightenRatio == value) return value;
 		this._darkThemeContrastColorLightenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeContrastColorLightenRatio;
 	}
 	
@@ -393,8 +468,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeDangerColor == value) return value;
 		this._darkThemeDangerColor = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeDangerColor;
 	}
 	
@@ -405,8 +480,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeDangerColorDarkenRatio == value) return value;
 		this._darkThemeDangerColorDarkenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeDangerColorDarkenRatio;
 	}
 	
@@ -417,8 +492,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeDangerColorLightenRatio == value) return value;
 		this._darkThemeDangerColorLightenRatio = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeDangerColorLightenRatio;
 	}
 	
@@ -429,8 +504,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	{
 		if (this._darkThemeFocusColor == value) return value;
 		this._darkThemeFocusColor = value;
-		this.refreshColors();
-		if (this._darkMode) this.styleChanged();
+		refreshColors();
+		if (this._darkMode) styleChanged();
 		return this._darkThemeFocusColor;
 	}
 	//##########################################################################################
@@ -440,6 +515,10 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	public var themeColor(default, null):Int;
 	public var themeColorDark(default, null):Int;
 	public var themeColorLight(default, null):Int;
+	
+	public var alternColor(default, null):Int;
+	public var alternColorDark(default, null):Int;
+	public var alternColorLight(default, null):Int;
 	
 	public var lightColor(default, null):Int;
 	public var lightColorDark(default, null):Int;
@@ -456,7 +535,9 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	
 	public var focusColor(default, null):Int;
 	
-	public function new(lightThemeColor:Int = 0xa0c0f0, darkThemeColor:Int = 0x4f6f9f) 
+	private var _colorUpdateFunctions:Array<SimpleTheme->Void> = new Array<SimpleTheme->Void>();
+	
+	public function new(lightThemeColor:Int = 0x96B4E1, darkThemeColor:Int = 0x4f6f9f) 
 	{
 		super();
 		this._lightThemeColor = lightThemeColor;
@@ -473,6 +554,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		CheckStyles.initialize(this, this.styleProvider);
 		ComboBoxStyles.initialize(this, this.styleProvider);
 		GridViewStyles.initialize(this, this.styleProvider);
+		HeaderStyles.initialize(this, this.styleProvider);
 		HierarchicalItemRendererStyles.initialize(this, this.styleProvider);
 		HScrollBarStyles.initialize(this, this.styleProvider);
 		HSliderStyles.initialize(this, this.styleProvider);
@@ -481,14 +563,26 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		LayoutGroupItemRendererStyles.initialize(this, this.styleProvider);
 		LayoutGroupStyles.initialize(this, this.styleProvider);
 		ListViewStyles.initialize(this, this.styleProvider);
+		PanelStyles.initialize(this, this.styleProvider);
 		PopUpListViewStyles.initialize(this, this.styleProvider);
 		ScrollContainerStyles.initialize(this, this.styleProvider);
+		SortOrderHeaderRendererStyles.initialize(this, this.styleProvider);
 		TabBarStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
 		TreeViewStyles.initialize(this, this.styleProvider);
 		VScrollBarStyles.initialize(this, this.styleProvider);
 		VSliderStyles.initialize(this, this.styleProvider);
+	}
+	
+	public function registerForColorUpdate(updateFunc:SimpleTheme->Void):Void
+	{
+		this._colorUpdateFunctions.push(updateFunc);
+	}
+	
+	public function unregisterFromColorUpdate(updateFunc:SimpleTheme-> Void):Void
+	{
+		this._colorUpdateFunctions.remove(updateFunc);
 	}
 	
 	private function styleChanged():Void
@@ -503,6 +597,10 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			this.themeColor = this._darkThemeColor;
 			this.themeColorDark = ColorUtil.darkenByRatio(this.themeColor, this._darkThemeColorDarkenRatio);
 			this.themeColorLight = ColorUtil.lightenByRatio(this.themeColor, this._darkThemeColorLightenRatio);
+			
+			this.alternColor = this._darkThemeAlternColor;
+			this.alternColorDark = ColorUtil.darkenByRatio(this.alternColor, this._darkThemeAlternColorDarkenRatio);
+			this.alternColorLight = ColorUtil.lightenByRatio(this.alternColor, this._darkThemeAlternColorLightenRatio);
 			
 			this.lightColor = this._darkThemeLightColor;
 			this.lightColorDark = ColorUtil.lightenByRatio(this.lightColor, this._darkThemeLightColorLightenRatio);
@@ -525,6 +623,10 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			this.themeColorDark = ColorUtil.darkenByRatio(this.themeColor, this._lightThemeColorDarkenRatio);
 			this.themeColorLight = ColorUtil.lightenByRatio(this.themeColor, this._lightThemeColorLightenRatio);
 			
+			this.alternColor = this._lightThemeAlternColor;
+			this.alternColorDark = ColorUtil.darkenByRatio(this.alternColor, this._lightThemeAlternColorDarkenRatio);
+			this.alternColorLight = ColorUtil.lightenByRatio(this.alternColor, this._lightThemeAlternColorLightenRatio);
+			
 			this.lightColor = this._lightThemeLightColor;
 			this.lightColorDark = ColorUtil.darkenByRatio(this.lightColor, this._lightThemeLightColorDarkenRatio);
 			this.lightColorDarker = ColorUtil.darkenByRatio(this.lightColor, this._lightThemeLightColorDarkenRatio * 2);
@@ -539,6 +641,11 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			this.dangerColorLight = ColorUtil.lightenByRatio(this.dangerColor, this._lightThemeDangerColorLightenRatio);
 			
 			this.focusColor = this._lightThemeFocusColor;
+		}
+		
+		for (func in this._colorUpdateFunctions)
+		{
+			func(this);
 		}
 	}
 	
@@ -557,6 +664,42 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	//####################################################################################################
 	// Fills & Borders
 	//####################################################################################################
+	public function getAlternBorder(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.alternColor);
+	}
+	
+	public function getAlternBorderDark(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.alternColorDark);
+	}
+	
+	public function getAlternBorderLight(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.alternColorLight);
+	}
+	
+	public function getAlternFill():FillStyle
+	{
+		return FillStyle.SolidColor(this.alternColor);
+	}
+	
+	public function getAlternFillDark():FillStyle
+	{
+		return FillStyle.SolidColor(this.alternColorDark);
+	}
+	
+	public function getAlternFillLight():FillStyle
+	{
+		return FillStyle.SolidColor(this.alternColorLight);
+	}
+	
 	public function getContrastBorder(?thickness:Float):LineStyle
 	{
 		if (thickness == null) thickness = this._lineThickness;
