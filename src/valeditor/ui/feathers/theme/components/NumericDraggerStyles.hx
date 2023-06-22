@@ -6,10 +6,12 @@ import feathers.graphics.LineStyle;
 import feathers.skins.RectangleSkin;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
+import feathers.text.TextFormat;
 import openfl.display.BitmapData;
 import valeditor.ui.feathers.controls.NumericDragger;
 import valeditor.ui.feathers.controls.NumericDraggerState;
 import valeditor.ui.feathers.theme.ValEditorTheme;
+import valeditor.ui.feathers.theme.simple.SimpleTheme;
 
 /**
  * ...
@@ -26,27 +28,9 @@ class NumericDraggerStyles
 	static public function initialize(theme:ValEditorTheme, styleProvider:ClassVariantStyleProvider):Void
 	{
 		NumericDraggerStyles.theme = theme;
+		theme.registerForColorUpdate(colorUpdate);
 		
-		if (LINE_BMD_DRAG == null)
-		{
-			LINE_BMD_DRAG = new BitmapData(2, 1, true, 0xffffffff);
-			LINE_BMD_DRAG.setPixel(0, 0, theme.lightColor);
-			LINE_BMD_DRAG.setPixel32(1, 0, 0x00ff0000);
-		}
-		
-		if (LINE_BMD_HOVER == null)
-		{
-			LINE_BMD_HOVER = new BitmapData(2, 1, true, 0xffffffff);
-			LINE_BMD_HOVER.setPixel(0, 0, theme.themeColor);
-			LINE_BMD_HOVER.setPixel32(1, 0, 0x00ff0000);
-		}
-		
-		if (LINE_BMD_UP == null)
-		{
-			LINE_BMD_UP = new BitmapData(2, 1, true, 0xffffffff);
-			LINE_BMD_UP.setPixel(0, 0, theme.themeColorDark);
-			LINE_BMD_UP.setPixel32(1, 0, 0x00ff0000);
-		}
+		colorUpdate(theme);
 		
 		if (styleProvider.getStyleFunction(NumericDragger, null) == null)
 		{
@@ -62,6 +46,30 @@ class NumericDraggerStyles
 		{
 			styleProvider.setStyleFunction(Label, NumericDragger.CHILD_VARIANT_LABEL, default_dragLabel_style);
 		}
+	}
+	
+	static private function colorUpdate(theme:SimpleTheme):Void
+	{
+		if (LINE_BMD_DRAG == null)
+		{
+			LINE_BMD_DRAG = new BitmapData(2, 1, true, 0xffffffff);
+		}
+		LINE_BMD_DRAG.setPixel(0, 0, theme.lightColor);
+		LINE_BMD_DRAG.setPixel32(1, 0, 0x00ff0000);
+		
+		if (LINE_BMD_HOVER == null)
+		{
+			LINE_BMD_HOVER = new BitmapData(2, 1, true, 0xffffffff);
+		}
+		LINE_BMD_HOVER.setPixel(0, 0, theme.alternColorLight);
+		LINE_BMD_HOVER.setPixel32(1, 0, 0x00ff0000);
+		
+		if (LINE_BMD_UP == null)
+		{
+			LINE_BMD_UP = new BitmapData(2, 1, true, 0xffffffff);
+		}
+		LINE_BMD_UP.setPixel(0, 0, theme.alternColor);
+		LINE_BMD_UP.setPixel32(1, 0, 0x00ff0000);
 	}
 	
 	static private function default_style(dragger:NumericDragger):Void
@@ -82,11 +90,11 @@ class NumericDraggerStyles
 		dragger.setLabelSkinForState(NumericDraggerState.DRAG, labelSkin);
 		
 		var skin:RectangleSkin = new RectangleSkin();
-		skin.fill = theme.getThemeFill();
+		skin.fill = theme.getAlternFill();
 		dragger.setSkinForState(NumericDraggerState.DRAG, skin);
 		
-		dragger.setLabelTextFormatForState(NumericDraggerState.UP, theme.getTextFormat(LEFT, theme.themeColorDark));
-		dragger.setLabelTextFormatForState(NumericDraggerState.HOVER, theme.getTextFormat(LEFT, theme.themeColor));
+		dragger.setLabelTextFormatForState(NumericDraggerState.UP, theme.getTextFormat(LEFT, theme.alternColor));
+		dragger.setLabelTextFormatForState(NumericDraggerState.HOVER, theme.getTextFormat(LEFT, theme.alternColorLight));
 		dragger.setLabelTextFormatForState(NumericDraggerState.DRAG, theme.getTextFormat(LEFT, theme.lightColor));
 		dragger.setLabelTextFormatForState(NumericDraggerState.DISABLED, theme.getTextFormat_disabled());
 		
