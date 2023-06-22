@@ -8,7 +8,7 @@ import openfl.filesystem.File;
  */
 class FolderOpenerDesktop 
 {
-	private var _file:File;
+	private var _file:File = new File();
 	private var _extensionList:Array<String>;
 	
 	private var _completeCallback:Array<File>->Void;
