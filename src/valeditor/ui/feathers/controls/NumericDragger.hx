@@ -5,7 +5,6 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
 import feathers.core.FocusManager;
 import feathers.core.IFocusObject;
-import feathers.core.InvalidationFlag;
 import feathers.events.FeathersEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -34,6 +33,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	static public var CHILD_VARIANT_INPUT:String = "valueDragger_input";
 	static public var CHILD_VARIANT_LABEL:String = "valueDragger_label" ;
 	
+	public var cancelDragWithRightClick(get, set):Bool;
 	public var currentState(get, never):#if flash Dynamic #else NumericDraggerState #end;
 	public var defaultBackgroundSkin:DisplayObject;
 	public var defaultLabelSkin:DisplayObject;
@@ -59,6 +59,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	public var step(get, set):Float;
 	public var textFormat:AbstractTextFormat;
 	public var value(get, set):Float;
+	
+	private var _cancelDragWithRightClick:Bool = true;
+	private function get_cancelDragWithRightClick():Bool { return this._cancelDragWithRightClick; }
+	private function set_cancelDragWithRightClick(value:Bool):Bool
+	{
+		return this._cancelDragWithRightClick = value;
+	}
 	
 	private var _currentState:NumericDraggerState = UP;
 	private function get_currentState():#if flash Dynamic #else NumericDraggerState #end {
@@ -237,9 +244,9 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private var _isDragging:Bool;
 	private var _pointerStartX:Float;
 	private var _pointerStartY:Float;
-	private var _beforeDragValue:Float;
 	private var _hasMoved:Bool;
 	private var _moveValue:Float;
+	private var _valueBeforeDrag:Float;
 	
 	#if flash // TODO : check if other targets do weird things with float values
 	private var _floatPrecision:Int = 2; // this corresponds to the default step value (0.01)
@@ -575,6 +582,38 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		return value;
 	}
 	
+	private function startDragging():Void
+	{
+		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
+		this.stage.addEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
+		if (this._cancelDragWithRightClick)
+		{
+			this.stage.addEventListener(MouseEvent.RIGHT_CLICK, dragLabel_stage_rightClickHandler);
+		}
+		
+		this._hasMoved = false;
+		this._moveValue = 0;
+		this._valueBeforeDrag = this._value;
+		this._pointerStartX = this.mouseX;
+		this._pointerStartY = this.mouseY;
+		this._isDragging = true;
+		
+		changeState(DRAG);
+	}
+	
+	private function stopDragging():Void
+	{
+		this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
+		this.stage.removeEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
+		if (this._cancelDragWithRightClick)
+		{
+			this.stage.removeEventListener(MouseEvent.RIGHT_CLICK, dragLabel_stage_rightClickHandler);
+		}
+		this._isDragging = false;
+		
+		changeState(UP);
+	}
+	
 	private function dragLabel_mouseOverHandler(evt:MouseEvent):Void
 	{
 		if (!this._enabled || this._currentState != UP) return;
@@ -614,17 +653,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		
 		if (this._debug) trace("dragLabel_mouseDownHandler");
 		
-		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
-		this.stage.addEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
-		
-		this._hasMoved = false;
-		this._moveValue = 0;
-		this._beforeDragValue = this._value;
-		this._pointerStartX = this.mouseX;
-		this._pointerStartY = this.mouseY;
-		this._isDragging = true;
-		
-		changeState(DRAG);
+		startDragging();
 	}
 	
 	private function dragLabel_stage_mouseMoveHandler(evt:MouseEvent):Void
@@ -670,18 +699,23 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function dragLabel_stage_mouseUpHandler(evt:MouseEvent):Void
 	{
-		var stage:Stage = cast evt.currentTarget;
-		stage.removeEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
-		stage.removeEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
-		this._isDragging = false;
-		
 		if (this._debug) trace("dragLabel_stage_mouseUpHandler");
 		
-		changeState(UP);
+		stopDragging();
+		
 		if (!this.liveDragging)
 		{
 			FeathersEvent.dispatch(this, Event.CHANGE);
 		}
+	}
+	
+	private function dragLabel_stage_rightClickHandler(evt:MouseEvent):Void
+	{
+		if (this._debug) trace("dragLabel_stage_rightClickHandler");
+		
+		stopDragging();
+		
+		this.value = this._valueBeforeDrag;
 	}
 	
 	private function focusInHandler(evt:FocusEvent):Void
