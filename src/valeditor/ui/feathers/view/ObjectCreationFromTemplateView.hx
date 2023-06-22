@@ -19,6 +19,7 @@ import openfl.events.Event;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
 
 /**
  * ...
@@ -63,6 +64,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	public function new() 
 	{
 		super();
+		this.variant = LayoutGroupVariant.WITH_BORDER;
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		initializeNow();
 	}

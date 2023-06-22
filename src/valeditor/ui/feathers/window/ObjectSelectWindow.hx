@@ -4,6 +4,7 @@ import feathers.controls.Button;
 import feathers.controls.ComboBox;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
+import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
@@ -19,6 +20,7 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.utils.ArraySort;
 import valedit.ValEdit;
 import valedit.ValEditObject;
@@ -51,15 +53,14 @@ class ObjectSelectWindow extends Panel
 	private function set_title(value:String):String
 	{
 		if (value == null) value = "";
-		if (_initialized)
+		if (this._initialized)
 		{
-			_titleLabel.text = value;
+			this._headerGroup.text = value;
 		}
 		return this._title = value;
 	}
 	
-	private var _headerGroup:LayoutGroup;
-	private var _titleLabel:Label;
+	private var _headerGroup:Header;
 	
 	private var _footerGroup:LayoutGroup;
 	private var _confirmButton:Button;
@@ -91,17 +92,9 @@ class ObjectSelectWindow extends Panel
 		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
 		
-		this._headerGroup = new LayoutGroup();
-		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		this._headerGroup.layout = hLayout;
+		this._headerGroup = new Header(this._title);
+		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = this._headerGroup;
-		
-		this._titleLabel = new Label(this._title);
-		this._headerGroup.addChild(_titleLabel);
 		
 		this._footerGroup = new LayoutGroup();
 		this._footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;

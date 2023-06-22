@@ -39,14 +39,14 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		super.initialize();
 		
 		#if flash
-		_extensionList = ["mp3", "wav"];
-		_filterList = [new FileFilter("Sounds (*.mp3, *.wav)", "*.mp3;*.wav")];
+		this._extensionList = ["mp3", "wav"];
+		this._filterList = [new FileFilter("Sounds (*.mp3, *.wav)", "*.mp3;*.wav")];
 		#else
-		_extensionList = ["ogg", "wav"];
-		_filterList = [new FileFilter("Sounds (*.ogg, *.wav)", "*.ogg;*.wav")];
+		this._extensionList = ["ogg", "wav"];
+		this._filterList = [new FileFilter("Sounds (*.ogg, *.wav)", "*.ogg;*.wav")];
 		#end
 		
-		_assetList.dataProvider = AssetLib._soundCollection;
+		this._assetList.dataProvider = AssetLib._soundCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new SoundAssetItemRenderer();
@@ -56,8 +56,8 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 			itemRenderer.asset = state.data;
 		};
 		
-		_assetList.itemRendererRecycler = recycler;
-		_assetList.itemToText = function(item:Dynamic):String
+		this._assetList.itemRendererRecycler = recycler;
+		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
@@ -73,17 +73,17 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		_soundLoader.start(files, soundLoadComplete, enableUI);
+		this._soundLoader.start(files, soundLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		_soundLoader.start(files, soundLoadComplete, enableUI);
+		this._soundLoader.start(files, soundLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		_soundLoader.start(files, soundLoadComplete, enableUI);
+		this._soundLoader.start(files, soundLoadComplete, enableUI);
 	}
 	#end
 	

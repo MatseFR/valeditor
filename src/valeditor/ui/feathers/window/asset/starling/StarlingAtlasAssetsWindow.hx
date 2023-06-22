@@ -34,11 +34,11 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 	{
 		super.initialize();
 		
-		_addAtlasButton = new Button("add Atlas");
-		_footerGroup.addChildAt(_addAtlasButton, 0);
-		_buttonList.push(_addAtlasButton);
+		this._addAtlasButton = new Button("add Atlas");
+		this._footerGroup.addChildAt(_addAtlasButton, 0);
+		this._buttonList.push(_addAtlasButton);
 		
-		_assetList.dataProvider = AssetLib._starlingAtlasCollection;
+		this._assetList.dataProvider = AssetLib._starlingAtlasCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new StarlingAtlasAssetItemRenderer();
@@ -48,8 +48,8 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 			itemRenderer.asset = state.data;
 		};
 		
-		_assetList.itemRendererRecycler = recycler;
-		_assetList.itemToText = function(item:Dynamic):String
+		this._assetList.itemRendererRecycler = recycler;
+		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
@@ -59,16 +59,16 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_addAtlasButton.removeEventListener(TriggerEvent.TRIGGER, onAddAtlasbutton);
+		this._addAtlasButton.removeEventListener(TriggerEvent.TRIGGER, onAddAtlasbutton);
 	}
 	
 	override function controlsEnable():Void 
 	{
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		_addAtlasButton.addEventListener(TriggerEvent.TRIGGER, onAddAtlasbutton);
+		this._addAtlasButton.addEventListener(TriggerEvent.TRIGGER, onAddAtlasbutton);
 	}
 	
 	private function atlasLoadComplete(atlas:TextureAtlas, bitmapAsset:BitmapAsset, textAsset:TextAsset):Void
@@ -79,7 +79,7 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 	private function onAddAtlasbutton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		_atlasLoader.start(atlasLoadComplete, enableUI, enableUI);
+		this._atlasLoader.start(atlasLoadComplete, enableUI, enableUI);
 	}
 	
 	override function onRemoveButton(evt:TriggerEvent):Void 

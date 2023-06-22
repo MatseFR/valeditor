@@ -151,7 +151,7 @@ class GridViewStyles
 		{
 			var backgroundSkin = new RectangleSkin();
 			backgroundSkin.fill = theme.getLightFill();
-			backgroundSkin.border = theme.getLightBorderDark();
+			backgroundSkin.border = theme.getContrastBorderLight();
 			backgroundSkin.width = 10.0;
 			backgroundSkin.height = 10.0;
 			gridView.backgroundSkin = backgroundSkin;

@@ -23,11 +23,12 @@ class ButtonStyles
 			styleProvider.setStyleFunction(Button, null, function(button:Button):Void {
 				if (button.backgroundSkin == null) {
 					var skin = new RectangleSkin();
-					skin.fill = theme.getLightFill();
+					skin.fill = theme.getLightFillLight();
 					skin.disabledFill = theme.getLightFillDark();
 					skin.setFillForState(DOWN, theme.getThemeFill());
+					skin.setFillForState(HOVER, theme.getThemeFillLight());
 					skin.border = theme.getContrastBorderLight();
-					skin.setBorderForState(DOWN, theme.getThemeBorderLight());
+					skin.setBorderForState(DOWN, theme.getThemeBorderDark());
 					skin.disabledBorder = theme.getContrastBorderLighter();
 					skin.cornerRadius = 3.0;
 					button.backgroundSkin = skin;
@@ -61,9 +62,10 @@ class ButtonStyles
 					var skin = new RectangleSkin();
 					skin.fill = theme.getThemeFill();
 					skin.disabledFill = theme.getThemeFillDark();
-					skin.setFillForState(DOWN, theme.getThemeFillLight());
-					skin.border = theme.getThemeBorderLight();
-					skin.disabledBorder = theme.getContrastBorderLighter();
+					skin.setFillForState(DOWN, theme.getThemeFillDark());
+					skin.setFillForState(HOVER, theme.getThemeFillLight());
+					skin.border = theme.getThemeBorderDark();
+					skin.disabledBorder = theme.getThemeBorderDark();
 					skin.cornerRadius = 3.0;
 					button.backgroundSkin = skin;
 				}

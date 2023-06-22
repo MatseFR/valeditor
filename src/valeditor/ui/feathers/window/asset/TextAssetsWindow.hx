@@ -37,10 +37,10 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	{
 		super.initialize();
 		
-		_extensionList = ["txt", "xml", "json"];
-		_filterList = [new FileFilter("Text", "*.txt;*.xml;*.json")];
+		this._extensionList = ["txt", "xml", "json"];
+		this._filterList = [new FileFilter("Text", "*.txt;*.xml;*.json")];
 		
-		_assetList.dataProvider = AssetLib._textCollection;
+		this._assetList.dataProvider = AssetLib._textCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new TextAssetItemRenderer();
@@ -50,8 +50,8 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 			itemRenderer.asset = state.data;
 		};
 		
-		_assetList.itemRendererRecycler = recycler;
-		_assetList.itemToText = function(item:Dynamic):String
+		this._assetList.itemRendererRecycler = recycler;
+		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
@@ -67,17 +67,17 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		_textLoader.start(files, textLoadComplete, enableUI);
+		this._textLoader.start(files, textLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		_textLoader.start(files, textLoadComplete, enableUI);
+		this._textLoader.start(files, textLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		_textLoader.start(files, textLoadComplete, enableUI);
+		this._textLoader.start(files, textLoadComplete, enableUI);
 	}
 	#end
 	

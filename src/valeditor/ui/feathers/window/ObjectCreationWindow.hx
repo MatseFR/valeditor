@@ -1,7 +1,7 @@
 package valeditor.ui.feathers.window;
 
 import feathers.controls.Button;
-import feathers.controls.Label;
+import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.navigators.TabItem;
@@ -15,6 +15,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.ui.feathers.view.ObjectCreationFromClassView;
 import valeditor.ui.feathers.view.ObjectCreationFromTemplateView;
 
@@ -48,13 +49,12 @@ class ObjectCreationWindow extends Panel
 		if (value == null) value = "";
 		if (this._initialized)
 		{
-			this._titleLabel.text = value;
+			this._headerGroup.text = value;
 		}
 		return this._title = value;
 	}
 	
-	private var _headerGroup:LayoutGroup;
-	private var _titleLabel:Label;
+	private var _headerGroup:Header;
 	
 	private var _footerGroup:LayoutGroup;
 	private var _confirmButton:Button;
@@ -77,17 +77,9 @@ class ObjectCreationWindow extends Panel
 		var hLayout:HorizontalLayout;
 		
 		// header
-		this._headerGroup = new LayoutGroup();
-		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		this._headerGroup.layout = hLayout;
+		this._headerGroup = new Header(this._title);
+		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = this._headerGroup;
-		
-		this._titleLabel = new Label(this._title);
-		this._headerGroup.addChild(_titleLabel);
 		
 		// footer
 		this._footerGroup = new LayoutGroup();

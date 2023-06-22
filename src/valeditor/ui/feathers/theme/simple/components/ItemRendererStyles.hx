@@ -1,4 +1,5 @@
 package valeditor.ui.feathers.theme.simple.components;
+import feathers.controls.GridView;
 import feathers.controls.ToggleButtonState;
 import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.skins.UnderlineSkin;
@@ -22,6 +23,11 @@ class ItemRendererStyles
 		{
 			styleProvider.setStyleFunction(ItemRenderer, null, Default);
 		}
+		
+		if (styleProvider.getStyleFunction(ItemRenderer, GridView.CHILD_VARIANT_CELL_RENDERER) == null)
+		{
+			styleProvider.setStyleFunction(ItemRenderer, GridView.CHILD_VARIANT_CELL_RENDERER, Default);
+		}
 	}
 	
 	static private function Default(itemRenderer:ItemRenderer):Void
@@ -30,10 +36,11 @@ class ItemRendererStyles
 		
 		if (itemRenderer.backgroundSkin == null) {
 			var skin = new UnderlineSkin();
-			skin.fill = theme.getLightFill();
+			skin.fill = theme.getLightFillLight();
 			skin.border = theme.getLightBorderDark();
 			skin.selectedFill = theme.getThemeFill();
-			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
 			if (isDesktop) {
 				skin.width = 32.0;
 				skin.height = 32.0;

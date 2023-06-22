@@ -39,10 +39,10 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 	{
 		super.initialize();
 		
-		_extensionList = ["jpg", "jpeg", "png", "gif"];
-		_filterList = [new FileFilter("Images (*.jpeg, *.jpg, *.gif, *.png)", "*.jpeg;*.jpg;*.gif;*.png")];
+		this._extensionList = ["jpg", "jpeg", "png", "gif"];
+		this._filterList = [new FileFilter("Images (*.jpeg, *.jpg, *.gif, *.png)", "*.jpeg;*.jpg;*.gif;*.png")];
 		
-		_assetList.dataProvider = AssetLib._bitmapCollection;
+		this._assetList.dataProvider = AssetLib._bitmapCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BitmapAssetItemRenderer();
@@ -52,8 +52,8 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 			itemRenderer.asset = state.data;
 		};
 		
-		_assetList.itemRendererRecycler = recycler;
-		_assetList.itemToText = function(item:Dynamic):String
+		this._assetList.itemRendererRecycler = recycler;
+		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
@@ -69,17 +69,17 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		_imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		_imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void 
 	{
-		_imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
 	}
 	#end
 	

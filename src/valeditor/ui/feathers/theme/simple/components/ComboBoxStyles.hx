@@ -25,11 +25,12 @@ class ComboBoxStyles
 				if (button.backgroundSkin == null) {
 					var skin = new TabSkin();
 					skin.cornerRadiusPosition = RelativePosition.RIGHT;
-					skin.fill = theme.getLightFill();
+					skin.fill = theme.getLightFillLight();
 					skin.disabledFill = theme.getLightFillDark();
 					skin.setFillForState(ButtonState.DOWN, theme.getThemeFill());
-					skin.border = theme.getThemeBorder();
-					skin.setBorderForState(ButtonState.DOWN, theme.getThemeBorderLight());
+					skin.setFillForState(ButtonState.HOVER, theme.getThemeFillLight());
+					skin.border = theme.getContrastBorderLight();
+					skin.setBorderForState(ButtonState.DOWN, theme.getThemeBorderDark());
 					skin.disabledBorder = theme.getContrastBorderLighter();
 					skin.cornerRadius = 3.0;
 					button.backgroundSkin = skin;

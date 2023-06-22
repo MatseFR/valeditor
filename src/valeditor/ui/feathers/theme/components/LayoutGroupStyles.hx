@@ -1,6 +1,5 @@
 package valeditor.ui.feathers.theme.components;
 import feathers.controls.LayoutGroup;
-import feathers.graphics.FillStyle;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.RelativePosition;
@@ -11,13 +10,12 @@ import feathers.skins.TriangleSkin;
 import feathers.skins.UnderlineSkin;
 import feathers.skins.VerticalLineSkin;
 import feathers.style.ClassVariantStyleProvider;
-import valeditor.ui.feathers.controls.value.SeparatorUI;
-import valeditor.ui.feathers.controls.value.SpacingUI;
-import valeditor.ui.feathers.controls.value.ValueUI;
-import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.controls.value.SeparatorUI;
+import valeditor.ui.feathers.controls.value.SpacingUI;
+import valeditor.ui.feathers.theme.ValEditorTheme;
+import valeditor.ui.feathers.variant.LayoutGroupVariant;
 
 /**
  * ...
@@ -57,8 +55,6 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT, toggleCustom_content);
-		
-		styleProvider.setStyleFunction(ValueUI, null, valueUI);
 	}
 	
 	static private function arrow_down_group(group:LayoutGroup):Void
@@ -175,12 +171,6 @@ class LayoutGroupStyles
 	{
 		//group.width = UIConfig.VALUE_NAME_WIDTH;
 		//trace("pouet");
-	}
-	
-	static private function valueUI(value:ValueUI):Void
-	{
-		value.minWidth = UIConfig.VALUE_MIN_WIDTH;
-		value.maxWidth = UIConfig.VALUE_MAX_WIDTH;
 	}
 	
 }

@@ -2,6 +2,7 @@ package valeditor.ui.feathers.window;
 
 import feathers.controls.Button;
 import feathers.controls.ComboBox;
+import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
@@ -22,6 +23,8 @@ import valedit.ValEdit;
 import valeditor.ValEditorTemplate;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
+import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
 /**
  * ...
@@ -53,13 +56,12 @@ class TemplateCreationWindow extends Panel
 		if (value == null) value = "";
 		if (this._initialized)
 		{
-			this._titleLabel.text = value;
+			this._headerGroup.text = value;
 		}
 		return this._title = value;
 	}
 	
-	private var _headerGroup:LayoutGroup;
-	private var _titleLabel:Label;
+	private var _headerGroup:Header;
 	
 	private var _footerGroup:LayoutGroup;
 	private var _confirmButton:Button;
@@ -102,17 +104,9 @@ class TemplateCreationWindow extends Panel
 		var vLayout:VerticalLayout;
 		
 		// header
-		this._headerGroup = new LayoutGroup();
-		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		this._headerGroup.layout = hLayout;
+		this._headerGroup = new Header(this._title);
+		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = this._headerGroup;
-		
-		this._titleLabel = new Label(this._title);
-		this._headerGroup.addChild(_titleLabel);
 		
 		// footer
 		this._footerGroup = new LayoutGroup();
@@ -154,7 +148,7 @@ class TemplateCreationWindow extends Panel
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
 		this._categoryControlsGroup.layout = hLayout;
-		addChild(this._categoryControlsGroup);
+		this._categoryGroup.addChild(this._categoryControlsGroup);
 		
 		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
@@ -205,6 +199,7 @@ class TemplateCreationWindow extends Panel
 		this._constructorGroup.addChild(this._constructorLabel);
 		
 		this._constructorContainer = new ScrollContainer();
+		this._constructorContainer.variant = ScrollContainerVariant.WITH_BORDER;
 		this._constructorContainer.layoutData = new VerticalLayoutData(100, 100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;

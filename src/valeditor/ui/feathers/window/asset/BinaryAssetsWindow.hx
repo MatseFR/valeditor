@@ -37,10 +37,10 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 	{
 		super.initialize();
 		
-		_extensionList = [];
-		_filterList = [];
+		this._extensionList = [];
+		this._filterList = [];
 		
-		_assetList.dataProvider = AssetLib._binaryCollection;
+		this._assetList.dataProvider = AssetLib._binaryCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BinaryAssetItemRenderer();
@@ -50,8 +50,8 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 			itemRenderer.asset = state.data;
 		};
 		
-		_assetList.itemRendererRecycler = recycler;
-		_assetList.itemToText = function(item:Dynamic):String
+		this._assetList.itemRendererRecycler = recycler;
+		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
@@ -67,17 +67,17 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		_binaryLoader.start(files, binaryLoadComplete, enableUI);
+		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		_binaryLoader.start(files, binaryLoadComplete, enableUI);
+		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		_binaryLoader.start(files, binaryLoadComplete, enableUI);
+		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
 	}
 	#end
 	

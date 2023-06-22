@@ -20,6 +20,8 @@ import valedit.ValEdit;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
 /**
  * ...
@@ -61,6 +63,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	public function new() 
 	{
 		super();
+		this.variant = LayoutGroupVariant.WITH_BORDER;
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		initializeNow();
 	}
@@ -152,6 +155,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		this._constructorGroup.addChild(this._constructorLabel);
 		
 		this._constructorContainer = new ScrollContainer();
+		this._constructorContainer.variant = ScrollContainerVariant.WITH_BORDER;
 		this._constructorContainer.layoutData = new VerticalLayoutData(100, 100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;

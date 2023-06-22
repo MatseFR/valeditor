@@ -67,6 +67,7 @@ class ObjectLibrary extends LayoutGroup
 		]);
 		
 		this._grid = new GridView(ValEditor.objectCollection, columns, onGridChange);
+		this._grid.variant = GridView.VARIANT_BORDERLESS;
 		this._grid.allowMultipleSelection = true;
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;

@@ -1,6 +1,7 @@
 package valeditor.ui.feathers.window.asset;
 
 import feathers.controls.Button;
+import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
@@ -15,6 +16,7 @@ import feathers.layout.TiledRowsListLayout;
 import feathers.layout.VerticalAlign;
 import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.MouseEvent;
 import openfl.net.FileFilter;
 #if desktop
 import valeditor.utils.file.FilesOpenerDesktop;
@@ -26,6 +28,7 @@ import openfl.net.FileReference;
 #end
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
  * ...
@@ -95,15 +98,14 @@ class AssetsWindow<T> extends Panel
 	private function set_title(value:String):String
 	{
 		if (value == null) value = "";
-		if (_titleLabel != null)
+		if (this._initialized)
 		{
-			_titleLabel.text = value;
+			this._headerGroup.text = value;
 		}
 		return this._title = value;
 	}
 	
-	private var _headerGroup:LayoutGroup;
-	private var _titleLabel:Label;
+	private var _headerGroup:Header;
 	
 	private var _footerGroup:LayoutGroup;
 	private var _assetList:ListView;
@@ -145,144 +147,136 @@ class AssetsWindow<T> extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		if (_headerEnabled)
+		if (this._headerEnabled)
 		{
-			_headerGroup = new LayoutGroup();
-			_headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-			hLayout = new HorizontalLayout();
-			hLayout.horizontalAlign = HorizontalAlign.CENTER;
-			hLayout.verticalAlign = VerticalAlign.MIDDLE;
-			hLayout.setPadding(Padding.DEFAULT);
-			_headerGroup.layout = hLayout;
-			this.header = _headerGroup;
-			
-			_titleLabel = new Label(this._title);
-			_headerGroup.addChild(_titleLabel);
+			this._headerGroup = new Header(this._title);
+			this._headerGroup.variant = HeaderVariant.THEME;
+			this.header = this._headerGroup;
 		}
 		
-		_footerGroup = new LayoutGroup();
-		_footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		//_footerGroup.layoutData = new AnchorLayoutData(null, 0, 0, 0);
+		this._footerGroup = new LayoutGroup();
+		this._footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.setPadding(Padding.DEFAULT);
-		_footerGroup.layout = hLayout;
-		this.footer = _footerGroup;
+		this._footerGroup.layout = hLayout;
+		this.footer = this._footerGroup;
 		
-		_addFilesButton = new Button("add file(s)");
-		if (_filesEnabled)
+		this._addFilesButton = new Button("add file(s)");
+		if (this._filesEnabled)
 		{
-			_footerGroup.addChild(_addFilesButton);
+			this._footerGroup.addChild(this._addFilesButton);
 		}
-		_buttonList.push(_addFilesButton);
+		this._buttonList.push(this._addFilesButton);
 		
 		#if desktop
-		_addFolderButton = new Button("add folder");
-		if (_filesEnabled)
+		this._addFolderButton = new Button("add folder");
+		if (this._filesEnabled)
 		{
-			_footerGroup.addChild(_addFolderButton);
+			this._footerGroup.addChild(this._addFolderButton);
 		}
-		_buttonList.push(_addFolderButton);
+		this._buttonList.push(this._addFolderButton);
 		#end
 		
-		_cancelButton = new Button("cancel");
-		if (_cancelEnabled)
+		this._cancelButton = new Button("cancel");
+		if (this._cancelEnabled)
 		{
-			_footerGroup.addChild(_cancelButton);
+			this._footerGroup.addChild(this._cancelButton);
 		}
-		_buttonList.push(_cancelButton);
+		this._buttonList.push(this._cancelButton);
 		
-		if (_removeEnabled)
+		if (this._removeEnabled)
 		{
-			_removeButton = new Button("remove selected");
-			_removeButton.enabled = false;
-			_footerGroup.addChild(_removeButton);
-			//_buttonList.push(_removeButton);
+			this._removeButton = new Button("remove selected");
+			this._removeButton.enabled = false;
+			this._footerGroup.addChild(this._removeButton);
 		}
 		
-		_assetList = new ListView();
-		_assetList.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		this._assetList = new ListView();
+		this._assetList.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		listLayout = new TiledRowsListLayout();
 		listLayout.setPadding(Padding.DEFAULT);
 		listLayout.setGap(Spacing.DEFAULT);
-		_assetList.layout = listLayout;
-		_assetList.allowMultipleSelection = _removeEnabled;
-		addChild(_assetList);
+		this._assetList.layout = listLayout;
+		this._assetList.allowMultipleSelection = this._removeEnabled;
+		addChild(this._assetList);
 		
 		//controlsEnable();
 	}
 	
 	public function reset():Void
 	{
-		if (_assetList != null) 
+		if (this._assetList != null) 
 		{
-			var controlsEnabled:Bool = _controlsEnabled;
+			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			_assetList.selectedIndex = -1;
+			this._assetList.selectedIndex = -1;
 			if (controlsEnabled) controlsEnable();
 		}
 	}
 	
 	private function controlsDisable():Void
 	{
-		if (!_controlsEnabled) return;
-		_assetList.removeEventListener(Event.CHANGE, onSelectionChange);
-		_addFilesButton.removeEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
+		if (!this._controlsEnabled) return;
+		this._assetList.removeEventListener(Event.CHANGE, onSelectionChange);
+		this._assetList.removeEventListener(MouseEvent.CLICK, onAssetListBackgroundClick);
+		this._addFilesButton.removeEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
 		#if desktop
-		_addFolderButton.removeEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
+		this._addFolderButton.removeEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
-		if (_cancelButton != null) _cancelButton.removeEventListener(TriggerEvent.TRIGGER, onCancelButton);
-		if (_removeButton != null) _removeButton.removeEventListener(TriggerEvent.TRIGGER, onRemoveButton);
-		_controlsEnabled = false;
+		if (this._cancelButton != null) this._cancelButton.removeEventListener(TriggerEvent.TRIGGER, onCancelButton);
+		if (this._removeButton != null) this._removeButton.removeEventListener(TriggerEvent.TRIGGER, onRemoveButton);
+		this._controlsEnabled = false;
 	}
 	
 	private function controlsEnable():Void
 	{
-		if (_controlsEnabled) return;
-		_assetList.addEventListener(Event.CHANGE, onSelectionChange);
-		_addFilesButton.addEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
+		if (this._controlsEnabled) return;
+		this._assetList.addEventListener(Event.CHANGE, onSelectionChange);
+		this._assetList.addEventListener(MouseEvent.CLICK, onAssetListBackgroundClick);
+		this._addFilesButton.addEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
 		#if desktop
-		_addFolderButton.addEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
+		this._addFolderButton.addEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
-		if (_cancelButton != null) _cancelButton.addEventListener(TriggerEvent.TRIGGER, onCancelButton);
-		if (_removeButton != null) _removeButton.addEventListener(TriggerEvent.TRIGGER, onRemoveButton);
-		_controlsEnabled = true;
+		if (this._cancelButton != null) this._cancelButton.addEventListener(TriggerEvent.TRIGGER, onCancelButton);
+		if (this._removeButton != null) this._removeButton.addEventListener(TriggerEvent.TRIGGER, onRemoveButton);
+		this._controlsEnabled = true;
 	}
 	
 	private function disableUI():Void
 	{
-		_assetList.selectable = false;
-		for (btn in _buttonList)
+		this._assetList.selectable = false;
+		for (btn in this._buttonList)
 		{
 			btn.enabled = false;
 		}
-		if (_removeButton != null) _removeButton.enabled = false;
+		if (this._removeButton != null) this._removeButton.enabled = false;
 	}
 	
 	private function enableUI():Void
 	{
-		_assetList.selectable = true;
-		for (btn in _buttonList)
+		this._assetList.selectable = true;
+		for (btn in this._buttonList)
 		{
 			btn.enabled = true;
 		}
-		if (_removeButton != null) _removeButton.enabled = _assetList.selectedIndices.length != 0;
+		if (this._removeButton != null) this._removeButton.enabled = this._assetList.selectedIndices.length != 0;
 	}
 	
 	private function onSelectionChange(evt:Event):Void
 	{
 		if (this._selectionCallback != null)
 		{
-			this._selectionCallback(_assetList.selectedItem);
+			this._selectionCallback(this._assetList.selectedItem);
 		}
 		if (this._closeOnSelection)
 		{
 			PopUpManager.removePopUp(this);
 		}
-		if (_removeButton != null)
+		if (this._removeButton != null)
 		{
-			_removeButton.enabled = _assetList.selectedIndices.length != 0;
+			this._removeButton.enabled = this._assetList.selectedIndices.length != 0;
 		}
 	}
 	
@@ -290,7 +284,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		_fileOpener.start(onAddFilesComplete, onAddFilesCancel, _filterList, _fileDialogTitle);
+		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList, this._fileDialogTitle);
 	}
 	
 	private function onAddFilesCancel():Void
@@ -306,7 +300,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFolderButton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		_folderOpener.start(onAddFolderComplete, onAddFolderCancel, _extensionList, _folderDialogTitle);
+		this._folderOpener.start(onAddFolderComplete, onAddFolderCancel, this._extensionList, this._folderDialogTitle);
 	}
 	
 	private function onAddFolderCancel():Void
@@ -322,7 +316,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		_fileOpener.start(onAddFilesComplete, onAddFilesCancel, _filterList);
+		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList);
 	}
 	
 	private function onAddFilesCancel():Void
@@ -336,10 +330,15 @@ class AssetsWindow<T> extends Panel
 	}
 	#end
 	
+	private function onAssetListBackgroundClick(evt:MouseEvent):Void
+	{
+		this._assetList.selectedIndex = -1;
+	}
+	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
 		PopUpManager.removePopUp(this);
-		if (_cancelCallback != null) _cancelCallback();
+		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
 	private function onRemoveButton(evt:TriggerEvent):Void

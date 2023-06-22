@@ -46,7 +46,9 @@ class CheckStyles
 					defaultIcon.border = theme.getContrastBorderLight();
 					defaultIcon.disabledBorder = theme.getContrastBorderLighter();
 					defaultIcon.setBorderForState(DOWN(false), theme.getThemeBorderDark());
-					defaultIcon.fill = theme.getLightFill();
+					defaultIcon.setFillForState(DOWN(false), theme.getThemeFillDark());
+					defaultIcon.setFillForState(HOVER(false), theme.getThemeFillLight());
+					defaultIcon.fill = theme.getLightFillLight();
 					defaultIcon.disabledFill = theme.getLightFillDark();
 					icon.defaultView = defaultIcon;
 					
@@ -56,8 +58,10 @@ class CheckStyles
 					selectedIcon.minWidth = 20.0;
 					selectedIcon.minHeight = 20.0;
 					selectedIcon.border = theme.getThemeBorderDark();
-					selectedIcon.disabledBorder = theme.getContrastBorderLighter();
-					selectedIcon.setBorderForState(DOWN(true), theme.getThemeBorder());
+					//selectedIcon.disabledBorder = theme.getContrastBorderLighter();
+					//selectedIcon.setBorderForState(DOWN(true), theme.getThemeBorder());
+					selectedIcon.setFillForState(HOVER(true), theme.getThemeFillLight());
+					selectedIcon.setFillForState(DOWN(true), theme.getThemeFillDark());
 					selectedIcon.fill = theme.getThemeFill();
 					selectedIcon.disabledFill = theme.getThemeFillDark();
 					var checkMark = new Shape();

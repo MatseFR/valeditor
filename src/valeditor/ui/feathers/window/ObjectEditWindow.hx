@@ -1,7 +1,7 @@
 package valeditor.ui.feathers.window;
 
 import feathers.controls.Button;
-import feathers.controls.Label;
+import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
@@ -13,9 +13,10 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import valedit.ValEdit;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
-import valedit.ValEdit;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
  * ...
@@ -62,13 +63,12 @@ class ObjectEditWindow extends Panel
 		if (value == null) value = "";
 		if (this._initialized)
 		{
-			this._titleLabel.text = value;
+			this._headerGroup.text = value;
 		}
 		return this._title = value;
 	}
 	
-	private var _headerGroup:LayoutGroup;
-	private var _titleLabel:Label;
+	private var _headerGroup:Header;
 	
 	private var _footerGroup:LayoutGroup;
 	private var _confirmButton:Button;
@@ -90,17 +90,9 @@ class ObjectEditWindow extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		this._headerGroup = new LayoutGroup();
-		this._headerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.CENTER;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		this._headerGroup.layout = hLayout;
+		this._headerGroup = new Header(this._title);
+		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = _headerGroup;
-		
-		this._titleLabel = new Label(this._title);
-		this._headerGroup.addChild(_titleLabel);
 		
 		_footerGroup = new LayoutGroup();
 		_footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
@@ -123,7 +115,9 @@ class ObjectEditWindow extends Panel
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
+		vLayout.paddingTop = Spacing.DEFAULT;
 		vLayout.paddingBottom = Spacing.DEFAULT;
+		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
 		_contentGroup.layout = vLayout;
 		addChild(_contentGroup);
 		

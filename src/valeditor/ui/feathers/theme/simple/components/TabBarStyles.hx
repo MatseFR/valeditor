@@ -29,10 +29,10 @@ class TabBarStyles
 				
 				if (tabBar.backgroundSkin == null)
 				{
-					var skin = new RectangleSkin();
-					skin.fill = theme.getLightFill();
-					skin.disabledFill = theme.getLightFillDark();
-					tabBar.backgroundSkin = skin;
+					//var skin = new RectangleSkin();
+					//skin.fill = theme.getLightFill();
+					//skin.disabledFill = theme.getLightFillDark();
+					//tabBar.backgroundSkin = skin;
 				}
 				
 				if (tabBar.focusRectSkin == null)
@@ -86,10 +86,10 @@ class TabBarStyles
 					skin.selectedFill = theme.getThemeFill();
 					skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
 					skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
-					skin.border = theme.getContrastBorderLighter();
+					skin.border = theme.getContrastBorderLight();
 					skin.selectedBorder = theme.getContrastBorderLight();
-					skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getThemeBorderLight());
-					skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorder());
+					//skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getThemeBorderLight());
+					skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorderDark());
 					button.backgroundSkin = skin;
 				}
 				
