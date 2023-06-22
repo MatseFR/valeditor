@@ -24,6 +24,32 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		_POOL.push(object);
 	}
 	
+	public var minWidth(get, set):Float;
+	private var _minWidth:Float;
+	private function get_minWidth():Float { return this._minWidth; }
+	private function set_minWidth(value:Float):Float
+	{
+		this._minWidth = value;
+		if (this._quad.width < this._minWidth)
+		{
+			this.width = this._minWidth;
+		}
+		return this._minWidth;
+	}
+	
+	public var minHeight(get, set):Float;
+	private var _minHeight:Float;
+	private function get_minHeight():Float { return this._minHeight; }
+	private function set_minHeight(value:Float):Float
+	{
+		this._minHeight = value;
+		if (this._quad.height < this._minHeight)
+		{
+			this.height = this._minHeight;
+		}
+		return this._minHeight;
+	}
+	
 	//@:setter(width)
 	override function set_width(value:Float):Float 
 	{
@@ -41,11 +67,17 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	private var _interestMap:Map<String, Bool>;
 	private var _quad:Quad;
 	
-	public function new() 
+	public function new(?minWidth:Float, ?minHeight:Float) 
 	{
 		super();
 		
-		this._quad = new Quad(1, 1, 0xff0000);
+		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
+		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
+		
+		this._minWidth = minWidth;
+		this._minHeight = minHeight;
+		
+		this._quad = new Quad(minWidth, minHeight, 0xff0000);
 		this._quad.alpha = 0.25;
 		addChild(this._quad);
 		
@@ -141,7 +173,12 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		this.rotationY = 0;
 		this.rotationZ = 0;
 		
-		this._quad.readjustSize(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
+		var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+		if (width < this._minWidth) width = this._minWidth;
+		var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+		if (height < this._minHeight) height = this._minHeight;
+		
+		this._quad.readjustSize(width, height);
 		
 		object.setProperty(RegularPropertyName.ROTATION_X, rotationX, true, false);
 		object.setProperty(RegularPropertyName.ROTATION_Y, rotationY, true, false);

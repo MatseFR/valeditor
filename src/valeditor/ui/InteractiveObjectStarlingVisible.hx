@@ -23,6 +23,32 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		_POOL.push(object);
 	}
 	
+	public var minWidth(get, set):Float;
+	private var _minWidth:Float;
+	private function get_minWidth():Float { return this._minWidth; }
+	private function set_minWidth(value:Float):Float
+	{
+		this._minWidth = value;
+		if (this.width < this._minWidth)
+		{
+			this.width = this._minWidth;
+		}
+		return this._minWidth;
+	}
+	
+	public var minHeight(get, set):Float;
+	private var _minHeight:Float;
+	private function get_minHeight():Float { return this._minHeight; }
+	private function set_minHeight(value:Float):Float
+	{
+		this._minHeight = value;
+		if (this.height < this._minHeight)
+		{
+			this.height = this._minHeight;
+		}
+		return this._minHeight;
+	}
+	
 	//@:setter(width)
 	override function set_width(value:Float):Float 
 	{
@@ -39,9 +65,15 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	
 	private var _interestMap:Map<String, Bool>;
 	
-	public function new() 
+	public function new(?minWidth:Float, ?minHeight:Float) 
 	{
 		super();
+		
+		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
+		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
+		
+		this._minWidth = minWidth;
+		this._minHeight = minHeight;
 		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);
@@ -107,7 +139,12 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
 		this.rotation = 0;
 		
-		refresh(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
+		var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+		if (width < this._minWidth) width = this._minWidth;
+		var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+		if (height < this._minHeight) height = this._minHeight;
+		
+		refresh(width, height);
 		
 		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
 		if (object.hasRadianRotation)
