@@ -153,7 +153,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._templateGroup.addChild(this._templateLabel);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("name", (item)->item.name),
+			new GridViewColumn("name", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className),
 			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);
