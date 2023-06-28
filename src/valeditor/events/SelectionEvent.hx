@@ -34,7 +34,7 @@ class SelectionEvent extends Event
 		#end
 	}
 	
-	public var object:Dynamic;
+	public var object(default, null):Dynamic;
 	
 	public function new(type:String, object:Dynamic, bubbles:Bool=false, cancelable:Bool=false) 
 	{
