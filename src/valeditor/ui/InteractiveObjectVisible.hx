@@ -196,11 +196,11 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
 		if (object.hasRadianRotation)
 		{
-			this.rotation = rotation;
+			this.rotation = MathUtil.rad2deg(rotation);
 		}
 		else
 		{
-			this.rotation = MathUtil.deg2rad(rotation);
+			this.rotation = rotation;
 		}
 	}
 	
@@ -213,6 +213,7 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 	{
 		this._shape.graphics.clear();
 		this._shape.graphics.beginFill(0xff0000, 0);
+		this._shape.graphics.drawRect(0, 0, width, height);
 		this._shape.graphics.lineStyle(1);
 		this._shape.graphics.lineBitmapStyle(LINE_BMD);
 		this._shape.graphics.moveTo(0, 0);
