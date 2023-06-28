@@ -21,15 +21,21 @@ import valeditor.ui.feathers.controls.value.SelectUI;
 import valeditor.ui.feathers.controls.value.SeparatorUI;
 import valeditor.ui.feathers.controls.value.SoundUI;
 import valeditor.ui.feathers.controls.value.SpacingUI;
-#if starling
-import valeditor.ui.feathers.controls.value.starling.StarlingTextureUI;
-#end
 import valeditor.ui.feathers.controls.value.StringUI;
 import valeditor.ui.feathers.controls.value.NoteUI;
 import valeditor.ui.feathers.controls.value.TextAssetUI;
 import valeditor.ui.feathers.controls.value.TextUI;
-import valeditor.ui.feathers.controls.value.starling.StarlingAtlasUI;
 import valedit.ui.IValueUI;
+
+#if desktop
+import valeditor.ui.feathers.controls.value.FilePathUI;
+import valeditor.ui.feathers.controls.value.PathUI;
+#end
+
+#if starling
+import valeditor.ui.feathers.controls.value.starling.StarlingAtlasUI;
+import valeditor.ui.feathers.controls.value.starling.StarlingTextureUI;
+#end
 
 /**
  * ...
@@ -72,6 +78,13 @@ class FeathersFactories
 	{
 		return new ComboUI();
 	}
+	
+	#if desktop
+	static public function exposedFilePath():IValueUI
+	{
+		return new FilePathUI();
+	}
+	#end
 	
 	static public function exposedFloat():IValueUI
 	{
@@ -137,6 +150,13 @@ class FeathersFactories
 	{
 		return new ObjectReferenceUI();
 	}
+	
+	#if desktop
+	static public function exposedPath():IValueUI
+	{
+		return new PathUI();
+	}
+	#end
 	
 	static public function exposedSelect():IValueUI
 	{
