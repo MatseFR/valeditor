@@ -90,7 +90,7 @@ class IntUI extends ValueUI
 		this._input = new TextInput();
 		this._input.variant = TextInputVariant.FULL_WIDTH;
 		this._input.prompt = "null";
-		addChild(this._input);
+		this._mainGroup.addChild(this._input);
 		
 		this._nullGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
