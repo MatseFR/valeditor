@@ -28,6 +28,7 @@ class TemplateLibrary extends LayoutGroup
 	
 	private var _templateAddButton:Button;
 	private var _templateRemoveButton:Button;
+	private var _templateRenameButton:Button;
 
 	public function new() 
 	{
@@ -60,6 +61,10 @@ class TemplateLibrary extends LayoutGroup
 		this._templateRemoveButton.enabled = false;
 		this._footer.addChild(this._templateRemoveButton);
 		
+		this._templateRenameButton = new Button("A", onTemplateRenameButton);
+		this._templateRenameButton.enabled = false;
+		this._footer.addChild(this._templateRenameButton);
+		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			new GridViewColumn("id", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className),
@@ -67,6 +72,7 @@ class TemplateLibrary extends LayoutGroup
 		]);
 		
 		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);
+		this._grid.variant = GridView.VARIANT_BORDERLESS;
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
@@ -85,12 +91,18 @@ class TemplateLibrary extends LayoutGroup
 		ValEditor.destroyTemplate(this._grid.selectedItem);
 	}
 	
+	private function onTemplateRenameButton(evt:TriggerEvent):Void
+	{
+		FeathersWindows.showTemplateRenameWindow(this._grid.selectedItem);
+	}
+	
 	private function onGridChange(evt:Event):Void
 	{
 		if (this._grid.selectedItem != null)
 		{
 			ValEditor.selection.object = this._grid.selectedItem;
 			this._templateRemoveButton.enabled = true;
+			this._templateRenameButton.enabled = true;
 		}
 		else
 		{
@@ -99,6 +111,7 @@ class TemplateLibrary extends LayoutGroup
 				ValEditor.selection.object = null;
 			}
 			this._templateRemoveButton.enabled = false;
+			this._templateRenameButton.enabled = false;
 		}
 	}
 	
