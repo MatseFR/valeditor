@@ -29,6 +29,7 @@ class ObjectLibrary extends LayoutGroup
 	
 	private var _objectAddButton:Button;
 	private var _objectRemoveButton:Button;
+	private var _objectRenameButton:Button;
 
 	public function new() 
 	{
@@ -61,6 +62,10 @@ class ObjectLibrary extends LayoutGroup
 		this._objectRemoveButton.enabled = false;
 		this._footer.addChild(this._objectRemoveButton);
 		
+		this._objectRenameButton = new Button("A", onObjectRenameButton);
+		this._objectRenameButton.enabled = false;
+		this._footer.addChild(this._objectRenameButton);
+		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			new GridViewColumn("id", (item)->item.id),
 			new GridViewColumn("class", (item)->item.className)
@@ -89,6 +94,11 @@ class ObjectLibrary extends LayoutGroup
 		{
 			ValEditor.destroyObject(object);
 		}
+	}
+	
+	private function onObjectRenameButton(evt:TriggerEvent):Void
+	{
+		FeathersWindows.showObjectRenameWindow(this._grid.selectedItem);
 	}
 	
 	private var _objectsToRemove:Array<ValEditorObject> = new Array<ValEditorObject>();
@@ -132,6 +142,7 @@ class ObjectLibrary extends LayoutGroup
 				}
 			}
 			this._objectRemoveButton.enabled = true;
+			this._objectRenameButton.enabled = this._grid.selectedItems.length == 1;
 			
 			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 		}
@@ -142,6 +153,7 @@ class ObjectLibrary extends LayoutGroup
 				ValEditor.selection.object = null;
 			}
 			this._objectRemoveButton.enabled = false;
+			this._objectRenameButton.enabled = false;
 		}
 	}
 	
