@@ -1,9 +1,15 @@
 package valeditor.ui.feathers;
 import feathers.core.PopUpManager;
 import openfl.Lib;
+import valeditor.ValEditorObject;
+import valeditor.ValEditorTemplate;
+import valeditor.editor.settings.ExportSettings;
+import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.ObjectCreationWindow;
+import valeditor.ui.feathers.window.ObjectRenameWindow;
 import valeditor.ui.feathers.window.ObjectSelectWindow;
 import valeditor.ui.feathers.window.TemplateCreationWindow;
+import valeditor.ui.feathers.window.TemplateRenameWindow;
 import valeditor.ui.feathers.window.asset.AssetBrowser;
 import valeditor.ui.feathers.window.asset.BinaryAssetsWindow;
 import valeditor.ui.feathers.window.asset.BitmapAssetsWindow;
@@ -40,11 +46,15 @@ class FeathersWindows
 	static private var _starlingTextureAssets:StarlingTextureAssetsWindow;
 	#end
 	
+	static private var _exportSettings:ExportSettingsWindow;
+	
 	static private var _objectCreate:ObjectCreationWindow;
 	static private var _objectEdit:ObjectEditWindow;
+	static private var _objectRename:ObjectRenameWindow;
 	static private var _objectSelect:ObjectSelectWindow;
 	
 	static private var _templateCreate:TemplateCreationWindow;
+	static private var _templateRename:TemplateRenameWindow;
 	
 	static public function showAssetBrowser():Void
 	{
@@ -181,6 +191,22 @@ class FeathersWindows
 	}
 	#end
 	
+	static public function showExportSettingsWindow(settings:ExportSettings, ?confirmCallback:Void->Void):Void
+	{
+		if (_exportSettings == null)
+		{
+			_exportSettings = new ExportSettingsWindow();
+		}
+		
+		_exportSettings.settings = settings;
+		_exportSettings.confirmCallback = confirmCallback;
+		
+		_exportSettings.width = Lib.current.stage.stageWidth / 2;
+		_exportSettings.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		PopUpManager.addPopUp(_exportSettings, Lib.current.stage);
+	}
+	
 	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void
 	{
 		if (_objectCreate == null)
@@ -217,6 +243,22 @@ class FeathersWindows
 		PopUpManager.addPopUp(_objectEdit, Lib.current.stage);
 	}
 	
+	static public function showObjectRenameWindow(object:ValEditorObject, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void):Void
+	{
+		if (_objectRename == null)
+		{
+			_objectRename = new ObjectRenameWindow();
+		}
+		
+		_objectRename.object = object;
+		_objectRename.confirmCallback = confirmCallback;
+		_objectRename.cancelCallback = cancelCallback;
+		
+		_objectRename.width = Lib.current.stage.stageWidth / 2;
+		
+		PopUpManager.addPopUp(_objectRename, Lib.current.stage);
+	}
+	
 	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, ?allowedClassNames:Array<String>, ?allowedCategories:Array<String>, ?excludeObjects:Array<Dynamic>, title:String = "Select Object"):Void
 	{
 		if (_objectSelect == null)
@@ -251,6 +293,22 @@ class FeathersWindows
 		_templateCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
 		
 		PopUpManager.addPopUp(_templateCreate, Lib.current.stage);
+	}
+	
+	static public function showTemplateRenameWindow(template:ValEditorTemplate, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void):Void
+	{
+		if (_templateRename == null)
+		{
+			_templateRename = new TemplateRenameWindow();
+		}
+		
+		_templateRename.template = template;
+		_templateRename.confirmCallback = confirmCallback;
+		_templateRename.cancelCallback = cancelCallback;
+		
+		_templateRename.width = Lib.current.stage.stageWidth / 2;
+		
+		PopUpManager.addPopUp(_templateRename, Lib.current.stage);
 	}
 	
 }
