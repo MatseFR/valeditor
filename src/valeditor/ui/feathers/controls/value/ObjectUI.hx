@@ -133,12 +133,8 @@ class ObjectUI extends ValueUI
 		this._topButton.text = this._exposedValue.name;
 		if (this._objectCollection == null)
 		{
+			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
 			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
-		}
-		else
-		{
-			// TODO : remove error when sure that it never happens
-			throw new Error("this should never happen ?");
 		}
 		updateEditable();
 	}
