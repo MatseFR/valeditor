@@ -109,25 +109,18 @@ class ComboUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = this._exposedValue.name;
+		this._list.enabled = !this._readOnly;
 		this._collection.removeAll();
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
 		{
 			_collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
 		}
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
-		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
 		updateEditable();
 	}
@@ -149,8 +142,8 @@ class ComboUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._list.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._list.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -161,6 +154,7 @@ class ComboUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
@@ -169,6 +163,7 @@ class ComboUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._list.addEventListener(Event.CHANGE, onListChange);
