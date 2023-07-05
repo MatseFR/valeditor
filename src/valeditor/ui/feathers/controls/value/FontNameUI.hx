@@ -15,6 +15,7 @@ import openfl.text.Font;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
+import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.ExposedValue;
 import valedit.events.ValueEvent;
@@ -50,8 +51,9 @@ class FontNameUI extends ValueUI
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
 	
+	private var _fontStringDataList:Array<StringData> = new Array<StringData>();
 	private var _fontNameList:Array<String> = new Array<String>();
-	private var _collection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _collection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 
 	public function new() 
 	{
@@ -87,6 +89,9 @@ class FontNameUI extends ValueUI
 		
 		this._list = new ComboBox(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
+		this._list.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();
@@ -109,28 +114,24 @@ class FontNameUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = this._exposedValue.name;
+		
 		this._collection.array = null;
-		this._fontNameList.resize(0);
+		StringData.poolArray(this._fontStringDataList);
+		this._fontStringDataList.resize(0);
 		var fonts:Array<Font> = Font.enumerateFonts(this._fontName.includeSystemFonts);
 		for (font in fonts)
 		{
 			this._fontNameList.push(font.fontName);
+			this._fontStringDataList.push(StringData.fromPool(font.fontName));
 		}
-		this._collection.array = this._fontNameList;
-		if (this._exposedValue.isNullable)
+		this._collection.array = this._fontStringDataList;
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullButton);
-			}
-		}
+		
 		updateEditable();
 	}
 	
@@ -142,7 +143,7 @@ class FontNameUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			this._list.selectedIndex = this._collection.indexOf(_exposedValue.value);
+			this._list.selectedIndex = this._fontNameList.indexOf(_exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
 	}
@@ -151,8 +152,8 @@ class FontNameUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._list.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._list.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -163,6 +164,7 @@ class FontNameUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
@@ -171,6 +173,7 @@ class FontNameUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._list.addEventListener(Event.CHANGE, onListChange);
