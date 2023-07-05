@@ -88,7 +88,6 @@ class ByteArrayUI extends ValueUI
 		
 		this._clearButton = new Button("clear");
 		this._clearButton.layoutData = new HorizontalLayoutData(50);
-		this._buttonGroup.addChild(this._clearButton);
 	}
 	
 	override public function initExposedValue():Void 
@@ -96,6 +95,22 @@ class ByteArrayUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = this._exposedValue.name;
+		
+		if (this._readOnly)
+		{
+			if (this._buttonGroup.parent != null) this._contentGroup.removeChild(this._buttonGroup);
+		}
+		else
+		{
+			if (this._buttonGroup.parent == null) this._contentGroup.addChild(this._buttonGroup);
+		}
+		
+		if (this._clearButton.parent != null) this._buttonGroup.removeChild(this._clearButton);
+		if (this._exposedValue.isNullable && !this._readOnly)
+		{
+			this._buttonGroup.addChild(this._clearButton);
+		}
+		
 		updateEditable();
 	}
 	
@@ -125,8 +140,8 @@ class ByteArrayUI extends ValueUI
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
 		this._pathLabel.enabled = this._exposedValue.isEditable;
-		this._loadButton.enabled = this._exposedValue.isEditable;
-		this._clearButton.enabled = this._exposedValue.isEditable;
+		this._loadButton.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -137,7 +152,8 @@ class ByteArrayUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._loadButton.removeEventListener(TriggerEvent.TRIGGER, onLoadButton);
 		this._clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
@@ -145,7 +161,8 @@ class ByteArrayUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
-		if (_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
 		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
