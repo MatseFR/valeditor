@@ -32,7 +32,6 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		super();
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -40,7 +39,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		this._extensionList = [];
 		this._filterList = [];
 		
-		this._assetList.dataProvider = AssetLib._binaryCollection;
+		this._assetList.dataProvider = AssetLib.binaryCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BinaryAssetItemRenderer();
