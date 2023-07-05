@@ -19,6 +19,7 @@ import openfl.events.Event;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
 
 /**
@@ -40,14 +41,14 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	private var _categoryControlsGroup:LayoutGroup;
 	private var _categoryPicker:ComboBox;
 	private var _categoryClearButton:Button;
-	private var _categoryCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _categoryCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classControlsGroup:LayoutGroup;
 	private var _classPicker:ComboBox;
 	private var _classClearButton:Button;
-	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _templateGroup:LayoutGroup;
 	private var _templateLabel:Label;
@@ -104,6 +105,9 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		
 		this._categoryPicker = new ComboBox(ValEditor.categoryCollection, onCategoryChange);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
+		this._categoryPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._categoryControlsGroup.addChild(this._categoryPicker);
 		
 		this._categoryClearButton = new Button("X", onCategoryClear);
@@ -132,6 +136,9 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
 		this._classPicker.selectedIndex = -1;
+		this._classPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
 		this._classPicker.layoutData = new HorizontalLayoutData(100);
 		this._classControlsGroup.addChild(this._classPicker);
@@ -237,7 +244,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	private function updateClassCollection():Void
 	{
-		var selectedItem:String = this._classPicker.selectedItem;
+		var selectedItem:StringData = this._classPicker.selectedItem;
 		this._classCollection.removeAll();
 		if (this._categoryPicker.selectedItem == null)
 		{
@@ -245,7 +252,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		}
 		else
 		{
-			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem));
+			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem.value));
 		}
 		
 		if (selectedItem != null)
