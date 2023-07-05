@@ -103,19 +103,11 @@ class TextUI extends ValueUI
 		this._label.text = this._exposedValue.name;
 		this._textArea.restrict = this._textValue.restrict;
 		this._textArea.maxChars = this._textValue.maxChars;
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
-		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
 		updateEditable();
 	}
@@ -135,8 +127,8 @@ class TextUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this._textArea.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._textArea.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -147,6 +139,7 @@ class TextUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._textArea.removeEventListener(Event.CHANGE, onInputChange);
@@ -157,6 +150,7 @@ class TextUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._textArea.addEventListener(Event.CHANGE, onInputChange);
