@@ -116,20 +116,12 @@ class IntDraggerUI extends ValueUI
 		this._dragger.dragScaleFactor = this._intValue.dragScaleFactor;
 		this._dragger.step = this._intValue.step;
 		this._dragger.liveDragging = this._intValue.liveDragging;
+		this._dragger.liveTyping = this._intValue.liveTyping;
 		
-		if (this._exposedValue.isNullable)
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
-		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
 		updateEditable();
 	}
@@ -158,8 +150,8 @@ class IntDraggerUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._dragger.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._dragger.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -170,6 +162,7 @@ class IntDraggerUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._dragger.removeEventListener(Event.CHANGE, onDraggerChange);
@@ -180,6 +173,7 @@ class IntDraggerUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._dragger.addEventListener(Event.CHANGE, onDraggerChange);
