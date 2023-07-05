@@ -62,60 +62,75 @@ class StarlingAtlasUI extends ValueUI
 		hLayout.paddingRight = Padding.VALUE;
 		this.layout = hLayout;
 		
-		_label = new Label();
-		_label.variant = LabelVariant.VALUE_NAME;
-		addChild(_label);
+		this._label = new Label();
+		this._label.variant = LabelVariant.VALUE_NAME;
+		addChild(this._label);
 		
-		_contentGroup = new LayoutGroup();
-		_contentGroup.layoutData = new HorizontalLayoutData(100);
+		this._contentGroup = new LayoutGroup();
+		this._contentGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		_contentGroup.layout = vLayout;
-		addChild(_contentGroup);
+		this._contentGroup.layout = vLayout;
+		addChild(this._contentGroup);
 		
-		_previewGroup = new LayoutGroup();
+		this._previewGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.CENTER;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
-		_previewGroup.layout = vLayout;
-		_contentGroup.addChild(_previewGroup);
+		this._previewGroup.layout = vLayout;
+		this._contentGroup.addChild(this._previewGroup);
 		
-		_preview = new Bitmap();
-		_previewGroup.addChild(_preview);
+		this._preview = new Bitmap();
+		this._previewGroup.addChild(this._preview);
 		
-		_nameLabel = new Label();
-		_contentGroup.addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._contentGroup.addChild(this._nameLabel);
 		
-		_pathLabel = new Label();
-		_pathLabel.wordWrap = true;
-		_contentGroup.addChild(_pathLabel);
+		this._pathLabel = new Label();
+		this._pathLabel.wordWrap = true;
+		this._contentGroup.addChild(this._pathLabel);
 		
-		_sizeLabel = new Label();
-		_contentGroup.addChild(_sizeLabel);
+		this._sizeLabel = new Label();
+		this._contentGroup.addChild(this._sizeLabel);
 		
-		_buttonGroup = new LayoutGroup();
+		this._buttonGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
-		_buttonGroup.layout = hLayout;
-		_contentGroup.addChild(_buttonGroup);
+		this._buttonGroup.layout = hLayout;
+		this._contentGroup.addChild(this._buttonGroup);
 		
-		_loadButton = new Button("set");
-		_loadButton.layoutData = new HorizontalLayoutData(50);
-		_buttonGroup.addChild(_loadButton);
+		this._loadButton = new Button("set");
+		this._loadButton.layoutData = new HorizontalLayoutData(50);
+		this._buttonGroup.addChild(this._loadButton);
 		
-		_clearButton = new Button("clear");
-		_clearButton.layoutData = new HorizontalLayoutData(50);
-		_buttonGroup.addChild(_clearButton);
+		this._clearButton = new Button("clear");
+		this._clearButton.layoutData = new HorizontalLayoutData(50);
 	}
 	
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
 		
-		_label.text = _exposedValue.name;
+		this._label.text = this._exposedValue.name;
+		
+		if (this._readOnly)
+		{
+			if (this._buttonGroup.parent != null) this._contentGroup.removeChild(this._buttonGroup);
+		}
+		else
+		{
+			if (this._buttonGroup.parent == null) this._contentGroup.addChild(this._buttonGroup);
+		}
+		
+		if (this._clearButton.parent != null) this._buttonGroup.removeChild(this._clearButton);
+		if (this._exposedValue.isNullable && !this._readOnly)
+		{
+			this._buttonGroup.addChild(this._clearButton);
+		}
+		
 		updateEditable();
 	}
 	
@@ -123,11 +138,11 @@ class StarlingAtlasUI extends ValueUI
 	{
 		super.updateExposedValue(exceptControl);
 		
-		if (_initialized && _exposedValue != null)
+		if (this._initialized && this._exposedValue != null)
 		{
-			var controlsEnabled:Bool = _controlsEnabled;
+			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			var value:TextureAtlas = _exposedValue.value;
+			var value:TextureAtlas = this._exposedValue.value;
 			if (value != null)
 			{
 				assetUpdate(AssetLib.getStarlingAtlasAssetFromAtlas(value));
@@ -142,12 +157,12 @@ class StarlingAtlasUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this.enabled = _exposedValue.isEditable;
-		_label.enabled = _exposedValue.isEditable;
-		_nameLabel.enabled = _exposedValue.isEditable;
-		_pathLabel.enabled = _exposedValue.isEditable;
-		_loadButton.enabled = _exposedValue.isEditable;
-		_clearButton.enabled = _exposedValue.isEditable;
+		this.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._nameLabel.enabled = this._exposedValue.isEditable;
+		this._pathLabel.enabled = this._exposedValue.isEditable;
+		this._loadButton.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void
@@ -158,23 +173,25 @@ class StarlingAtlasUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		_loadButton.removeEventListener(TriggerEvent.TRIGGER, onLoadButton);
-		_clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
+		this._loadButton.removeEventListener(TriggerEvent.TRIGGER, onLoadButton);
+		this._clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
 	
 	override function controlsEnable():Void 
 	{
-		if (_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		_loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
-		_clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
+		this._loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
+		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		_exposedValue.value = null;
+		this._exposedValue.value = null;
 		assetUpdate(null);
 	}
 	
@@ -185,7 +202,7 @@ class StarlingAtlasUI extends ValueUI
 	
 	private function assetSelected(asset:StarlingAtlasAsset):Void
 	{
-		_exposedValue.value = asset;
+		this._exposedValue.value = asset;
 		assetUpdate(asset);
 	}
 	
@@ -193,16 +210,16 @@ class StarlingAtlasUI extends ValueUI
 	{
 		if (asset == null)
 		{
-			_nameLabel.text = "";
-			_pathLabel.text = "";
-			_sizeLabel.text = "";
+			this._nameLabel.text = "";
+			this._pathLabel.text = "";
+			this._sizeLabel.text = "";
 			previewUpdate(null);
 		}
 		else
 		{
-			_nameLabel.text = asset.name;
-			_pathLabel.text = asset.path;
-			_sizeLabel.text = asset.content.texture.width + "x" + asset.content.texture.height;
+			this._nameLabel.text = asset.name;
+			this._pathLabel.text = asset.path;
+			this._sizeLabel.text = asset.content.texture.width + "x" + asset.content.texture.height;
 			previewUpdate(asset);
 		}
 	}
@@ -211,13 +228,13 @@ class StarlingAtlasUI extends ValueUI
 	{
 		if (asset == null)
 		{
-			_preview.bitmapData = null;
+			this._preview.bitmapData = null;
 		}
 		else
 		{
-			_preview.bitmapData = asset.preview;
+			this._preview.bitmapData = asset.preview;
 		}
-		_previewGroup.setInvalid();
+		this._previewGroup.setInvalid();
 	}
 	
 }
