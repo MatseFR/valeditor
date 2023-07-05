@@ -92,22 +92,18 @@ class BoolUI extends ValueUI
 	{
 		super.initExposedValue();
 		this._label.text = this._exposedValue.name;
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
 		if (this._exposedValue.isNullable)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
+			if (!this._readOnly) addChild(this._nullGroup);
 			this._check.text = this._exposedValue.value == null ? "(null)" : "";
 		}
 		else
 		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
 			this._check.text = "";
 		}
+		
 		updateEditable();
 	}
 	
@@ -136,8 +132,8 @@ class BoolUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._check.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._check.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -148,7 +144,8 @@ class BoolUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
-		if (!_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._check.removeEventListener(Event.CHANGE, onCheckChange);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
@@ -156,7 +153,8 @@ class BoolUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
-		if (_controlsEnabled) return;
+		if (this._readOnly) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._check.addEventListener(Event.CHANGE, onCheckChange);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
