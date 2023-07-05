@@ -22,12 +22,14 @@ class ValueUI extends LayoutGroup implements IValueUI
 		if (this._exposedValue == value) return value;
 		if (this._exposedValue != null) 
 		{
+			this._exposedValue.removeEventListener(ValueEvent.ACCESS_CHANGE, onValueAccessChange);
 			this._exposedValue.removeEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
 			this._exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
 		}
 		this._exposedValue = value;
 		if (this._exposedValue != null)
 		{
+			this._exposedValue.addEventListener(ValueEvent.ACCESS_CHANGE, onValueAccessChange);
 			this._exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
 			this._exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
 		}
@@ -37,6 +39,7 @@ class ValueUI extends LayoutGroup implements IValueUI
 	}
 	
 	private var _controlsEnabled:Bool = false;
+	private var _readOnly:Bool = false;
 	
 	public function new() 
 	{
@@ -59,22 +62,33 @@ class ValueUI extends LayoutGroup implements IValueUI
 	
 	private function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		this._controlsEnabled = false;
 	}
 	
 	private function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		this._controlsEnabled = true;
 	}
 	
 	public function initExposedValue():Void
 	{
-		
+		this._readOnly = this._exposedValue.isReadOnly;
 	}
 	
 	public function updateExposedValue(exceptControl:IValueUI = null):Void
 	{
 		
+	}
+	
+	private function onValueAccessChange(evt:ValueEvent):Void
+	{
+		if (evt.value.isReadOnly && this._controlsEnabled)
+		{
+			controlsDisable();
+		}
+		initExposedValue();
 	}
 	
 	private function onValueEditableChange(evt:ValueEvent):Void
