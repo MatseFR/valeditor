@@ -20,6 +20,7 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.utils.ArraySort;
 import valedit.ValEdit;
@@ -69,8 +70,8 @@ class ObjectSelectWindow extends Panel
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
-	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
-	private var _classList:Array<String> = new Array<String>();
+	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	private var _classList:Array<StringData> = new Array<StringData>();
 	
 	private var _objectGroup:LayoutGroup;
 	private var _objectLabel:Label;
@@ -126,6 +127,9 @@ class ObjectSelectWindow extends Panel
 		this._classGroup.addChild(this._classLabel);
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
+		this._classPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._classGroup.addChild(this._classPicker);
 		
 		this._objectGroup = new LayoutGroup();
@@ -140,7 +144,7 @@ class ObjectSelectWindow extends Panel
 		this._objectGroup.addChild(this._objectLabel);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("id", (item)->item.id),
+			new GridViewColumn("id", (item)->cast(item, ValEditorObject).id),
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
@@ -152,8 +156,10 @@ class ObjectSelectWindow extends Panel
 	public function reset(allowedClassNames:Array<String> = null, excludeObjects:Array<Dynamic> = null):Void
 	{
 		var classNames:Array<String>;
+		var stringData:StringData;
+		StringData.poolArray(this._classList);
 		this._classList.resize(0);
-		var selectedItem:String = this._classPicker.selectedItem;
+		var selectedItem:StringData = this._classPicker.selectedItem;
 		this._classCollection.array = null;
 		
 		this._objectCollection.removeAll();
@@ -174,9 +180,10 @@ class ObjectSelectWindow extends Panel
 				classNames = ValEdit.getClassListForBaseClass(allowedName);
 				for (className in classNames)
 				{
-					if (this._classList.indexOf(className) == -1)
+					stringData = ValEditor.getClassStringData(className);
+					if (this._classList.indexOf(stringData) == -1)
 					{
-						this._classList.push(className);
+						this._classList.push(stringData);
 					}
 				}
 			}
@@ -186,7 +193,7 @@ class ObjectSelectWindow extends Panel
 			// allow all classes
 			this._classCollection.addAll(ValEditor.classCollection);
 		}
-		this._classList.sort(ArraySort.alphabetical);
+		this._classList.sort(ArraySort.stringData);
 		this._classCollection.array = this._classList;
 		if (selectedItem != null)
 		{
@@ -204,7 +211,7 @@ class ObjectSelectWindow extends Panel
 		this._objectCollection.removeAll();
 		if (this._classPicker.selectedItem != null)
 		{
-			this._objectCollection.addAll(ValEditor.getObjectCollectionForClassName(this._classPicker.selectedItem));
+			this._objectCollection.addAll(ValEditor.getObjectCollectionForClassName(this._classPicker.selectedItem.value));
 		}
 	}
 	
