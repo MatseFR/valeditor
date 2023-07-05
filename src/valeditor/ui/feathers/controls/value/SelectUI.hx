@@ -112,26 +112,20 @@ class SelectUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = _exposedValue.name;
+		
 		cast(_list.layoutData, HorizontalLayoutData).percentWidth = this._select.listPercentWidth;
+		
 		this._collection.removeAll();
 		var count:Int = this._select.choiceList.length;
 		for (i in 0...count)
 		{
 			this._collection.add({text:this._select.choiceList[i], value:this._select.valueList[i]});
 		}
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
-		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
 		updateEditable();
 	}
@@ -153,8 +147,8 @@ class SelectUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._list.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._list.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -165,6 +159,7 @@ class SelectUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
@@ -173,6 +168,7 @@ class SelectUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (_controlsEnabled) return;
 		super.controlsEnable();
 		this._list.addEventListener(Event.CHANGE, onListChange);
