@@ -46,6 +46,11 @@ class ObjectUI extends ValueUI
 			{
 				this._objectCollection.object = value.value;
 			}
+			if (this._objectCollection != null)
+			{
+				this._objectCollection.isEditable = value.isEditable;
+				this._objectCollection.isReadOnly = value.isReadOnly;
+			}
 		}
 		return super.set_exposedValue(value);
 	}
@@ -136,6 +141,12 @@ class ObjectUI extends ValueUI
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
 			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
 		}
+		if (this._objectCollection != null)
+		{
+			this._objectCollection.isEditable = this._exposedValue.isEditable;
+			this._objectCollection.isReadOnly = this._readOnly;
+		}
+		
 		updateEditable();
 	}
 	
@@ -162,6 +173,8 @@ class ObjectUI extends ValueUI
 		this._topButton.enabled = this._exposedValue.isEditable;
 		this._trailGroup.enabled = this._exposedValue.isEditable;
 		this._valueGroup.enabled = this._exposedValue.isEditable;
+		
+		if (this._objectCollection != null) this._objectCollection.isEditable = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -178,6 +191,7 @@ class ObjectUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._topButton.removeEventListener(Event.CHANGE, onTopButtonChange);
@@ -185,6 +199,7 @@ class ObjectUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (_controlsEnabled) return;
 		super.controlsEnable();
 		this._topButton.addEventListener(Event.CHANGE, onTopButtonChange);
