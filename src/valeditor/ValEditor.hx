@@ -3,8 +3,11 @@ import feathers.data.ArrayCollection;
 import haxe.Constraints.Function;
 import juggler.animation.Juggler;
 import openfl.Lib;
+import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.EventDispatcher;
+import openfl.events.EventType;
 import valedit.ExposedCollection;
 import valedit.ObjectType;
 import valedit.ValEdit;
@@ -15,21 +18,39 @@ import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import inputAction.Input;
 import inputAction.controllers.KeyboardController;
+import valeditor.events.EditorEvent;
 import valeditor.ui.InteractiveFactories;
+import valeditor.ui.feathers.data.StringData;
+import valeditor.utils.ArraySort;
 
 /**
  * ...
  * @author Matse
  */
 @:access(valedit.ValEdit)
-class ValEditor 
+class ValEditor
 {
+	static public var currentContainer(get, set):ValEditorContainer;
+	static public var eventDispatcher(get, never):EventDispatcher;
+	static public var file(default, null):ValEditorFile = new ValEditorFile();
 	static public var input(default, null):Input = new Input();
 	static public var keyboardController(default, null):KeyboardController;
+	static public var rootContainer(get, set):ValEditorContainer;
+	static public var rootScene(get, set):DisplayObjectContainer;
+	#if starling
+	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
+	#end
 	static public var selection(default, null):Selection = new Selection();
 	static public var viewPort(default, null):ViewPort = new ViewPort();
 	
-	static public var currentContainer(get, set):ValEditorContainer;
+	static public var categoryCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	static public var classCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
+	
+	
+	
+	static public var isMouseOverUI:Bool;
+	
 	static private var _currentContainer:ValEditorContainer;
 	static private function get_currentContainer():ValEditorContainer
 	{
@@ -42,16 +63,24 @@ class ValEditor
 		if (_currentContainer != null)
 		{
 			_currentContainer.close();
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
 		}
 		_currentContainer = value;
 		if (_currentContainer != null)
 		{
+			_currentContainer.rootContainer = _rootScene;
+			#if starling
+			_currentContainer.rootContainerStarling = _rootSceneStarling;
+			#end
 			_currentContainer.open();
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
 		}
 		return _currentContainer;
 	}
 	
-	static public var rootContainer(get, set):ValEditorContainer;
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+	static private function get_eventDispatcher():EventDispatcher { return _eventDispatcher; }
+	
 	static private var _rootContainer:ValEditorContainer;
 	static private function get_rootContainer():ValEditorContainer { return _rootContainer; }
 	static private function set_rootContainer(value:ValEditorContainer):ValEditorContainer
@@ -61,21 +90,50 @@ class ValEditor
 		{
 			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
 			_rootContainer.close();
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
 		}
 		_rootContainer = value;
 		if (_rootContainer != null)
 		{
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
+			_rootContainer.rootContainer = _rootScene;
+			#if starling
+			_rootContainer.rootContainerStarling = _rootSceneStarling;
+			#end
 			_rootContainer.x = viewPort.x;
 			_rootContainer.y = viewPort.y;
 			_rootContainer.viewWidth = viewPort.width;
 			_rootContainer.viewHeight = viewPort.height;
 			_rootContainer.adjustView();
 			_rootContainer.open();
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
 		}
 		return _rootContainer;
 	}
 	
+	static private var _rootScene:DisplayObjectContainer;
+	static private function get_rootScene():DisplayObjectContainer { return _rootScene; }
+	static private function set_rootScene(value:DisplayObjectContainer):DisplayObjectContainer
+	{
+		if (_rootContainer != null)
+		{
+			_rootContainer.rootContainer = value;
+		}
+		return _rootScene = value;
+	}
+	
+	#if starling
+	static private var _rootSceneStarling:starling.display.DisplayObjectContainer;
+	static private function get_rootSceneStarling():starling.display.DisplayObjectContainer { return _rootSceneStarling; }
+	static private function set_rootSceneStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer
+	{
+		if (_rootContainer != null)
+		{
+			_rootContainer.rootContainerStarling = value;
+		}
+		return _rootSceneStarling = value;
+	}
+	#end
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
@@ -86,18 +144,14 @@ class ValEditor
 		_rootContainer.adjustView();
 	}
 	
-	static public var categoryCollection(default, null):ArrayCollection<String> = new ArrayCollection<String>();
-	static public var classCollection(default, null):ArrayCollection<String> = new ArrayCollection<String>();
-	static public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
-	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
-	
-	static public var isMouseOverUI:Bool;
-	
-	static private var _categoryToClassCollection:Map<String, ArrayCollection<String>> = new Map<String, ArrayCollection<String>>();
+	static private var _categoryToClassCollection:Map<String, ArrayCollection<StringData>> = new Map<String, ArrayCollection<StringData>>();
 	static private var _categoryToObjectCollection:Map<String, ArrayCollection<ValEditorObject>> = new Map<String, ArrayCollection<ValEditorObject>>();
 	static private var _categoryToTemplateCollection:Map<String, ArrayCollection<ValEditorTemplate>> = new Map<String, ArrayCollection<ValEditorTemplate>>();
 	static private var _classToObjectCollection:Map<String, ArrayCollection<ValEditorObject>> = new Map<String, ArrayCollection<ValEditorObject>>();
 	static private var _classToTemplateCollection:Map<String, ArrayCollection<ValEditorTemplate>> = new Map<String, ArrayCollection<ValEditorTemplate>>();
+	
+	static private var _categoryToStringData:Map<String, StringData> = new Map<String, StringData>();
+	static private var _classNameToStringData:Map<String, StringData> = new Map<String, StringData>();
 	
 	static private var _classMap:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
 	
@@ -107,6 +161,17 @@ class ValEditor
 		input.addController(keyboardController);
 		Juggler.start();
 		Juggler.root.add(input);
+		
+		categoryCollection.sortCompareFunction = ArraySort.stringData;
+		classCollection.sortCompareFunction = ArraySort.stringData;
+		templateCollection.sortCompareFunction = ArraySort.template;
+	}
+	
+	/** Creates an empty "new file" but does not clear exposed data */
+	static public function reset():Void
+	{
+		file.clear();
+		_rootContainer.clear();
 	}
 	
 	static public function registerClass(type:Class<Dynamic>, collection:ExposedCollection, canBeCreated:Bool = true, objectType:Int = -1, ?constructorCollection:ExposedCollection, ?settings:ValEditorClassSettings, ?categoryList:Array<String>):ValEditorClass
@@ -116,6 +181,13 @@ class ValEditor
 		{
 			trace("ValEditor.registerClass ::: Class " + className + " already registered");
 			return null;
+		}
+		
+		var strClass:StringData = _classNameToStringData.get(className);
+		if (strClass == null)
+		{
+			strClass = StringData.fromPool(className);
+			_classNameToStringData.set(className, strClass);
 		}
 		
 		var v:ValEditorClass = new ValEditorClass();
@@ -160,55 +232,77 @@ class ValEditor
 		v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
 		v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
 		
+		var objCollection:ArrayCollection<ValEditorObject>;
+		var strCollection:ArrayCollection<StringData>;
+		var templateCollection:ArrayCollection<ValEditorTemplate>;
+		var stringData:StringData;
+		
 		if (categoryList != null)
 		{
-			var strCollection:ArrayCollection<String>;
 			for (category in categoryList)
 			{
 				if (!_categoryToClassCollection.exists(category))
 				{
-					categoryCollection.add(category);
-					_categoryToClassCollection.set(category, new ArrayCollection<String>());
-					_categoryToObjectCollection.set(category, new ArrayCollection<ValEditorObject>());
-					_categoryToTemplateCollection.set(category, new ArrayCollection<ValEditorTemplate>());
+					stringData = StringData.fromPool(category);
+					_categoryToStringData.set(category, stringData);
+					categoryCollection.add(stringData);
+					
+					strCollection = new ArrayCollection<StringData>();
+					strCollection.sortCompareFunction = ArraySort.stringData;
+					_categoryToClassCollection.set(category, strCollection);
+					
+					objCollection = new ArrayCollection<ValEditorObject>();
+					objCollection.sortCompareFunction = ArraySort.object;
+					_categoryToObjectCollection.set(category, objCollection);
+					
+					templateCollection = new ArrayCollection<ValEditorTemplate>();
+					templateCollection.sortCompareFunction = ArraySort.template;
+					_categoryToTemplateCollection.set(category, templateCollection);
 				}
 				strCollection = _categoryToClassCollection.get(category);
-				strCollection.add(className);
+				strCollection.add(strClass);
 			}
 		}
 		
-		var objCollection:ArrayCollection<ValEditorObject>;
 		if (!_classToObjectCollection.exists(className))
 		{
 			objCollection = new ArrayCollection<ValEditorObject>();
+			objCollection.sortCompareFunction = ArraySort.object;
 			_classToObjectCollection.set(className, objCollection);
 		}
 		
-		var templateCollection:ArrayCollection<ValEditorTemplate>;
 		if (!_classToTemplateCollection.exists(className))
 		{
 			templateCollection = new ArrayCollection<ValEditorTemplate>();
+			templateCollection.sortCompareFunction = ArraySort.template;
 			_classToTemplateCollection.set(className, templateCollection);
 		}
 		
 		for (superName in v.superClassNames)
 		{
+			if (!_classNameToStringData.exists(superName))
+			{
+				_classNameToStringData.set(superName, StringData.fromPool(superName));
+			}
+			
 			if (!_classToObjectCollection.exists(superName))
 			{
 				objCollection = new ArrayCollection<ValEditorObject>();
+				objCollection.sortCompareFunction = ArraySort.object;
 				_classToObjectCollection.set(superName, objCollection);
 			}
 			
 			if (!_classToTemplateCollection.exists(superName))
 			{
 				templateCollection = new ArrayCollection<ValEditorTemplate>();
+				templateCollection.sortCompareFunction = ArraySort.template;
 				_classToTemplateCollection.set(superName, templateCollection);
 			}
 		}
 		
 		if (canBeCreated)
 		{
-			classCollection.add(className);
+			classCollection.add(strClass);
 		}
 		
 		return v;
@@ -225,19 +319,26 @@ class ValEditor
 		
 		var valClass:ValEditorClass = _classMap.get(className);
 		_classMap.remove(className);
+		var strClass:StringData = _classNameToStringData.get(className);
+		_classNameToStringData.remove(className);
 		
-		var strCollection:ArrayCollection<String>;
+		var strCategory:StringData;
+		var strCollection:ArrayCollection<StringData>;
 		for (category in valClass.categories)
 		{
 			strCollection = _categoryToClassCollection.get(category);
-			strCollection.remove(className);
+			strCollection.remove(strClass);
 			if (strCollection.length == 0)
 			{
 				// no more class associated with this category : remove category
-				categoryCollection.remove(category);
+				strCategory = _categoryToStringData.get(category);
+				categoryCollection.remove(strCategory);
 				_categoryToClassCollection.remove(category);
 				_categoryToObjectCollection.remove(category);
 				_categoryToTemplateCollection.remove(category);
+				
+				strCategory.pool();
+				_categoryToStringData.remove(category);
 			}
 		}
 		
@@ -250,7 +351,7 @@ class ValEditor
 				destroyObjectInternal(cast obj);
 			}
 			
-			classCollection.remove(className);
+			classCollection.remove(strClass);
 			_classToObjectCollection.remove(className);
 		}
 		else
@@ -260,6 +361,9 @@ class ValEditor
 				unregisterObjectInternal(cast obj);
 			}
 		}
+		
+		_classNameToStringData.remove(className);
+		strClass.pool();
 	}
 	
 	static public function createObjectWithClass(clss:Class<Dynamic>, ?id:String, ?params:Array<Dynamic>):ValEditorObject
@@ -323,7 +427,7 @@ class ValEditor
 	{
 		ValEdit.registerObjectInternal(valObject);
 		
-		objectCollection.add(valObject);
+		//objectCollection.add(valObject);
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.add(valObject);
@@ -392,7 +496,7 @@ class ValEditor
 	{
 		ValEdit.unregisterObjectInternal(valObject);
 		
-		objectCollection.remove(valObject);
+		//objectCollection.remove(valObject);
 		
 		valObject.container.remove(valObject);
 		
@@ -463,9 +567,19 @@ class ValEditor
 		}
 	}
 	
-	static public function getClassCollectionForCategory(category:String):ArrayCollection<String>
+	static public function getCategoryStringData(category:String):StringData
+	{
+		return _categoryToStringData.get(category);
+	}
+	
+	static public function getClassCollectionForCategory(category:String):ArrayCollection<StringData>
 	{
 		return _categoryToClassCollection.get(category);
+	}
+	
+	static public function getClassStringData(className:String):StringData
+	{
+		return _classNameToStringData.get(className);
 	}
 	
 	static public function getValEditClassByClass(clss:Class<Dynamic>):ValEditorClass
@@ -496,6 +610,31 @@ class ValEditor
 	static public function getTemplateCollectionForCategory(category:String):ArrayCollection<ValEditorTemplate>
 	{
 		return _categoryToTemplateCollection.get(category);
+	}
+	
+	static public function addEventListener<T>(type:EventType<T>, listener:T->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void
+	{
+		_eventDispatcher.addEventListener(type, listener, useCapture, priority, useWeakReference);
+	}
+	
+	static public function dispatchEvent(event:Event):Void
+	{
+		_eventDispatcher.dispatchEvent(event);
+	}
+	
+	static public function hasEventListener(type:String):Bool
+	{
+		return _eventDispatcher.hasEventListener(type);
+	}
+	
+	static public function removeEventListener<T>(type:EventType<T>, listener:T->Void, useCapture:Bool = false):Void
+	{
+		_eventDispatcher.removeEventListener(type, listener, useCapture);
+	}
+	
+	static public function willTrigger(type:String):Bool
+	{
+		return _eventDispatcher.willTrigger(type);
 	}
 	
 }
