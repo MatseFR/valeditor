@@ -32,7 +32,6 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		super();
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -40,7 +39,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		this._extensionList = ["txt", "xml", "json"];
 		this._filterList = [new FileFilter("Text", "*.txt;*.xml;*.json")];
 		
-		this._assetList.dataProvider = AssetLib._textCollection;
+		this._assetList.dataProvider = AssetLib.textCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new TextAssetItemRenderer();
