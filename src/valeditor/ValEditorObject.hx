@@ -4,9 +4,11 @@ import haxe.Constraints.Function;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
 import valedit.ExposedValue;
+import valedit.IValEditContainer;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
+import valeditor.events.ObjectEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
@@ -18,6 +20,20 @@ import valeditor.ui.shape.PivotIndicator;
 class ValEditorObject extends ValEditObject 
 {
 	public var collection(get, set):ExposedCollection;
+	public var container(get, set):IValEditContainer;
+	public var getBoundsFunctionName(get, set):String;
+	public var hasPivotProperties:Bool;
+	public var hasScaleProperties:Bool;
+	public var hasTransformProperty:Bool;
+	public var hasTransformationMatrixProperty:Bool;
+	public var hasRadianRotation:Bool;
+	public var interactiveObject(get, set):IInteractiveObject;
+	public var isMouseDown:Bool;
+	public var mouseRestoreX:Float;
+	public var mouseRestoreY:Float;
+	public var pivotIndicator(get, set):PivotIndicator;
+	public var selectionBox(get, set):SelectionBox;
+	
 	private var _collection:ExposedCollection;
 	private function get_collection():ExposedCollection { return this._collection; }
 	private function set_collection(value:ExposedCollection):ExposedCollection
@@ -28,17 +44,15 @@ class ValEditorObject extends ValEditObject
 		return this._collection = value;
 	}
 	
-	public var container(get, set):ValEditorContainer;
-	private var _container:ValEditorContainer;
-	private function get_container():ValEditorContainer { return this._container; }
-	private function set_container(value:ValEditorContainer):ValEditorContainer
+	private var _container:IValEditContainer;
+	private function get_container():IValEditContainer { return this._container; }
+	private function set_container(value:IValEditContainer):IValEditContainer
 	{
 		if (value == this._container) return value;
 		
 		return this._container = value;
 	}
 	
-	public var getBoundsFunctionName(get, set):String;
 	private var _getBoundsFunctionName:String = "getBounds";
 	private function get_getBoundsFunctionName():String { return this._getBoundsFunctionName; }
 	private function set_getBoundsFunctionName(value:String):String
@@ -51,7 +65,13 @@ class ValEditorObject extends ValEditObject
 		return this._getBoundsFunctionName = value;
 	}
 	
-	public var interactiveObject(get, set):IInteractiveObject;
+	override function set_id(value:String):String 
+	{
+		super.set_id(value);
+		ObjectEvent.dispatch(this, ObjectEvent.RENAMED, this);
+		return this._id;
+	}
+	
 	private var _interactiveObject:IInteractiveObject;
 	private function get_interactiveObject():IInteractiveObject { return this._interactiveObject; }
 	private function set_interactiveObject(value:IInteractiveObject):IInteractiveObject
@@ -64,7 +84,6 @@ class ValEditorObject extends ValEditObject
 		return this._interactiveObject = value;
 	}
 	
-	public var pivotIndicator(get, set):PivotIndicator;
 	private var _pivotIndicator:PivotIndicator;
 	private function get_pivotIndicator():PivotIndicator { return this._pivotIndicator; }
 	private function set_pivotIndicator(value:PivotIndicator):PivotIndicator
@@ -77,7 +96,6 @@ class ValEditorObject extends ValEditObject
 		return this._pivotIndicator = value;
 	}
 	
-	public var selectionBox(get, set):SelectionBox;
 	private var _selectionBox:SelectionBox;
 	private function get_selectionBox():SelectionBox { return this._selectionBox; }
 	private function set_selectionBox(value:SelectionBox):SelectionBox
@@ -89,14 +107,6 @@ class ValEditorObject extends ValEditObject
 		}
 		return this._selectionBox = value;
 	}
-	
-	public var hasPivotProperties:Bool;
-	public var hasScaleProperties:Bool;
-	public var hasTransformProperty:Bool;
-	public var hasTransformationMatrixProperty:Bool;
-	public var hasRadianRotation:Bool;
-	
-	public var isMouseDown:Bool;
 	
 	private var _boundsFunction:Function;
 	
