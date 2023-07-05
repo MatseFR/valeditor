@@ -29,7 +29,6 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		this._filesEnabled = false;
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -38,7 +37,7 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		this._footerGroup.addChildAt(_addAtlasButton, 0);
 		this._buttonList.push(_addAtlasButton);
 		
-		this._assetList.dataProvider = AssetLib._starlingAtlasCollection;
+		this._assetList.dataProvider = AssetLib.starlingAtlasCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new StarlingAtlasAssetItemRenderer();
