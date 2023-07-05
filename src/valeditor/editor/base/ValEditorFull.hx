@@ -3,10 +3,19 @@ import feathers.controls.navigators.StackItem;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
+import openfl.display.Sprite;
 import openfl.ui.Keyboard;
+import valedit.ObjectType;
 import valedit.ValEdit;
+import valedit.data.valeditor.SettingsData;
+import valeditor.ValEditorContainer;
+import valeditor.editor.settings.ExportSettings;
 import valeditor.input.InputActionID;
 import valeditor.ui.feathers.view.EditorView;
+
+#if starling
+import starling.core.Starling;
+#end
 
 /**
  * ...
@@ -21,15 +30,33 @@ class ValEditorFull extends ValEditorBaseFeathers
 		super();
 	}
 	
-	override function ready():Void 
+	override function editorSetup():Void 
 	{
-		var item:StackItem;
+		super.editorSetup();
 		
-		super.ready();
+		var sprite:Sprite = new Sprite();
+		addChild(sprite);
+		ValEditor.rootScene = sprite;
+		
+		#if starling
+		var starlingSprite = new starling.display.Sprite();
+		Starling.current.stage.addChild(starlingSprite);
+		ValEditor.rootSceneStarling = starlingSprite;
+		#end
+		
+		var container:ValEditorContainer = new ValEditorContainer();
+		ValEditor.rootContainer = container;
 		
 		ValEditor.init();
 		initInputActions();
 		ValEditor.input.addEventListener(InputActionEvent.ACTION_BEGIN, onInputActionBegin);
+	}
+	
+	override function initUI():Void 
+	{
+		super.initUI();
+		
+		var item:StackItem;
 		
 		this.editView = new EditorView();
 		this.editView.initializeNow();
@@ -37,6 +64,18 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);
+	}
+	
+	override function exposeData():Void 
+	{
+		super.exposeData();
+		
+		ValEditor.registerClass(ExportSettings, SettingsData.exposeExportSettings(), false, ObjectType.OTHER);
+	}
+	
+	override function ready():Void 
+	{
+		super.ready();
 		
 		this.screenNavigator.rootItemID = EditorView.ID;
 	}
@@ -119,5 +158,25 @@ class ValEditorFull extends ValEditorBaseFeathers
 		keyAction = new KeyAction(InputActionID.EXPORT_AS, false, true, true);
 		ValEditor.keyboardController.addKeyAction(Keyboard.E, keyAction);
 	}
+	
+	public function exposeAll():Void
+	{
+		exposeOpenFL();
+		#if starling
+		exposeStarling();
+		#end
+	}
+	
+	public function exposeOpenFL():Void
+	{
+		
+	}
+	
+	#if starling
+	public function exposeStarling():Void
+	{
+		
+	}
+	#end
 	
 }
