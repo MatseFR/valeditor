@@ -43,6 +43,8 @@ class FunctionUI extends ValueUI
 	private var _trailGroup:LayoutGroup;
 	private var _valueGroup:ValueContainer;
 	
+	private var _parameterControls:Array<IValueUI> = new Array<IValueUI>();
+	
 	/**
 	   
 	**/
@@ -111,7 +113,15 @@ class FunctionUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		
 		this._button.text = this._func.name;
+		
+		if (this._parameterGroup.parent != null)
+		{
+			this._parameterGroup.removeChildren();
+			removeChild(this._parameterGroup);
+		}
+		this._parameterControls.resize(0);
 		
 		var exposedValues:Array<ExposedValue> = this._func.getExposedValueParameters();
 		if (exposedValues.length != 0)
@@ -121,16 +131,9 @@ class FunctionUI extends ValueUI
 			{
 				uiControl = ValEdit.toUIControl(exposedValue);
 				this._valueGroup.addChild(cast uiControl);
+				this._parameterControls.push(uiControl);
 			}
 			addChild(this._parameterGroup);
-		}
-		else
-		{
-			if (this._parameterGroup.parent != null)
-			{
-				this._parameterGroup.removeChildren();
-				removeChild(this._parameterGroup);
-			}
 		}
 		
 		updateEditable();
@@ -139,10 +142,10 @@ class FunctionUI extends ValueUI
 	private function updateEditable():Void
 	{
 		this.enabled = this._exposedValue.isEditable;
-		this._button.enabled = this._exposedValue.isEditable;
 		this._parameterGroup.enabled = this._exposedValue.isEditable;
 		this._trailGroup.enabled = this._exposedValue.isEditable;
 		this._valueGroup.enabled = this._exposedValue.isEditable;
+		this._button.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -153,6 +156,7 @@ class FunctionUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._button.removeEventListener(TriggerEvent.TRIGGER, onButton);
@@ -161,6 +165,7 @@ class FunctionUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (_controlsEnabled) return;
 		super.controlsEnable();
 		this._button.addEventListener(TriggerEvent.TRIGGER, onButton);
