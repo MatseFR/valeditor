@@ -48,6 +48,7 @@ class ObjectEditWindow extends Panel
 	private function get_editObject():Dynamic { return this._editObject; }
 	private function set_editObject(value:Dynamic):Dynamic
 	{
+		if (this._editObject == value) return value;
 		if (this._initialized)
 		{
 			ValEdit.edit(value, this._contentGroup);
@@ -92,25 +93,25 @@ class ObjectEditWindow extends Panel
 		
 		this._headerGroup = new Header(this._title);
 		this._headerGroup.variant = HeaderVariant.THEME;
-		this.header = _headerGroup;
+		this.header = this._headerGroup;
 		
-		_footerGroup = new LayoutGroup();
-		_footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._footerGroup = new LayoutGroup();
+		this._footerGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.setPadding(Padding.DEFAULT);
-		_footerGroup.layout = hLayout;
+		this._footerGroup.layout = hLayout;
 		this.footer = _footerGroup;
 		
-		_confirmButton = new Button("confirm", onConfirmButton);
-		_footerGroup.addChild(_confirmButton);
+		this._confirmButton = new Button("confirm", onConfirmButton);
+		this._footerGroup.addChild(_confirmButton);
 		
-		_cancelButton = new Button("cancel", onCancelButton);
-		_footerGroup.addChild(_cancelButton);
+		this._cancelButton = new Button("cancel", onCancelButton);
+		this._footerGroup.addChild(_cancelButton);
 		
-		_contentGroup = new ScrollContainer();
-		_contentGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		this._contentGroup = new ScrollContainer();
+		this._contentGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -118,8 +119,8 @@ class ObjectEditWindow extends Panel
 		vLayout.paddingTop = Spacing.DEFAULT;
 		vLayout.paddingBottom = Spacing.DEFAULT;
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
-		_contentGroup.layout = vLayout;
-		addChild(_contentGroup);
+		this._contentGroup.layout = vLayout;
+		addChild(this._contentGroup);
 		
 		if (this._editObject != null)
 		{
@@ -136,6 +137,7 @@ class ObjectEditWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		PopUpManager.removePopUp(this);
+		this.editObject = null;
 		this._confirmCallback();
 	}
 	
