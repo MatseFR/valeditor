@@ -101,7 +101,6 @@ class FilePathUI extends ValueUI
 		
 		this._buttonGroup = new LayoutGroup();
 		this._buttonGroup.layoutData = new HorizontalLayoutData(100);
-		
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -121,19 +120,19 @@ class FilePathUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
-		if (this._exposedValue.isNullable)
+		if (this._readOnly)
 		{
-			if (this._clearButton.parent == null)
-			{
-				this._buttonGroup.addChild(this._clearButton);
-			}
+			if (this._buttonGroup.parent != null) this._controlGroup.removeChild(this._buttonGroup);
 		}
 		else
 		{
-			if (this._clearButton.parent != null)
-			{
-				this._buttonGroup.removeChild(this._clearButton);
-			}
+			if (this._buttonGroup.parent == null) this._controlGroup.addChild(this._buttonGroup);
+		}
+		
+		if (this._clearButton.parent != null) this._buttonGroup.removeChild(this._clearButton);
+		if (this._exposedValue.isNullable && !this._readOnly)
+		{
+			this._buttonGroup.addChild(this._clearButton);
 		}
 		
 		updateEditable();
@@ -154,8 +153,8 @@ class FilePathUI extends ValueUI
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
 		this._pathLabel.enabled = this._exposedValue.isEditable;
-		this._setButton.enabled = this._exposedValue.isEditable;
-		this._clearButton.enabled = this._exposedValue.isEditable;
+		this._setButton.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -166,6 +165,7 @@ class FilePathUI extends ValueUI
 	
 	override function controlsDisable():Void 
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._setButton.removeEventListener(TriggerEvent.TRIGGER, onSetButton);
@@ -174,6 +174,7 @@ class FilePathUI extends ValueUI
 	
 	override function controlsEnable():Void 
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._setButton.addEventListener(TriggerEvent.TRIGGER, onSetButton);
