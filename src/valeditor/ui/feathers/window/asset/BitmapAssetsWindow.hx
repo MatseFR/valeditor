@@ -34,7 +34,6 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		super();
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -42,7 +41,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		this._extensionList = ["jpg", "jpeg", "png", "gif"];
 		this._filterList = [new FileFilter("Images (*.jpeg, *.jpg, *.gif, *.png)", "*.jpeg;*.jpg;*.gif;*.png")];
 		
-		this._assetList.dataProvider = AssetLib._bitmapCollection;
+		this._assetList.dataProvider = AssetLib.bitmapCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BitmapAssetItemRenderer();
