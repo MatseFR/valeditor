@@ -20,6 +20,7 @@ import valedit.ValEdit;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
@@ -42,12 +43,12 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private var _categoryControlsGroup:LayoutGroup;
 	private var _categoryPicker:ComboBox;
 	private var _categoryClearButton:Button;
-	private var _categoryCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _categoryCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
-	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _idGroup:LayoutGroup;
 	private var _idLabel:Label;
@@ -56,6 +57,8 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private var _constructorGroup:LayoutGroup;
 	private var _constructorLabel:Label;
 	private var _constructorContainer:ScrollContainer;
+	private var _constructorButtonGroup:LayoutGroup;
+	private var _constructorDefaultsButton:Button;
 	
 	private var _valEditClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
@@ -103,6 +106,9 @@ class ObjectCreationFromClassView extends LayoutGroup
 		
 		this._categoryPicker = new ComboBox(ValEditor.categoryCollection);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
+		this._categoryPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._categoryPicker.selectedIndex = -1;
 		this._categoryPicker.addEventListener(Event.CHANGE, onCategoryChange);
 		this._categoryControlsGroup.addChild(this._categoryPicker);
@@ -124,6 +130,9 @@ class ObjectCreationFromClassView extends LayoutGroup
 		
 		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
+		this._classPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._classPicker.selectedIndex = -1;
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
 		this._classGroup.addChild(this._classPicker);
@@ -164,6 +173,17 @@ class ObjectCreationFromClassView extends LayoutGroup
 		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
 		this._constructorContainer.layout = vLayout;
 		this._constructorGroup.addChild(this._constructorContainer);
+		
+		this._constructorButtonGroup = new LayoutGroup();
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.paddingTop = Spacing.VERTICAL_GAP;
+		this._constructorButtonGroup.layout = vLayout;
+		this._constructorGroup.addChild(this._constructorButtonGroup);
+		
+		this._constructorDefaultsButton = new Button("Restore constructor defaults", onConstructorDefaultsButton);
+		this._constructorButtonGroup.addChild(this._constructorDefaultsButton);
 	}
 	
 	private function onAddedToStage(evt:Event):Void
@@ -222,12 +242,13 @@ class ObjectCreationFromClassView extends LayoutGroup
 		{
 			this._idInput.errorString = null;
 		}
+		this._constructorDefaultsButton.enabled = this._constructorCollection != null;
 		this._confirmButton.enabled = isValid;
 	}
 	
 	private function updateClassCollection():Void
 	{
-		var selectedItem:String = this._classPicker.selectedItem;
+		var selectedItem:StringData = this._classPicker.selectedItem;
 		this._classCollection.removeAll();
 		if (this._categoryPicker.selectedItem == null)
 		{
@@ -235,7 +256,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		}
 		else
 		{
-			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem));
+			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem.value));
 		}
 		
 		if (selectedItem != null)
@@ -260,7 +281,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	{
 		if (this._classPicker.selectedIndex != -1)
 		{
-			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem);
+			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem.value);
 			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else
@@ -275,6 +296,11 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private function onIDInputChange(evt:Event):Void
 	{
 		checkValid();
+	}
+	
+	private function onConstructorDefaultsButton(evt:TriggerEvent):Void
+	{
+		this._constructorCollection.restoreDefaultValues();
 	}
 	
 }
