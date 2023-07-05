@@ -438,7 +438,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	}
 	
 	public var darkThemeContrastColorDarkenRatio(get, set):Float;
-	private var _darkThemeContrastColorDarkenRatio:Float = 0.35;
+	private var _darkThemeContrastColorDarkenRatio:Float = 0.25;
 	private function get_darkThemeContrastColorDarkenRatio():Float { return this._darkThemeContrastColorDarkenRatio; }
 	private function set_darkThemeContrastColorDarkenRatio(value:Float):Float
 	{
