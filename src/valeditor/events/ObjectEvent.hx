@@ -13,11 +13,11 @@ class ObjectEvent extends Event
 	inline static public var RENAMED:String = "renamed";
 	
 	#if !flash
-	private static var _POOL:Array<ObjectEvent> = new Array<ObjectEvent>();
+	static private var _POOL:Array<ObjectEvent> = new Array<ObjectEvent>();
 	
-	private static function fromPool(type:String, object:ValEditObject, bubbles:Bool, cancelable:Bool):ObjectEvent
+	static private function fromPool(type:String, object:ValEditObject, bubbles:Bool, cancelable:Bool):ObjectEvent
 	{
-		if (_POOL.length != null) return _POOL.pop().setTo(type, object, bubbles, cancelable);
+		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, bubbles, cancelable);
 		return new ObjectEvent(type, object, bubbles, cancelable);
 	}
 	#end
