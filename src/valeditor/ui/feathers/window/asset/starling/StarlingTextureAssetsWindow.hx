@@ -32,7 +32,6 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		this._filesEnabled = false;
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -45,7 +44,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		_footerGroup.addChildAt(_addTextureButton, 1);
 		_buttonList.push(_addTextureButton);
 		
-		_assetList.dataProvider = AssetLib._starlingTextureCollection;
+		_assetList.dataProvider = AssetLib.starlingTextureCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new StarlingTextureAssetItemRenderer();
