@@ -1,5 +1,6 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
+import valeditor.utils.ReverseIterator;
 
 /**
  * ...
@@ -8,6 +9,8 @@ import haxe.iterators.ArrayIterator;
 class ValEditorObjectGroup 
 {
 	public var isMouseDown(get, set):Bool;
+	public var numObjects(get, never):Int;
+	
 	private var _isMouseDown:Bool;
 	private function get_isMouseDown():Bool { return this._isMouseDown; }
 	private function set_isMouseDown(value:Bool):Bool
@@ -19,7 +22,6 @@ class ValEditorObjectGroup
 		return this._isMouseDown = value;
 	}
 	
-	public var numObjects(get, never):Int;
 	private function get_numObjects():Int { return this._objects.length; }
 	
 	private var _objects:Array<ValEditorObject> = new Array<ValEditorObject>();
@@ -37,6 +39,15 @@ class ValEditorObjectGroup
 	public function clear():Void
 	{
 		this._objects.resize(0);
+	}
+	
+	public function deleteObjects():Void
+	{
+		for (i in new ReverseIterator(this._objects.length - 1, 0))
+		{
+			ValEditor.destroyObject(this._objects[i]);
+		}
+		clear();
 	}
 	
 	public function addObject(object:ValEditorObject):Void
