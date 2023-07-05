@@ -209,20 +209,32 @@ class ColorUI extends ValueUI
 	{
 		super.initExposedValue();
 		this._label.text = this._exposedValue.name;
-		if (this._exposedValue.isNullable)
+		
+		if (this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
+			if (this._redGroup.parent != null)
 			{
-				addChild(this._nullGroup);
+				removeChild(this._redGroup);
+				removeChild(this._greenGroup);
+				removeChild(this._blueGroup);
 			}
 		}
 		else
 		{
-			if (this._nullGroup.parent != null)
+			if (this._redGroup.parent == null)
 			{
-				removeChild(this._nullGroup);
+				addChild(this._redGroup);
+				addChild(this._greenGroup);
+				addChild(this._blueGroup);
 			}
 		}
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
+		{
+			addChild(this._nullGroup);
+		}
+		
 		updateEditable();
 	}
 	
@@ -242,14 +254,14 @@ class ColorUI extends ValueUI
 		this._label.enabled = this._exposedValue.isEditable;
 		this._preview.enabled = this._exposedValue.isEditable;
 		this._hexLabel.enabled = this._exposedValue.isEditable;
-		this._hexInput.enabled = this._exposedValue.isEditable;
 		this._redLabel.enabled = this._exposedValue.isEditable;
-		this._redDragger.enabled = this._exposedValue.isEditable;
 		this._greenLabel.enabled = this._exposedValue.isEditable;
-		this._greenDragger.enabled = this._exposedValue.isEditable;
 		this._blueLabel.enabled = this._exposedValue.isEditable;
-		this._blueDragger.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._hexInput.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._redDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._greenDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._blueDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -281,6 +293,7 @@ class ColorUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._hexInput.removeEventListener(Event.CHANGE, onHexInputChange);
@@ -298,6 +311,7 @@ class ColorUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (_controlsEnabled) return;
 		super.controlsEnable();
 		this._hexInput.addEventListener(Event.CHANGE, onHexInputChange);
