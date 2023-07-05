@@ -1,16 +1,9 @@
 package valeditor.editor.base;
 
 import feathers.controls.Application;
-import feathers.controls.navigators.StackItem;
 import feathers.controls.navigators.StackNavigator;
 import feathers.style.Theme;
-import openfl.display.Sprite;
 import openfl.display.StageScaleMode;
-import valedit.value.ExposedFloatDrag;
-import valedit.value.ExposedIntDrag;
-import valeditor.ui.feathers.FeathersFactories;
-import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.view.EditView;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.value.ExposedBitmap;
@@ -21,11 +14,13 @@ import valedit.value.ExposedColor;
 import valedit.value.ExposedColorReadOnly;
 import valedit.value.ExposedCombo;
 import valedit.value.ExposedFloat;
+import valedit.value.ExposedFloatDrag;
 import valedit.value.ExposedFloatRange;
 import valedit.value.ExposedFontName;
 import valedit.value.ExposedFunction;
 import valedit.value.ExposedGroup;
 import valedit.value.ExposedInt;
+import valedit.value.ExposedIntDrag;
 import valedit.value.ExposedIntRange;
 import valedit.value.ExposedName;
 import valedit.value.ExposedNote;
@@ -38,9 +33,15 @@ import valedit.value.ExposedSpacing;
 import valedit.value.ExposedString;
 import valedit.value.ExposedText;
 import valedit.value.ExposedTextAsset;
+import valeditor.ui.feathers.FeathersFactories;
+import valeditor.ui.feathers.theme.ValEditorTheme;
+
+#if desktop
+import valedit.value.ExposedFilePath;
+import valedit.value.ExposedPath;
+#end
 
 #if starling
-import starling.core.Starling;
 import valedit.value.starling.ExposedStarlingAtlas;
 import valedit.value.starling.ExposedStarlingTexture;
 #end
@@ -51,10 +52,6 @@ import valedit.value.starling.ExposedStarlingTexture;
  */
 class ValEditorBaseFeathers extends Application 
 {
-	public var scene(default, null):Sprite;
-	#if starling
-	public var starlingScene(default, null):starling.display.Sprite;
-	#end
 	public var screenNavigator(default, null):StackNavigator;
 	public var theme(default, null):ValEditorTheme;
 	
@@ -70,37 +67,50 @@ class ValEditorBaseFeathers extends Application
 	{
 		super.initialize();
 		
-		AssetLib.init();
-		
-		initUI();
-		
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.stageFocusRect = false;
-		
-		scene = new Sprite();
-		addChild(scene);
-		
-		#if starling
-		starlingScene = new starling.display.Sprite();
-		Starling.current.stage.addChild(starlingScene);
-		#end
 		
 		theme = new ValEditorTheme();
 		Theme.setTheme(theme);
 		
-		AssetLib.load(ready);
+		AssetLib.init();
+		AssetLib.load(assetsLoaded);
 	}
 	
-	private function ready():Void
+	private function assetsLoaded():Void
+	{
+		registerExposedValuesUI();
+		editorSetup();
+		exposeData();
+		initUI();
+		ready();
+	}
+	
+	private function editorSetup():Void
+	{
+		
+	}
+	
+	private function exposeData():Void
+	{
+		
+	}
+	
+	private function initUI():Void
 	{
 		screenNavigator = new StackNavigator();
 		addChild(screenNavigator);
 	}
 	
+	private function ready():Void
+	{
+		
+	}
+	
 	/**
 	   
 	**/
-	private function initUI():Void
+	private function registerExposedValuesUI():Void
 	{
 		ValEdit.registerUIClass(ExposedBitmap, FeathersFactories.exposedBitmap);
 		ValEdit.registerUIClass(ExposedBitmapData, FeathersFactories.exposedBitmapData);
@@ -129,6 +139,11 @@ class ValEditorBaseFeathers extends Application
 		ValEdit.registerUIClass(ExposedString, FeathersFactories.exposedString);
 		ValEdit.registerUIClass(ExposedText, FeathersFactories.exposedText);
 		ValEdit.registerUIClass(ExposedTextAsset, FeathersFactories.exposedTextAsset);
+		
+		#if desktop
+		ValEdit.registerUIClass(ExposedFilePath, FeathersFactories.exposedFilePath);
+		ValEdit.registerUIClass(ExposedPath, FeathersFactories.exposedPath);
+		#end
 		
 		#if starling
 		ValEdit.registerUIClass(ExposedStarlingAtlas, FeathersFactories.exposedStarlingAtlas);
