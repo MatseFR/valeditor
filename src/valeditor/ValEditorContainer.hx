@@ -18,8 +18,8 @@ import starling.events.TouchPhase;
 import valedit.ObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
-import valedit.ValEditObject;
 import valedit.util.RegularPropertyName;
+import valeditor.events.LayerEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;
 import valeditor.ui.IInteractiveObject;
@@ -31,9 +31,16 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorContainer extends ValEditContainer implements IAnimatable
+class ValEditorContainer extends ValEditContainer implements IAnimatable implements IValEditorContainer
 {
 	public var isOpen(get, never):Bool;
+	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
+	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	public var viewCenterX(get, set):Float;
+	public var viewCenterY(get, set):Float;
+	public var viewHeight(get, set):Float;
+	public var viewWidth(get, set):Float;
+	
 	private var _isOpen:Bool;
 	private function get_isOpen():Bool { return this._isOpen; }
 	
@@ -88,23 +95,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		return value;
 	}
 	
-	public var viewWidth(get, set):Float;
-	private var _viewWidth:Float = 0;
-	private function get_viewWidth():Float { return this._viewWidth; }
-	private function set_viewWidth(value:Float):Float
-	{
-		return this._viewWidth = value;
-	}
-	
-	public var viewHeight(get, set):Float;
-	private var _viewHeight:Float = 0;
-	private function get_viewHeight():Float { return this._viewHeight; }
-	private function set_viewHeight(value:Float):Float
-	{
-		return this._viewHeight = value;
-	}
-	
-	public var viewCenterX(get, set):Float;
 	private var _viewCenterX:Float = 0;
 	private function get_viewCenterX():Float { return this._viewCenterX; }
 	private function set_viewCenterX(value:Float):Float
@@ -113,7 +103,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		return this._viewCenterX;
 	}
 	
-	public var viewCenterY(get, set):Float;
 	private var _viewCenterY:Float = 0;
 	private function get_viewCenterY():Float { return this._viewCenterY; }
 	private function set_viewCenterY(value:Float):Float
@@ -122,8 +111,19 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		return this._viewCenterX;
 	}
 	
-	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
-	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	private var _viewHeight:Float = 0;
+	private function get_viewHeight():Float { return this._viewHeight; }
+	private function set_viewHeight(value:Float):Float
+	{
+		return this._viewHeight = value;
+	}
+	
+	private var _viewWidth:Float = 0;
+	private function get_viewWidth():Float { return this._viewWidth; }
+	private function set_viewWidth(value:Float):Float
+	{
+		return this._viewWidth = value;
+	}
 	
 	private var _containerUI:Sprite = new Sprite();
 	private var _pivotIndicator:PivotIndicator = new PivotIndicator(UIConfig.CONTAINER_PIVOT_SIZE, UIConfig.CONTAINER_PIVOT_COLOR,
@@ -134,8 +134,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 	private var _mouseObject:ValEditorObject;
 	private var _mouseObjectOffsetX:Float;
 	private var _mouseObjectOffsetY:Float;
-	private var _mouseObjectRestoreX:Float;
-	private var _mouseObjectRestoreY:Float;
 	
 	private var _selection:ValEditorObjectGroup = new ValEditorObjectGroup();
 	
@@ -156,6 +154,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		this._containerUI.addChild(this._pivotIndicator);
 		var layer:ValEditorLayer = new ValEditorLayer();
 		addLayer(layer);
+		this.currentLayer = layer;
+	}
+	
+	override public function clear():Void
+	{
+		
+		super.clear();
 	}
 	
 	public function adjustView():Void
@@ -202,24 +207,22 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		super.removeLayer(layer);
 	}
 	
-	override public function add(object:ValEditObject):Void 
+	override function layer_objectAdded(evt:LayerEvent):Void 
 	{
-		super.add(object);
+		super.layer_objectAdded(evt);
 		
-		var editorObject:ValEditorObject = cast object;
+		var editorObject:ValEditorObject = cast evt.object;
 		
 		editorObject.container = this;
 		
-		switch (object.objectType)
+		switch (editorObject.objectType)
 		{
 			case ObjectType.DISPLAY_OPENFL :
-				this._container.addChild(cast editorObject.interactiveObject);
 				var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
 				dispatcher.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
 			
 			#if starling
 			case ObjectType.DISPLAY_STARLING :
-				this._containerStarling.addChild(cast editorObject.interactiveObject);
 				var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
 				starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
 			#end
@@ -228,31 +231,32 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 				// nothing here
 			
 			default :
-				throw new Error("ValEditorContainer.add ::: unknown object type " + object.objectType);
+				throw new Error("ValEditorContainer.layer_objectAdded ::: unknown object type " + editorObject.objectType);
 		}
 		
-		this._interactiveObjectToValEditObject.set(editorObject.interactiveObject, editorObject);
+		if (editorObject.interactiveObject != null)
+		{
+			this._interactiveObjectToValEditObject.set(editorObject.interactiveObject, editorObject);
+		}
 		this.objectCollection.add(editorObject);
 	}
 	
-	override public function remove(object:ValEditObject):Void 
+	override function layer_objectRemoved(evt:LayerEvent):Void 
 	{
-		super.remove(object);
+		super.layer_objectRemoved(evt);
 		
-		var editorObject:ValEditorObject = cast object;
+		var editorObject:ValEditorObject = cast evt.object;
 		
 		editorObject.container = null;
 		
-		switch (object.objectType)
+		switch (editorObject.objectType)
 		{
 			case ObjectType.DISPLAY_OPENFL :
-				this._container.removeChild(cast editorObject.interactiveObject);
 				var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
 				dispatcher.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
 			
 			#if starling
 			case ObjectType.DISPLAY_STARLING :
-				this._containerStarling.removeChild(cast editorObject.interactiveObject);
 				var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
 				starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
 			#end
@@ -261,10 +265,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 				// nothing here
 			
 			default :
-				throw new Error("ValEditorContainer.remove ::: unknown object type " + object.objectType);
+				throw new Error("ValEditorContainer.layer_objectRemoved ::: unknown object type " + editorObject.objectType);
 		}
 		
-		this._interactiveObjectToValEditObject.remove(editorObject.interactiveObject);
+		if (editorObject.interactiveObject != null)
+		{
+			this._interactiveObjectToValEditObject.remove(editorObject.interactiveObject);
+		}
 		this.objectCollection.remove(editorObject);
 	}
 	
@@ -308,19 +315,31 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		this._selection.isMouseDown = true;
 		this._mouseObjectOffsetX = evt.localX;
 		this._mouseObjectOffsetY = evt.localY;
-		this._mouseObjectRestoreX = this._mouseObject.getProperty(RegularPropertyName.X);
-		this._mouseObjectRestoreY = this._mouseObject.getProperty(RegularPropertyName.Y);
-		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
 		
-		cast(this._mouseObject.interactiveObject, EventDispatcher).addEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
-		cast(this._mouseObject.interactiveObject, EventDispatcher).addEventListener(MouseEvent.RELEASE_OUTSIDE, onObjectMouseUpOutside);
+		if (this._selection.hasObject(this._mouseObject))
+		{
+			for (object in this._selection)
+			{
+				object.mouseRestoreX = object.getProperty(RegularPropertyName.X);
+				object.mouseRestoreY = object.getProperty(RegularPropertyName.Y);
+			}
+		}
+		else
+		{
+			this._mouseObject.mouseRestoreX = this._mouseObject.getProperty(RegularPropertyName.X);
+			this._mouseObject.mouseRestoreY = this._mouseObject.getProperty(RegularPropertyName.Y);
+		}
+		
+		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
+		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
+		Lib.current.stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 	}
 	
 	private function onObjectMouseUp(evt:MouseEvent):Void
 	{
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
-		cast(this._mouseObject.interactiveObject, EventDispatcher).removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
-		cast(this._mouseObject.interactiveObject, EventDispatcher).removeEventListener(MouseEvent.RELEASE_OUTSIDE, onObjectMouseUpOutside);
+		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
+		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 		
 		if ((this._mouseDownWithCtrl && evt.ctrlKey) || (this._mouseDownWithShift && evt.shiftKey))
 		{
@@ -341,6 +360,24 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		this._mouseObject.isMouseDown = false;
 		this._selection.isMouseDown = false;
 		
+		if (ValEditor.isMouseOverUI)
+		{
+			// release outside
+			if (this._selection.hasObject(this._mouseObject))
+			{
+				for (obj in this._selection)
+				{
+					obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+					obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+				}
+			}
+			else
+			{
+				this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObject.mouseRestoreX);
+				this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObject.mouseRestoreY);
+			}
+		}
+		
 		this._mouseObject = null;
 		
 		for (obj in this._selection)
@@ -350,24 +387,37 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 		}
 	}
 	
-	private function onObjectMouseUpOutside(evt:MouseEvent):Void
+	private function onObjectRightMouseUp(evt:MouseEvent):Void
 	{
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
-		cast(this._mouseObject.interactiveObject, EventDispatcher).removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
-		cast(this._mouseObject.interactiveObject, EventDispatcher).removeEventListener(MouseEvent.RELEASE_OUTSIDE, onObjectMouseUpOutside);
+		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
+		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 		
 		this._mouseObject.isMouseDown = false;
 		this._selection.isMouseDown = false;
 		
-		if (!this._selection.hasObject(this._mouseObject))
+		// cancel move
+		if (this._selection.hasObject(this._mouseObject))
 		{
-			ValEditor.selection.object = this._mouseObject;
+			for (obj in this._selection)
+			{
+				obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+				obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+			}
+		}
+		else
+		{
+			this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObject.mouseRestoreX);
+			this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObject.mouseRestoreY);
 		}
 		
-		this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObjectRestoreX);
-		this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObjectRestoreY);
-		
 		this._mouseObject = null;
+		
+		for (obj in this._selection)
+		{
+			obj.selectionBox.objectUpdate(obj);
+			obj.pivotIndicator.objectUpdate(obj);
+		}
 	}
 	
 	private function onObjectMouseMove(evt:MouseEvent):Void
@@ -425,15 +475,30 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 				this._mouseObjectOffsetX = _pt.x;
 				this._mouseObjectOffsetY = _pt.y;
 			}
-			this._mouseObjectRestoreX = this._mouseObject.getProperty(RegularPropertyName.X);
-			this._mouseObjectRestoreY = this._mouseObject.getProperty(RegularPropertyName.Y);
+			
+			if (this._selection.hasObject(this._mouseObject))
+			{
+				for (obj in this._selection)
+				{
+					obj.mouseRestoreX = obj.getProperty(RegularPropertyName.X);
+					obj.mouseRestoreY = obj.getProperty(RegularPropertyName.Y);
+				}
+			}
+			else
+			{
+				this._mouseObject.mouseRestoreX = this._mouseObject.getProperty(RegularPropertyName.X);
+				this._mouseObject.mouseRestoreY = this._mouseObject.getProperty(RegularPropertyName.Y);
+			}
+			
 			Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
+			Lib.current.stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 		}
 		else if (touch.phase == TouchPhase.ENDED)
 		{
 			if (this._mouseObject == null) return;
 			
 			Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
+			Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 			
 			if ((this._mouseDownWithCtrl && evt.ctrlKey) || (this._mouseDownWithShift && evt.shiftKey))
 			{
@@ -457,8 +522,19 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable
 			if (ValEditor.isMouseOverUI)
 			{
 				// release outside
-				this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObjectRestoreX);
-				this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObjectRestoreY);
+				if (this._selection.hasObject(this._mouseObject))
+				{
+					for (obj in this._selection)
+					{
+						obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+						obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+					}
+				}
+				else
+				{
+					this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObject.mouseRestoreX);
+					this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObject.mouseRestoreY);
+				}
 			}
 			
 			this._mouseObject = null;
