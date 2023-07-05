@@ -116,10 +116,12 @@ class IntRangeUI extends ValueUI
 	{
 		super.initExposedValue();
 		this._label.text = this._exposedValue.name;
+		
 		this._slider.minimum = this._intRange.min;
 		this._slider.maximum = this._intRange.max;
 		this._slider.step = this._intRange.step;
 		this._slider.snapInterval = this._intRange.step;
+		
 		this._input.variant = this._intRange.inputVariant;
 		if (this._intRange.min < 0)
 		{
@@ -129,20 +131,13 @@ class IntRangeUI extends ValueUI
 		{
 			this._input.restrict = "0123456789";
 		}
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
-		}
+		
 		updateEditable();
 	}
 	
@@ -172,9 +167,9 @@ class IntRangeUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._slider.enabled = this._exposedValue.isEditable;
-		this._input.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._slider.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -185,6 +180,7 @@ class IntRangeUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._slider.removeEventListener(Event.CHANGE, onSliderChange);
@@ -194,6 +190,7 @@ class IntRangeUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._slider.addEventListener(Event.CHANGE, onSliderChange);
