@@ -19,6 +19,7 @@ import valeditor.ui.feathers.theme.simple.SimpleTheme;
  */
 class NumericDraggerStyles 
 {
+	static public var LINE_BMD_DISABLED:BitmapData;
 	static public var LINE_BMD_DRAG:BitmapData;
 	static public var LINE_BMD_HOVER:BitmapData;
 	static public var LINE_BMD_UP:BitmapData;
@@ -50,6 +51,13 @@ class NumericDraggerStyles
 	
 	static private function colorUpdate(theme:SimpleTheme):Void
 	{
+		if (LINE_BMD_DISABLED == null)
+		{
+			LINE_BMD_DISABLED = new BitmapData(2, 1, true, 0xffffffff);
+		}
+		LINE_BMD_DISABLED.setPixel(0, 0, theme.contrastColorLighter);
+		LINE_BMD_DISABLED.setPixel32(1, 0, 0x00ff0000);
+		
 		if (LINE_BMD_DRAG == null)
 		{
 			LINE_BMD_DRAG = new BitmapData(2, 1, true, 0xffffffff);
@@ -88,6 +96,11 @@ class NumericDraggerStyles
 		labelSkin.fill = null;
 		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_DRAG, null, true);
 		dragger.setLabelSkinForState(NumericDraggerState.DRAG, labelSkin);
+		
+		labelSkin = new UnderlineSkin();
+		labelSkin.fill = null;
+		labelSkin.border = LineStyle.Bitmap(1, LINE_BMD_DISABLED, null, true);
+		dragger.setLabelSkinForState(NumericDraggerState.DISABLED, labelSkin);
 		
 		var skin:RectangleSkin = new RectangleSkin();
 		skin.fill = theme.getAlternFill();
