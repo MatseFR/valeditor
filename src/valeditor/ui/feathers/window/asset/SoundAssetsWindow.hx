@@ -33,7 +33,6 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		super();
 	}
 	
-	@:access(valedit.asset.AssetLib)
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -46,7 +45,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		this._filterList = [new FileFilter("Sounds (*.ogg, *.wav)", "*.ogg;*.wav")];
 		#end
 		
-		this._assetList.dataProvider = AssetLib._soundCollection;
+		this._assetList.dataProvider = AssetLib.soundCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new SoundAssetItemRenderer();
