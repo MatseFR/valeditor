@@ -13,6 +13,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import valeditor.ValEditor;
+import valeditor.events.EditorEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -67,11 +68,11 @@ class ObjectLibrary extends LayoutGroup
 		this._footer.addChild(this._objectRenameButton);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("id", (item)->item.id),
+			new GridViewColumn("id", (item)->cast(item, ValEditorObject).id),
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
-		this._grid = new GridView(ValEditor.objectCollection, columns, onGridChange);
+		this._grid = new GridView(null, columns, onGridChange);
 		this._grid.variant = GridView.VARIANT_BORDERLESS;
 		this._grid.allowMultipleSelection = true;
 		this._grid.resizableColumns = true;
@@ -79,7 +80,18 @@ class ObjectLibrary extends LayoutGroup
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
 		
+		if (ValEditor.currentContainer != null)
+		{
+			this._grid.dataProvider = ValEditor.currentContainer.objectCollection;
+		}
+		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onEditorContainerOpen);
+	}
+	
+	private function onEditorContainerOpen(evt:EditorEvent):Void
+	{
+		this._grid.dataProvider = evt.object.objectCollection;
 	}
 	
 	private function onObjectAddButton(evt:TriggerEvent):Void
