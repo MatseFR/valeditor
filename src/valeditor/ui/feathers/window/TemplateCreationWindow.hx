@@ -23,6 +23,7 @@ import valedit.ValEdit;
 import valeditor.ValEditorTemplate;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
@@ -72,12 +73,12 @@ class TemplateCreationWindow extends Panel
 	private var _categoryControlsGroup:LayoutGroup;
 	private var _categoryPicker:ComboBox;
 	private var _categoryClearButton:Button;
-	private var _categoryCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _categoryCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
-	private var _classCollection:ArrayCollection<String> = new ArrayCollection<String>();
+	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	
 	private var _idGroup:LayoutGroup;
 	private var _idLabel:Label;
@@ -86,6 +87,8 @@ class TemplateCreationWindow extends Panel
 	private var _constructorGroup:LayoutGroup;
 	private var _constructorLabel:Label;
 	private var _constructorContainer:ScrollContainer;
+	private var _constructorButtonGroup:LayoutGroup;
+	private var _constructorDefaultsButton:Button;
 	
 	private var _valEditClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
@@ -152,6 +155,9 @@ class TemplateCreationWindow extends Panel
 		
 		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
+		this._categoryPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._categoryControlsGroup.addChild(this._categoryPicker);
 		
 		this._categoryClearButton = new Button("X", onCategoryClear);
@@ -170,6 +176,9 @@ class TemplateCreationWindow extends Panel
 		this._classGroup.addChild(this._classLabel);
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
+		this._classPicker.itemToText = function(item:Dynamic):String {
+			return item.value;
+		};
 		this._classGroup.addChild(this._classPicker);
 		
 		// ID
@@ -208,11 +217,22 @@ class TemplateCreationWindow extends Panel
 		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
 		this._constructorContainer.layout = vLayout;
 		this._constructorGroup.addChild(this._constructorContainer);
+		
+		this._constructorButtonGroup = new LayoutGroup();
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.paddingTop = Spacing.VERTICAL_GAP;
+		this._constructorButtonGroup.layout = vLayout;
+		this._constructorGroup.addChild(this._constructorButtonGroup);
+		
+		this._constructorDefaultsButton = new Button("Restore constructor defaults", onConstructorDefaultsButton);
+		this._constructorButtonGroup.addChild(this._constructorDefaultsButton);
 	}
 	
-	public function reset(?allowedClassNames:Array<String>, ?allowedCategories:Array<String>):Void
+	public function reset(?allowedClassNames:Array<StringData>, ?allowedCategories:Array<StringData>):Void
 	{
-		var selectedItem:String = this._classPicker.selectedItem;
+		var selectedItem:StringData = this._classPicker.selectedItem;
 		if (allowedClassNames != null && allowedClassNames.length != 0)
 		{
 			this._classCollection.array = allowedClassNames;
@@ -254,6 +274,7 @@ class TemplateCreationWindow extends Panel
 		{
 			this._idInput.errorString = null;
 		}
+		this._constructorDefaultsButton.enabled = this._constructorCollection != null;
 		this._confirmButton.enabled = isValid;
 	}
 	
@@ -322,6 +343,11 @@ class TemplateCreationWindow extends Panel
 	private function onIDInputChange(evt:Event):Void
 	{
 		checkValid();
+	}
+	
+	private function onConstructorDefaultsButton(evt:TriggerEvent):Void
+	{
+		this._constructorCollection.restoreDefaultValues();
 	}
 	
 }
