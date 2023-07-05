@@ -113,6 +113,7 @@ class FloatUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = this._exposedValue.name;
+		
 		this._input.variant = this._floatValue.inputVariant;
 		switch (this._floatValue.numericMode)
 		{
@@ -122,20 +123,13 @@ class FloatUI extends ValueUI
 			default :
 				this._input.restrict = "-0123456789.";
 		}
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
-		}
+		
 		updateEditable();
 	}
 	
@@ -163,8 +157,8 @@ class FloatUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._input.enabled = this._exposedValue.isEditable;
-		this._nullButton.enabled = this._exposedValue.isEditable;
+		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -175,6 +169,7 @@ class FloatUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._input.removeEventListener(Event.CHANGE, onInputChange);
@@ -183,6 +178,7 @@ class FloatUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._input.addEventListener(Event.CHANGE, onInputChange);
