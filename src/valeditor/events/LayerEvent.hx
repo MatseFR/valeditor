@@ -15,16 +15,16 @@ class LayerEvent extends Event
 	inline static public var RENAMED:String = "renamed";
 	
 	#if !flash
-	private static var _POOL:Array<LayerEvent> = new Array<LayerEvent>();
+	static private var _POOL:Array<LayerEvent> = new Array<LayerEvent>();
 	
-	private static function fromPool(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool, cancelable:Bool):LayerEvent
+	static private function fromPool(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool, cancelable:Bool):LayerEvent
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(type, layer, object, bubbles, cancelable);
 		return new LayerEvent(type, layer, object, bubbles, cancelable);
 	}
 	#end
 	
-	static public function dispatch(dispatcher:IEventDispatcher, type:String, layer:ValEditLayer, object:ValEditObject,
+	static public function dispatch(dispatcher:IEventDispatcher, type:String, layer:ValEditLayer, object:ValEditObject = null,
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
@@ -40,7 +40,7 @@ class LayerEvent extends Event
 	public var layer(default, null):ValEditLayer;
 	public var object(default, null):ValEditObject;
 
-	public function new(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool = false, cancelable:Bool = false) 
+	public function new(type:String, layer:ValEditLayer, object:ValEditObject = null, bubbles:Bool = false, cancelable:Bool = false) 
 	{
 		super(type, bubbles, cancelable);
 		this.layer = layer;
