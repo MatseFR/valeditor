@@ -16,7 +16,6 @@ import feathers.utils.ExclusivePointer;
 import feathers.utils.MathUtil;
 import haxe.ds.Map;
 import openfl.display.DisplayObject;
-import openfl.display.Stage;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
@@ -49,7 +48,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	public var isIntValue(get, set):Bool;
 	public var liveDragging:Bool = true;
 	/** if false, input will only set the value when pressing ENTER key (default is true) */
-	public var liveInput:Bool = true;
+	public var liveTyping:Bool = true;
 	public var maximum(get, set):Float;
 	public var minimum(get, set):Float;
 	/** this property exists to allow adjusting the drag to a zoom level or something similar */
@@ -410,7 +409,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		
 		if (dataInvalid)
 		{
-			#if flash // TODO : check if other targets do weird things with float values
+			#if (flash || html5) // TODO : check if other targets do weird things with float values
 			var str:String = Std.string(MathUtil.roundToPrecision(this._value, this._floatPrecision));
 			#else
 			var str:String = Std.string(this._value);
@@ -746,7 +745,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function input_changeHandler(evt:Event):Void
 	{
-		if (!this._inputHasFocus || !this.liveInput) return;
+		if (!this._inputHasFocus || !this.liveTyping) return;
 		
 		if (this._input.text == "") return;
 		this.value = restrictValue(Std.parseFloat(this._input.text));
@@ -773,7 +772,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	{
 		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
 		{
-			if (!this.liveInput && this._input.text != "")
+			if (!this.liveTyping && this._input.text != "")
 			{
 				this.value = restrictValue(Std.parseFloat(this._input.text));
 			}
