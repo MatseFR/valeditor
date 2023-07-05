@@ -12,6 +12,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import valeditor.ValEditorTemplate;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -66,7 +67,7 @@ class TemplateLibrary extends LayoutGroup
 		this._footer.addChild(this._templateRenameButton);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("id", (item)->item.id),
+			new GridViewColumn("id", (item)->cast(item, ValEditorTemplate).id),
 			new GridViewColumn("class", (item)->item.className),
 			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);
