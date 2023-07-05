@@ -26,7 +26,7 @@ class EditorEvent extends Event
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
-		return dispatcher.dispatchEvent(new EditorEvent(type, object, bubbles, cancelable);
+		return dispatcher.dispatchEvent(new EditorEvent(type, object, bubbles, cancelable));
 		#else
 		var event:EditorEvent = fromPool(type, object, bubbles, cancelable);
 		var result:Bool = dispatcher.dispatchEvent(event);
