@@ -113,20 +113,13 @@ class StringUI extends ValueUI
 		this._input.restrict = this._stringValue.restrict;
 		this._input.maxChars = this._stringValue.maxChars;
 		cast(this._input.layoutData, HorizontalLayoutData).percentWidth = this._stringValue.inputPercentWidth;
-		if (this._exposedValue.isNullable)
+		
+		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
+		if (this._exposedValue.isNullable && !this._readOnly)
 		{
-			if (this._nullGroup.parent == null)
-			{
-				addChild(this._nullGroup);
-			}
+			addChild(this._nullGroup);
 		}
-		else
-		{
-			if (this._nullGroup.parent != null)
-			{
-				removeChild(this._nullGroup);
-			}
-		}
+		
 		updateEditable();
 	}
 	
@@ -145,7 +138,8 @@ class StringUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this._input.enabled = this._exposedValue.isEditable;
+		this._label.enabled = this._exposedValue.isEditable;
+		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -156,6 +150,7 @@ class StringUI extends ValueUI
 	
 	override function controlsDisable():Void
 	{
+		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._input.removeEventListener(Event.CHANGE, onInputChange);
@@ -166,6 +161,7 @@ class StringUI extends ValueUI
 	
 	override function controlsEnable():Void
 	{
+		if (this._readOnly) return;
 		if (_controlsEnabled) return;
 		super.controlsEnable();
 		this._input.addEventListener(Event.CHANGE, onInputChange);
