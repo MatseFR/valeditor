@@ -11,6 +11,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
@@ -158,6 +159,8 @@ class ComboUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
+		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
+		this._list.removeEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -167,7 +170,19 @@ class ComboUI extends ValueUI
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._list.addEventListener(Event.CHANGE, onListChange);
+		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
+		this._list.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+	}
+	
+	private function onComboKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onComboKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onListChange(evt:Event):Void
