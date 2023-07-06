@@ -12,15 +12,10 @@ class PivotIndicator extends Shape
 {
 	static private var _POOL:Array<PivotIndicator> = new Array<PivotIndicator>();
 	
-	static public function fromPool():PivotIndicator
+	static public function fromPool(size:Float = 5, color:Int = 0x000000, alpha:Float = 1, outlineColor:Int = 0xffffff, outlineAlpha:Float = 1):PivotIndicator
 	{
-		if (_POOL.length != 0) return _POOL.pop();
-		return new PivotIndicator();
-	}
-	
-	static public function toPool(pivot:PivotIndicator):Void
-	{
-		_POOL.push(pivot);
+		if (_POOL.length != 0) return _POOL.pop().setTo(size, color, alpha, outlineColor, outlineAlpha);
+		return new PivotIndicator(size, color, alpha, outlineColor, outlineAlpha);
 	}
 	
 	private var _interestMap:Map<String, Bool>;
@@ -35,10 +30,16 @@ class PivotIndicator extends Shape
 		this._interestMap.set(RegularPropertyName.PIVOT_X, true);
 		this._interestMap.set(RegularPropertyName.PIVOT_Y, true);
 		
-		//var left:Float = -4;
-		//var right:Float = 5;
-		//var top:Float = -4;
-		//var bottom:Float = 5;
+		this.setTo(size, color, alpha, outlineColor, outlineAlpha);
+	}
+	
+	public function pool():Void
+	{
+		_POOL[_POOL.length] = this;
+	}
+	
+	private function setTo(size:Float, color:Int, alpha:Float, outlineColor:Int, outlineAlpha:Float):PivotIndicator
+	{
 		var left:Float = -(size-1);
 		var right:Float = size;
 		var top:Float = -(size-1);
@@ -71,6 +72,8 @@ class PivotIndicator extends Shape
 		this.graphics.moveTo(0.5, top);
 		this.graphics.lineTo(0.5, bottom);
 		this.graphics.endFill();
+		
+		return this;
 	}
 	
 	public function hasInterestIn(regularPropertyName:String):Bool
@@ -82,11 +85,6 @@ class PivotIndicator extends Shape
 	{
 		this.x = object.getProperty(RegularPropertyName.X);
 		this.y = object.getProperty(RegularPropertyName.Y);
-	}
-	
-	public function pool():Void
-	{
-		toPool(this);
 	}
 	
 }
