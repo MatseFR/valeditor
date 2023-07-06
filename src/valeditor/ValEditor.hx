@@ -427,8 +427,6 @@ class ValEditor
 	{
 		ValEdit.registerObjectInternal(valObject);
 		
-		//objectCollection.add(valObject);
-		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.add(valObject);
 		
@@ -481,22 +479,22 @@ class ValEditor
 	{
 		if (valObject.clss.disposeFunctionName != null)
 		{
-			var func:Function = Reflect.field(valObject.realObject, valObject.clss.disposeFunctionName);
-			Reflect.callMethod(valObject.realObject, func, []);
+			var func:Function = Reflect.field(valObject.object, valObject.clss.disposeFunctionName);
+			Reflect.callMethod(valObject.object, func, []);
 		}
 		else if (valObject.clss.disposeCustom != null)
 		{
-			Reflect.callMethod(valObject.clss.disposeCustom, valObject.clss.disposeCustom, [valObject.realObject]);
+			Reflect.callMethod(valObject.clss.disposeCustom, valObject.clss.disposeCustom, [valObject.object]);
 		}
 		
 		unregisterObjectInternal(valObject);
+		
+		valObject.pool();
 	}
 	
 	static private function unregisterObjectInternal(valObject:ValEditorObject):Void
 	{
 		ValEdit.unregisterObjectInternal(valObject);
-		
-		//objectCollection.remove(valObject);
 		
 		valObject.container.remove(valObject);
 		
@@ -556,14 +554,7 @@ class ValEditor
 		}
 		else
 		{
-			if (clss.proxyPropertyMap != null)
-			{
-				return clss.proxyPropertyMap.hasPropertyRegular(propertyName);
-			}
-			else
-			{
-				return clss.propertyMap.hasPropertyRegular(propertyName);
-			}
+			return clss.propertyMap.hasPropertyRegular(propertyName);
 		}
 	}
 	
