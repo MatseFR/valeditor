@@ -19,6 +19,14 @@ import valeditor.ui.shape.PivotIndicator;
  */
 class ValEditorObject extends ValEditObject 
 {
+	static private var _POOL:Array<ValEditorObject> = new Array<ValEditorObject>();
+	
+	static public function fromPool(clss:ValEditClass, ?id:String):ValEditorObject
+	{
+		if (_POOL.length != 0) return cast _POOL.pop().setTo(clss, id);
+		return new ValEditorObject(clss, id);
+	}
+	
 	public var collection(get, set):ExposedCollection;
 	public var container(get, set):IValEditContainer;
 	public var getBoundsFunctionName(get, set):String;
@@ -58,7 +66,7 @@ class ValEditorObject extends ValEditObject
 	private function set_getBoundsFunctionName(value:String):String
 	{
 		if (value == this._getBoundsFunctionName) return value;
-		if (this.object != null)
+		if (this.object != null && value != null)
 		{
 			this._boundsFunction = Reflect.field(this.object, value);
 		}
@@ -113,6 +121,34 @@ class ValEditorObject extends ValEditObject
 	public function new(clss:ValEditClass, ?id:String) 
 	{
 		super(clss, id);
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		
+		this.collection = null;
+		if (this._interactiveObject != null)
+		{
+			this._interactiveObject.pool();
+			this._interactiveObject = null;
+		}
+		if (this._pivotIndicator != null)
+		{
+			this._pivotIndicator.pool();
+			this._pivotIndicator = null;
+		}
+		if (this._selectionBox != null)
+		{
+			this._selectionBox.pool();
+			this._selectionBox = null;
+		}
+	}
+	
+	override public function pool():Void 
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override public function ready():Void 
@@ -179,12 +215,12 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			if (this.realObject != this.object)
-			{
-				this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
-				if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
-				Reflect.setProperty(this.realObject, this._realPropertyName, Reflect.getProperty(this.realObject, this._realPropertyName) + value);
-			}
+			//if (this.realObject != this.object)
+			//{
+				//this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
+				//if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
+				//Reflect.setProperty(this.realObject, this._realPropertyName, Reflect.getProperty(this.realObject, this._realPropertyName) + value);
+			//}
 			
 			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
 			{
@@ -221,12 +257,12 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			if (this.realObject != this.object)
-			{
-				this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
-				if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
-				Reflect.setProperty(this.realObject, this._realPropertyName, value);
-			}
+			//if (this.realObject != this.object)
+			//{
+				//this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
+				//if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
+				//Reflect.setProperty(this.realObject, this._realPropertyName, value);
+			//}
 			
 			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
 			{
