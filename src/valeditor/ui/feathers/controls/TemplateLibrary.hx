@@ -12,6 +12,8 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
+import openfl.events.KeyboardEvent;
 import valeditor.ValEditorTemplate;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
@@ -73,6 +75,10 @@ class TemplateLibrary extends LayoutGroup
 		]);
 		
 		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);
+		this._grid.addEventListener(KeyboardEvent.KEY_DOWN, onGridKeyDown);
+		this._grid.addEventListener(KeyboardEvent.KEY_UP, onGridKeyUp);
+		this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
+		this._grid.addEventListener(FocusEvent.FOCUS_OUT, onGridFocusOut);
 		this._grid.variant = GridView.VARIANT_BORDERLESS;
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;
@@ -114,6 +120,26 @@ class TemplateLibrary extends LayoutGroup
 			this._templateRemoveButton.enabled = false;
 			this._templateRenameButton.enabled = false;
 		}
+	}
+	
+	private function onGridFocusIn(evt:FocusEvent):Void
+	{
+		this._grid.showFocus(false);
+	}
+	
+	private function onGridFocusOut(evt:FocusEvent):Void
+	{
+		this._grid.showFocus(false);
+	}
+	
+	private function onGridKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onGridKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onObjectSelectionChange(evt:SelectionEvent):Void
