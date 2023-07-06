@@ -12,15 +12,10 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 {
 	static private var _POOL:Array<InteractiveObjectStarlingVisible> = new Array<InteractiveObjectStarlingVisible>();
 	
-	static public function fromPool():InteractiveObjectStarlingVisible
+	static public function fromPool(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarlingVisible
 	{
-		if (_POOL.length != 0) return _POOL.pop();
-		return new InteractiveObjectStarlingVisible();
-	}
-	
-	static public function toPool(object:InteractiveObjectStarlingVisible):Void
-	{
-		_POOL.push(object);
+		if (_POOL.length != 0) return _POOL.pop().setTo(minWidth, minHeight);
+		return new InteractiveObjectStarlingVisible(minWidth, minHeight);
 	}
 	
 	public var minWidth(get, set):Float;
@@ -28,6 +23,7 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	private function get_minWidth():Float { return this._minWidth; }
 	private function set_minWidth(value:Float):Float
 	{
+		if (this._minWidth == value) return value;
 		this._minWidth = value;
 		if (this.width < this._minWidth)
 		{
@@ -41,6 +37,7 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	private function get_minHeight():Float { return this._minHeight; }
 	private function set_minHeight(value:Float):Float
 	{
+		if (this._minHeight == value) return value;
 		this._minHeight = value;
 		if (this.height < this._minHeight)
 		{
@@ -69,12 +66,6 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	{
 		super();
 		
-		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
-		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
-		
-		this._minWidth = minWidth;
-		this._minHeight = minHeight;
-		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);
 		this._interestMap.set(RegularPropertyName.Y, true);
@@ -85,6 +76,24 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		this._interestMap.set(RegularPropertyName.SCALE_Y, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		
+		this.setTo(minWidth, minHeight);
+	}
+	
+	public function pool():Void
+	{
+		_POOL[_POOL.length] = this;
+	}
+	
+	private function setTo(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarlingVisible
+	{
+		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
+		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
+		
+		this.minWidth = minWidth;
+		this.minHeight = minHeight;
+		
+		return this;
 	}
 	
 	public function hasInterestIn(regularPropertyName:String):Bool
@@ -155,11 +164,6 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		{
 			this.rotation = MathUtil.deg2rad(rotation);
 		}
-	}
-	
-	public function pool():Void
-	{
-		toPool(this);
 	}
 	
 	private function refresh(width:Float, height:Float):Void

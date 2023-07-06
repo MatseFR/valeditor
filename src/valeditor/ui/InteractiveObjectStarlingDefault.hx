@@ -12,15 +12,10 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 {
 	static private var _POOL:Array<InteractiveObjectStarlingDefault> = new Array<InteractiveObjectStarlingDefault>();
 	
-	static public function fromPool():InteractiveObjectStarlingDefault
+	static public function fromPool(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarlingDefault
 	{
-		if (_POOL.length != 0) return _POOL.pop();
-		return new InteractiveObjectStarlingDefault();
-	}
-	
-	static public function toPool(object:InteractiveObjectStarlingDefault):Void
-	{
-		_POOL.push(object);
+		if (_POOL.length != 0) return _POOL.pop().setTo(minWidth, minHeight);
+		return new InteractiveObjectStarlingDefault(minWidth, minHeight);
 	}
 	
 	public var minWidth(get, set):Float;
@@ -28,6 +23,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 	private function get_minWidth():Float { return this._minWidth; }
 	private function set_minWidth(value:Float):Float
 	{
+		if (this._minWidth == value) return value;
 		this._minWidth = value;
 		if (this.width < this._minWidth)
 		{
@@ -41,6 +37,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 	private function get_minHeight():Float { return this._minHeight; }
 	private function set_minHeight(value:Float):Float
 	{
+		if (this._minHeight == value) return value;
 		this._minHeight = value;
 		if (this.height < this._minHeight)
 		{
@@ -67,13 +64,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 	
 	public function new(?minWidth:Float, ?minHeight:Float) 
 	{
-		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
-		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
-		
-		this._minWidth = minWidth;
-		this._minHeight = minHeight;
-		
-		super(minWidth, minHeight, 0xff0000);
+		super(1, 1, 0xff0000);
 		this.alpha = 0;
 		
 		this._interestMap = new Map<String, Bool>();
@@ -86,6 +77,24 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 		this._interestMap.set(RegularPropertyName.SCALE_Y, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		
+		this.setTo(minWidth, minHeight);
+	}
+	
+	public function pool():Void
+	{
+		_POOL[_POOL.length] = this;
+	}
+	
+	private function setTo(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarlingDefault
+	{
+		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
+		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
+		
+		this.minWidth = minWidth;
+		this.minHeight = minHeight;
+		
+		return this;
 	}
 	
 	public function hasInterestIn(regularPropertyName:String):Bool
@@ -156,11 +165,6 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 		{
 			this.rotation = MathUtil.deg2rad(rotation);
 		}
-	}
-	
-	public function pool():Void
-	{
-		toPool(this);
 	}
 	
 }

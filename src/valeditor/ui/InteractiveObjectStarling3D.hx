@@ -13,15 +13,10 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 {
 	static private var _POOL:Array<InteractiveObjectStarling3D> = new Array<InteractiveObjectStarling3D>();
 	
-	static public function fromPool():InteractiveObjectStarling3D
+	static public function fromPool(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarling3D
 	{
-		if (_POOL.length != 0) return _POOL.pop();
-		return new InteractiveObjectStarling3D();
-	}
-	
-	static public function toPool(object:InteractiveObjectStarling3D):Void
-	{
-		_POOL.push(object);
+		if (_POOL.length != 0) return _POOL.pop().setTo(minWidth, minHeight);
+		return new InteractiveObjectStarling3D(minWidth, minHeight);
 	}
 	
 	public var minWidth(get, set):Float;
@@ -29,6 +24,7 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	private function get_minWidth():Float { return this._minWidth; }
 	private function set_minWidth(value:Float):Float
 	{
+		if (this._minWidth == value) return value;
 		this._minWidth = value;
 		if (this._quad.width < this._minWidth)
 		{
@@ -42,6 +38,7 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	private function get_minHeight():Float { return this._minHeight; }
 	private function set_minHeight(value:Float):Float
 	{
+		if (this._minHeight == value) return value;
 		this._minHeight = value;
 		if (this._quad.height < this._minHeight)
 		{
@@ -71,16 +68,6 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	{
 		super();
 		
-		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
-		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
-		
-		this._minWidth = minWidth;
-		this._minHeight = minHeight;
-		
-		this._quad = new Quad(minWidth, minHeight, 0xff0000);
-		this._quad.alpha = 0.25;
-		addChild(this._quad);
-		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);
 		this._interestMap.set(RegularPropertyName.Y, true);
@@ -97,6 +84,28 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		this._interestMap.set(RegularPropertyName.SCALE_Z, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		
+		this._quad = new Quad(1, 1, 0xff0000);
+		this._quad.alpha = 0.25;
+		addChild(this._quad);
+		
+		this.setTo(minWidth, minHeight);
+	}
+	
+	public function pool():Void
+	{
+		_POOL[_POOL.length] = this;
+	}
+	
+	private function setTo(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarling3D
+	{
+		if (minWidth == null) minWidth = UIConfig.INTERACTIVE_OBJECT_MIN_WIDTH;
+		if (minHeight == null) minHeight = UIConfig.INTERACTIVE_OBJECT_MIN_HEIGHT;
+		
+		this.minWidth = minWidth;
+		this.minHeight = minHeight;
+		
+		return this;
 	}
 	
 	public function hasInterestIn(regularPropertyName:String):Bool
@@ -198,11 +207,6 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		}
 		
 		this.scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
-	}
-	
-	public function pool():Void
-	{
-		toPool(this);
 	}
 	
 }
