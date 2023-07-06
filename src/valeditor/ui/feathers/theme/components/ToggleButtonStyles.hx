@@ -61,6 +61,14 @@ class ToggleButtonStyles
 		btn.horizontalAlign = HorizontalAlign.LEFT;
 		btn.textFormat = theme.getTextFormat();
 		btn.textFormat.bold = true;
+		
+		if (btn.focusRectSkin == null)
+		{
+			skin = new RectangleSkin();
+			skin.fill = null;
+			skin.border = theme.getFocusBorder();
+			btn.focusRectSkin = skin;
+		}
 	}
 	
 	static private function panel(btn:ToggleButton):Void
@@ -94,6 +102,14 @@ class ToggleButtonStyles
 		var selectedIcon:Shape = new Shape();
 		drawDisclosureOpenIcon(selectedIcon, theme.contrastColor);
 		btn.selectedIcon = selectedIcon;
+		
+		if (btn.focusRectSkin == null)
+		{
+			skin = new RectangleSkin();
+			skin.fill = null;
+			skin.border = theme.getFocusBorder();
+			btn.focusRectSkin = skin;
+		}
 	}
 	
 	private static function drawDisclosureClosedIcon(icon:Shape, color:UInt):Void {
