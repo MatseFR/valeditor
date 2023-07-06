@@ -70,11 +70,33 @@ class ValEditorObjectGroup
 		return this._objects.remove(object);
 	}
 	
+	public function modifyDisplayProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
+	{
+		for (object in this._objects)
+		{
+			if (object.isDisplayObject)
+			{
+				object.modifyProperty(regularPropertyName, value, objectOnly, dispatchValueChange);
+			}
+		}
+	}
+	
 	public function modifyProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
 	{
 		for (object in this._objects)
 		{
 			object.modifyProperty(regularPropertyName, value, objectOnly, dispatchValueChange);
+		}
+	}
+	
+	public function setDisplayProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
+	{
+		for (object in this._objects)
+		{
+			if (object.isDisplayObject)
+			{
+				object.setProperty(regularPropertyName, value, objectOnly, dispatchValueChange);
+			}
 		}
 	}
 	

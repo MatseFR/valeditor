@@ -15,7 +15,7 @@ import openfl.geom.Point;
 import starling.events.Touch;
 import starling.events.TouchEvent;
 import starling.events.TouchPhase;
-import valedit.ObjectType;
+import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.util.RegularPropertyName;
@@ -215,23 +215,23 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		editorObject.container = this;
 		
-		switch (editorObject.objectType)
+		if (editorObject.isDisplayObject)
 		{
-			case ObjectType.DISPLAY_OPENFL :
-				var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
-				dispatcher.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-			
-			#if starling
-			case ObjectType.DISPLAY_STARLING :
-				var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
-				starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
-			#end
-			
-			case ObjectType.OTHER :
-				// nothing here
-			
-			default :
-				throw new Error("ValEditorContainer.layer_objectAdded ::: unknown object type " + editorObject.objectType);
+			switch (editorObject.displayObjectType)
+			{
+				case DisplayObjectType.OPENFL :
+					var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
+					dispatcher.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+				
+				#if starling
+				case DisplayObjectType.STARLING :
+					var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
+					starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
+				#end
+				
+				default :
+					throw new Error("ValEditorContainer.layer_objectAdded ::: unknown display object type " + editorObject.displayObjectType);
+			}
 		}
 		
 		if (editorObject.interactiveObject != null)
@@ -249,23 +249,23 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		editorObject.container = null;
 		
-		switch (editorObject.objectType)
+		if (editorObject.isDisplayObject)
 		{
-			case ObjectType.DISPLAY_OPENFL :
-				var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
-				dispatcher.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-			
-			#if starling
-			case ObjectType.DISPLAY_STARLING :
-				var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
-				starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
-			#end
-			
-			case ObjectType.OTHER :
-				// nothing here
-			
-			default :
-				throw new Error("ValEditorContainer.layer_objectRemoved ::: unknown object type " + editorObject.objectType);
+			switch (editorObject.displayObjectType)
+			{
+				case DisplayObjectType.OPENFL :
+					var dispatcher:EventDispatcher = cast editorObject.interactiveObject;
+					dispatcher.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+				
+				#if starling
+				case DisplayObjectType.STARLING :
+					var starlingDispatcher:starling.events.EventDispatcher = cast editorObject.interactiveObject;
+					starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
+				#end
+				
+				default :
+					throw new Error("ValEditorContainer.layer_objectRemoved ::: unknown display object type " + editorObject.displayObjectType);
+			}
 		}
 		
 		if (editorObject.interactiveObject != null)
@@ -320,8 +320,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			for (object in this._selection)
 			{
-				object.mouseRestoreX = object.getProperty(RegularPropertyName.X);
-				object.mouseRestoreY = object.getProperty(RegularPropertyName.Y);
+				if (object.isDisplayObject)
+				{
+					object.mouseRestoreX = object.getProperty(RegularPropertyName.X);
+					object.mouseRestoreY = object.getProperty(RegularPropertyName.Y);
+				}
 			}
 		}
 		else
@@ -367,8 +370,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			{
 				for (obj in this._selection)
 				{
-					obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
-					obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+					if (obj.isDisplayObject)
+					{
+						obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+						obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+					}
 				}
 			}
 			else
@@ -401,8 +407,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			for (obj in this._selection)
 			{
-				obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
-				obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+				if (obj.isDisplayObject)
+				{
+					obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+					obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+				}
 			}
 		}
 		else
@@ -429,18 +438,19 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._mouseDownWithCtrl = false;
 		this._mouseDownWithShift = false;
 		
+		var moveX:Float = Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
+		var moveY:Float = Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
+		
 		if (!this._selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = null;
-			this._mouseObject.setProperty(RegularPropertyName.X, Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX);
-			this._mouseObject.setProperty(RegularPropertyName.Y, Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY);
+			this._mouseObject.modifyProperty(RegularPropertyName.X, moveX);
+			this._mouseObject.modifyProperty(RegularPropertyName.Y, moveY);
 		}
 		else
 		{
-			var moveX:Float = Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
-			var moveY:Float = Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
-			this._selection.modifyProperty(RegularPropertyName.X, moveX);
-			this._selection.modifyProperty(RegularPropertyName.Y, moveY);
+			this._selection.modifyDisplayProperty(RegularPropertyName.X, moveX);
+			this._selection.modifyDisplayProperty(RegularPropertyName.Y, moveY);
 		}
 	}
 	
@@ -480,8 +490,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			{
 				for (obj in this._selection)
 				{
-					obj.mouseRestoreX = obj.getProperty(RegularPropertyName.X);
-					obj.mouseRestoreY = obj.getProperty(RegularPropertyName.Y);
+					if (obj.isDisplayObject)
+					{
+						obj.mouseRestoreX = obj.getProperty(RegularPropertyName.X);
+						obj.mouseRestoreY = obj.getProperty(RegularPropertyName.Y);
+					}
 				}
 			}
 			else
@@ -526,8 +539,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				{
 					for (obj in this._selection)
 					{
-						obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
-						obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+						if (obj.isDisplayObject)
+						{
+							obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
+							obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
+						}
 					}
 				}
 				else
@@ -550,28 +566,34 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	private function select(object:ValEditorObject):Void
 	{
-		var box:SelectionBox = SelectionBox.fromPool();
-		this._containerUI.addChild(box);
-		object.selectionBox = box;
-		
-		var pivot:PivotIndicator = PivotIndicator.fromPool();
-		this._containerUI.addChild(pivot);
-		object.pivotIndicator = pivot;
+		if (object.isDisplayObject)
+		{
+			var box:SelectionBox = SelectionBox.fromPool();
+			this._containerUI.addChild(box);
+			object.selectionBox = box;
+			
+			var pivot:PivotIndicator = PivotIndicator.fromPool();
+			this._containerUI.addChild(pivot);
+			object.pivotIndicator = pivot;
+		}
 		
 		this._selection.addObject(object);
 	}
 	
 	private function unselect(object:ValEditorObject):Void
 	{
-		var box:SelectionBox = object.selectionBox;
-		this._containerUI.removeChild(box);
-		object.selectionBox = null;
-		box.pool();
-		
-		var pivot:PivotIndicator = object.pivotIndicator;
-		this._containerUI.removeChild(pivot);
-		object.pivotIndicator = null;
-		pivot.pool();
+		if (object.isDisplayObject)
+		{
+			var box:SelectionBox = object.selectionBox;
+			this._containerUI.removeChild(box);
+			object.selectionBox = null;
+			box.pool();
+			
+			var pivot:PivotIndicator = object.pivotIndicator;
+			this._containerUI.removeChild(pivot);
+			object.pivotIndicator = null;
+			pivot.pool();
+		}
 		
 		this._selection.removeObject(object);
 	}
@@ -707,108 +729,108 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			// Move down
 			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_1) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.Y, 1.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_1);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.Y, 1.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 				}
 			}
 			
 			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_10) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.Y, 10.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_10);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.Y, 10.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 				}
 			}
 			
 			// Move left
 			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_1) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.X, -1.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_1);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.X, -1.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 				}
 			}
 			
 			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_10) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.X, -10.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_10);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.X, -10.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 				}
 			}
 			
 			// Move right
 			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_1) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.X, 1.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_1);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.X, 1.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 				}
 			}
 			
 			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_10) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.X, 10.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_10);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.X, 10.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 				}
 			}
 			
 			// Move up
 			if (ValEditor.input.justDid(InputActionID.MOVE_UP_1) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.Y, -1.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_1);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.Y, -1.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 				}
 			}
 			
 			if (ValEditor.input.justDid(InputActionID.MOVE_UP_10) != null)
 			{
-				this._selection.modifyProperty(RegularPropertyName.Y, -10.0);
+				this._selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 			}
 			else
 			{
 				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_10);
 				if (action != null && action.canRepeat())
 				{
-					this._selection.modifyProperty(RegularPropertyName.Y, -10.0);
+					this._selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 				}
 			}
 			

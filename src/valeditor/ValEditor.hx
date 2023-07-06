@@ -9,7 +9,7 @@ import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
 import valedit.ExposedCollection;
-import valedit.ObjectType;
+import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
@@ -174,7 +174,7 @@ class ValEditor
 		_rootContainer.clear();
 	}
 	
-	static public function registerClass(type:Class<Dynamic>, collection:ExposedCollection, canBeCreated:Bool = true, objectType:Int = -1, ?constructorCollection:ExposedCollection, ?settings:ValEditorClassSettings, ?categoryList:Array<String>):ValEditorClass
+	static public function registerClass(type:Class<Dynamic>, collection:ExposedCollection, canBeCreated:Bool = true, ?isDisplayObject:Bool, ?displayObjectType:Int, ?constructorCollection:ExposedCollection, ?settings:ValEditorClassSettings, ?categoryList:Array<String>):ValEditorClass
 	{
 		var className:String = Type.getClassName(type);
 		if (_classMap.exists(className))
@@ -192,7 +192,7 @@ class ValEditor
 		
 		var v:ValEditorClass = new ValEditorClass();
 		
-		var result:ValEditClass = ValEdit.registerClass(type, collection, canBeCreated, objectType, constructorCollection, settings, categoryList, v);
+		var result:ValEditClass = ValEdit.registerClass(type, collection, canBeCreated, isDisplayObject, displayObjectType, constructorCollection, settings, categoryList, v);
 		if (result == null) return null;
 		
 		_classMap.set(className, v);
@@ -204,26 +204,23 @@ class ValEditor
 		}
 		else
 		{
-			v.hasRadianRotation = objectType == ObjectType.DISPLAY_STARLING;
+			v.hasRadianRotation = v.isDisplayObject && v.displayObjectType == DisplayObjectType.STARLING;
 		}
 		
-		if (v.interactiveFactory == null)
+		if (v.isDisplayObject && v.interactiveFactory == null)
 		{
-			switch (v.objectType)
+			switch (v.displayObjectType)
 			{
-				case ObjectType.DISPLAY_OPENFL :
+				case DisplayObjectType.OPENFL :
 					v.interactiveFactory = InteractiveFactories.openFL_default;
 				
 				#if starling
-				case ObjectType.DISPLAY_STARLING :
+				case DisplayObjectType.STARLING :
 					v.interactiveFactory = InteractiveFactories.starling_default;
 				#end
 				
-				case ObjectType.OTHER :
-					// nothing here
-				
 				default :
-					throw new Error("ValEdit.registerClass");
+					throw new Error("ValEditor.registerClass ::: unknown display object type " + v.displayObjectType);
 			}
 		}
 		
@@ -378,12 +375,15 @@ class ValEditor
 		
 		ValEdit.createObjectWithClassName(className, id, params, valObject);
 		
-		valObject.interactiveObject = valClass.interactiveFactory(valObject);
-		valObject.hasPivotProperties = valClass.hasPivotProperties;
-		valObject.hasScaleProperties = valClass.hasScaleProperties;
-		valObject.hasTransformProperty = valClass.hasTransformProperty;
-		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
-		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		if (valClass.interactiveFactory != null)
+		{
+			valObject.interactiveObject = valClass.interactiveFactory(valObject);
+			valObject.hasPivotProperties = valClass.hasPivotProperties;
+			valObject.hasScaleProperties = valClass.hasScaleProperties;
+			valObject.hasTransformProperty = valClass.hasTransformProperty;
+			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+			valObject.hasRadianRotation = valClass.hasRadianRotation;
+		}
 		
 		registerObjectInternal(valObject);
 		

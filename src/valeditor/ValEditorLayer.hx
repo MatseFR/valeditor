@@ -2,9 +2,10 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import openfl.errors.Error;
-import valedit.ObjectType;
+import valedit.DisplayObjectType;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
+import valedit.util.StringIndexedMap;
 import valeditor.events.LayerEvent;
 
 /**
@@ -23,6 +24,8 @@ class ValEditorLayer extends ValEditLayer
 		return this._name;
 	}
 	
+	private var _displayObjects:StringIndexedMap<ValEditorObject> = new StringIndexedMap<ValEditorObject>();
+	
 	public function new() 
 	{
 		super();
@@ -34,21 +37,21 @@ class ValEditorLayer extends ValEditLayer
 		
 		var editorObject:ValEditorObject = cast object;
 		
-		switch (object.objectType)
+		if (object.isDisplayObject)
 		{
-			case ObjectType.DISPLAY_OPENFL :
-				this._container.addChild(cast editorObject.interactiveObject);
-			
-			#if starling
-			case ObjectType.DISPLAY_STARLING :
-				this._containerStarling.addChild(cast editorObject.interactiveObject);
-			#end
-			
-			case ObjectType.OTHER :
-				// nothing here
-			
-			default :
-				throw new Error("ValEditorLayer.add ::: unknown object type " + object.objectType);
+			switch (object.displayObjectType)
+			{
+				case DisplayObjectType.OPENFL :
+					this._container.addChild(cast editorObject.interactiveObject);
+				
+				#if starling
+				case DisplayObjectType.STARLING :
+					this._containerStarling.addChild(cast editorObject.interactiveObject);
+				#end
+				
+				default :
+					throw new Error("ValEditorLayer.add ::: unknown display object type " + object.displayObjectType);
+			}
 		}
 		
 		this.objectCollection.add(editorObject);
@@ -60,21 +63,21 @@ class ValEditorLayer extends ValEditLayer
 		
 		var editorObject:ValEditorObject = cast object;
 		
-		switch (object.objectType)
+		if (object.isDisplayObject)
 		{
-			case ObjectType.DISPLAY_OPENFL :
-				this._container.removeChild(cast editorObject.interactiveObject);
-			
-			#if starling
-			case ObjectType.DISPLAY_STARLING :
-				this._containerStarling.removeChild(cast editorObject.interactiveObject);
-			#end
-			
-			case ObjectType.OTHER :
-				// nothing here
-			
-			default :
-				throw new Error("ValEditorContainer.remove ::: unknown object type " + object.objectType);
+			switch (object.displayObjectType)
+			{
+				case DisplayObjectType.OPENFL :
+					this._container.removeChild(cast editorObject.interactiveObject);
+				
+				#if starling
+				case DisplayObjectType.STARLING :
+					this._containerStarling.removeChild(cast editorObject.interactiveObject);
+				#end
+				
+				default :
+					throw new Error("ValEditorContainer.remove ::: unknown display object type " + object.displayObjectType);
+			}
 		}
 		
 		this.objectCollection.remove(editorObject);

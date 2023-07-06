@@ -20,9 +20,9 @@ class ValEditorClass extends ValEditClass
 	public var hasTransformationMatrixProperty:Bool;
 	public var hasRadianRotation:Bool;
 
-	public function new(?classReference:Class<Dynamic>, ?className:String, ?sourceCollection:ExposedCollection, canBeCreated:Bool = true, objectType:Int = -1, ?constructorCollection:ExposedCollection)
+	public function new(?classReference:Class<Dynamic>, ?className:String, ?sourceCollection:ExposedCollection, canBeCreated:Bool = true, isDisplayObject:Bool = false, ?constructorCollection:ExposedCollection)
 	{
-		super(classReference, className, sourceCollection, canBeCreated, objectType, constructorCollection);
+		super(classReference, className, sourceCollection, canBeCreated, isDisplayObject, constructorCollection);
 	}
 	
 	override public function addContainer(container:DisplayObjectContainer, object:Dynamic, parentValue:ExposedValue = null):ExposedCollection 

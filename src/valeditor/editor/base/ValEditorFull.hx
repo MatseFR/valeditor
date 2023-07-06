@@ -5,7 +5,6 @@ import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
 import openfl.display.Sprite;
 import openfl.ui.Keyboard;
-import valedit.ObjectType;
 import valedit.ValEdit;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
@@ -70,7 +69,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.exposeData();
 		
-		ValEditor.registerClass(ExportSettings, SettingsData.exposeExportSettings(), false, ObjectType.OTHER);
+		ValEditor.registerClass(ExportSettings, SettingsData.exposeExportSettings(), false, false);
 	}
 	
 	override function ready():Void 
