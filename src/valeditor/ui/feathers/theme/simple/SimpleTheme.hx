@@ -300,7 +300,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	}
 	
 	public var lightThemeFocusColor(get, set):Int;
-	private var _lightThemeFocusColor:Int = 0xcfcf00;
+	private var _lightThemeFocusColor:Int = 0xDC00B4;
 	private function get_lightThemeFocusColor():Int { return this._lightThemeFocusColor; }
 	private function set_lightThemeFocusColor(value:Int):Int
 	{
