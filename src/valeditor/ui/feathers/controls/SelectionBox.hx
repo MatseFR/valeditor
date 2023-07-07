@@ -18,11 +18,6 @@ class SelectionBox extends Sprite
 		return new SelectionBox();
 	}
 	
-	static public function toPool(box:SelectionBox):Void
-	{
-		_POOL.push(box);
-	}
-	
 	public var pivotX(get, set):Float;
 	private var _pivotX:Float = 0;
 	private function get_pivotX():Float { return this._pivotX; }
@@ -77,6 +72,12 @@ class SelectionBox extends Sprite
 		
 		this._group = new SelectionGroup();
 		addChild(this._group);
+	}
+	
+	public function pool():Void
+	{
+		if (this.parent != null) this.parent.removeChild(this);
+		_POOL[_POOL.length] = this;
 	}
 	
 	public function hasInterestIn(regularPropertyName:String):Bool
@@ -138,11 +139,6 @@ class SelectionBox extends Sprite
 		{
 			this.rotation = rotation;
 		}
-	}
-	
-	public function pool():Void
-	{
-		toPool(this);
 	}
 	
 }
