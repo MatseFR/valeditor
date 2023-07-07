@@ -521,7 +521,19 @@ class ValEditor
 	
 	static private function destroyTemplateInternal(template:ValEditorTemplate):Void
 	{
+		if (template.clss.disposeFunctionName != null)
+		{
+			var func:Function = Reflect.field(template.object, template.clss.disposeFunctionName);
+			Reflect.callMethod(template.object, func, []);
+		}
+		else if (template.clss.disposeCustom != null)
+		{
+			Reflect.callMethod(template.clss.disposeCustom, template.clss.disposeCustom, [template.object]);
+		}
+		
 		unregisterTemplateInternal(template);
+		
+		template.pool();
 	}
 	
 	static private function unregisterTemplateInternal(template:ValEditorTemplate):Void
