@@ -85,6 +85,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		switch (action.actionID)
 		{
+			case InputActionID.DELETE :
+				ValEditor.selection.delete();
+			
+			case InputActionID.SELECT_ALL :
+				ValEditor.currentContainer.selectAllVisible();
+			
+			case InputActionID.UNSELECT_ALL :
+				ValEditor.selection.object = null;
+			
 			case InputActionID.NEW_FILE :
 				trace("new file");
 			
@@ -131,6 +140,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.keyboardController.addKeyAction(Keyboard.UP, keyAction);
 		keyAction = new KeyAction(InputActionID.MOVE_UP_10, false, false, true, 0, 0, firstRepeatDelay, repeatDelay);
 		ValEditor.keyboardController.addKeyAction(Keyboard.UP, keyAction);
+		
+		// select all
+		keyAction = new KeyAction(InputActionID.SELECT_ALL, false, true, false);
+		ValEditor.keyboardController.addKeyAction(Keyboard.A, keyAction);
+		
+		// unselect all
+		keyAction = new KeyAction(InputActionID.UNSELECT_ALL, false, true, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.A, keyAction);
 		
 		// delete
 		keyAction = new KeyAction(InputActionID.DELETE);
