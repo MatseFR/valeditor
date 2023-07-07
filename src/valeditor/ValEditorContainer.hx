@@ -564,6 +564,21 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	}
 	#end
 	
+	public function selectAllVisible():Void
+	{
+		clearSelection();
+		
+		var visibleObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
+		for (layer in this.layerCollection)
+		{
+			layer.getAllVisibleObjects(visibleObjects);
+		}
+		for (object in visibleObjects)
+		{
+			ValEditor.selection.addObject(object);
+		}
+	}
+	
 	private function select(object:ValEditorObject):Void
 	{
 		if (object.isDisplayObject)
@@ -585,14 +600,20 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (object.isDisplayObject)
 		{
 			var box:SelectionBox = object.selectionBox;
-			this._containerUI.removeChild(box);
-			object.selectionBox = null;
-			box.pool();
+			if (box != null)
+			{
+				this._containerUI.removeChild(box);
+				object.selectionBox = null;
+				box.pool();
+			}
 			
 			var pivot:PivotIndicator = object.pivotIndicator;
-			this._containerUI.removeChild(pivot);
-			object.pivotIndicator = null;
-			pivot.pool();
+			if (pivot != null)
+			{
+				this._containerUI.removeChild(pivot);
+				object.pivotIndicator = null;
+				pivot.pool();
+			}
 		}
 		
 		this._selection.removeObject(object);
@@ -832,12 +853,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				{
 					this._selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 				}
-			}
-			
-			// delete
-			if (ValEditor.input.justDid(InputActionID.DELETE) != null)
-			{
-				this._selection.deleteObjects();
 			}
 		}
 	}
