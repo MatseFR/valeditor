@@ -157,7 +157,7 @@ class ObjectSelectWindow extends Panel
 	{
 		var classNames:Array<String>;
 		var stringData:StringData;
-		StringData.poolArray(this._classList);
+		
 		this._classList.resize(0);
 		var selectedItem:StringData = this._classPicker.selectedItem;
 		this._classCollection.array = null;
