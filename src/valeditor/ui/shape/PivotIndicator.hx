@@ -30,11 +30,12 @@ class PivotIndicator extends Shape
 		this._interestMap.set(RegularPropertyName.PIVOT_X, true);
 		this._interestMap.set(RegularPropertyName.PIVOT_Y, true);
 		
-		this.setTo(size, color, alpha, outlineColor, outlineAlpha);
+		setTo(size, color, alpha, outlineColor, outlineAlpha);
 	}
 	
 	public function pool():Void
 	{
+		if (this.parent != null) this.parent.removeChild(this);
 		_POOL[_POOL.length] = this;
 	}
 	
