@@ -14,7 +14,9 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
+import valeditor.ValEditorTemplateGroup;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -80,6 +82,7 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
 		this._grid.addEventListener(FocusEvent.FOCUS_OUT, onGridFocusOut);
 		this._grid.variant = GridView.VARIANT_BORDERLESS;
+		this._grid.allowMultipleSelection = true;
 		this._grid.resizableColumns = true;
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
@@ -103,17 +106,54 @@ class TemplateLibrary extends LayoutGroup
 		FeathersWindows.showTemplateRenameWindow(this._grid.selectedItem);
 	}
 	
+	private var _templatesToRemove:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	private function onGridChange(evt:Event):Void
 	{
-		if (this._grid.selectedItem != null)
+		if (this._grid.selectedItems.length != 0)
 		{
-			ValEditor.selection.object = this._grid.selectedItem;
+			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+			
+			var selection:Dynamic = ValEditor.selection.object;
+			if (Std.isOfType(selection, ValEditorTemplate))
+			{
+				if (this._grid.selectedItems.indexOf(selection) == -1)
+				{
+					ValEditor.selection.removeTemplate(selection);
+				}
+			}
+			else if (Std.isOfType(selection, ValEditorTemplateGroup))
+			{
+				var group:ValEditorTemplateGroup = cast selection;
+				for (template in group)
+				{
+					if (this._grid.selectedItems.indexOf(template) == -1)
+					{
+						this._templatesToRemove.push(template);
+					}
+				}
+				
+				if (this._templatesToRemove.length != 0)
+				{
+					ValEditor.selection.removeTemplates(this._templatesToRemove);
+					this._templatesToRemove.resize(0);
+				}
+			}
+			
+			for (template in this._grid.selectedItems)
+			{
+				if (!ValEditor.selection.hasTemplate(template))
+				{
+					ValEditor.selection.addTemplate(template);
+				}
+			}
 			this._templateRemoveButton.enabled = true;
-			this._templateRenameButton.enabled = true;
+			this._templateRenameButton.enabled = this._grid.selectedItems.length == 1;
+			
+			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 		}
 		else
 		{
-			if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate))
+			if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate) || Std.isOfType(ValEditor.selection.object, ValEditorTemplateGroup))
 			{
 				ValEditor.selection.object = null;
 			}
@@ -124,7 +164,7 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onGridFocusIn(evt:FocusEvent):Void
 	{
-		this._grid.showFocus(false);
+		this._grid.showFocus(true);
 	}
 	
 	private function onGridFocusOut(evt:FocusEvent):Void
@@ -134,6 +174,33 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onGridKeyDown(evt:KeyboardEvent):Void
 	{
+		switch (evt.keyCode)
+		{
+			case Keyboard.A :
+				if (evt.ctrlKey && evt.shiftKey)
+				{
+					// unselect all
+					this._grid.selectedIndex = -1;
+				}
+				else if (evt.ctrlKey)
+				{
+					var selectedIndices:Array<Int> = [];
+					var count:Int = this._grid.dataProvider.length;
+					for (i in 0...count)
+					{
+						selectedIndices[i] = i;
+					}
+					this._grid.selectedIndices = selectedIndices;
+				}
+			
+			case Keyboard.DELETE, Keyboard.BACKSPACE :
+				var templatesToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
+				for (template in templatesToRemove)
+				{
+					ValEditor.destroyTemplate(template);
+				}
+		}
+		
 		evt.stopPropagation();
 	}
 	
@@ -146,7 +213,24 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (evt.object != null)
 		{
-			this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
+			if (Std.isOfType(evt.object, ValEditorTemplate))
+			{
+				this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
+			}
+			else if (Std.isOfType(evt.object, ValEditorTemplateGroup))
+			{
+				var group:ValEditorTemplateGroup = cast evt.object;
+				var selectedItems:Array<Dynamic> = [];
+				for (template in group)
+				{
+					selectedItems.push(template);
+				}
+				this._grid.selectedItems = selectedItems;
+			}
+			else
+			{
+				this._grid.selectedIndex = -1;
+			}
 		}
 		else
 		{
