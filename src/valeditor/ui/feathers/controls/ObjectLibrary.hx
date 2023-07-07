@@ -14,6 +14,7 @@ import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.ValEditor;
 import valeditor.events.EditorEvent;
 import valeditor.events.SelectionEvent;
@@ -166,7 +167,7 @@ class ObjectLibrary extends LayoutGroup
 		}
 		else
 		{
-			if (!Std.isOfType(ValEditor.selection.object, ValEditorTemplate))
+			if (Std.isOfType(ValEditor.selection.object, ValEditorObject) || Std.isOfType(ValEditor.selection.object, ValEditorObjectGroup))
 			{
 				ValEditor.selection.object = null;
 			}
@@ -187,6 +188,34 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onGridKeyDown(evt:KeyboardEvent):Void
 	{
+		switch (evt.keyCode)
+		{
+			case Keyboard.A :
+				if (evt.ctrlKey && evt.shiftKey)
+				{
+					// unselect all
+					this._grid.selectedIndex = -1;
+				}
+				else if (evt.ctrlKey)
+				{
+					// select all
+					var selectedIndices:Array<Int> = [];
+					var count:Int = this._grid.dataProvider.length;
+					for (i in 0...count)
+					{
+						selectedIndices[i] = i;
+					}
+					this._grid.selectedIndices = selectedIndices;
+				}
+			
+			case Keyboard.DELETE, Keyboard.BACKSPACE :
+				var objectsToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
+				for (object in objectsToRemove)
+				{
+					ValEditor.destroyObject(object);
+				}
+		}
+		
 		evt.stopPropagation();
 	}
 	
