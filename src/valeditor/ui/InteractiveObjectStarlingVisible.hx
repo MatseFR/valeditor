@@ -77,11 +77,12 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
 		
-		this.setTo(minWidth, minHeight);
+		setTo(minWidth, minHeight);
 	}
 	
 	public function pool():Void
 	{
+		this.removeFromParent();
 		_POOL[_POOL.length] = this;
 	}
 	

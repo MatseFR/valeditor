@@ -104,11 +104,12 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		this._shape = new Shape();
 		addChild(this._shape);
 		
-		this.setTo(minWidth, minHeight);
+		setTo(minWidth, minHeight);
 	}
 	
 	public function pool():Void
 	{
+		if (this.parent != null) this.parent.removeChild(this);
 		_POOL[_POOL.length] = this;
 	}
 	

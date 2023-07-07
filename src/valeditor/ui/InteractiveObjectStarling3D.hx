@@ -89,11 +89,12 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		this._quad.alpha = 0.25;
 		addChild(this._quad);
 		
-		this.setTo(minWidth, minHeight);
+		setTo(minWidth, minHeight);
 	}
 	
 	public function pool():Void
 	{
+		this.removeFromParent();
 		_POOL[_POOL.length] = this;
 	}
 	
