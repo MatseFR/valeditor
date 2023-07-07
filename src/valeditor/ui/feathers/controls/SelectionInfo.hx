@@ -8,6 +8,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
+import valeditor.ValEditorTemplateGroup;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -128,12 +129,42 @@ class SelectionInfo extends LayoutGroup
 		}
 		else
 		{
+			var singleClass:Bool = true;
+			var className:String = null;
+			
 			if (Std.isOfType(this._object, ValEditorTemplate))
 			{
 				var template:ValEditorTemplate = cast this._object;
 				this._idValue.text = template.id;
 				this._classValue.text = template.className;
 				this._typeValue.text = "Template";
+			}
+			else if (Std.isOfType(this._object, ValEditorTemplateGroup))
+			{
+				var templateGroup:ValEditorTemplateGroup = cast this._object;
+				this._idValue.text = templateGroup.numTemplates + " templates";
+				
+				for (template in templateGroup)
+				{
+					if (className == null)
+					{
+						className = template.className;
+					}
+					else if (template.className != className)
+					{
+						singleClass = false;
+						break;
+					}
+				}
+				
+				if (singleClass)
+				{
+					this._classValue.text = className;
+				}
+				else
+				{
+					this._classValue.text = "(multiple classes)";
+				}
 			}
 			else if (Std.isOfType(this._object, ValEditorObject))
 			{
@@ -144,12 +175,10 @@ class SelectionInfo extends LayoutGroup
 			}
 			else if (Std.isOfType(this._object, ValEditorObjectGroup))
 			{
-				var group:ValEditorObjectGroup = cast this._object;
-				this._idValue.text = group.numObjects + " objects";
+				var objectGroup:ValEditorObjectGroup = cast this._object;
+				this._idValue.text = objectGroup.numObjects + " objects";
 				
-				var singleClass:Bool = true;
-				var className:String = null;
-				for (valObject in group)
+				for (valObject in objectGroup)
 				{
 					if (className == null)
 					{
