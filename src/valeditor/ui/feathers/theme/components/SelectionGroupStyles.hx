@@ -26,7 +26,7 @@ class SelectionGroupStyles
 	static private function default_style(group:SelectionGroup):Void
 	{
 		var skin:RectangleSkin = new RectangleSkin();
-		skin.border = theme.getThemeBorder(UIConfig.SELECTION_BOX_THICKNESS);
+		skin.border = theme.getFocusBorder(UIConfig.SELECTION_BOX_THICKNESS);
 		
 		group.backgroundSkin = skin;
 	}
