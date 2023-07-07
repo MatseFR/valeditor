@@ -43,15 +43,17 @@ class ValEditorObjectGroup
 	
 	public function deleteObjects():Void
 	{
-		for (i in new ReverseIterator(this._objects.length - 1, 0))
+		var objectsToDelete:Array<ValEditorObject> = this._objects.copy();
+		for (object in objectsToDelete)
 		{
-			ValEditor.destroyObject(this._objects[i]);
+			ValEditor.destroyObject(object);
 		}
 		clear();
 	}
 	
 	public function addObject(object:ValEditorObject):Void
 	{
+		if (this._objects.indexOf(object) != -1) return;
 		this._objects.push(object);
 	}
 	
