@@ -10,4 +10,5 @@ interface IValEditorContainer extends IValEditContainer
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject>;
 	function open():Void;
 	function close():Void;
+	function selectAllVisible():Void;
 }
