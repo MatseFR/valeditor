@@ -5,6 +5,7 @@ import openfl.errors.Error;
 import valedit.DisplayObjectType;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
+import valedit.util.RegularPropertyName;
 import valedit.util.StringIndexedMap;
 import valeditor.events.LayerEvent;
 
@@ -31,6 +32,21 @@ class ValEditorLayer extends ValEditLayer
 		super();
 	}
 	
+	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
+	{
+		if (visibleObjects == null) visibleObjects = new Array<ValEditorObject>();
+		
+		for (object in this._displayObjects)
+		{
+			if (object.getProperty(RegularPropertyName.VISIBLE) == true)
+			{
+				visibleObjects.push(object);
+			}
+		}
+		
+		return visibleObjects;
+	}
+	
 	override public function add(object:ValEditObject):Void 
 	{
 		super.add(object);
@@ -39,6 +55,8 @@ class ValEditorLayer extends ValEditLayer
 		
 		if (object.isDisplayObject)
 		{
+			this._displayObjects.set(editorObject.id, editorObject);
+			
 			switch (object.displayObjectType)
 			{
 				case DisplayObjectType.OPENFL :
@@ -65,6 +83,8 @@ class ValEditorLayer extends ValEditLayer
 		
 		if (object.isDisplayObject)
 		{
+			this._displayObjects.remove(editorObject.id);
+			
 			switch (object.displayObjectType)
 			{
 				case DisplayObjectType.OPENFL :
