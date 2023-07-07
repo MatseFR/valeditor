@@ -1,9 +1,6 @@
 package valeditor.editor;
-import valeditor.events.SelectionEvent;
 import openfl.events.EventDispatcher;
-import valedit.ValEditObject;
-import valedit.ValEditObjectGroup;
-import valedit.ValEditTemplate;
+import valeditor.events.SelectionEvent;
 
 /**
  * ...
@@ -11,32 +8,31 @@ import valedit.ValEditTemplate;
  */
 class Selection extends EventDispatcher
 {
-	private var _group:ValEditorObjectGroup = new ValEditorObjectGroup();
-	
 	public var object(get, set):Dynamic;
 	private function get_object():Dynamic 
 	{
-		if (this._template != null) return this._template;
-		if (this._group.numObjects == 0) return null;
-		if (this._group.numObjects == 1) return this._group.getObjectAt(0);
-		return this._group;
+		if (this._objectGroup.numObjects == 0 && this._templateGroup.numTemplates == 0) return null;
+		if (this._objectGroup.numObjects == 1) return this._objectGroup.getObjectAt(0);
+		if (this._templateGroup.numTemplates == 1) return this._templateGroup.getTemplateAt(0);
+		if (this._objectGroup.numObjects != 0) return this._objectGroup;
+		return this._templateGroup;
 	}
 	private function set_object(value:Dynamic):Dynamic
 	{
-		if (value == null && this._template == null && this._group.numObjects == 0) return value;
-		if (this._template != null && this._template == value) return value;
-		if (this._group.numObjects == 1 && this._group.getObjectAt(0) == value) return value;
-		this._template = null;
-		this._group.clear();
+		if (value == null && this._objectGroup.numObjects == 0 && this._templateGroup.numTemplates == 0) return value;
+		if (this._objectGroup.numObjects == 1 && this._objectGroup.getObjectAt(0) == value) return value;
+		if (this._templateGroup.numTemplates == 1 && this._templateGroup.getTemplateAt(0) == value) return value;
+		this._objectGroup.clear();
+		this._templateGroup.clear();
 		if (value != null)
 		{
 			if (Std.isOfType(value, ValEditorObject))
 			{
-				this._group.addObject(cast value);
+				this._objectGroup.addObject(cast value);
 			}
 			else if (Std.isOfType(value, ValEditorTemplate))
 			{
-				this._template = cast value;
+				this._templateGroup.addTemplate(cast value);
 			}
 		}
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
@@ -46,11 +42,12 @@ class Selection extends EventDispatcher
 	public var numObjects(get, never):Int;
 	private function get_numObjects():Int
 	{
-		if (this._template != null) return 1;
-		return this._group.numObjects;
+		if (this._templateGroup.numTemplates != 0) return this._templateGroup.numTemplates;
+		return this._objectGroup.numObjects;
 	}
 	
-	private var _template:ValEditorTemplate;
+	private var _objectGroup:ValEditorObjectGroup = new ValEditorObjectGroup();
+	private var _templateGroup:ValEditorTemplateGroup = new ValEditorTemplateGroup();
 
 	public function new() 
 	{
@@ -60,30 +57,54 @@ class Selection extends EventDispatcher
 	public function addObject(object:ValEditorObject):Void
 	{
 		if (object == null) return;
-		this._template = null;
-		this._group.addObject(object);
+		this._templateGroup.clear();
+		this._objectGroup.addObject(object);
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
 	public function addObjects(objects:Array<ValEditorObject>):Void
 	{
 		if (objects == null || objects.length == 0) return;
-		this._template = null;
+		this._templateGroup.clear();
 		for (object in objects)
 		{
-			this._group.addObject(object);
+			this._objectGroup.addObject(object);
+		}
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+	}
+	
+	public function addTemplate(template:ValEditorTemplate):Void
+	{
+		if (template == null) return;
+		this._objectGroup.clear();
+		this._templateGroup.addTemplate(template);
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+	}
+	
+	public function addTemplates(templates:Array<ValEditorTemplate>):Void
+	{
+		if (templates == null || templates.length == 0) return;
+		this._objectGroup.clear();
+		for (template in templates)
+		{
+			this._templateGroup.addTemplate(template);
 		}
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
 	public function hasObject(object:ValEditorObject):Bool
 	{
-		return this._group.hasObject(object);
+		return this._objectGroup.hasObject(object);
+	}
+	
+	public function hasTemplate(template:ValEditorTemplate):Bool
+	{
+		return this._templateGroup.hasTemplate(template);
 	}
 	
 	public function removeObject(object:ValEditorObject):Void
 	{
-		var removed:Bool = this._group.removeObject(object);
+		var removed:Bool = this._objectGroup.removeObject(object);
 		if (removed)
 		{
 			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
@@ -96,13 +117,50 @@ class Selection extends EventDispatcher
 		var removed:Bool;
 		for (object in objects)
 		{
-			removed = this._group.removeObject(object);
+			removed = this._objectGroup.removeObject(object);
 			if (removed) objectRemoved = true;
 		}
 		
 		if (objectRemoved)
 		{
 			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+		}
+	}
+	
+	public function removeTemplate(template:ValEditorTemplate):Void
+	{
+		var removed:Bool = this._templateGroup.removeTemplate(template);
+		if (removed)
+		{
+			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+		}
+	}
+	
+	public function removeTemplates(templates:Array<ValEditorTemplate>):Void
+	{
+		var templateRemoved:Bool = false;
+		var removed:Bool;
+		for (template in templates)
+		{
+			removed = this._templateGroup.removeTemplate(template);
+			if (removed) templateRemoved = true;
+		}
+		
+		if (templateRemoved)
+		{
+			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+		}
+	}
+	
+	public function delete():Void
+	{
+		if (this._templateGroup.numTemplates != 0)
+		{
+			this._templateGroup.deleteTemplates();
+		}
+		else
+		{
+			this._objectGroup.deleteObjects();
 		}
 	}
 	
