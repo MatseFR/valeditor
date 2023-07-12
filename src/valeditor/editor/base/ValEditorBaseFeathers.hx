@@ -11,7 +11,6 @@ import valedit.value.ExposedBitmapData;
 import valedit.value.ExposedBool;
 import valedit.value.ExposedByteArray;
 import valedit.value.ExposedColor;
-import valedit.value.ExposedColorReadOnly;
 import valedit.value.ExposedCombo;
 import valedit.value.ExposedFloat;
 import valedit.value.ExposedFloatDrag;
@@ -33,6 +32,7 @@ import valedit.value.ExposedSpacing;
 import valedit.value.ExposedString;
 import valedit.value.ExposedText;
 import valedit.value.ExposedTextAsset;
+import valedit.value.base.ExposedValue;
 import valeditor.ui.feathers.FeathersFactories;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 
@@ -79,6 +79,7 @@ class ValEditorBaseFeathers extends Application
 	
 	private function assetsLoaded():Void
 	{
+		registerExposedValuesFactories();
 		registerExposedValuesUI();
 		editorSetup();
 		exposeData();
@@ -107,6 +108,46 @@ class ValEditorBaseFeathers extends Application
 		
 	}
 	
+	private function registerExposedValuesFactories():Void
+	{
+		ExposedValue.registerFactory(ExposedBitmap, ExposedBitmap.fromPool);
+		ExposedValue.registerFactory(ExposedBitmapData, ExposedBitmapData.fromPool);
+		ExposedValue.registerFactory(ExposedBool, ExposedBool.fromPool);
+		ExposedValue.registerFactory(ExposedByteArray, ExposedByteArray.fromPool);
+		ExposedValue.registerFactory(ExposedColor, ExposedColor.fromPool);
+		ExposedValue.registerFactory(ExposedCombo, ExposedCombo.fromPool);
+		ExposedValue.registerFactory(ExposedFloat, ExposedFloat.fromPool);
+		ExposedValue.registerFactory(ExposedFloatDrag, ExposedFloatDrag.fromPool);
+		ExposedValue.registerFactory(ExposedFloatRange, ExposedFloatRange.fromPool);
+		ExposedValue.registerFactory(ExposedFontName, ExposedFontName.fromPool);
+		ExposedValue.registerFactory(ExposedFunction, ExposedFunction.fromPool);
+		ExposedValue.registerFactory(ExposedGroup, ExposedGroup.fromPool);
+		ExposedValue.registerFactory(ExposedInt, ExposedInt.fromPool);
+		ExposedValue.registerFactory(ExposedIntDrag, ExposedIntDrag.fromPool);
+		ExposedValue.registerFactory(ExposedIntRange, ExposedIntRange.fromPool);
+		ExposedValue.registerFactory(ExposedName, ExposedName.fromPool);
+		ExposedValue.registerFactory(ExposedNote, ExposedNote.fromPool);
+		ExposedValue.registerFactory(ExposedObject, ExposedObject.fromPool);
+		ExposedValue.registerFactory(ExposedObjectReference, ExposedObjectReference.fromPool);
+		ExposedValue.registerFactory(ExposedSelect, ExposedSelect.fromPool);
+		ExposedValue.registerFactory(ExposedSeparator, ExposedSeparator.fromPool);
+		ExposedValue.registerFactory(ExposedSound, ExposedSound.fromPool);
+		ExposedValue.registerFactory(ExposedSpacing, ExposedSpacing.fromPool);
+		ExposedValue.registerFactory(ExposedString, ExposedString.fromPool);
+		ExposedValue.registerFactory(ExposedText, ExposedText.fromPool);
+		ExposedValue.registerFactory(ExposedTextAsset, ExposedTextAsset.fromPool);
+		
+		#if desktop
+		ExposedValue.registerFactory(ExposedFilePath, ExposedFilePath.fromPool);
+		ExposedValue.registerFactory(ExposedPath, ExposedPath.fromPool);
+		#end
+		
+		#if starling
+		ExposedValue.registerFactory(ExposedStarlingAtlas, ExposedStarlingAtlas.fromPool);
+		ExposedValue.registerFactory(ExposedStarlingTexture, ExposedStarlingTexture.fromPool);
+		#end
+	}
+	
 	/**
 	   
 	**/
@@ -117,7 +158,6 @@ class ValEditorBaseFeathers extends Application
 		ValEdit.registerUIClass(ExposedBool, FeathersFactories.exposedBool);
 		ValEdit.registerUIClass(ExposedByteArray, FeathersFactories.exposedByteArray);
 		ValEdit.registerUIClass(ExposedColor, FeathersFactories.exposedColor);
-		ValEdit.registerUIClass(ExposedColorReadOnly, FeathersFactories.exposedColorReadOnly);
 		ValEdit.registerUIClass(ExposedCombo, FeathersFactories.exposedCombo);
 		ValEdit.registerUIClass(ExposedFloat, FeathersFactories.exposedFloat);
 		ValEdit.registerUIClass(ExposedFloatDrag, FeathersFactories.exposedFloatDrag);
