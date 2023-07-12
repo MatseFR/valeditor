@@ -1,9 +1,8 @@
 package valeditor;
-import valedit.ExposedValue;
-
-import flash.display.DisplayObjectContainer;
+import openfl.display.DisplayObjectContainer;
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
+import valedit.value.base.ExposedValueWithChildren;
 import valeditor.ui.IInteractiveObject;
 
 /**
@@ -25,7 +24,7 @@ class ValEditorClass extends ValEditClass
 		super(classReference, className, sourceCollection, canBeCreated, isDisplayObject, constructorCollection);
 	}
 	
-	override public function addContainer(container:DisplayObjectContainer, object:Dynamic, parentValue:ExposedValue = null):ExposedCollection 
+	override public function addContainer(container:DisplayObjectContainer, object:Dynamic, parentValue:ExposedValueWithChildren = null):ExposedCollection 
 	{
 		var collection:ExposedCollection = super.addContainer(container, object, parentValue);
 		if (Std.isOfType(object, ValEditorObject))
