@@ -2,7 +2,7 @@ package valeditor.ui.feathers.controls.value;
 
 import feathers.controls.LayoutGroup;
 import openfl.events.Event;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 
@@ -11,7 +11,7 @@ import valedit.ui.IValueUI;
  * @author Matse
  */
 @:styleContext
-class ValueUI extends LayoutGroup implements IValueUI
+abstract class ValueUI extends LayoutGroup implements IValueUI
 {
 	public var exposedValue(get, set):ExposedValue;
 	
@@ -45,6 +45,15 @@ class ValueUI extends LayoutGroup implements IValueUI
 	{
 		super();
 	}
+	
+	public function clear():Void
+	{
+		this.exposedValue = null;
+		controlsDisable();
+		if (this.parent != null) this.parent.removeChild(this);
+	}
+	
+	abstract public function pool():Void;
 	
 	override function layoutGroup_addedToStageHandler(event:Event):Void 
 	{

@@ -29,6 +29,19 @@ import valeditor.ui.feathers.controls.value.ValueUI;
  */
 class StarlingTextureUI extends ValueUI 
 {
+	static private var _POOL:Array<StarlingTextureUI> = new Array<StarlingTextureUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():StarlingTextureUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new StarlingTextureUI();
+	}
+	
 	private var _label:Label;
 	
 	private var _contentGroup:LayoutGroup;
@@ -48,6 +61,12 @@ class StarlingTextureUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

@@ -12,7 +12,7 @@ import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.ValEdit;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
@@ -25,6 +25,19 @@ import valeditor.ui.feathers.Padding;
  */
 class FunctionUI extends ValueUI 
 {
+	static private var _POOL:Array<FunctionUI> = new Array<FunctionUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FunctionUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FunctionUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		_func = cast value;
@@ -52,6 +65,24 @@ class FunctionUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._valueGroup.clearContent();
+		for (control in this._parameterControls)
+		{
+			control.pool();
+		}
+		this._parameterControls.resize(0);
+		this._func = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

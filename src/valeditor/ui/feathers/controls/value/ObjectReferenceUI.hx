@@ -10,7 +10,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
 import starling.utils.Padding;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
@@ -26,6 +26,19 @@ import valeditor.ui.feathers.variant.LabelVariant;
 @:access(valedit.value.ExposedObjectReference)
 class ObjectReferenceUI extends ValueUI 
 {
+	static private var _POOL:Array<ObjectReferenceUI> = new Array<ObjectReferenceUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():ObjectReferenceUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ObjectReferenceUI();
+	}
+	
 	private var _objectReferenceValue:ExposedObjectReference;
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
@@ -55,6 +68,18 @@ class ObjectReferenceUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._objectReferenceValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

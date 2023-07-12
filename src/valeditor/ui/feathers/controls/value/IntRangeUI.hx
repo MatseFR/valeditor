@@ -15,7 +15,7 @@ import openfl.events.Event;
 import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.TextInputVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedIntRange;
@@ -29,6 +29,19 @@ import valeditor.ui.feathers.controls.ValueWedge;
  */
 class IntRangeUI extends ValueUI 
 {
+	static private var _POOL:Array<IntRangeUI> = new Array<IntRangeUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():IntRangeUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new IntRangeUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -60,6 +73,18 @@ class IntRangeUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._intRange = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

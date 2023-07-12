@@ -5,7 +5,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.value.ExposedNote;
 import valeditor.ui.feathers.Padding;
 
@@ -15,6 +15,19 @@ import valeditor.ui.feathers.Padding;
  */
 class NoteUI extends ValueUI 
 {
+	static private var _POOL:Array<NoteUI> = new Array<NoteUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():NoteUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new NoteUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		this._textValue = cast value;
@@ -32,6 +45,18 @@ class NoteUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._textValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

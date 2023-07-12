@@ -17,7 +17,7 @@ import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.TextInputVariant;
 import valeditor.utils.MathUtil;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloat;
@@ -30,6 +30,19 @@ import valeditor.ui.feathers.Padding;
  */
 class FloatUI extends ValueUI 
 {
+	static private var _POOL:Array<FloatUI> = new Array<FloatUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FloatUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FloatUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -60,6 +73,18 @@ class FloatUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._floatValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

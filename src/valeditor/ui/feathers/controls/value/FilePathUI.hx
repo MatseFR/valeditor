@@ -9,7 +9,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFilePath;
@@ -23,6 +23,19 @@ import valeditor.utils.file.FileSelectorDesktop;
  */
 class FilePathUI extends ValueUI 
 {
+	static private var _POOL:Array<FilePathUI> = new Array<FilePathUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FilePathUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FilePathUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -54,6 +67,18 @@ class FilePathUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._filePathValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

@@ -11,7 +11,7 @@ import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IGroupUI;
 import valedit.ui.IValueUI;
@@ -23,6 +23,19 @@ import valedit.value.ExposedGroup;
  */
 class GroupUI extends ValueUI implements IGroupUI
 {
+	static private var _POOL:Array<GroupUI> = new Array<GroupUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():GroupUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new GroupUI();
+	}
+	
 	private var _controls:Array<IValueUI> = new Array<IValueUI>();
 	private var _group:ExposedGroup;
 	
@@ -44,6 +57,25 @@ class GroupUI extends ValueUI implements IGroupUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		
+		this._valueGroup.removeChildren();
+		for (control in this._controls)
+		{
+			control.pool();
+		}
+		this._controls.resize(0);
+		this._group = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

@@ -6,19 +6,18 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import openfl.errors.Error;
 import openfl.events.Event;
 import valedit.ExposedCollection;
+import valedit.value.base.ExposedValue;
+import valedit.ValEdit;
+import valedit.events.ValueEvent;
+import valedit.ui.IValueUI;
+import valedit.value.ExposedObject;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valedit.ExposedValue;
-import valedit.ValEdit;
-import valedit.events.ValueEvent;
-import valedit.ui.IValueUI;
-import valedit.value.ExposedObject;
 
 /**
  * ...
@@ -26,21 +25,36 @@ import valedit.value.ExposedObject;
  */
 class ObjectUI extends ValueUI 
 {
+	static private var _POOL:Array<ObjectUI> = new Array<ObjectUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():ObjectUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ObjectUI();
+	}
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
 		{
 			this._exposedObject = null;
-			this._objectCollection = null;
-			ValEdit.edit(null, this._valueGroup);
+			if (this._objectCollection != null)
+			{
+				ValEdit.edit(null, this._valueGroup);
+				this._objectCollection = null;
+			}
 		}
 		else
 		{
 			this._exposedObject = cast value;
 			if (this._objectCollection == null)
 			{
-				this._objectCollection = ValEdit.edit(value.value, this._valueGroup, value);
+				this._objectCollection = ValEdit.edit(value.value, this._valueGroup, cast value);
 			}
 			else
 			{
@@ -73,6 +87,23 @@ class ObjectUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._exposedObject = null;
+		if (this._objectCollection != null)
+		{
+			ValEdit.edit(null, this._valueGroup);
+			this._objectCollection = null;
+		}
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 
@@ -139,7 +170,7 @@ class ObjectUI extends ValueUI
 		if (this._objectCollection == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, this._exposedValue);
+			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, cast this._exposedValue);
 		}
 		if (this._objectCollection != null)
 		{
@@ -185,7 +216,7 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		ValEdit.edit(this._exposedValue.value, this._valueGroup, this._exposedValue);
+		ValEdit.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
 		super.onValueObjectChange(evt);
 	}
 	

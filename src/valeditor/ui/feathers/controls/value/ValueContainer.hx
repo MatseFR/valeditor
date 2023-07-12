@@ -11,6 +11,19 @@ import valedit.ui.IValueUI;
  */
 class ValueContainer extends LayoutGroup implements IGroupUI 
 {
+	static private var _POOL:Array<ValueContainer> = new Array<ValueContainer>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():ValueContainer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ValueContainer();
+	}
+	
 	private var _controls:Array<IValueUI> = new Array<IValueUI>();
 	
 	/**
@@ -19,7 +32,18 @@ class ValueContainer extends LayoutGroup implements IGroupUI
 	public function new() 
 	{
 		super();
-		
+	}
+	
+	public function clearContent():Void
+	{
+		removeChildren();
+		this._controls.resize(0);
+	}
+	
+	public function pool():Void
+	{
+		clearContent();
+		_POOL[_POOL.length] = this;
 	}
 	
 	public function addExposedControl(control:IValueUI):Void 

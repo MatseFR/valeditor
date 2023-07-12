@@ -11,7 +11,7 @@ import feathers.layout.VerticalLayout;
 import feathers.utils.MathUtil;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloatDrag;
@@ -25,6 +25,19 @@ import valeditor.ui.feathers.variant.LabelVariant;
  */
 class FloatDraggerUI extends ValueUI 
 {
+	static private var _POOL:Array<FloatDraggerUI> = new Array<FloatDraggerUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FloatDraggerUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FloatDraggerUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -55,6 +68,18 @@ class FloatDraggerUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._floatValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

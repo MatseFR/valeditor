@@ -1,5 +1,5 @@
 package valeditor.ui.feathers.controls.value;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.value.ExposedPath;
 import valeditor.utils.file.FolderSelectorDesktop;
 #if desktop
@@ -23,6 +23,19 @@ import valeditor.ui.feathers.variant.LabelVariant;
  */
 class PathUI extends ValueUI 
 {
+	static private var _POOL:Array<PathUI> = new Array<PathUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():PathUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new PathUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -54,6 +67,18 @@ class PathUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._pathValue = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

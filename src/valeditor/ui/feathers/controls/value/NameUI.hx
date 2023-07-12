@@ -12,6 +12,19 @@ import valeditor.ui.feathers.Spacing;
  */
 class NameUI extends ValueUI 
 {
+	static private var _POOL:Array<NameUI> = new Array<NameUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():NameUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new NameUI();
+	}
+	
 	private var _label:Label;
 	
 	/**
@@ -21,6 +34,12 @@ class NameUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

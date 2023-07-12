@@ -16,7 +16,7 @@ import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.TextInputVariant;
 import valeditor.utils.MathUtil;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloatRange;
@@ -30,6 +30,19 @@ import valeditor.ui.feathers.controls.ValueWedge;
  */
 class FloatRangeUI extends ValueUI 
 {
+	static private var _POOL:Array<FloatRangeUI> = new Array<FloatRangeUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FloatRangeUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FloatRangeUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -61,6 +74,18 @@ class FloatRangeUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._floatRange = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

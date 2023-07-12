@@ -26,6 +26,19 @@ import valeditor.ui.feathers.FeathersWindows;
  */
 class SoundUI extends ValueUI 
 {
+	static private var _POOL:Array<SoundUI> = new Array<SoundUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():SoundUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new SoundUI();
+	}
+	
 	private var _label:Label;
 	
 	private var _contentGroup:LayoutGroup;
@@ -47,6 +60,22 @@ class SoundUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		if (this._soundChannel != null)
+		{
+			this._soundChannel.stop();
+			this._soundChannel = null;
+		}
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

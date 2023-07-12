@@ -25,6 +25,19 @@ import valedit.ui.IValueUI;
  */
 class BitmapUI extends ValueUI 
 {
+	static private var _POOL:Array<BitmapUI> = new Array<BitmapUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():BitmapUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new BitmapUI();
+	}
+	
 	private var _label:Label;
 	
 	private var _contentGroup:LayoutGroup;
@@ -44,6 +57,12 @@ class BitmapUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void 
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

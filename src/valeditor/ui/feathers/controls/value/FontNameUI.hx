@@ -17,7 +17,7 @@ import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFontName;
@@ -28,6 +28,19 @@ import valedit.value.ExposedFontName;
  */
 class FontNameUI extends ValueUI 
 {
+	static private var _POOL:Array<FontNameUI> = new Array<FontNameUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():FontNameUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new FontNameUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -59,6 +72,18 @@ class FontNameUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._fontName = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

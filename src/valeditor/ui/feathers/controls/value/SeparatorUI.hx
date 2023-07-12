@@ -12,6 +12,19 @@ import feathers.layout.VerticalLayoutData;
 @:styleContext
 class SeparatorUI extends ValueUI 
 {
+	static private var _POOL:Array<SeparatorUI> = new Array<SeparatorUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():SeparatorUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new SeparatorUI();
+	}
+	
 	public var paddingBottom(get, set):Float;
 	public var paddingLeft(get, set):Float;
 	public var paddingRight(get, set):Float;
@@ -49,6 +62,12 @@ class SeparatorUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

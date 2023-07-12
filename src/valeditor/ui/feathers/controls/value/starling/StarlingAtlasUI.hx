@@ -27,6 +27,19 @@ import valeditor.ui.feathers.Spacing;
  */
 class StarlingAtlasUI extends ValueUI 
 {
+	static private var _POOL:Array<StarlingAtlasUI> = new Array<StarlingAtlasUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():StarlingAtlasUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new StarlingAtlasUI();
+	}
+	
 	private var _label:Label;
 	
 	private var _contentGroup:LayoutGroup;
@@ -46,6 +59,12 @@ class StarlingAtlasUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

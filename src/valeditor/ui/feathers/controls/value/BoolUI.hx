@@ -25,6 +25,19 @@ import valeditor.ui.feathers.controls.ValueWedge;
  */
 class BoolUI extends ValueUI 
 {
+	static private var _POOL:Array<BoolUI> = new Array<BoolUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():BoolUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new BoolUI();
+	}
+	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
 	private var _check:Check;
@@ -41,6 +54,12 @@ class BoolUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

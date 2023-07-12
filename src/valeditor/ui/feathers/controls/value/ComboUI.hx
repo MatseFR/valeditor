@@ -16,7 +16,7 @@ import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedCombo;
@@ -27,6 +27,19 @@ import valedit.value.ExposedCombo;
  */
 class ComboUI extends ValueUI 
 {
+	static private var _POOL:Array<ComboUI> = new Array<ComboUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():ComboUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ComboUI();
+	}
+	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
 		if (value == null)
@@ -56,6 +69,18 @@ class ComboUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	override public function clear():Void 
+	{
+		super.clear();
+		this._combo = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

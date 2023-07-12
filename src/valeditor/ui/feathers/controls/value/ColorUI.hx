@@ -33,6 +33,19 @@ import valeditor.ui.feathers.Padding;
  */
 class ColorUI extends ValueUI 
 {
+	static private var _POOL:Array<ColorUI> = new Array<ColorUI>();
+	
+	static public function disposePool():Void
+	{
+		_POOL.resize(0);
+	}
+	
+	static public function fromPool():ColorUI
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ColorUI();
+	}
+	
 	private var _previewGroup:LayoutGroup;
 	private var _label:Label;
 	private var _preview:LayoutGroup;
@@ -66,6 +79,12 @@ class ColorUI extends ValueUI
 	{
 		super();
 		initializeNow();
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 
