@@ -2,7 +2,6 @@ package valeditor.ui.feathers;
 import valeditor.ui.feathers.controls.value.BitmapUI;
 import valeditor.ui.feathers.controls.value.BoolUI;
 import valeditor.ui.feathers.controls.value.ByteArrayUI;
-import valeditor.ui.feathers.controls.value.ColorReadOnlyUI;
 import valeditor.ui.feathers.controls.value.ColorUI;
 import valeditor.ui.feathers.controls.value.ComboUI;
 import valeditor.ui.feathers.controls.value.FloatDraggerUI;
@@ -43,165 +42,199 @@ import valeditor.ui.feathers.controls.value.starling.StarlingTextureUI;
  */
 class FeathersFactories 
 {
+	static public function disposePools():Void
+	{
+		BitmapUI.disposePool();
+		BoolUI.disposePool();
+		ByteArrayUI.disposePool();
+		ColorUI.disposePool();
+		ComboUI.disposePool();
+		#if desktop
+		FilePathUI.disposePool();
+		#end
+		FloatUI.disposePool();
+		FloatDraggerUI.disposePool();
+		FloatRangeUI.disposePool();
+		FontNameUI.disposePool();
+		FunctionUI.disposePool();
+		GroupUI.disposePool();
+		IntUI.disposePool();
+		IntDraggerUI.disposePool();
+		IntRangeUI.disposePool();
+		NameUI.disposePool();
+		NoteUI.disposePool();
+		ObjectUI.disposePool();
+		ObjectReferenceUI.disposePool();
+		#if desktop
+		PathUI.disposePool();
+		#end
+		SelectUI.disposePool();
+		SeparatorUI.disposePool();
+		SoundUI.disposePool();
+		SpacingUI.disposePool();
+		StringUI.disposePool();
+		TextUI.disposePool();
+		TextAssetUI.disposePool();
+		
+		#if starling
+		StarlingAtlasUI.disposePool();
+		StarlingTextureUI.disposePool();
+		#end
+	}
 	
 	static public function exposedBitmap():IValueUI
 	{
-		return new BitmapUI();
+		return BitmapUI.fromPool();
 	}
 	
 	static public function exposedBitmapData():IValueUI
 	{
-		return new BitmapUI();
+		return BitmapUI.fromPool();
 	}
 	
 	static public function exposedBool():IValueUI
 	{
-		return new BoolUI();
+		return BoolUI.fromPool();
 	}
 	
 	static public function exposedByteArray():IValueUI
 	{
-		return new ByteArrayUI();
+		return ByteArrayUI.fromPool();
 	}
 	
 	static public function exposedColor():IValueUI
 	{
-		return new ColorUI();
-	}
-	
-	static public function exposedColorReadOnly():IValueUI
-	{
-		return new ColorReadOnlyUI();
+		return ColorUI.fromPool();
 	}
 	
 	static public function exposedCombo():IValueUI
 	{
-		return new ComboUI();
+		return ComboUI.fromPool();
 	}
 	
 	#if desktop
 	static public function exposedFilePath():IValueUI
 	{
-		return new FilePathUI();
+		return FilePathUI.fromPool();
 	}
 	#end
 	
 	static public function exposedFloat():IValueUI
 	{
-		return new FloatUI();
+		return FloatUI.fromPool();
 	}
 	
 	static public function exposedFloatDrag():IValueUI
 	{
-		return new FloatDraggerUI();
+		return FloatDraggerUI.fromPool();
 	}
 	
 	static public function exposedFloatRange():IValueUI
 	{
-		return new FloatRangeUI();
+		return FloatRangeUI.fromPool();
 	}
 	
 	static public function exposedFontName():IValueUI
 	{
-		return new FontNameUI();
+		return FontNameUI.fromPool();
 	}
 	
 	static public function exposedFunction():IValueUI
 	{
-		return new FunctionUI();
+		return FunctionUI.fromPool();
 	}
 	
 	static public function exposedGroup():IValueUI
 	{
-		return new GroupUI();
+		return GroupUI.fromPool();
 	}
 	
 	static public function exposedInt():IValueUI
 	{
-		return new IntUI();
+		return IntUI.fromPool();
 	}
 	
 	static public function exposedIntDrag():IValueUI
 	{
-		return new IntDraggerUI();
+		return IntDraggerUI.fromPool();
 	}
 	
 	static public function exposedIntRange():IValueUI
 	{
-		return new IntRangeUI();
+		return IntRangeUI.fromPool();
 	}
 	
 	static public function exposedName():IValueUI
 	{
-		return new NameUI();
+		return NameUI.fromPool();
 	}
 	
 	static public function exposedNote():IValueUI
 	{
-		return new NoteUI();
+		return NoteUI.fromPool();
 	}
 	
 	static public function exposedObject():IValueUI
 	{
-		return new ObjectUI();
+		return ObjectUI.fromPool();
 	}
 	
 	static public function exposedObjectReference():IValueUI
 	{
-		return new ObjectReferenceUI();
+		return ObjectReferenceUI.fromPool();
 	}
 	
 	#if desktop
 	static public function exposedPath():IValueUI
 	{
-		return new PathUI();
+		return PathUI.fromPool();
 	}
 	#end
 	
 	static public function exposedSelect():IValueUI
 	{
-		return new SelectUI();
+		return SelectUI.fromPool();
 	}
 	
 	static public function exposedSeparator():IValueUI
 	{
-		return new SeparatorUI();
+		return SeparatorUI.fromPool();
 	}
 	
 	static public function exposedSound():IValueUI
 	{
-		return new SoundUI();
+		return SoundUI.fromPool();
 	}
 	
 	static public function exposedSpacing():IValueUI
 	{
-		return new SpacingUI();
+		return SpacingUI.fromPool();
 	}
 	
 	static public function exposedString():IValueUI
 	{
-		return new StringUI();
+		return StringUI.fromPool();
 	}
 	
 	static public function exposedText():IValueUI
 	{
-		return new TextUI();
+		return TextUI.fromPool();
 	}
 	
 	static public function exposedTextAsset():IValueUI
 	{
-		return new TextAssetUI();
+		return TextAssetUI.fromPool();
 	}
 	
 	#if starling
 	static public function exposedStarlingAtlas():IValueUI
 	{
-		return new StarlingAtlasUI();
+		return StarlingAtlasUI.fromPool();
 	}
 	
 	static public function exposedStarlingTexture():IValueUI
 	{
-		return new StarlingTextureUI();
+		return StarlingTextureUI.fromPool();
 	}
 	#end
 	
