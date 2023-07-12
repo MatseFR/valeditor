@@ -3,7 +3,7 @@ package valeditor;
 import haxe.Constraints.Function;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
-import valedit.ExposedValue;
+import valedit.value.base.ExposedValue;
 import valedit.IValEditContainer;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
