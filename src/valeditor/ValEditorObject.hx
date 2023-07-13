@@ -34,6 +34,7 @@ class ValEditorObject extends ValEditObject
 	public var hasScaleProperties:Bool;
 	public var hasTransformProperty:Bool;
 	public var hasTransformationMatrixProperty:Bool;
+	public var hasVisibleProperty:Bool;
 	public var hasRadianRotation:Bool;
 	public var interactiveObject(get, set):IInteractiveObject;
 	public var isMouseDown:Bool;
@@ -215,13 +216,6 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			//if (this.realObject != this.object)
-			//{
-				//this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
-				//if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
-				//Reflect.setProperty(this.realObject, this._realPropertyName, Reflect.getProperty(this.realObject, this._realPropertyName) + value);
-			//}
-			
 			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
 			{
 				this._interactiveObject.objectUpdate(this);
@@ -257,13 +251,6 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			//if (this.realObject != this.object)
-			//{
-				//this._realPropertyName = this.realPropertyMap.getObjectPropertyName(regularPropertyName);
-				//if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
-				//Reflect.setProperty(this.realObject, this._realPropertyName, value);
-			//}
-			
 			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
 			{
 				this._interactiveObject.objectUpdate(this);

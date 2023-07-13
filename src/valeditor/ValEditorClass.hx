@@ -17,6 +17,8 @@ class ValEditorClass extends ValEditClass
 	public var hasScaleProperties:Bool;
 	public var hasTransformProperty:Bool;
 	public var hasTransformationMatrixProperty:Bool;
+	public var hasVisibleProperty:Bool;
+	
 	public var hasRadianRotation:Bool;
 
 	public function new(?classReference:Class<Dynamic>, ?className:String, ?sourceCollection:ExposedCollection, canBeCreated:Bool = true, isDisplayObject:Bool = false, ?constructorCollection:ExposedCollection)

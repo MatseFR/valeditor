@@ -228,6 +228,7 @@ class ValEditor
 		v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
 		v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
 		v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
+		v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
 		
 		var objCollection:ArrayCollection<ValEditorObject>;
 		var strCollection:ArrayCollection<StringData>;
@@ -382,6 +383,7 @@ class ValEditor
 			valObject.hasScaleProperties = valClass.hasScaleProperties;
 			valObject.hasTransformProperty = valClass.hasTransformProperty;
 			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 			valObject.hasRadianRotation = valClass.hasRadianRotation;
 		}
 		
