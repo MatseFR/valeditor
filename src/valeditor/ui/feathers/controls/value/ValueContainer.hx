@@ -52,6 +52,15 @@ class ValueContainer extends LayoutGroup implements IGroupUI
 		addChild(cast control);
 	}
 	
+	public function addExposedControls(controls:Array<IValueUI>):Void
+	{
+		for (control in controls)
+		{
+			this._controls.push(control);
+			addChild(cast control);
+		}
+	}
+	
 	public function addExposedControlAfter(control:IValueUI, afterControl:IValueUI):Void
 	{
 		var index:Int = this._controls.indexOf(afterControl);
@@ -78,6 +87,15 @@ class ValueContainer extends LayoutGroup implements IGroupUI
 	{
 		this._controls.remove(control);
 		removeChild(cast control);
+	}
+	
+	public function removeAllExposedControls():Void
+	{
+		for (control in this._controls)
+		{
+			removeChild(cast control);
+		}
+		this._controls.resize(0);
 	}
 	
 	public function updateExposedValues():Void
