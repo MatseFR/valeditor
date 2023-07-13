@@ -170,7 +170,7 @@ class ObjectUI extends ValueUI
 		if (this._objectCollection == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			this._objectCollection = ValEdit.edit(_exposedValue.value, this._valueGroup, cast this._exposedValue);
+			this._objectCollection = ValEdit.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
 		}
 		if (this._objectCollection != null)
 		{
@@ -216,7 +216,14 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		ValEdit.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
+		if (this._objectCollection == null)
+		{
+			this._objectCollection = ValEdit.edit(this._exposedObject.value, this._valueGroup, this._exposedObject);
+		}
+		else
+		{
+			this._objectCollection.object = this._exposedObject.value;
+		}
 		super.onValueObjectChange(evt);
 	}
 	
