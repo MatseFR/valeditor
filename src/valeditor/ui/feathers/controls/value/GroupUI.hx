@@ -114,6 +114,15 @@ class GroupUI extends ValueUI implements IGroupUI
 		this._valueGroup.addChild(cast control);
 	}
 	
+	public function addExposedControls(controls:Array<IValueUI>):Void
+	{
+		for (control in controls)
+		{
+			this._controls.push(control);
+			this._valueGroup.addChild(cast control);
+		}
+	}
+	
 	public function addExposedControlAfter(control:IValueUI, afterControl:IValueUI):Void
 	{
 		var index:Int = this._controls.indexOf(afterControl);
@@ -140,6 +149,15 @@ class GroupUI extends ValueUI implements IGroupUI
 	{
 		this._controls.remove(control);
 		this._valueGroup.removeChild(cast control);
+	}
+	
+	public function removeAllExposedControls():Void
+	{
+		for (control in this._controls)
+		{
+			this._valueGroup.removeChild(cast control);
+		}
+		this._controls.resize(0);
 	}
 	
 	override public function initExposedValue():Void 
