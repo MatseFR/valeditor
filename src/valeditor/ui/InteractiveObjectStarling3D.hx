@@ -84,6 +84,7 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		this._interestMap.set(RegularPropertyName.SCALE_Z, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		this._interestMap.set(RegularPropertyName.VISIBLE, true);
 		
 		this._quad = new Quad(1, 1, 0xff0000);
 		this._quad.alpha = 0.25;
@@ -208,6 +209,11 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		}
 		
 		this.scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
+		
+		if (object.hasVisibleProperty)
+		{
+			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
+		}
 	}
 	
 }

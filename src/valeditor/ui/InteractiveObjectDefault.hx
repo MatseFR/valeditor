@@ -100,6 +100,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		this._interestMap.set(RegularPropertyName.SCALE_Y, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		this._interestMap.set(RegularPropertyName.VISIBLE, true);
 		
 		this._shape = new Shape();
 		addChild(this._shape);
@@ -187,6 +188,11 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		else
 		{
 			this.rotation = rotation;
+		}
+		
+		if (object.hasVisibleProperty)
+		{
+			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
 		}
 	}
 	

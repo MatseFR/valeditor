@@ -76,6 +76,7 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		this._interestMap.set(RegularPropertyName.SCALE_Y, true);
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
+		this._interestMap.set(RegularPropertyName.VISIBLE, true);
 		
 		setTo(minWidth, minHeight);
 	}
@@ -164,6 +165,11 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		else
 		{
 			this.rotation = MathUtil.deg2rad(rotation);
+		}
+		
+		if (object.hasVisibleProperty)
+		{
+			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
 		}
 	}
 	
