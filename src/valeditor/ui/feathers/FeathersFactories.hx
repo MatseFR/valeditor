@@ -1,4 +1,5 @@
 package valeditor.ui.feathers;
+import valedit.ui.UICollection;
 import valeditor.ui.feathers.controls.value.BitmapUI;
 import valeditor.ui.feathers.controls.value.BoolUI;
 import valeditor.ui.feathers.controls.value.ByteArrayUI;
@@ -44,6 +45,8 @@ class FeathersFactories
 {
 	static public function disposePools():Void
 	{
+		UICollection.disposePool();
+		
 		BitmapUI.disposePool();
 		BoolUI.disposePool();
 		ByteArrayUI.disposePool();
