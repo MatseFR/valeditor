@@ -32,9 +32,9 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 			this._exposedValue.addEventListener(ValueEvent.ACCESS_CHANGE, onValueAccessChange);
 			this._exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
 			this._exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+			initExposedValue();
+			updateExposedValue();
 		}
-		initExposedValue();
-		updateExposedValue();
 		return this._exposedValue;
 	}
 	
