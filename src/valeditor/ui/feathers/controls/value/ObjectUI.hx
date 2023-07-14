@@ -8,11 +8,10 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ExposedCollection;
-import valedit.value.base.ExposedValue;
-import valedit.ValEdit;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObject;
+import valedit.value.base.ExposedValue;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.controls.value.ValueUI;
@@ -45,7 +44,7 @@ class ObjectUI extends ValueUI
 			this._exposedObject = null;
 			if (this._objectCollection != null)
 			{
-				ValEdit.edit(null, this._valueGroup);
+				ValEditor.edit(null, this._valueGroup);
 				this._objectCollection = null;
 			}
 		}
@@ -54,7 +53,7 @@ class ObjectUI extends ValueUI
 			this._exposedObject = cast value;
 			if (this._objectCollection == null)
 			{
-				this._objectCollection = ValEdit.edit(value.value, this._valueGroup, cast value);
+				this._objectCollection = ValEditor.edit(value.value, this._valueGroup, cast value);
 			}
 			else
 			{
@@ -95,7 +94,7 @@ class ObjectUI extends ValueUI
 		this._exposedObject = null;
 		if (this._objectCollection != null)
 		{
-			ValEdit.edit(null, this._valueGroup);
+			ValEditor.edit(null, this._valueGroup);
 			this._objectCollection = null;
 		}
 	}
@@ -170,7 +169,7 @@ class ObjectUI extends ValueUI
 		if (this._objectCollection == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			this._objectCollection = ValEdit.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
+			this._objectCollection = ValEditor.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
 		}
 		if (this._objectCollection != null)
 		{
@@ -218,7 +217,7 @@ class ObjectUI extends ValueUI
 	{
 		if (this._objectCollection == null)
 		{
-			this._objectCollection = ValEdit.edit(this._exposedObject.value, this._valueGroup, this._exposedObject);
+			this._objectCollection = ValEditor.edit(this._exposedObject.value, this._valueGroup, this._exposedObject);
 		}
 		else
 		{

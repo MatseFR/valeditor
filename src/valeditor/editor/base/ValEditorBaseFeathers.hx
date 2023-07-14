@@ -153,41 +153,41 @@ class ValEditorBaseFeathers extends Application
 	**/
 	private function registerExposedValuesUI():Void
 	{
-		ValEdit.registerUIClass(ExposedBitmap, FeathersFactories.exposedBitmap);
-		ValEdit.registerUIClass(ExposedBitmapData, FeathersFactories.exposedBitmapData);
-		ValEdit.registerUIClass(ExposedBool, FeathersFactories.exposedBool);
-		ValEdit.registerUIClass(ExposedByteArray, FeathersFactories.exposedByteArray);
-		ValEdit.registerUIClass(ExposedColor, FeathersFactories.exposedColor);
-		ValEdit.registerUIClass(ExposedCombo, FeathersFactories.exposedCombo);
-		ValEdit.registerUIClass(ExposedFloat, FeathersFactories.exposedFloat);
-		ValEdit.registerUIClass(ExposedFloatDrag, FeathersFactories.exposedFloatDrag);
-		ValEdit.registerUIClass(ExposedFloatRange, FeathersFactories.exposedFloatRange);
-		ValEdit.registerUIClass(ExposedFontName, FeathersFactories.exposedFontName);
-		ValEdit.registerUIClass(ExposedFunction, FeathersFactories.exposedFunction);
-		ValEdit.registerUIClass(ExposedGroup, FeathersFactories.exposedGroup);
-		ValEdit.registerUIClass(ExposedInt, FeathersFactories.exposedInt);
-		ValEdit.registerUIClass(ExposedIntDrag, FeathersFactories.exposedIntDrag);
-		ValEdit.registerUIClass(ExposedIntRange, FeathersFactories.exposedIntRange);
-		ValEdit.registerUIClass(ExposedName, FeathersFactories.exposedName);
-		ValEdit.registerUIClass(ExposedNote, FeathersFactories.exposedNote);
-		ValEdit.registerUIClass(ExposedObject, FeathersFactories.exposedObject);
-		ValEdit.registerUIClass(ExposedObjectReference, FeathersFactories.exposedObjectReference);
-		ValEdit.registerUIClass(ExposedSelect, FeathersFactories.exposedSelect);
-		ValEdit.registerUIClass(ExposedSeparator, FeathersFactories.exposedSeparator);
-		ValEdit.registerUIClass(ExposedSound, FeathersFactories.exposedSound);
-		ValEdit.registerUIClass(ExposedSpacing, FeathersFactories.exposedSpacing);
-		ValEdit.registerUIClass(ExposedString, FeathersFactories.exposedString);
-		ValEdit.registerUIClass(ExposedText, FeathersFactories.exposedText);
-		ValEdit.registerUIClass(ExposedTextAsset, FeathersFactories.exposedTextAsset);
+		ValEditor.registerUIClass(ExposedBitmap, FeathersFactories.exposedBitmap);
+		ValEditor.registerUIClass(ExposedBitmapData, FeathersFactories.exposedBitmapData);
+		ValEditor.registerUIClass(ExposedBool, FeathersFactories.exposedBool);
+		ValEditor.registerUIClass(ExposedByteArray, FeathersFactories.exposedByteArray);
+		ValEditor.registerUIClass(ExposedColor, FeathersFactories.exposedColor);
+		ValEditor.registerUIClass(ExposedCombo, FeathersFactories.exposedCombo);
+		ValEditor.registerUIClass(ExposedFloat, FeathersFactories.exposedFloat);
+		ValEditor.registerUIClass(ExposedFloatDrag, FeathersFactories.exposedFloatDrag);
+		ValEditor.registerUIClass(ExposedFloatRange, FeathersFactories.exposedFloatRange);
+		ValEditor.registerUIClass(ExposedFontName, FeathersFactories.exposedFontName);
+		ValEditor.registerUIClass(ExposedFunction, FeathersFactories.exposedFunction);
+		ValEditor.registerUIClass(ExposedGroup, FeathersFactories.exposedGroup);
+		ValEditor.registerUIClass(ExposedInt, FeathersFactories.exposedInt);
+		ValEditor.registerUIClass(ExposedIntDrag, FeathersFactories.exposedIntDrag);
+		ValEditor.registerUIClass(ExposedIntRange, FeathersFactories.exposedIntRange);
+		ValEditor.registerUIClass(ExposedName, FeathersFactories.exposedName);
+		ValEditor.registerUIClass(ExposedNote, FeathersFactories.exposedNote);
+		ValEditor.registerUIClass(ExposedObject, FeathersFactories.exposedObject);
+		ValEditor.registerUIClass(ExposedObjectReference, FeathersFactories.exposedObjectReference);
+		ValEditor.registerUIClass(ExposedSelect, FeathersFactories.exposedSelect);
+		ValEditor.registerUIClass(ExposedSeparator, FeathersFactories.exposedSeparator);
+		ValEditor.registerUIClass(ExposedSound, FeathersFactories.exposedSound);
+		ValEditor.registerUIClass(ExposedSpacing, FeathersFactories.exposedSpacing);
+		ValEditor.registerUIClass(ExposedString, FeathersFactories.exposedString);
+		ValEditor.registerUIClass(ExposedText, FeathersFactories.exposedText);
+		ValEditor.registerUIClass(ExposedTextAsset, FeathersFactories.exposedTextAsset);
 		
 		#if desktop
-		ValEdit.registerUIClass(ExposedFilePath, FeathersFactories.exposedFilePath);
-		ValEdit.registerUIClass(ExposedPath, FeathersFactories.exposedPath);
+		ValEditor.registerUIClass(ExposedFilePath, FeathersFactories.exposedFilePath);
+		ValEditor.registerUIClass(ExposedPath, FeathersFactories.exposedPath);
 		#end
 		
 		#if starling
-		ValEdit.registerUIClass(ExposedStarlingAtlas, FeathersFactories.exposedStarlingAtlas);
-		ValEdit.registerUIClass(ExposedStarlingTexture, FeathersFactories.exposedStarlingTexture);
+		ValEditor.registerUIClass(ExposedStarlingAtlas, FeathersFactories.exposedStarlingAtlas);
+		ValEditor.registerUIClass(ExposedStarlingTexture, FeathersFactories.exposedStarlingTexture);
 		#end
 	}
 	

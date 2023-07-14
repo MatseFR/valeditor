@@ -16,7 +16,6 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valedit.ExposedCollection;
-import valedit.ValEdit;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -282,11 +281,11 @@ class ObjectCreationFromClassView extends LayoutGroup
 		if (this._classPicker.selectedIndex != -1)
 		{
 			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem.value);
-			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
+			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else
 		{
-			ValEdit.editConstructor(null, this._constructorContainer);
+			ValEditor.editConstructor(null, this._constructorContainer);
 			this._constructorCollection = null;
 			this._valEditClass = null;
 		}

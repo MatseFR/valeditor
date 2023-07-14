@@ -59,7 +59,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		this.editView = new EditorView();
 		this.editView.initializeNow();
-		ValEdit.uiContainerDefault = this.editView.editContainer;
+		ValEditor.uiContainerDefault = this.editView.editContainer;
 		
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);

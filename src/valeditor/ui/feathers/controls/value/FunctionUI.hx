@@ -160,7 +160,7 @@ class FunctionUI extends ValueUI
 			var uiControl:IValueUI;
 			for (exposedValue in exposedValues)
 			{
-				uiControl = ValEdit.toUIControl(exposedValue);
+				uiControl = ValEditor.toUIControl(exposedValue);
 				this._valueGroup.addChild(cast uiControl);
 				this._parameterControls.push(uiControl);
 			}

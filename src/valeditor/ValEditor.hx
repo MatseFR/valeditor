@@ -13,7 +13,11 @@ import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
+import valedit.ValEditTemplate;
+import valedit.ui.IValueUI;
 import valedit.util.RegularPropertyName;
+import valedit.value.base.ExposedValue;
+import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import inputAction.Input;
@@ -41,13 +45,12 @@ class ValEditor
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
 	#end
 	static public var selection(default, null):Selection = new Selection();
+	static public var uiContainerDefault:DisplayObjectContainer;
 	static public var viewPort(default, null):ViewPort = new ViewPort();
 	
 	static public var categoryCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var classCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
-	
-	
 	
 	static public var isMouseOverUI:Bool;
 	
@@ -154,6 +157,8 @@ class ValEditor
 	static private var _classNameToStringData:Map<String, StringData> = new Map<String, StringData>();
 	
 	static private var _classMap:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
+	static private var _displayMap:Map<DisplayObjectContainer, ValEditClass> = new Map<DisplayObjectContainer, ValEditClass>();
+	static private var _uiClassMap:Map<String, Void->IValueUI> = new Map<String, Void->IValueUI>();
 	
 	static public function init():Void
 	{
@@ -362,6 +367,177 @@ class ValEditor
 		
 		_classNameToStringData.remove(className);
 		strClass.pool();
+	}
+	
+	static public function registerUIClass(exposedValueClass:Class<Dynamic>, factory:Void->IValueUI):Void
+	{
+		var className:String = Type.getClassName(exposedValueClass);
+		if (_uiClassMap.exists(className))
+		{
+			trace("ValEdit.registerUIClass ::: Class " + className + " already registered");
+			return;
+		}
+		
+		_uiClassMap[className] = factory;
+	}
+	
+	static public function unregisterUIClass(exposedValueClass:Class<Dynamic>):Void
+	{
+		var className:String = Type.getClassName(exposedValueClass);
+		if (!_uiClassMap.exists(className))
+		{
+			trace("ValEdit.unregisterUIClass ::: Class " + className + " not registered");
+		}
+		
+		_uiClassMap.remove(className);
+	}
+	
+	/**
+	   
+	   @param	object	instance of a registered Class
+	   @param	uiContainer	if left null uiContainerDefault is used
+	**/
+	static public function edit(object:Dynamic, ?container:DisplayObjectContainer, ?parentValue:ExposedValueWithChildren):ExposedCollection
+	{
+		if (container == null) container = uiContainerDefault;
+		if (container == null)
+		{
+			throw new Error("ValEdit.edit ::: null container");
+		}
+		
+		clearContainer(container);
+		
+		if (object == null) return null;
+		
+		var clss:Class<Dynamic> = Type.getClass(object);
+		var className:String = Type.getClassName(clss);
+		var valClass:ValEditClass = _classMap[className];
+		
+		if (Std.isOfType(object, ValEditObject))
+		{
+			valClass = cast(object, ValEditObject).clss;
+		}
+		else
+		{
+			clss = Type.getClass(object);
+			className = Type.getClassName(clss);
+			valClass = _classMap[className];
+		}
+		
+		if (valClass != null)
+		{
+			_displayMap[container] = valClass;
+			return valClass.addContainer(container, object, parentValue);
+		}
+		else
+		{
+			while (true)
+			{
+				clss = Type.getSuperClass(clss);
+				if (clss == null) break;
+				className = Type.getClassName(clss);
+				valClass = _classMap[className];
+				if (valClass != null)
+				{
+					_displayMap[container] = valClass;
+					return valClass.addContainer(container, object, parentValue);
+				}
+			}
+			throw new Error("ValEdit.edit ::: unknown Class " + Type.getClassName(Type.getClass(object)));
+		}
+	}
+	
+	static public function editConstructor(className:String, ?container:DisplayObjectContainer):ExposedCollection
+	{
+		if (container == null) container = uiContainerDefault;
+		if (container == null)
+		{
+			throw new Error("ValEdit.editConstructor ::: null container");
+		}
+		
+		clearContainer(container);
+		
+		if (className == null) return null;
+		
+		var valClass:ValEditClass = _classMap[className];
+		if (valClass != null)
+		{
+			if (valClass.constructorCollection != null)
+			{
+				_displayMap[container] = valClass;
+				return valClass.addConstructorContainer(container);
+			}
+			else
+			{
+				return null;
+			}
+		}
+		else
+		{
+			throw new Error("ValEdit.edit ::: unknown Class " + className);
+		}
+	}
+	
+	/**
+	   
+	   @param	a registered Class
+	   @param	uiContainer	if left null uiContainerDefault is used
+	**/
+	static public function editConstructorWithClass<T>(clss:Class<T>, ?container:DisplayObjectContainer):ExposedCollection
+	{
+		return editConstructor(Type.getClassName(clss), container);
+	}
+	
+	
+	static public function editTemplate(template:ValEditTemplate, ?container:DisplayObjectContainer):Void
+	{
+		if (container == null) container = uiContainerDefault;
+		if (container == null)
+		{
+			throw new Error("ValEdit.editTemplate ::: null container");
+		}
+		
+		clearContainer(container);
+		
+		if (template == null) return;
+		
+		var valClass:ValEditClass = _classMap.get(template.className);
+		valClass.addTemplateContainer(container, template);
+	}
+	
+	/**
+	   
+	   @param	container
+	**/
+	static public function clearContainer(?container:DisplayObjectContainer):Void
+	{
+		if (container == null) container = uiContainerDefault;
+		if (container == null)
+		{
+			throw new Error("ValEdit.clearContainer ::: null container");
+		}
+		
+		var valClass:ValEditClass = _displayMap[container];
+		if (valClass != null)
+		{
+			valClass.removeContainer(container);
+			_displayMap.remove(container);
+		}
+	}
+	
+	/**
+	   
+	   @param	exposedValue
+	   @return
+	**/
+	static public function toUIControl<T:ExposedValue>(exposedValue:T):IValueUI
+	{
+		var clss:Class<T> = Type.getClass(exposedValue);
+		var className:String = Type.getClassName(clss);
+		var control:IValueUI = _uiClassMap[className]();
+		control.exposedValue = cast exposedValue;//cast(exposedValue, ExposedValue);
+		cast(exposedValue, ExposedValue).uiControl = control;
+		return control;
 	}
 	
 	static public function createObjectWithClass(clss:Class<Dynamic>, ?id:String, ?params:Array<Dynamic>):ValEditorObject

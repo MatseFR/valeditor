@@ -14,7 +14,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import valedit.ExposedCollection;
-import valedit.ValEdit;
+import valeditor.ValEditor;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
@@ -40,7 +40,7 @@ class ExportSettingsWindow extends Panel
 		if (this._settings == value) return value;
 		if (this._initialized)
 		{
-			this._settingsCollection = ValEdit.edit(value, this._editContainer);
+			this._settingsCollection = ValEditor.edit(value, this._editContainer);
 		}
 		return this._settings = value;
 	}
@@ -100,7 +100,7 @@ class ExportSettingsWindow extends Panel
 		
 		if (this._settings != null)
 		{
-			this._settingsCollection = ValEdit.edit(this._settings, this._editContainer);
+			this._settingsCollection = ValEditor.edit(this._settings, this._editContainer);
 		}
 	}
 	

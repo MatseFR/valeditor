@@ -51,7 +51,7 @@ class ObjectEditWindow extends Panel
 		if (this._editObject == value) return value;
 		if (this._initialized)
 		{
-			ValEdit.edit(value, this._contentGroup);
+			ValEditor.edit(value, this._contentGroup);
 		}
 		return this._editObject = value;
 	}
@@ -124,7 +124,7 @@ class ObjectEditWindow extends Panel
 		
 		if (this._editObject != null)
 		{
-			ValEdit.edit(this._editObject, this._contentGroup);
+			ValEditor.edit(this._editObject, this._contentGroup);
 		}
 	}
 	

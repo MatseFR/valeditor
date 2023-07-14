@@ -302,11 +302,11 @@ class TemplateCreationWindow extends Panel
 		if (this._classPicker.selectedItem != null)
 		{
 			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem);
-			this._constructorCollection = ValEdit.editConstructor(this._valEditClass.className, this._constructorContainer);
+			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
 		}
 		else
 		{
-			ValEdit.editConstructor(null, this._constructorContainer);
+			ValEditor.editConstructor(null, this._constructorContainer);
 			this._constructorCollection = null;
 			this._valEditClass = null;
 		}
