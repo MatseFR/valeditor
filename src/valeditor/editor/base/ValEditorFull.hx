@@ -77,6 +77,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		super.ready();
 		
 		this.screenNavigator.rootItemID = EditorView.ID;
+		
+		ValEditor.currentContainer = ValEditor.rootContainer;
 	}
 	
 	private function onInputActionBegin(evt:InputActionEvent):Void
