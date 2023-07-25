@@ -2,7 +2,7 @@ package valeditor.ui;
 
 import starling.display.Quad;
 import starling.display.Sprite3D;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
 /**

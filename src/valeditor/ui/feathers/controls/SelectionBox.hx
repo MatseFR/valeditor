@@ -1,7 +1,7 @@
 package valeditor.ui.feathers.controls;
 
 import openfl.display.Sprite;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
 /**

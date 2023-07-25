@@ -18,7 +18,7 @@ import starling.events.TouchPhase;
 import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.events.LayerEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;

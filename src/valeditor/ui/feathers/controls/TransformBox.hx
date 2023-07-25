@@ -5,7 +5,7 @@ import feathers.controls.LayoutGroup;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import openfl.display.Sprite;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.ui.UIConfig;
 import valeditor.utils.MathUtil;
 

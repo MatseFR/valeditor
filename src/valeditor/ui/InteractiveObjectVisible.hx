@@ -4,7 +4,7 @@ import openfl.display.BitmapData;
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Matrix;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
 /**

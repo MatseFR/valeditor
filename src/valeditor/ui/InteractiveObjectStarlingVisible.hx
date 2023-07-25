@@ -1,7 +1,7 @@
 package valeditor.ui;
 
 import starling.display.Canvas;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
 /**

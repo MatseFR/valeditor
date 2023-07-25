@@ -15,7 +15,7 @@ import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.ui.IValueUI;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;

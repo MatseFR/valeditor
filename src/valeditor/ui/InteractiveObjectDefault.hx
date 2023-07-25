@@ -2,7 +2,7 @@ package valeditor.ui;
 
 import openfl.display.Shape;
 import openfl.display.Sprite;
-import valedit.util.RegularPropertyName;
+import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
 /**
