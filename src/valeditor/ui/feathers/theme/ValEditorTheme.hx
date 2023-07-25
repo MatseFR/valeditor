@@ -1,6 +1,7 @@
 package valeditor.ui.feathers.theme;
 
 import valeditor.ui.feathers.theme.components.AssetItemRendererStyles;
+import valeditor.ui.feathers.theme.components.FrameItemRendererStyles;
 import valeditor.ui.feathers.theme.components.LabelStyles;
 import valeditor.ui.feathers.theme.components.LayoutGroupStyles;
 import valeditor.ui.feathers.theme.components.SelectionGroupStyles;
@@ -30,14 +31,15 @@ class ValEditorTheme extends SimpleTheme
 		super(lightThemeColor, darkThemeColor);
 		
 		AssetItemRendererStyles.initialize(this, this.styleProvider);
+		FrameItemRendererStyles.initialize(this, this.styleProvider);
 		LabelStyles.initialize(this, this.styleProvider);
 		LayoutGroupStyles.initialize(this, this.styleProvider);
+		NumericDraggerStyles.initialize(this, this.styleProvider);
 		SelectionGroupStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
 		ToggleCustomStyles.initialize(this, this.styleProvider);
 		ToggleLayoutGroupStyles.initialize(this, this.styleProvider);
-		NumericDraggerStyles.initialize(this, this.styleProvider);
 		ValueUIStyles.initialize(this, this.styleProvider);
 		ValueWedgeStyles.initialize(this, this.styleProvider);
 	}
