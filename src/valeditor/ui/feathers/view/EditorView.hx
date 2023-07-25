@@ -55,6 +55,7 @@ class EditorView extends LayoutGroup
 	
 	// center content
 	private var _displayArea:LayoutGroup;
+	private var _scenario:ScenarioView;
 	
 	// right content
 	private var _objectInfoGroup:ToggleLayoutGroup;
@@ -146,6 +147,7 @@ class EditorView extends LayoutGroup
 		var vLayout:VerticalLayout;
 		
 		var startWidth:Float;
+		var startHeight:Float;
 		
 		this.layout = new AnchorLayout();
 		
@@ -181,6 +183,8 @@ class EditorView extends LayoutGroup
 		this._leftBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
 		
 		this._centerBox = new VDividedBox();
+		//startHeight = Lib.current.stage.stageHeight / 4;
+		//this._centerBox.height = startHeight >= this._centerBox.minHeight ? startHeight : this._centerBox.minHeight;
 		this._mainBox.addChild(this._centerBox);
 		
 		this._rightBox = new LayoutGroup();
@@ -220,6 +224,11 @@ class EditorView extends LayoutGroup
 		this._displayArea = new LayoutGroup();
 		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
 		this._centerBox.addChild(this._displayArea);
+		
+		this._scenario = new ScenarioView();
+		startHeight = Lib.current.stage.stageHeight / 4;
+		this._scenario.height = startHeight >= this._scenario.minHeight ? startHeight : this._scenario.minHeight;
+		this._centerBox.addChild(this._scenario);
 		
 		// right content
 		this._objectInfoGroup = new ToggleLayoutGroup();
