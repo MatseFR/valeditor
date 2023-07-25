@@ -1,6 +1,5 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
-import valeditor.utils.ReverseIterator;
 
 /**
  * ...
