@@ -5,8 +5,8 @@ import openfl.errors.Error;
 import valedit.DisplayObjectType;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
-import valedit.util.RegularPropertyName;
-import valedit.util.StringIndexedMap;
+import valedit.utils.RegularPropertyName;
+import valedit.utils.StringIndexedMap;
 import valeditor.events.LayerEvent;
 
 /**
@@ -27,9 +27,10 @@ class ValEditorLayer extends ValEditLayer
 	
 	private var _displayObjects:StringIndexedMap<ValEditorObject> = new StringIndexedMap<ValEditorObject>();
 	
-	public function new() 
+	public function new(?timeLine:ValEditorTimeLine) 
 	{
-		super();
+		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(50);
+		super(timeLine);
 	}
 	
 	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
