@@ -4,6 +4,7 @@ import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
 import feathers.controls.LayoutGroup;
+import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
@@ -11,9 +12,11 @@ import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
+import openfl.display.DisplayObject;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import openfl.events.MouseEvent;
 import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
@@ -87,6 +90,8 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.sortableColumns = true;
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
+		
+		this._grid.addEventListener(MouseEvent.MOUSE_DOWN, onGridMouseDown);
 		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
 	}
@@ -207,6 +212,22 @@ class TemplateLibrary extends LayoutGroup
 	private function onGridKeyUp(evt:KeyboardEvent):Void
 	{
 		evt.stopPropagation();
+	}
+	
+	private function onGridMouseDown(evt:MouseEvent):Void
+	{
+		var object:DisplayObject = evt.target;
+		var template:ValEditorTemplate = null;
+		while (true)
+		{
+			if (object is ItemRenderer)
+			{
+				template = cast(object, ItemRenderer).data;
+				break;
+			}
+			object = object.parent;
+		}
+		ValEditor.libraryDragManager.startDrag(template);
 	}
 	
 	private function onObjectSelectionChange(evt:SelectionEvent):Void
