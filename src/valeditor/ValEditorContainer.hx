@@ -181,6 +181,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		return name;
 	}
 	
+	public function canAddObject():Bool
+	{
+		return cast(this._currentLayer, ValEditorLayer).canAddObject();
+	}
+	
 	override public function addLayer(layer:ValEditLayer):Void 
 	{
 		if (layer.name == null || layer.name == "")
