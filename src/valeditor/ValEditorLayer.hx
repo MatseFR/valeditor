@@ -48,9 +48,14 @@ class ValEditorLayer extends ValEditLayer
 		return visibleObjects;
 	}
 	
-	override public function add(object:ValEditObject):Void 
+	public function canAddObject():Bool
 	{
-		super.add(object);
+		return this.timeLine.frameCurrent != null;
+	}
+	
+	override public function activate(object:ValEditObject):Void 
+	{
+		super.activate(object);
 		
 		var editorObject:ValEditorObject = cast object;
 		
@@ -76,9 +81,9 @@ class ValEditorLayer extends ValEditLayer
 		this.objectCollection.add(editorObject);
 	}
 	
-	override public function remove(object:ValEditObject):Void 
+	override public function deactivate(object:ValEditObject):Void 
 	{
-		super.remove(object);
+		super.deactivate(object);
 		
 		var editorObject:ValEditorObject = cast object;
 		
