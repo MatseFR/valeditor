@@ -183,8 +183,6 @@ class EditorView extends LayoutGroup
 		this._leftBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
 		
 		this._centerBox = new VDividedBox();
-		//startHeight = Lib.current.stage.stageHeight / 4;
-		//this._centerBox.height = startHeight >= this._centerBox.minHeight ? startHeight : this._centerBox.minHeight;
 		this._mainBox.addChild(this._centerBox);
 		
 		this._rightBox = new LayoutGroup();
