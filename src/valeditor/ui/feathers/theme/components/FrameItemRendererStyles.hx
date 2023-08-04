@@ -114,7 +114,7 @@ class FrameItemRendererStyles
 		skin.border = theme.getContrastBorder();
 		skin.width = width;
 		skin.height = height;
-		item.setIconForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(false), skin);
+		item.setSkinForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(false), skin);
 		
 		item.setIconForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(false), start_tween_icon());
 		
@@ -124,7 +124,7 @@ class FrameItemRendererStyles
 		skin.border = theme.getContrastBorder();
 		skin.width = width;
 		skin.height = height;
-		item.setIconForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(true), skin);
+		item.setSkinForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(true), skin);
 		
 		item.setIconForState(FrameItemState.KEYFRAME_SINGLE_TWEEN(true), start_tween_icon());
 		
@@ -352,7 +352,7 @@ class FrameItemRendererStyles
 		
 		// KEYFRAME_END_TWEEN selected
 		skin = new TopBottomAndRightSkin();
-		skin.fill = theme.getThemeFill();
+		skin.fill = theme.getFocusFill();
 		skin.border = theme.getContrastBorder();
 		skin.width = width;
 		skin.height = height;
