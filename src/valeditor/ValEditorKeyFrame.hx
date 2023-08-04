@@ -1,6 +1,9 @@
 package valeditor;
 
+import openfl.events.Event;
 import valedit.ValEditKeyFrame;
+import valedit.ValEditObject;
+import valeditor.events.DefaultEvent;
 
 /**
  * ...
@@ -30,6 +33,18 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function add(object:ValEditObject):Void 
+	{
+		super.add(object);
+		if (this.objects.length == 1) DefaultEvent.dispatch(this, Event.CHANGE);
+	}
+	
+	override public function remove(object:ValEditObject):Void 
+	{
+		super.remove(object);
+		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
 	
 }
