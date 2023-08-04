@@ -22,6 +22,7 @@ import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import inputAction.Input;
 import inputAction.controllers.KeyboardController;
+import valeditor.editor.drag.LibraryDragManager;
 import valeditor.events.EditorEvent;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.data.StringData;
@@ -39,6 +40,7 @@ class ValEditor
 	static public var file(default, null):ValEditorFile = new ValEditorFile();
 	static public var input(default, null):Input = new Input();
 	static public var keyboardController(default, null):KeyboardController;
+	static public var libraryDragManager(default, null):LibraryDragManager;
 	static public var rootContainer(get, set):ValEditorContainer;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
@@ -166,6 +168,7 @@ class ValEditor
 		input.addController(keyboardController);
 		Juggler.start();
 		Juggler.root.add(input);
+		libraryDragManager = new LibraryDragManager();
 		
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
 		classCollection.sortCompareFunction = ArraySort.stringData;
@@ -620,10 +623,10 @@ class ValEditor
 			objCollection.add(valObject);
 		}
 		
-		if (currentContainer != null)
-		{
-			currentContainer.add(valObject);
-		}
+		//if (currentContainer != null)
+		//{
+			//currentContainer.add(valObject);
+		//}
 	}
 	
 	static private function registerTemplateInternal(template:ValEditorTemplate):Void
@@ -674,7 +677,10 @@ class ValEditor
 	{
 		ValEdit.unregisterObjectInternal(valObject);
 		
-		valObject.container.remove(valObject);
+		if (valObject.container != null)
+		{
+			valObject.container.remove(valObject);
+		}
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.remove(valObject);
