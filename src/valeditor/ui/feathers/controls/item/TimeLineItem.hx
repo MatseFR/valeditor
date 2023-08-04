@@ -9,6 +9,8 @@ import feathers.layout.HorizontalListLayout;
 import feathers.layout.VerticalLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valedit.ValEditFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.ui.feathers.renderers.FrameItemRenderer;
@@ -84,7 +86,6 @@ class TimeLineItem extends LayoutGroup
 		this._list.scrollPolicyX = ScrollPolicy.OFF;
 		this._list.scrollPolicyY = ScrollPolicy.OFF;
 		
-		//var recycler = DisplayObjectRecycler.withClass(FrameItemRenderer);
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return FrameItemRenderer.fromPool();
 		});
@@ -94,6 +95,8 @@ class TimeLineItem extends LayoutGroup
 		
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		addChild(this._list);
+		
+		this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 	}
 	
 	private function itemReset(itemRenderer:FrameItemRenderer, state:ListViewItemState):Void
@@ -103,8 +106,9 @@ class TimeLineItem extends LayoutGroup
 	
 	private function itemUpdate(itemRenderer:FrameItemRenderer, state:ListViewItemState):Void
 	{
-		this._frame = cast state.data;
-		if (this._frame.isKeyFrame)
+		itemRenderer.index = state.index;
+		this._frame = cast state.data.frame;
+		if (this._frame != null)
 		{
 			if (this._frame.indexStart == this._frame.indexEnd)
 			{
@@ -208,7 +212,7 @@ class TimeLineItem extends LayoutGroup
 						}
 						else
 						{
-							itemRenderer.state = FrameItemState.KEYFRAME;
+							itemRenderer.state = FrameItemState.KEYFRAME(state.selected);
 						}
 					}
 				}
@@ -223,7 +227,7 @@ class TimeLineItem extends LayoutGroup
 			else
 			{
 				itemRenderer.state = FrameItemState.FRAME(state.selected);
-				//itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_EMPTY(state.selected);
+				//itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_EMPTY(true);
 			}
 		}
 	}
@@ -234,9 +238,40 @@ class TimeLineItem extends LayoutGroup
 		return this;
 	}
 	
+	private function onKeyDown(evt:KeyboardEvent):Void
+	{
+		switch (evt.keyCode)
+		{
+			case Keyboard.F5 :
+				if (evt.shiftKey)
+				{
+					this._timeLine.removeFrame();
+				}
+				else
+				{
+					this._timeLine.insertFrame();
+				}
+			
+			case Keyboard.F6 :
+				if (evt.shiftKey)
+				{
+					this._timeLine.removeKeyFrame();
+				}
+				else
+				{
+					this._timeLine.insertKeyFrame();
+				}
+		}
+		
+		evt.stopPropagation();
+	}
+	
 	private function onListChange(evt:Event):Void
 	{
-		
+		if (this._list.selectedIndex != -1)
+		{
+			this.timeLine.parent.frameIndex = this._list.selectedIndex;
+		}
 	}
 	
 }
