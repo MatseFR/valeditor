@@ -22,6 +22,7 @@ class FrameItemRenderer extends LayoutGroup
 		return new FrameItemRenderer();
 	}
 	
+	public var index:Int;
 	public var state(get, set):#if flash Dynamic #else FrameItemState #end;
 	
 	private var _state:FrameItemState;
@@ -62,8 +63,6 @@ class FrameItemRenderer extends LayoutGroup
 		var vLayout:VerticalLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.LEFT;
 		vLayout.verticalAlign = VerticalAlign.BOTTOM;
-		//vLayout.paddingLeft = 1;
-		//vLayout.paddingBottom = 3;
 		this.layout = vLayout;
 	}
 	
