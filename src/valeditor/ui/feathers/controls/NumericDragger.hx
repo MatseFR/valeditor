@@ -422,22 +422,22 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 			{
 				if (this._isIntValue)
 				{
-					this._input.restrict = "0123456789";
+					this._input.restrict = "-0123456789";
 				}
 				else
 				{
-					this._input.restrict = "0123456789.";
+					this._input.restrict = "-0123456789.";
 				}
 			}
 			else
 			{
 				if (this._isIntValue)
 				{
-					this._input.restrict = "-0123456789";
+					this._input.restrict = "0123456789";
 				}
 				else
 				{
-					this._input.restrict = "-0123456789.";
+					this._input.restrict = "0123456789.";
 				}
 			}
 		}
@@ -747,7 +747,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	{
 		if (!this._inputHasFocus || !this.liveTyping) return;
 		
-		if (this._input.text == "") return;
+		if (this._input.text == "" || this._input.text == "-") return;
 		this.value = restrictValue(Std.parseFloat(this._input.text));
 	}
 	
