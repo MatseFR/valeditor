@@ -1,6 +1,6 @@
 package valeditor.editor;
 import openfl.events.EventDispatcher;
-import valedit.ValEditFrame;
+import valedit.ValEditKeyFrame;
 import valeditor.ValEditorFrameGroup;
 import valeditor.events.SelectionEvent;
 
@@ -32,7 +32,7 @@ class Selection extends EventDispatcher
 		this._templateGroup.clear();
 		if (value != null)
 		{
-			if (Std.isOfType(value, ValEditFrame))
+			if (Std.isOfType(value, ValEditKeyFrame))
 			{
 				this._frameGroup.addFrame(cast value);
 			}
@@ -66,7 +66,7 @@ class Selection extends EventDispatcher
 		super();
 	}
 	
-	public function addFrame(frame:ValEditFrame):Void
+	public function addFrame(frame:ValEditKeyFrame):Void
 	{
 		if (frame == null) return;
 		this._objectGroup.clear();
@@ -75,7 +75,7 @@ class Selection extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function addFrames(frames:Array<ValEditFrame>):Void
+	public function addFrames(frames:Array<ValEditKeyFrame>):Void
 	{
 		if (frames == null || frames.length == 0) return;
 		this._objectGroup.clear();
@@ -129,7 +129,28 @@ class Selection extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function hasFrame(frame:ValEditFrame):Bool
+	public function clearFrames():Void
+	{
+		if (this._frameGroup.numFrames == 0) return;
+		this._frameGroup.clear();
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+	}
+	
+	public function clearObjects():Void
+	{
+		if (this._objectGroup.numObjects == 0) return;
+		this._objectGroup.clear();
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+	}
+	
+	public function clearTemplates():Void
+	{
+		if (this._templateGroup.numTemplates == 0) return;
+		this._templateGroup.clear();
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
+	}
+	
+	public function hasFrame(frame:ValEditKeyFrame):Bool
 	{
 		return this._frameGroup.hasFrame(frame);
 	}
@@ -144,7 +165,7 @@ class Selection extends EventDispatcher
 		return this._templateGroup.hasTemplate(template);
 	}
 	
-	public function removeFrame(frame:ValEditFrame):Void
+	public function removeFrame(frame:ValEditKeyFrame):Void
 	{
 		var removed:Bool = this._frameGroup.removeFrame(frame);
 		if (removed)
@@ -153,7 +174,7 @@ class Selection extends EventDispatcher
 		}
 	}
 	
-	public function removeFrames(frames:Array<ValEditFrame>):Void
+	public function removeFrames(frames:Array<ValEditKeyFrame>):Void
 	{
 		var frameRemoved:Bool = false;
 		var removed:Bool;
