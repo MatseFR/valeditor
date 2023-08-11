@@ -3,23 +3,25 @@ package valeditor.ui.feathers.controls.item;
 import feathers.controls.Check;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
+import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import valeditor.ValEditorLayer;
+import valeditor.ui.feathers.variant.CheckVariant;
 
 /**
  * ...
  * @author Matse
  */
 @:styleContext
-class LayerItem extends LayoutGroup 
+class LayerItem extends LayoutGroupItemRenderer 
 {
 	static private var _POOL:Array<LayerItem> = new Array<LayerItem>();
 	
-	static public function fromPool(layer:ValEditorLayer):LayerItem
+	static public function fromPool(layer:ValEditorLayer = null):LayerItem
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(layer);
 		return new LayerItem(layer);
@@ -48,8 +50,11 @@ class LayerItem extends LayoutGroup
 		super();
 		this.layer = layer;
 		initializeNow();
-		this._name.text = layer.name;
-		this._visibleToggle.selected = layer.visible;
+		if (this.layer != null)
+		{
+			this._name.text = layer.name;
+			this._visibleToggle.selected = layer.visible;
+		}
 	}
 	
 	public function clear():Void
@@ -77,6 +82,7 @@ class LayerItem extends LayoutGroup
 		addChild(this._name);
 		
 		this._visibleToggle = new Check(null, true);
+		this._visibleToggle.variant = CheckVariant.LAYER;
 		this._visibleToggle.addEventListener(Event.CHANGE, onVisibleToggle);
 		addChild(this._visibleToggle);
 	}
