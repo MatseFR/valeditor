@@ -2,11 +2,10 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import openfl.events.Event;
-import valedit.ValEditFrame;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditTimeLine;
 import valeditor.ui.feathers.data.FrameData;
-import valeditor.utils.ReverseIterator;
+import valedit.utils.ReverseIterator;
 
 /**
  * ...
@@ -49,7 +48,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 		return null;
 	}
 	
-	private var _numFrames:Int = 0;
 	private function get_numFrames():Int { return this._numFrames; }
 	private function set_numFrames(value:Int):Int
 	{
@@ -149,13 +147,13 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 			this._frameCurrent.indexEnd++;
 			
-			var lastFrame:ValEditorKeyFrame = this.lastKeyFrame;
+			var lastFrame:ValEditKeyFrame = this.lastKeyFrame;
 			while (lastFrame != null && lastFrame != this._frameCurrent)
 			{
 				lastFrame.indexStart++;
 				lastFrame.indexEnd++;
 				this._frames[lastFrame.indexEnd] = lastFrame;
-				this._frameDatas[lastFrame.indexEnd].frame = lastFrame;
+				this._frameDatas[lastFrame.indexEnd].frame = cast lastFrame;
 				lastFrame = getPreviousKeyFrame(lastFrame);
 			}
 			this._frames[this._frameCurrent.indexEnd] = this._frameCurrent;
@@ -163,7 +161,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 		}
 		else
 		{
-			var keyFrame:ValEditorKeyFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
+			var keyFrame:ValEditKeyFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
 			if (keyFrame == null)
 			{
 				keyFrame = ValEditorKeyFrame.fromPool();
@@ -173,7 +171,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				for (i in 0...this._frameIndex)
 				{
 					this._frames[i] = keyFrame;
-					this._frameDatas[i].frame = keyFrame;
+					this._frameDatas[i].frame = cast keyFrame;
 				}
 			}
 			else
@@ -181,7 +179,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				for (i in keyFrame.indexEnd...this._frameIndex)
 				{
 					this._frames[i] = keyFrame;
-					this._frameDatas[i].frame = keyFrame;
+					this._frameDatas[i].frame = cast keyFrame;
 				}
 				keyFrame.indexEnd = this._frameIndex - 1;
 			}
@@ -208,6 +206,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 						keyFrame = ValEditorKeyFrame.fromPool();
 						registerKeyFrame(keyFrame);
 						keyFrame.indexStart = keyFrame.indexEnd = this._frameIndex + 1;
+						keyFrame.copyObjectsFrom(this._frameCurrent);
 						this._frames[this._frameIndex + 1] = keyFrame;
 						this._frameDatas[this._frameIndex + 1].frame = keyFrame;
 					}
@@ -218,6 +217,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 					registerKeyFrame(keyFrame);
 					keyFrame.indexStart = this._frameIndex + 1;
 					keyFrame.indexEnd = this._frameCurrent.indexEnd;
+					keyFrame.copyObjectsFrom(this._frameCurrent);
 					this._frameCurrent.indexEnd = this._frameIndex;
 					for (i in this._frameIndex + 1...keyFrame.indexEnd + 1)
 					{
@@ -233,23 +233,24 @@ class ValEditorTimeLine extends ValEditTimeLine
 				registerKeyFrame(keyFrame);
 				keyFrame.indexStart = this._frameIndex;
 				keyFrame.indexEnd = this._frameCurrent.indexEnd;
+				keyFrame.copyObjectsFrom(this._frameCurrent);
 				this._frameCurrent.indexEnd = this._frameIndex - 1;
 				for (i in this._frameIndex...keyFrame.indexEnd + 1)
 				{
 					this._frames[i] = keyFrame;
 					this._frameDatas[i].frame = keyFrame;
 				}
-				//this._frameCurrent = keyFrame;
 				setFrameCurrent(keyFrame);
 			}
 		}
 		else
 		{
 			// empty frame
+			var prevFrame:ValEditKeyFrame = null;
 			if (this._frameIndex != 0)
 			{
-				keyFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
-				if (keyFrame == null)
+				prevFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
+				if (prevFrame == null)
 				{
 					keyFrame = ValEditorKeyFrame.fromPool();
 					registerKeyFrame(keyFrame);
@@ -263,20 +264,23 @@ class ValEditorTimeLine extends ValEditTimeLine
 				}
 				else
 				{
-					for (i in keyFrame.indexEnd + 1...this._frameIndex)
+					for (i in prevFrame.indexEnd + 1...this._frameIndex)
 					{
-						this._frames[i] = keyFrame;
-						this._frameDatas[i].frame = keyFrame;
+						this._frames[i] = prevFrame;
+						this._frameDatas[i].frame = cast prevFrame;
 					}
-					keyFrame.indexEnd = this._frameIndex - 1;
+					prevFrame.indexEnd = this._frameIndex - 1;
 				}
 			}
 			keyFrame = ValEditorKeyFrame.fromPool();
 			registerKeyFrame(keyFrame);
 			keyFrame.indexStart = keyFrame.indexEnd = this._frameIndex;
+			if (prevFrame != null)
+			{
+				keyFrame.copyObjectsFrom(prevFrame);
+			}
 			this._frames[this._frameIndex] = keyFrame;
 			this._frameDatas[this._frameIndex] = FrameData.fromPool(keyFrame);
-			//this._frameCurrent = keyFrame;
 			setFrameCurrent(keyFrame);
 		}
 		this.frameCollection.updateAll();
@@ -286,7 +290,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		if (this._frameCurrent != null)
 		{
-			var keyFrame:ValEditorKeyFrame;
+			var keyFrame:ValEditKeyFrame;
 			if (this._frameCurrent.indexStart == this._frameCurrent.indexEnd)
 			{
 				// remove key frame
@@ -295,7 +299,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				{
 					keyFrame.indexStart--;
 					this._frames[keyFrame.indexStart] = keyFrame;
-					this._frameDatas[keyFrame.indexStart].frame = keyFrame;
+					this._frameDatas[keyFrame.indexStart].frame = cast keyFrame;
 					this._frames[keyFrame.indexEnd] = null;
 					this._frameDatas[keyFrame.indexEnd].frame = null;
 					keyFrame.indexEnd--;
@@ -304,7 +308,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 				
 				unregisterKeyFrame(this._frameCurrent);
 				this._frameCurrent.pool();
-				//this._frameCurrent = this._frames[this._frameIndex];
 				setFrameCurrent(this._frames[this._frameIndex]);
 			}
 			else
@@ -318,13 +321,12 @@ class ValEditorTimeLine extends ValEditTimeLine
 				{
 					keyFrame.indexStart--;
 					this._frames[keyFrame.indexStart] = keyFrame;
-					this._frameDatas[keyFrame.indexStart].frame = keyFrame;
+					this._frameDatas[keyFrame.indexStart].frame = cast keyFrame;
 					this._frames[keyFrame.indexEnd] = null;
 					this._frameDatas[keyFrame.indexEnd].frame = null;
 					keyFrame.indexEnd--;
 					keyFrame = getNextKeyFrame(keyFrame);
 				}
-				//this._frameCurrent = this._frames[this._frameIndex];
 				setFrameCurrent(this._frames[this._frameIndex]);
 			}
 			this.frameCollection.updateAll();
@@ -339,7 +341,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 		{
 			if (this._frameCurrent.indexStart == this._frameIndex)
 			{
-				var keyFrame:ValEditorKeyFrame;
+				var keyFrame:ValEditKeyFrame;
 				// look for previous key frame
 				keyFrame = getPreviousKeyFrame(this._frameCurrent);
 				if (keyFrame != null)
@@ -347,12 +349,11 @@ class ValEditorTimeLine extends ValEditTimeLine
 					for (i in keyFrame.indexEnd + 1...this._frameCurrent.indexEnd + 1)
 					{
 						this._frames[i] = keyFrame;
-						this._frameDatas[i].frame = keyFrame;
+						this._frameDatas[i].frame = cast keyFrame;
 					}
 					keyFrame.indexEnd = this._frameCurrent.indexEnd;
 					unregisterKeyFrame(this._frameCurrent);
 					this._frameCurrent.pool();
-					//this._frameCurrent = keyFrame;
 					setFrameCurrent(this._frameCurrent);
 				}
 				else
@@ -364,54 +365,17 @@ class ValEditorTimeLine extends ValEditTimeLine
 						for (i in this._frameCurrent.indexStart...keyFrame.indexStart)
 						{
 							this._frames[i] = keyFrame;
-							this._frameDatas[i].frame = keyFrame;
+							this._frameDatas[i].frame = cast keyFrame;
 						}
 						keyFrame.indexStart = this._frameCurrent.indexStart;
 						unregisterKeyFrame(this._frameCurrent);
 						this._frameCurrent.pool();
-						//this._frameCurrent = keyFrame;
 						setFrameCurrent(keyFrame);
 					}
 				}
 				this.frameCollection.updateAll();
 			}
 		}
-	}
-	
-	public function getNextKeyFrame(frame:ValEditFrame):ValEditorKeyFrame
-	{
-		for (i in frame.indexEnd + 1...this._numFrames)
-		{
-			if (this._frames[i] != null) return cast this._frames[i];
-		}
-		return null;
-	}
-	
-	public function getNextKeyFrameFromIndex(index:Int):ValEditorKeyFrame
-	{
-		for (i in index...this._numFrames)
-		{
-			if (this._frames[i] != null) return cast this._frames[i];
-		}
-		return null;
-	}
-	
-	public function getPreviousKeyFrame(frame:ValEditFrame):ValEditorKeyFrame
-	{
-		for (i in new ReverseIterator(frame.indexStart -1, 0))
-		{
-			if (this._frames[i] != null) return cast this._frames[i];
-		}
-		return null;
-	}
-	
-	public function getPreviousKeyFrameFromIndex(index:Int):ValEditorKeyFrame
-	{
-		for (i in new ReverseIterator(index, 0))
-		{
-			if (this._frames[i] != null) return cast this._frames[i];
-		}
-		return null;
 	}
 	
 	private function setTo(numFrames:Int):ValEditorTimeLine
