@@ -8,6 +8,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
+import valeditor.ValEditorFrameGroup;
 import valeditor.ValEditorTemplateGroup;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.Padding;
@@ -165,6 +166,7 @@ class SelectionInfo extends LayoutGroup
 				{
 					this._classValue.text = "(multiple classes)";
 				}
+				this._typeValue.text = "Template";
 			}
 			else if (Std.isOfType(this._object, ValEditorObject))
 			{
@@ -198,6 +200,20 @@ class SelectionInfo extends LayoutGroup
 				{
 					this._classValue.text = "(multiple classes)";
 				}
+				this._typeValue.text = "Object";
+			}
+			else if (Std.isOfType(this._object, ValEditorKeyFrame))
+			{
+				this._idValue.text = "-";
+				this._classValue.text = "ValEditKeyFrame";
+				this._typeValue.text = "KeyFrame";
+			}
+			else if (Std.isOfType(this._object, ValEditorFrameGroup))
+			{
+				var frameGroup:ValEditorFrameGroup = cast this._object;
+				this._idValue.text = frameGroup.numFrames + " keyframes";
+				this._classValue.text = "ValEditKeyFrame";
+				this._typeValue.text = "KeyFrame";
 			}
 			else
 			{
