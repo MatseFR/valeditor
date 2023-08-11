@@ -50,7 +50,7 @@ class ValEditorLayer extends ValEditLayer
 	
 	public function canAddObject():Bool
 	{
-		return this.timeLine.frameCurrent != null;
+		return this.timeLine.frameCurrent != null && (!this.timeLine.frameCurrent.tween || this.timeLine.frameCurrent.indexCurrent == this.timeLine.frameCurrent.indexStart);
 	}
 	
 	override public function activate(object:ValEditObject):Void 
