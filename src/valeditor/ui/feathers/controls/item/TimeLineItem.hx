@@ -11,7 +11,7 @@ import feathers.utils.DisplayObjectRecycler;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
-import valedit.ValEditFrame;
+import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.ui.feathers.renderers.FrameItemRenderer;
 import valeditor.ui.feathers.renderers.FrameItemState;
@@ -24,7 +24,7 @@ class TimeLineItem extends LayoutGroup
 {
 	static private var _POOL:Array<TimeLineItem> = new Array<TimeLineItem>();
 	
-	static public function fromPool(timeLine:ValEditorTimeLine):TimeLineItem
+	static public function fromPool(timeLine:ValEditorTimeLine = null):TimeLineItem
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(timeLine);
 		return new TimeLineItem(timeLine);
@@ -50,7 +50,7 @@ class TimeLineItem extends LayoutGroup
 	
 	private var _list:ListView;
 	
-	private var _frame:ValEditFrame;
+	private var _frame:ValEditKeyFrame;
 
 	public function new(timeLine:ValEditorTimeLine) 
 	{
@@ -62,7 +62,6 @@ class TimeLineItem extends LayoutGroup
 	public function clear():Void
 	{
 		this.timeLine = null;
-		this._list.dataProvider = null;
 	}
 	
 	public function pool():Void
@@ -90,7 +89,7 @@ class TimeLineItem extends LayoutGroup
 			return FrameItemRenderer.fromPool();
 		});
 		recycler.update = itemUpdate;
-		recycler.reset = itemReset;
+		recycler.destroy = itemDestroy;
 		this._list.itemRendererRecycler = recycler;
 		
 		this._list.addEventListener(Event.CHANGE, onListChange);
@@ -99,15 +98,23 @@ class TimeLineItem extends LayoutGroup
 		this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 	}
 	
-	private function itemReset(itemRenderer:FrameItemRenderer, state:ListViewItemState):Void
+	public function timeLineUpdate(state:ListViewItemState):Void
+	{
+		if (!state.selected)
+		{
+			this._list.selectedIndex = -1;
+		}
+		this.timeLine = state.data.timeLine;
+	}
+	
+	private function itemDestroy(itemRenderer:FrameItemRenderer):Void
 	{
 		itemRenderer.pool();
 	}
 	
 	private function itemUpdate(itemRenderer:FrameItemRenderer, state:ListViewItemState):Void
 	{
-		itemRenderer.index = state.index;
-		this._frame = cast state.data.frame;
+		this._frame = state.data.frame;
 		if (this._frame != null)
 		{
 			if (this._frame.indexStart == this._frame.indexEnd)
@@ -115,7 +122,7 @@ class TimeLineItem extends LayoutGroup
 				// KEYFRAME_SINGLE
 				if (this._frame.isEmpty)
 				{
-					if (this._frame.hasTween)
+					if (this._frame.tween)
 					{
 						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_TWEEN_EMPTY(state.selected);
 					}
@@ -126,7 +133,7 @@ class TimeLineItem extends LayoutGroup
 				}
 				else
 				{
-					if (this._frame.hasTween)
+					if (this._frame.tween)
 					{
 						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_TWEEN(state.selected);
 					}
@@ -143,7 +150,7 @@ class TimeLineItem extends LayoutGroup
 					// KEYFRAME_START
 					if (this._frame.isEmpty)
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_START_TWEEN_EMPTY(state.selected);
 						}
@@ -154,7 +161,7 @@ class TimeLineItem extends LayoutGroup
 					}
 					else
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_START_TWEEN(state.selected);
 						}
@@ -169,7 +176,7 @@ class TimeLineItem extends LayoutGroup
 					// KEYFRAME_END
 					if (this._frame.isEmpty)
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_END_TWEEN_EMPTY(state.selected);
 						}
@@ -180,7 +187,7 @@ class TimeLineItem extends LayoutGroup
 					}
 					else
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_END_TWEEN(state.selected);
 						}
@@ -195,7 +202,7 @@ class TimeLineItem extends LayoutGroup
 					// KEYFRAME
 					if (this._frame.isEmpty)
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_TWEEN_EMPTY(state.selected);
 						}
@@ -206,7 +213,7 @@ class TimeLineItem extends LayoutGroup
 					}
 					else
 					{
-						if (this._frame.hasTween)
+						if (this._frame.tween)
 						{
 							itemRenderer.state = FrameItemState.KEYFRAME_TWEEN(state.selected);
 						}
@@ -227,7 +234,6 @@ class TimeLineItem extends LayoutGroup
 			else
 			{
 				itemRenderer.state = FrameItemState.FRAME(state.selected);
-				//itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_EMPTY(true);
 			}
 		}
 	}
@@ -271,6 +277,10 @@ class TimeLineItem extends LayoutGroup
 		if (this._list.selectedIndex != -1)
 		{
 			this.timeLine.parent.frameIndex = this._list.selectedIndex;
+			if (this._list.selectedItem.frame != null)
+			{
+				ValEditor.selection.object = this._list.selectedItem.frame;
+			}
 		}
 	}
 	
