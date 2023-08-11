@@ -109,8 +109,8 @@ class ObjectUI extends ValueUI
 	{
 		super.initialize();
 		
-		var vLayout:VerticalLayout;
 		var hLayout:HorizontalLayout;
+		var vLayout:VerticalLayout;
 		
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
