@@ -6,8 +6,10 @@ import inputAction.events.InputActionEvent;
 import openfl.display.Sprite;
 import openfl.ui.Keyboard;
 import valedit.ValEdit;
+import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
+import valeditor.ValEditorKeyFrame;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.input.InputActionID;
 import valeditor.ui.feathers.view.EditorView;
@@ -69,6 +71,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.exposeData();
 		
+		ValEditor.registerClass(ValEditorContainer, ContainerData.exposeValEditorContainer(), false, false);
+		ValEditor.registerClass(ValEditorKeyFrame, ContainerData.exposeValEditKeyFrame(), false, false);
 		ValEditor.registerClass(ExportSettings, SettingsData.exposeExportSettings(), false, false);
 	}
 	
