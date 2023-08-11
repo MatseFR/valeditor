@@ -4,7 +4,6 @@ import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
 import valeditor.ui.feathers.renderers.FrameItemRenderer;
 import valeditor.ui.feathers.renderers.FrameItemState;
-import valeditor.ui.feathers.skins.BottomAndRightSkin;
 import valeditor.ui.feathers.skins.TopBottomAndRightSkin;
 
 /**
@@ -238,7 +237,7 @@ class FrameItemRendererStyles
 		
 		// KEYFRAME selected
 		skinB = new TopAndBottomBorderSkin();
-		skinB.fill = theme.getThemeFill();
+		skinB.fill = theme.getFocusFill();
 		skinB.border = theme.getContrastBorder();
 		skinB.width = width;
 		skinB.height = height;
