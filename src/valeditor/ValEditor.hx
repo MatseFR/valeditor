@@ -599,7 +599,16 @@ class ValEditor
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection);
 		
-		valObject.interactiveObject = valClass.interactiveFactory(valObject);
+		if (valClass.interactiveFactory != null)
+		{
+			valObject.interactiveObject = valClass.interactiveFactory(valObject);
+			valObject.hasPivotProperties = valClass.hasPivotProperties;
+			valObject.hasScaleProperties = valClass.hasScaleProperties;
+			valObject.hasTransformProperty = valClass.hasTransformProperty;
+			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
+			valObject.hasRadianRotation = valClass.hasRadianRotation;
+		}
 		
 		registerObjectInternal(valObject);
 		
