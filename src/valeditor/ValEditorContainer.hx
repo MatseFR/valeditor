@@ -19,6 +19,7 @@ import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.utils.RegularPropertyName;
+import valeditor.events.ContainerEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;
@@ -78,6 +79,14 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			this._containerUI.y = this._y - value;
 		}
 		return super.set_cameraY(value);
+	}
+	
+	override function set_currentLayer(value:ValEditLayer):ValEditLayer 
+	{
+		if (this._currentLayer == value) return value;
+		super.set_currentLayer(value);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_SELECTED, this._currentLayer);
+		return this._currentLayer;
 	}
 	
 	override function set_rootContainer(value:DisplayObjectContainer):DisplayObjectContainer 
@@ -154,12 +163,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._containerUI.addChild(this._pivotIndicator);
 		var layer:ValEditorLayer = new ValEditorLayer();
 		addLayer(layer);
-		this.currentLayer = layer;
 	}
 	
 	override public function clear():Void
 	{
-		
+		this._viewCenterX = 0;
+		this._viewCenterY = 0;
+		this.layerCollection.removeAll();
 		super.clear();
 	}
 	
@@ -176,7 +186,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			this._layerNameIndex++;
 			name = "layer " + this._layerNameIndex;
-			if (!this._layers.exists(name)) break;
+			if (!this._layerMap.exists(name)) break;
 		}
 		return name;
 	}
@@ -194,6 +204,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		this.layerCollection.add(cast layer);
 		super.addLayer(layer);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_ADDED, layer);
+		this.currentLayer = layer;
 	}
 	
 	override public function addLayerAt(layer:ValEditLayer, index:Int):Void 
@@ -204,12 +216,45 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		this.layerCollection.addAt(cast layer, index);
 		super.addLayerAt(layer, index);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_ADDED, layer);
+		this.currentLayer = layer;
+	}
+	
+	public function getLayerIndex(layer:ValEditLayer):Int
+	{
+		return this._layers.indexOf(layer);
 	}
 	
 	override public function removeLayer(layer:ValEditLayer):Void 
 	{
+		var index:Int = this.layerCollection.indexOf(cast layer);
 		this.layerCollection.remove(cast layer);
 		super.removeLayer(layer);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_REMOVED, layer);
+		if (this._currentLayer == layer)
+		{
+			if (index != 0)
+			{
+				index --;
+			}
+			this.currentLayer = this.layerCollection.get(index);
+		}
+	}
+	
+	override public function removeLayerAt(index:Int):Void 
+	{
+		var layer:ValEditLayer = this._layers[index];
+		this.layerCollection.removeAt(index);
+		super.removeLayerAt(index);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_REMOVED, layer);
+		if (this._currentLayer == layer)
+		{
+			if (index != 0)
+			{
+				index --;
+			}
+			this.currentLayer = this.layerCollection.get(index);
+		}
 	}
 	
 	override function layer_objectAdded(evt:LayerEvent):Void 
@@ -289,6 +334,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		Lib.current.stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMiddleMouseDown);
 		
 		Juggler.root.add(this);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OPEN);
 	}
 	
 	public function close():Void
@@ -300,6 +347,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		Lib.current.stage.removeEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMiddleMouseUp);
 		
 		Juggler.root.remove(this);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.CLOSE);
 	}
 	
 	private function onObjectMouseDown(evt:MouseEvent):Void
@@ -311,6 +360,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._mouseDownWithShift = evt.shiftKey;
 		
 		var object:ValEditorObject = this._interactiveObjectToValEditObject.get(evt.target);
+		if (!object.isSelectable) return;
 		if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 		{
 			ValEditor.selection.object = null;
@@ -644,10 +694,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			clearSelection();
 		}
-		else if (Std.isOfType(evt.object, ValEditorTemplate))
-		{
-			clearSelection();
-		}
 		else if (Std.isOfType(evt.object, ValEditorObject))
 		{
 			var object:ValEditorObject = cast evt.object;
@@ -670,7 +716,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				select(object);
 			}
 		}
-		else // ValEditorGroup
+		else if (Std.isOfType(evt.object, ValEditorObjectGroup))
 		{
 			var group:ValEditorObjectGroup = cast evt.object;
 			for (obj in this._selection)
@@ -694,6 +740,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					select(obj);
 				}
 			}
+		}
+		else
+		{
+			clearSelection();
 		}
 	}
 	
