@@ -48,10 +48,10 @@ class EditorView extends LayoutGroup
 	private var _rightBox:LayoutGroup;
 	
 	// left content
-	private var _objectLibGroup:ToggleLayoutGroup;
-	private var _libNavigator:TabNavigator;
-	private var _objectLib:ObjectLibrary;
+	private var _templateLibGroup:ToggleLayoutGroup;
 	private var _templateLib:TemplateLibrary;
+	private var _objectGroup:ToggleLayoutGroup;
+	private var _objectLib:ObjectLibrary;
 	
 	// center content
 	private var _displayArea:LayoutGroup;
@@ -197,26 +197,33 @@ class EditorView extends LayoutGroup
 		this._rightBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
 		
 		// left content
-		this._objectLibGroup = new ToggleLayoutGroup();
-		this._objectLibGroup.toggleVariant = ToggleButtonVariant.PANEL;
-		this._objectLibGroup.contentVariant = LayoutGroupVariant.CONTENT;
-		this._objectLibGroup.text = "Library";
-		this._objectLibGroup.isOpen = true;
-		this._objectLibGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-		this._objectLibGroup.contentLayout = new AnchorLayout();
-		this._leftBox.addChild(this._objectLibGroup);
+		this._templateLibGroup = new ToggleLayoutGroup();
+		this._templateLibGroup.contentVariant = LayoutGroupVariant.CONTENT;
+		this._templateLibGroup.toggleVariant = ToggleButtonVariant.PANEL;
+		this._templateLibGroup.text = "Library";
+		this._templateLibGroup.isOpen = true;
+		this._templateLibGroup.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._objectGroup), 0);
+		this._templateLibGroup.contentLayout = new AnchorLayout();
+		this._leftBox.addChild(this._templateLibGroup);
 		
-		this._objectLib = new ObjectLibrary();
+		//this._objectLib = new ObjectLibrary();
 		this._templateLib = new TemplateLibrary();
+		this._templateLib.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		this._templateLibGroup.addContent(this._templateLib);
+		//var views:ArrayCollection<TabItem> = new ArrayCollection<TabItem>([
+			//TabItem.withDisplayObject("Objects", this._objectLib),
+			//TabItem.withDisplayObject("Templates", this._templateLib)
+		//]);
+		//
+		//this._libNavigator = new TabNavigator(views);
+		//this._libNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
+		//this._objectLibGroup.addContent(this._libNavigator);
 		
-		var views:ArrayCollection<TabItem> = new ArrayCollection<TabItem>([
-			TabItem.withDisplayObject("Objects", this._objectLib),
-			TabItem.withDisplayObject("Templates", this._templateLib)
-		]);
-		
-		this._libNavigator = new TabNavigator(views);
-		this._libNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
-		this._objectLibGroup.addContent(this._libNavigator);
+		//this._objectGroup = new ToggleLayoutGroup();
+		//this._objectGroup.contentVariant = LayoutGroupVariant.CONTENT;
+		//this._objectGroup.toggleVariant = ToggleButtonVariant.PANEL;
+		//this._objectGroup.text = "Objects";
+		//this._objectGroup.isOpen = true;
 		
 		// center content
 		this._displayArea = new LayoutGroup();
