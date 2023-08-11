@@ -27,7 +27,6 @@ class ValEditorObject extends ValEditObject
 		return new ValEditorObject(clss, id);
 	}
 	
-	public var collection(get, set):ExposedCollection;
 	public var container(get, set):IValEditContainer;
 	public var getBoundsFunctionName(get, set):String;
 	public var hasPivotProperties:Bool;
@@ -38,19 +37,18 @@ class ValEditorObject extends ValEditObject
 	public var hasRadianRotation:Bool;
 	public var interactiveObject(get, set):IInteractiveObject;
 	public var isMouseDown:Bool;
+	public var isSelectable:Bool = true;
 	public var mouseRestoreX:Float;
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
 	public var selectionBox(get, set):SelectionBox;
 	
-	private var _collection:ExposedCollection;
-	private function get_collection():ExposedCollection { return this._collection; }
-	private function set_collection(value:ExposedCollection):ExposedCollection
+	override function set_collection(value:ExposedCollection):ExposedCollection 
 	{
 		if (value == this._collection) return value;
 		if (this._collection != null) this._collection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 		if (value != null) value.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
-		return this._collection = value;
+		return super.set_collection(value);
 	}
 	
 	private var _container:IValEditContainer;
@@ -128,7 +126,8 @@ class ValEditorObject extends ValEditObject
 	{
 		super.clear();
 		
-		this.collection = null;
+		this.isSelectable = true;
+		
 		if (this._interactiveObject != null)
 		{
 			this._interactiveObject.pool();
