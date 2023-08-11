@@ -414,11 +414,13 @@ class ValEditor
 		
 		var clss:Class<Dynamic> = Type.getClass(object);
 		var className:String = Type.getClassName(clss);
+		var collection:ExposedCollection = null;
 		var valClass:ValEditClass = _classMap[className];
 		
 		if (Std.isOfType(object, ValEditObject))
 		{
 			valClass = cast(object, ValEditObject).clss;
+			collection = cast(object, ValEditObject).collection;
 		}
 		else
 		{
@@ -430,7 +432,7 @@ class ValEditor
 		if (valClass != null)
 		{
 			_displayMap[container] = valClass;
-			return valClass.addContainer(container, object, parentValue);
+			return valClass.addContainer(container, object, collection, parentValue);
 		}
 		else
 		{
@@ -443,7 +445,7 @@ class ValEditor
 				if (valClass != null)
 				{
 					_displayMap[container] = valClass;
-					return valClass.addContainer(container, object, parentValue);
+					return valClass.addContainer(container, object, collection, parentValue);
 				}
 			}
 			throw new Error("ValEdit.edit ::: unknown Class " + Type.getClassName(Type.getClass(object)));
@@ -543,17 +545,17 @@ class ValEditor
 		return control;
 	}
 	
-	static public function createObjectWithClass(clss:Class<Dynamic>, ?id:String, ?params:Array<Dynamic>):ValEditorObject
+	static public function createObjectWithClass(clss:Class<Dynamic>, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection):ValEditorObject
 	{
-		return createObjectWithClassName(Type.getClassName(clss), id, params);
+		return createObjectWithClassName(Type.getClassName(clss), id, params, collection);
 	}
 	
-	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>):ValEditorObject
+	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(className);
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
 		
-		ValEdit.createObjectWithClassName(className, id, params, valObject);
+		ValEdit.createObjectWithClassName(className, id, params, valObject, collection);
 		
 		if (valClass.interactiveFactory != null)
 		{
@@ -568,7 +570,7 @@ class ValEditor
 		
 		registerObjectInternal(valObject);
 		
-		selection.object = valObject;
+		//selection.object = valObject;
 		
 		return valObject;
 	}
@@ -590,18 +592,32 @@ class ValEditor
 		return template;
 	}
 	
-	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String):ValEditorObject
+	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(template.className);
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
 		
-		ValEdit.createObjectWithTemplate(template, id, valObject);
+		ValEdit.createObjectWithTemplate(template, id, valObject, collection);
 		
 		valObject.interactiveObject = valClass.interactiveFactory(valObject);
 		
 		registerObjectInternal(valObject);
 		
 		return valObject;
+	}
+	
+	static public function cloneObject(object:ValEditObject, ?id:String):ValEditObject
+	{
+		var newObject:ValEditObject;
+		if (object.template != null)
+		{
+			newObject = createObjectWithTemplate(cast object.template, id, object.collection.clone(true));
+		}
+		else
+		{
+			newObject = createObjectWithClassName(object.className, id, object.collection.clone(true));
+		}
+		return newObject;
 	}
 	
 	static private function registerObjectInternal(valObject:ValEditorObject):Void
