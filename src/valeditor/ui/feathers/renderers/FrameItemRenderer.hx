@@ -22,7 +22,6 @@ class FrameItemRenderer extends LayoutGroup
 		return new FrameItemRenderer();
 	}
 	
-	public var index:Int;
 	public var state(get, set):#if flash Dynamic #else FrameItemState #end;
 	
 	private var _state:FrameItemState;
