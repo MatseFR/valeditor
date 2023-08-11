@@ -1,8 +1,7 @@
 package valeditor.ui.feathers.theme.simple.components;
-import feathers.controls.ToggleButtonState;
 import feathers.controls.Check;
+import feathers.controls.ToggleButtonState;
 import feathers.graphics.FillStyle;
-import feathers.graphics.LineStyle;
 import feathers.skins.MultiSkin;
 import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
