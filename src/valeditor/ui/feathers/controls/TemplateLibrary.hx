@@ -220,6 +220,7 @@ class TemplateLibrary extends LayoutGroup
 		var template:ValEditorTemplate = null;
 		while (true)
 		{
+			if (object == null) break;
 			if (object is ItemRenderer)
 			{
 				template = cast(object, ItemRenderer).data;
@@ -227,7 +228,10 @@ class TemplateLibrary extends LayoutGroup
 			}
 			object = object.parent;
 		}
-		ValEditor.libraryDragManager.startDrag(template);
+		if (template != null)
+		{
+			ValEditor.libraryDragManager.startDrag(template);
+		}
 	}
 	
 	private function onObjectSelectionChange(evt:SelectionEvent):Void
