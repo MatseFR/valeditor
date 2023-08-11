@@ -23,23 +23,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	{
 		if (this._indexCurrent == value) return value;
 		this._indexCurrent = value;
-		if (this._tween)
-		{
-			if (this._indexCurrent == this.indexStart)
-			{
-				for (object in this.objects)
-				{
-					cast(object, ValEditorObject).isSelectable = true;
-				}
-			}
-			else
-			{
-				for (object in this.objects)
-				{
-					cast(object, ValEditorObject).isSelectable = false;
-				}
-			}
-		}
+		updateObjectsSelectable();
 		updateTweens();
 		return this._indexCurrent;
 	}
@@ -48,7 +32,9 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	{
 		if (this._tween == value) return value;
 		super.set_tween(value);
-		DefaultEvent.dispatch(this, Event.CHANGE);
+		updateObjectsSelectable();
+		updateTweens();
+		DefaultEvent.dispatch(this, Event.CHANGE); // this is used by the timeline UI item to update frames state
 		return this._tween;
 	}
 	
@@ -117,6 +103,20 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
 	
+	override public function exit():Void 
+	{
+		super.exit();
+		
+		// unselect objects if needed
+		for (object in this.objects)
+		{
+			if (ValEditor.selection.hasObject(cast object))
+			{
+				ValEditor.selection.removeObject(cast object);
+			}
+		}
+	}
+	
 	override function buildTweens():Void 
 	{
 		for (object in this.objects)
@@ -124,6 +124,49 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 			object.collection.applyToObject(object.object);
 		}
 		super.buildTweens();
+	}
+	
+	public function selectAllObjects():Void
+	{
+		for (object in this.objects)
+		{
+			if (!ValEditor.selection.hasObject(cast object))
+			{
+				ValEditor.selection.addObject(cast object);
+			}
+		}
+	}
+	
+	private function updateObjectsSelectable():Void
+	{
+		if (this._tween)
+		{
+			if (this._indexCurrent == this.indexStart)
+			{
+				for (object in this.objects)
+				{
+					cast(object, ValEditorObject).isSelectable = true;
+				}
+			}
+			else
+			{
+				for (object in this.objects)
+				{
+					if (ValEditor.selection.hasObject(cast object))
+					{
+						ValEditor.selection.removeObject(cast object);
+					}
+					cast(object, ValEditorObject).isSelectable = false;
+				}
+			}
+		}
+		else
+		{
+			for (object in this.objects)
+			{
+				cast(object, ValEditorObject).isSelectable = true;
+			}
+		}
 	}
 	
 }
