@@ -247,7 +247,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private var _moveValue:Float;
 	private var _valueBeforeDrag:Float;
 	
-	#if flash // TODO : check if other targets do weird things with float values
+	#if (flash || html5) // TODO : check if other targets do weird things with float values
 	private var _floatPrecision:Int = 2; // this corresponds to the default step value (0.01)
 	#end
 	
