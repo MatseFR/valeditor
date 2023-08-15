@@ -95,6 +95,7 @@ class LibraryDragManager
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject())
 		{
 			ValEditor.currentContainer.add(this.object);
+			ValEditor.selection.object = this.object;
 			this.object = null;
 		}
 		
