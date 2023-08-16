@@ -540,7 +540,7 @@ class ValEditor
 		var clss:Class<T> = Type.getClass(exposedValue);
 		var className:String = Type.getClassName(clss);
 		var control:IValueUI = _uiClassMap[className]();
-		control.exposedValue = cast exposedValue;//cast(exposedValue, ExposedValue);
+		control.exposedValue = cast exposedValue;
 		cast(exposedValue, ExposedValue).uiControl = control;
 		return control;
 	}
@@ -569,8 +569,6 @@ class ValEditor
 		}
 		
 		registerObjectInternal(valObject);
-		
-		//selection.object = valObject;
 		
 		return valObject;
 	}
