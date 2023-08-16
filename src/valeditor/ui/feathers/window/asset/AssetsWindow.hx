@@ -284,7 +284,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList, this._fileDialogTitle);
+		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList, null, this._fileDialogTitle);
 	}
 	
 	private function onAddFilesCancel():Void
