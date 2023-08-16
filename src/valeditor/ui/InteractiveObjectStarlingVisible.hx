@@ -18,21 +18,10 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		return new InteractiveObjectStarlingVisible(minWidth, minHeight);
 	}
 	
-	public var minWidth(get, set):Float;
-	private var _minWidth:Float;
-	private function get_minWidth():Float { return this._minWidth; }
-	private function set_minWidth(value:Float):Float
-	{
-		if (this._minWidth == value) return value;
-		this._minWidth = value;
-		if (this.width < this._minWidth)
-		{
-			this.width = this._minWidth;
-		}
-		return this._minWidth;
-	}
-	
 	public var minHeight(get, set):Float;
+	public var minWidth(get, set):Float;
+	public var visibilityLocked:Bool;
+	
 	private var _minHeight:Float;
 	private function get_minHeight():Float { return this._minHeight; }
 	private function set_minHeight(value:Float):Float
@@ -46,17 +35,30 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		return this._minHeight;
 	}
 	
-	//@:setter(width)
-	override function set_width(value:Float):Float 
+	private var _minWidth:Float;
+	private function get_minWidth():Float { return this._minWidth; }
+	private function set_minWidth(value:Float):Float
 	{
-		refresh(value, this.height);
-		return value;
+		if (this._minWidth == value) return value;
+		this._minWidth = value;
+		if (this.width < this._minWidth)
+		{
+			this.width = this._minWidth;
+		}
+		return this._minWidth;
 	}
 	
 	//@:setter(height)
 	override function set_height(value:Float):Float 
 	{
 		refresh(this.width, value);
+		return value;
+	}
+	
+	//@:setter(width)
+	override function set_width(value:Float):Float 
+	{
+		refresh(value, this.height);
 		return value;
 	}
 	
@@ -84,6 +86,7 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	public function pool():Void
 	{
 		this.removeFromParent();
+		this.visibilityLocked = false;
 		_POOL[_POOL.length] = this;
 	}
 	
@@ -167,7 +170,7 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 			this.rotation = MathUtil.deg2rad(rotation);
 		}
 		
-		if (object.hasVisibleProperty)
+		if (!this.visibilityLocked && object.hasVisibleProperty)
 		{
 			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
 		}

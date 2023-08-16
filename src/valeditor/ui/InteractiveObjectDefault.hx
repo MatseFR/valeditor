@@ -19,21 +19,14 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		return new InteractiveObjectDefault(minWidth, minHeight);
 	}
 	
-	public var minWidth(get, set):Float;
-	private var _minWidth:Float;
-	private function get_minWidth():Float { return this._minWidth; }
-	private function set_minWidth(value:Float):Float
-	{
-		if (this._minWidth == value) return value;
-		this._minWidth = value;
-		if (this.realWidth < this._minWidth)
-		{
-			this.realWidth = this._minWidth;
-		}
-		return this._minWidth;
-	}
-	
 	public var minHeight(get, set):Float;
+	public var minWidth(get, set):Float;
+	public var pivotX(get, set):Float;
+	public var pivotY(get, set):Float;
+	public var realHeight(get, set):Float;
+	public var realWidth(get, set):Float;
+	public var visibilityLocked:Bool;
+	
 	private var _minHeight:Float;
 	private function get_minHeight():Float { return this._minHeight; }
 	private function set_minHeight(value:Float):Float
@@ -47,7 +40,19 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		return this._minHeight;
 	}
 	
-	public var pivotX(get, set):Float;
+	private var _minWidth:Float;
+	private function get_minWidth():Float { return this._minWidth; }
+	private function set_minWidth(value:Float):Float
+	{
+		if (this._minWidth == value) return value;
+		this._minWidth = value;
+		if (this.realWidth < this._minWidth)
+		{
+			this.realWidth = this._minWidth;
+		}
+		return this._minWidth;
+	}
+	
 	private var _pivotX:Float = 0;
 	private function get_pivotX():Float { return this._pivotX; }
 	private function set_pivotX(value:Float):Float
@@ -56,7 +61,6 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		return this._pivotX;
 	}
 	
-	public var pivotY(get, set):Float;
 	private var _pivotY:Float = 0;
 	private function get_pivotY():Float { return this._pivotY; }
 	private function set_pivotY(value:Float):Float
@@ -65,19 +69,17 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		return this._pivotY;
 	}
 	
-	public var realWidth(get, set):Float;
-	private function get_realWidth():Float { return this._shape.width; }
-	private function set_realWidth(value:Float):Float
-	{
-		refreshShape(value, this.realHeight);
-		return value;
-	}
-	
-	public var realHeight(get, set):Float;
 	private function get_realHeight():Float { return this._shape.height; }
 	private function set_realHeight(value:Float):Float
 	{
 		refreshShape(this.realWidth, value);
+		return value;
+	}
+	
+	private function get_realWidth():Float { return this._shape.width; }
+	private function set_realWidth(value:Float):Float
+	{
+		refreshShape(value, this.realHeight);
 		return value;
 	}
 	
@@ -111,6 +113,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	public function pool():Void
 	{
 		if (this.parent != null) this.parent.removeChild(this);
+		this.visibilityLocked = false;
 		_POOL[_POOL.length] = this;
 	}
 	
@@ -190,7 +193,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			this.rotation = rotation;
 		}
 		
-		if (object.hasVisibleProperty)
+		if (!this.visibilityLocked && object.hasVisibleProperty)
 		{
 			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
 		}
