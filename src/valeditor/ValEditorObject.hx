@@ -37,7 +37,7 @@ class ValEditorObject extends ValEditObject
 	public var hasRadianRotation:Bool;
 	public var interactiveObject(get, set):IInteractiveObject;
 	public var isMouseDown:Bool;
-	public var isSelectable:Bool = true;
+	public var isSelectable(get, set):Bool;
 	public var mouseRestoreX:Float;
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
@@ -87,8 +87,31 @@ class ValEditorObject extends ValEditObject
 		if (value != null)
 		{
 			value.objectUpdate(this);
+			if (!this._isSelectable) Reflect.setProperty(value, "visible", this._isSelectable);
+			value.visibilityLocked = !this._isSelectable;
 		}
 		return this._interactiveObject = value;
+	}
+	
+	private var _isSelectable:Bool = true;
+	private function get_isSelectable():Bool { return this._isSelectable; }
+	private function set_isSelectable(value:Bool):Bool
+	{
+		if (this._isSelectable == value) return value;
+		if (this._interactiveObject != null)
+		{
+			this._interactiveObject.visibilityLocked = !value;
+			if (value)
+			{
+				this._interactiveObject.objectUpdate(this);
+			}
+			else
+			{
+				Reflect.setProperty(this._interactiveObject, "visible", value);
+			}
+			
+		}
+		return this._isSelectable = value;
 	}
 	
 	private var _pivotIndicator:PivotIndicator;
