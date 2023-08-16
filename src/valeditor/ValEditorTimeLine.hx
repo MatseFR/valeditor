@@ -126,6 +126,39 @@ class ValEditorTimeLine extends ValEditTimeLine
 		_POOL[_POOL.length] = this;
 	}
 	
+	override public function play():Void 
+	{
+		if (this._isPlaying) return;
+		
+		var lastFrame:ValEditKeyFrame = null;
+		for (frame in this._frames)
+		{
+			if (frame != lastFrame)
+			{
+				cast(frame, ValEditorKeyFrame).isPlaying = true;
+				lastFrame = frame;
+			}
+		}
+		updateLastFrameIndex();
+		super.play();
+	}
+	
+	override public function stop():Void 
+	{
+		if (!this._isPlaying) return;
+		
+		var lastFrame:ValEditKeyFrame = null;
+		for (frame in this._frames)
+		{
+			if (frame != lastFrame)
+			{
+				cast(frame, ValEditorKeyFrame).isPlaying = false;
+				lastFrame = frame;
+			}
+		}
+		super.stop();
+	}
+	
 	override public function registerKeyFrame(keyFrame:ValEditKeyFrame):Void 
 	{
 		super.registerKeyFrame(keyFrame);
