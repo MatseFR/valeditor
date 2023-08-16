@@ -19,6 +19,8 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		return new ValEditorKeyFrame();
 	}
 	
+	public var isPlaying(get, set):Bool;
+	
 	override function set_indexCurrent(value:Int):Int 
 	{
 		if (this._indexCurrent == value) return value;
@@ -26,6 +28,27 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		updateObjectsSelectable();
 		updateTweens();
 		return this._indexCurrent;
+	}
+	
+	private var _isPlaying:Bool;
+	private function get_isPlaying():Bool { return this._isPlaying; }
+	private function set_isPlaying(value:Bool):Bool
+	{
+		if (this._isPlaying == value) return value;
+		
+		this._isPlaying = value;
+		if (this._isPlaying)
+		{
+			for (object in this.objects)
+			{
+				cast(object, ValEditorObject).isSelectable = false;
+			}
+		}
+		else
+		{
+			updateObjectsSelectable();
+		}
+		return this._isPlaying;
 	}
 	
 	override function set_tween(value:Bool):Bool 
@@ -117,15 +140,6 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		}
 	}
 	
-	//override function buildTweens():Void 
-	//{
-		//for (object in this.objects)
-		//{
-			//object.collection.applyToObject(object.object);
-		//}
-		//super.buildTweens();
-	//}
-	
 	public function selectAllObjects():Void
 	{
 		for (object in this.objects)
@@ -139,6 +153,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	
 	private function updateObjectsSelectable():Void
 	{
+		if (this._isPlaying) return;
 		if (this._tween)
 		{
 			if (this._indexCurrent == this.indexStart)
