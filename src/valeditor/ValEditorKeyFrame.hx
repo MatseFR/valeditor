@@ -81,12 +81,12 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		super.add(object);
 		if (this._tween)
 		{
-			resetTweens();
+			rebuildTweens();
 		}
 		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
 		if (prevFrame != null && prevFrame._tween)
 		{
-			prevFrame.resetTweens();
+			prevFrame.rebuildTweens();
 		}
 		if (this.objects.length == 1) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
@@ -94,11 +94,11 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	override public function remove(object:ValEditObject):Void 
 	{
 		super.remove(object);
-		if (this._tween) resetTweens();
+		if (this._tween) rebuildTweens();
 		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
 		if (prevFrame != null && prevFrame._tween)
 		{
-			prevFrame.resetTweens();
+			prevFrame.rebuildTweens();
 		}
 		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
@@ -117,14 +117,14 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		}
 	}
 	
-	override function buildTweens():Void 
-	{
-		for (object in this.objects)
-		{
-			object.collection.applyToObject(object.object);
-		}
-		super.buildTweens();
-	}
+	//override function buildTweens():Void 
+	//{
+		//for (object in this.objects)
+		//{
+			//object.collection.applyToObject(object.object);
+		//}
+		//super.buildTweens();
+	//}
 	
 	public function selectAllObjects():Void
 	{
