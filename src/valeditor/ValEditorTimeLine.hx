@@ -4,6 +4,7 @@ import feathers.data.ArrayCollection;
 import openfl.events.Event;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditTimeLine;
+import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.data.FrameData;
 import valedit.utils.ReverseIterator;
 
@@ -26,6 +27,14 @@ class ValEditorTimeLine extends ValEditTimeLine
 	public var nextKeyFrame(get, never):ValEditorKeyFrame;
 	public var numFrames(get, set):Int;
 	public var previousKeyFrame(get, never):ValEditorKeyFrame;
+	
+	override function set_frameIndex(value:Int):Int 
+	{
+		if (this._frameIndex == value) return value;
+		super.set_frameIndex(value);
+		TimeLineEvent.dispatch(this, TimeLineEvent.FRAME_INDEX_CHANGE);
+		return this._frameIndex;
+	}
 	
 	private function get_lastKeyFrame():ValEditorKeyFrame
 	{
@@ -354,7 +363,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 					keyFrame.indexEnd = this._frameCurrent.indexEnd;
 					unregisterKeyFrame(this._frameCurrent);
 					this._frameCurrent.pool();
-					setFrameCurrent(this._frameCurrent);
+					setFrameCurrent(keyFrame);
 				}
 				else
 				{
