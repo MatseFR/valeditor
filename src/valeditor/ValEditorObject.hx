@@ -177,6 +177,8 @@ class ValEditorObject extends ValEditObject
 		{
 			this._pivotIndicator.objectUpdate(this);
 		}
+		
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
 	}
 	
 	private function onValueChange(evt:ValueEvent):Void
