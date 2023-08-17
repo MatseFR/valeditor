@@ -25,8 +25,8 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	{
 		if (this._indexCurrent == value) return value;
 		this._indexCurrent = value;
-		updateObjectsSelectable();
 		updateTweens();
+		updateObjectsSelectable();
 		return this._indexCurrent;
 	}
 	
