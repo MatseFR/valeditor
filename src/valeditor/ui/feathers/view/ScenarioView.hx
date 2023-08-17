@@ -160,6 +160,7 @@ class ScenarioView extends LayoutGroup
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this._timeLineList.layout = vLayout;
+		this._timeLineList.addEventListener(ScrollEvent.SCROLL, onTimeLineListScroll);
 		this._timeLineGroup.addChild(this._timeLineList);
 		
 		this._timeLineBottomGroup = new LayoutGroup();
@@ -168,14 +169,26 @@ class ScenarioView extends LayoutGroup
 		this._timeLineMainGroup.addChild(this._timeLineBottomGroup);
 		
 		this._hScrollBar = new HScrollBar();
-		this._hScrollBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
+		//this._hScrollBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
 		this._timeLineBottomGroup.addChild(this._hScrollBar);
+		
+		this._timeLineList.addEventListener(Event.RESIZE, onTimeLineResize);
 		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
 		
 		listsChangeEnable();
+	}
+	
+	private function onTimeLineResize(evt:Event):Void
+	{
+		updateHScrollBar();
+		this._hScrollBar.width = this._timeLineList.width;
+		this._hScrollBar.page = this._timeLineList.width;
+		
+		updateVScrollBar();
+		this._vScrollBar.page = this._timeLineList.height;
 	}
 	
 	private function layerItemDestroy(itemRenderer:LayerItem):Void
@@ -222,7 +235,6 @@ class ScenarioView extends LayoutGroup
 	{
 		this._vScrollBar.minimum = this._timeLineList.minScrollY;
 		this._vScrollBar.maximum = this._timeLineList.maxScrollY;
-		this._vScrollBar.value = this._timeLineList.scrollY;
 	}
 	
 	private function onContainerClose(evt:EditorEvent):Void
@@ -282,9 +294,14 @@ class ScenarioView extends LayoutGroup
 		if (this._layerList.selectedIndex != -1)
 		{
 			listsChangeDisable();
+			
 			var layer:ValEditorLayer = new ValEditorLayer();
 			createTimeLineItem(cast layer.timeLine, this._layerList.selectedIndex);
+			this._timeLineList.validateNow();
+			updateVScrollBar();
+			
 			this._container.addLayerAt(layer, this._layerList.selectedIndex);
+			
 			listsChangeEnable();
 		}
 	}
@@ -299,8 +316,8 @@ class ScenarioView extends LayoutGroup
 	
 	private function onLayerListScroll(evt:ScrollEvent):Void
 	{
-		this._timeLineList.scrollY = this._layerList.scrollY;
-		updateVScrollBar();
+		//this._timeLineList.scrollY = this._layerList.scrollY;
+		this._vScrollBar.value = this._layerList.scrollY;
 	}
 	
 	private function onLayerRemoveButton(evt:TriggerEvent):Void
@@ -334,19 +351,19 @@ class ScenarioView extends LayoutGroup
 	private function onTimeLineItemScroll(evt:Event):Void
 	{
 		var timeLineItem:TimeLineItem = cast evt.target;
-		var scrollX:Float = timeLineItem.scrollX;
-		
-		for (item in this._timeLineItems)
-		{
-			if (item == timeLineItem) continue;
-			item.scrollX = scrollX;
-		}
+		this._hScrollBar.value = timeLineItem.scrollX;
 	}
 	
 	private function onTimeLineItemSelected(evt:Event):Void
 	{
 		var layer:ValEditLayer = this._container.getLayerAt(this._timeLineItems.indexOf(cast evt.target));
 		this._container.currentLayer = layer;
+	}
+	
+	private function onTimeLineListScroll(evt:ScrollEvent):Void
+	{
+		//this._layerList.scrollY = this._timeLineList.scrollY;
+		this._vScrollBar.value = this._timeLineList.scrollY;
 	}
 	
 	private function onHScrollBarChange(evt:Event):Void
