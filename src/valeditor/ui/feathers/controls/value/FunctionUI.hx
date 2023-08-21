@@ -13,7 +13,6 @@ import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valedit.value.base.ExposedValue;
-import valedit.ValEdit;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFunction;
@@ -76,6 +75,10 @@ class FunctionUI extends ValueUI
 			control.pool();
 		}
 		this._parameterControls.resize(0);
+		if (this._parameterGroup.parent != null)
+		{
+			removeChild(this._parameterGroup);
+		}
 		this._func = null;
 	}
 	
@@ -147,12 +150,16 @@ class FunctionUI extends ValueUI
 		
 		this._button.text = this._func.name;
 		
-		if (this._parameterGroup.parent != null)
+		if (this._parameterControls.length != 0)
 		{
-			this._parameterGroup.removeChildren();
+			this._valueGroup.removeChildren();
+			for (control in this._parameterControls)
+			{
+				control.pool();
+			}
+			this._parameterControls.resize(0);
 			removeChild(this._parameterGroup);
 		}
-		this._parameterControls.resize(0);
 		
 		var exposedValues:Array<ExposedValue> = this._func.getExposedValueParameters();
 		if (exposedValues.length != 0)
