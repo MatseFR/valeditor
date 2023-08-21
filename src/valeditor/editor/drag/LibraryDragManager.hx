@@ -31,10 +31,10 @@ class LibraryDragManager
 		}
 		this.isDragging = true;
 		this.template = template;
-		this.object = ValEditor.createObjectWithTemplate(this.template);
-		this.objectIndicator.objectUpdate(this.object);
+		this.objectIndicator.objectUpdate(this.template.object);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		Lib.current.stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 	}
 	
 	public function stopDrag():Void
@@ -43,6 +43,7 @@ class LibraryDragManager
 		this.isDragging = false;
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
 		
 		if (this.objectIndicator.parent != null)
 		{
@@ -58,7 +59,6 @@ class LibraryDragManager
 	
 	private function onMouseMove(evt:MouseEvent):Void
 	{
-		trace("" + evt.stageX + ", " + evt.stageY);
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY))
 		{
 			if (ValEditor.currentContainer.canAddObject())
@@ -69,16 +69,10 @@ class LibraryDragManager
 				}
 				this.objectIndicator.x = evt.stageX;
 				this.objectIndicator.y = evt.stageY;
-				
-				if (this.object.isDisplayObject)
-				{
-					this.object.setProperty(RegularPropertyName.X, evt.stageX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
-					this.object.setProperty(RegularPropertyName.Y, evt.stageY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
-				}
 			}
 			else
 			{
-				// TODO : show some "forbidden" icon or something
+				// TODO : show some "forbidden" icon, message or something
 			}
 		}
 		else
@@ -94,11 +88,23 @@ class LibraryDragManager
 	{
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject())
 		{
+			this.object = ValEditor.createObjectWithTemplate(this.template);
+			if (this.object.isDisplayObject)
+			{
+				this.object.setProperty(RegularPropertyName.X, evt.stageX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
+				this.object.setProperty(RegularPropertyName.Y, evt.stageY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
+			}
+			
 			ValEditor.currentContainer.add(this.object);
 			ValEditor.selection.object = this.object;
 			this.object = null;
 		}
 		
+		stopDrag();
+	}
+	
+	private function onRightClick(evt:MouseEvent):Void
+	{
 		stopDrag();
 	}
 	
