@@ -507,6 +507,7 @@ class ValEditor
 		if (template == null) return;
 		
 		var valClass:ValEditClass = _classMap.get(template.className);
+		_displayMap[container] = valClass;
 		valClass.addTemplateContainer(container, template);
 	}
 	
@@ -581,21 +582,23 @@ class ValEditor
 	static public function createTemplateWithClassName(className:String, ?id:String, ?constructorCollection:ExposedCollection):ValEditorTemplate
 	{
 		var valClass:ValEditorClass = _classMap.get(className);
-		var template:ValEditorTemplate = new ValEditorTemplate(valClass, id);
+		var template:ValEditorTemplate = ValEditorTemplate.fromPool(valClass, id, null, constructorCollection);
 		
 		ValEdit.createTemplateWithClassName(className, id, constructorCollection, template);
+		
+		template.object = createObjectWithTemplate(template, template.collection, false);
 		
 		registerTemplateInternal(template);
 		
 		return template;
 	}
 	
-	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection):ValEditorObject
+	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, registerToTemplate:Bool = true):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(template.className);
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
 		
-		ValEdit.createObjectWithTemplate(template, id, valObject, collection);
+		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
 		
 		if (valClass.interactiveFactory != null)
 		{
@@ -691,6 +694,11 @@ class ValEditor
 			Reflect.callMethod(valObject.clss.disposeCustom, valObject.clss.disposeCustom, [valObject.object]);
 		}
 		
+		if (valObject.template != null)
+		{
+			valObject.template.removeInstance(valObject);
+		}
+		
 		unregisterObjectInternal(valObject);
 		
 		valObject.pool();
@@ -728,15 +736,16 @@ class ValEditor
 	
 	static private function destroyTemplateInternal(template:ValEditorTemplate):Void
 	{
-		if (template.clss.disposeFunctionName != null)
-		{
-			var func:Function = Reflect.field(template.object, template.clss.disposeFunctionName);
-			Reflect.callMethod(template.object, func, []);
-		}
-		else if (template.clss.disposeCustom != null)
-		{
-			Reflect.callMethod(template.clss.disposeCustom, template.clss.disposeCustom, [template.object]);
-		}
+		//if (template.clss.disposeFunctionName != null)
+		//{
+			//var func:Function = Reflect.field(template.object.object, template.clss.disposeFunctionName);
+			//Reflect.callMethod(template.object, func, []);
+		//}
+		//else if (template.clss.disposeCustom != null)
+		//{
+			//Reflect.callMethod(template.clss.disposeCustom, template.clss.disposeCustom, [template.object.object]);
+		//}
+		destroyObject(template.object);
 		
 		unregisterTemplateInternal(template);
 		
@@ -767,7 +776,7 @@ class ValEditor
 	
 	static public function checkForClassProperty(clss:ValEditorClass, propertyName:String):Bool
 	{
-		if (clss.sourceCollection.hasValue(propertyName))
+		if (clss.objectCollection.hasValue(propertyName))
 		{
 			return true;
 		}

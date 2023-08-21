@@ -19,9 +19,9 @@ class ValEditorClass extends ValEditClass
 	
 	public var hasRadianRotation:Bool;
 
-	public function new(?classReference:Class<Dynamic>, ?className:String, ?sourceCollection:ExposedCollection, canBeCreated:Bool = true, isDisplayObject:Bool = false, ?constructorCollection:ExposedCollection)
+	public function new(?classReference:Class<Dynamic>, ?className:String, ?objectCollection:ExposedCollection, canBeCreated:Bool = true, isDisplayObject:Bool = false, ?constructorCollection:ExposedCollection)
 	{
-		super(classReference, className, sourceCollection, canBeCreated, isDisplayObject, constructorCollection);
+		super(classReference, className, objectCollection, canBeCreated, isDisplayObject, constructorCollection);
 	}
 	
 }

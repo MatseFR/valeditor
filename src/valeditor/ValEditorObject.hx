@@ -223,6 +223,8 @@ class ValEditorObject extends ValEditObject
 		{
 			this._pivotIndicator.objectUpdate(this);
 		}
+		
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
 	}
 	
 	public function modifyProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
@@ -293,6 +295,11 @@ class ValEditorObject extends ValEditObject
 				this._pivotIndicator.objectUpdate(this);
 			}
 		}
+	}
+	
+	public function functionCalled(propertyName:String, parameters:Array<Dynamic>):Void
+	{
+		ObjectEvent.dispatch(this, ObjectEvent.FUNCTION_CALLED, this, propertyName, parameters);
 	}
 	
 	public function getBounds(targetSpace:Dynamic):Rectangle
