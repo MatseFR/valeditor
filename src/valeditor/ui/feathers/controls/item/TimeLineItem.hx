@@ -18,6 +18,7 @@ import valeditor.events.DefaultEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.renderers.FrameItemRenderer;
 import valeditor.ui.feathers.renderers.FrameItemState;
+import valeditor.ui.feathers.variant.ListViewVariant;
 
 /**
  * ...
@@ -97,8 +98,6 @@ class TimeLineItem extends LayoutGroup
 	private var _dispatchScrollEvents:Bool = true;
 	private var _list:ListView;
 	private var _frame:ValEditKeyFrame;
-	
-	private var _emptyString:String = null;
 
 	public function new(timeLine:ValEditorTimeLine) 
 	{
@@ -136,162 +135,12 @@ class TimeLineItem extends LayoutGroup
 		this.layout = vLayout;
 		
 		this._list = new ListView();
-		this._list.variant = ListView.VARIANT_BORDERLESS;
-		var listLayout:HorizontalListLayout = new HorizontalListLayout();
-		this._list.layout = listLayout;
-		this._list.scrollPolicyX = ScrollPolicy.OFF;
-		this._list.scrollPolicyY = ScrollPolicy.OFF;
-		this._list.itemToText = itemToText;
-		
-		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			return FrameItemRenderer.fromPool();
-		});
-		recycler.update = itemUpdate;
-		recycler.destroy = itemDestroy;
-		this._list.itemRendererRecycler = recycler;
-		
+		this._list.variant = ListViewVariant.TIMELINE;
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(ScrollEvent.SCROLL, onListScroll);
 		addChild(this._list);
 		
 		this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-	}
-	
-	private function itemToText(data:Dynamic):String
-	{
-		return this._emptyString;
-	}
-	
-	private function itemDestroy(itemRenderer:FrameItemRenderer):Void
-	{
-		itemRenderer.pool();
-	}
-	
-	private function itemUpdate(itemRenderer:FrameItemRenderer, state:ListViewItemState):Void
-	{
-		this._frame = state.data.frame;
-		if (this._frame != null)
-		{
-			if (this._frame.indexStart == this._frame.indexEnd)
-			{
-				// KEYFRAME_SINGLE
-				if (this._frame.isEmpty)
-				{
-					if (this._frame.tween)
-					{
-						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_TWEEN_EMPTY(state.selected);
-					}
-					else
-					{
-						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_EMPTY(state.selected);
-					}
-				}
-				else
-				{
-					if (this._frame.tween)
-					{
-						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE_TWEEN(state.selected);
-					}
-					else
-					{
-						itemRenderer.state = FrameItemState.KEYFRAME_SINGLE(state.selected);
-					}
-				}
-			}
-			else
-			{
-				if (this._frame.indexStart == state.index)
-				{
-					// KEYFRAME_START
-					if (this._frame.isEmpty)
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_START_TWEEN_EMPTY(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_START_EMPTY(state.selected);
-						}
-					}
-					else
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_START_TWEEN(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_START(state.selected);
-						}
-					}
-				}
-				else if (this._frame.indexEnd == state.index)
-				{
-					// KEYFRAME_END
-					if (this._frame.isEmpty)
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_END_TWEEN_EMPTY(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_END_EMPTY(state.selected);
-						}
-					}
-					else
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_END_TWEEN(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_END(state.selected);
-						}
-					}
-				}
-				else
-				{
-					// KEYFRAME
-					if (this._frame.isEmpty)
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_TWEEN_EMPTY(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_EMPTY(state.selected);
-						}
-					}
-					else
-					{
-						if (this._frame.tween)
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME_TWEEN(state.selected);
-						}
-						else
-						{
-							itemRenderer.state = FrameItemState.KEYFRAME(state.selected);
-						}
-					}
-				}
-			}
-			this._frame = null;
-		}
-		else
-		{
-			if ((state.index + 1) % 5 == 0)
-			{
-				itemRenderer.state = FrameItemState.FRAME_5(state.selected);
-			}
-			else
-			{
-				itemRenderer.state = FrameItemState.FRAME(state.selected);
-			}
-		}
 	}
 	
 	private function setTo(timeLine:ValEditorTimeLine):TimeLineItem
