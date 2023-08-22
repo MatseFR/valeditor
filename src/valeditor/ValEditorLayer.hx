@@ -15,6 +15,14 @@ import valeditor.events.LayerEvent;
  */
 class ValEditorLayer extends ValEditLayer 
 {
+	static private var _POOL:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+	
+	static public function fromPool(?timeLine:ValEditorTimeLine):ValEditorLayer
+	{
+		if (_POOL.length != 0) return cast _POOL.pop().setTo(timeLine);
+		return new ValEditorLayer(timeLine);
+	}
+	
 	public var objectCollection(default, null):ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	
 	override function set_name(value:String):String 
@@ -29,8 +37,21 @@ class ValEditorLayer extends ValEditLayer
 	
 	public function new(?timeLine:ValEditorTimeLine) 
 	{
-		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(50);
+		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(120);
 		super(timeLine);
+	}
+	
+	override public function clear():Void 
+	{
+		this.objectCollection.removeAll();
+		this._displayObjects.clear();
+		super.clear();
+	}
+	
+	override public function pool():Void 
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
