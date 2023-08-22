@@ -31,7 +31,7 @@ class LibraryDragManager
 		}
 		this.isDragging = true;
 		this.template = template;
-		this.objectIndicator.objectUpdate(this.template.object);
+		this.objectIndicator.objectUpdate(cast this.template.object);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		Lib.current.stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
