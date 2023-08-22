@@ -117,6 +117,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 	
 	override public function clear():Void 
 	{
+		this.frameCollection.removeAll();
 		super.clear();
 	}
 	
