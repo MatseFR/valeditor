@@ -2,6 +2,7 @@ package valeditor.ui.feathers.renderers;
 
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.display.PixelSnapping;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 
@@ -53,7 +54,7 @@ class BitmapScrollRenderer extends Sprite
 	public function new(bitmapData:BitmapData, rectMap:Map<FrameItemState, Rectangle>) 
 	{
 		super();
-		this._bitmap = new Bitmap(bitmapData);
+		this._bitmap = new Bitmap(bitmapData, PixelSnapping.AUTO);
 		addChild(this._bitmap);
 		this.rectMap = rectMap;
 		this.state = FrameItemState.FRAME(false);
