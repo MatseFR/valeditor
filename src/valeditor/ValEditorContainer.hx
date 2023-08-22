@@ -34,6 +34,14 @@ import valeditor.ui.shape.PivotIndicator;
  */
 class ValEditorContainer extends ValEditContainer implements IAnimatable implements IValEditorContainer
 {
+	static private var _POOL:Array<ValEditorContainer> = new Array<ValEditorContainer>();
+	
+	static public function fromPool():ValEditorContainer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ValEditorContainer();
+	}
+	
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
@@ -167,10 +175,29 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	override public function clear():Void
 	{
-		this._viewCenterX = 0;
-		this._viewCenterY = 0;
 		this.layerCollection.removeAll();
+		this.objectCollection.removeAll();
+		this.viewCenterX = 0;
+		this.viewCenterY = 0;
+		this.viewWidth = 0;
+		this.viewHeight = 0;
+		
+		this._currentLayer = null;
+		this._interactiveObjectToValEditObject.clear();
+		
+		this._mouseObject = null;
+		
+		this._selection.clear();
+		
+		this._layerNameIndex = 0;
+		
 		super.clear();
+	}
+	
+	override public function pool():Void 
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	public function adjustView():Void
