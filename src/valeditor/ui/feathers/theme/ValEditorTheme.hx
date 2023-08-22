@@ -1,6 +1,7 @@
 package valeditor.ui.feathers.theme;
 
 import valeditor.ui.feathers.theme.components.AssetItemRendererStyles;
+import valeditor.ui.feathers.theme.components.ListViewStyles;
 import valeditor.ui.feathers.theme.components.CheckVariantStyles;
 import valeditor.ui.feathers.theme.components.FrameItemRendererStyles;
 import valeditor.ui.feathers.theme.components.LabelStyles;
@@ -33,6 +34,7 @@ class ValEditorTheme extends SimpleTheme
 		super(lightThemeColor, darkThemeColor);
 		
 		AssetItemRendererStyles.initialize(this, this.styleProvider);
+		ListViewStyles.initialize(this, this.styleProvider);
 		CheckVariantStyles.initialize(this, this.styleProvider);
 		FrameItemRendererStyles.initialize(this, this.styleProvider);
 		LabelStyles.initialize(this, this.styleProvider);
