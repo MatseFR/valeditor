@@ -281,6 +281,8 @@ class ScenarioView extends LayoutGroup
 		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
 		this._timeLineItems.insert(index, item);
 		this._timeLineList.addChildAt(item, index);
+		
+		item.scrollX = this._hScrollBar.value;
 	}
 	
 	private function destroyTimeLineItem(item:TimeLineItem):Void
