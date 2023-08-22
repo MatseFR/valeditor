@@ -6,7 +6,6 @@ import feathers.graphics.LineStyle;
 import feathers.skins.RectangleSkin;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
-import feathers.text.TextFormat;
 import openfl.display.BitmapData;
 import valeditor.ui.feathers.controls.NumericDragger;
 import valeditor.ui.feathers.controls.NumericDraggerState;
