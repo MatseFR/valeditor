@@ -69,6 +69,10 @@ class ValEditorObject extends ValEditObject
 		{
 			this._boundsFunction = Reflect.field(this.object, value);
 		}
+		else
+		{
+			this._boundsFunction = null;
+		}
 		return this._getBoundsFunctionName = value;
 	}
 	
@@ -149,6 +153,15 @@ class ValEditorObject extends ValEditObject
 	{
 		super.clear();
 		
+		this.container = null;
+		this.getBoundsFunctionName = null;
+		this.hasPivotProperties = false;
+		this.hasScaleProperties = false;
+		this.hasTransformProperty = false;
+		this.hasTransformationMatrixProperty = false;
+		this.hasVisibleProperty = false;
+		this.hasRadianRotation = false;
+		this.isMouseDown = false;
 		this.isSelectable = true;
 		
 		if (this._interactiveObject != null)
