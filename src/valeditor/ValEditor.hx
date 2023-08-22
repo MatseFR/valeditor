@@ -648,11 +648,6 @@ class ValEditor
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.add(valObject);
 		}
-		
-		//if (currentContainer != null)
-		//{
-			//currentContainer.add(valObject);
-		//}
 	}
 	
 	static private function registerTemplateInternal(template:ValEditorTemplate):Void
@@ -736,16 +731,7 @@ class ValEditor
 	
 	static private function destroyTemplateInternal(template:ValEditorTemplate):Void
 	{
-		//if (template.clss.disposeFunctionName != null)
-		//{
-			//var func:Function = Reflect.field(template.object.object, template.clss.disposeFunctionName);
-			//Reflect.callMethod(template.object, func, []);
-		//}
-		//else if (template.clss.disposeCustom != null)
-		//{
-			//Reflect.callMethod(template.clss.disposeCustom, template.clss.disposeCustom, [template.object.object]);
-		//}
-		destroyObject(template.object);
+		destroyObject(cast template.object);
 		
 		unregisterTemplateInternal(template);
 		
