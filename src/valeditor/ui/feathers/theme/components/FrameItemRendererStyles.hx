@@ -327,7 +327,7 @@ class FrameItemRendererStyles
 		skin.height = height;
 		item.setSkinForState(FrameItemState.KEYFRAME_END_EMPTY(false), skin);
 		
-		item.setIconForState(FrameItemState.KEYFRAME_END_EMPTY(false), end_icon());
+		item.setIconForState(FrameItemState.KEYFRAME_END_EMPTY(false), end_empty_icon());
 		
 		// KEYFRAME_END_EMPTY selected
 		skin = new TopBottomAndRightSkin();
@@ -337,7 +337,7 @@ class FrameItemRendererStyles
 		skin.height = height;
 		item.setSkinForState(FrameItemState.KEYFRAME_END_EMPTY(true), skin);
 		
-		item.setIconForState(FrameItemState.KEYFRAME_END_EMPTY(true), end_icon());
+		item.setIconForState(FrameItemState.KEYFRAME_END_EMPTY(true), end_empty_icon());
 		
 		// KEYFRAME_END_TWEEN
 		skin = new TopBottomAndRightSkin();
