@@ -71,9 +71,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.exposeData();
 		
-		ValEditor.registerClass(ValEditorContainer, ContainerData.exposeValEditorContainer(), false, false);
-		ValEditor.registerClass(ValEditorKeyFrame, ContainerData.exposeValEditKeyFrame(), false, false);
-		ValEditor.registerClass(ExportSettings, SettingsData.exposeExportSettings(), false, false);
+		ValEditor.registerClassSimple(ValEditorContainer, ContainerData.exposeValEditorContainer());
+		ValEditor.registerClassSimple(ValEditorKeyFrame, ContainerData.exposeValEditKeyFrame());
+		ValEditor.registerClassSimple(ExportSettings, SettingsData.exposeExportSettings());
 	}
 	
 	override function ready():Void 

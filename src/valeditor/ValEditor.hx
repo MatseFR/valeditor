@@ -182,7 +182,43 @@ class ValEditor
 		_rootContainer.clear();
 	}
 	
-	static public function registerClass(type:Class<Dynamic>, collection:ExposedCollection, canBeCreated:Bool = true, ?isDisplayObject:Bool, ?displayObjectType:Int, ?constructorCollection:ExposedCollection, ?settings:ValEditorClassSettings, ?categoryList:Array<String>):ValEditorClass
+	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
+	{
+		if (settings == null) settings = new ValEditorClassSettings();
+		
+		ValEdit.getClassSettings(type, settings);
+		
+		getClassInteractiveSettings(type, settings);
+		
+		#if starling
+		if (settings.isDisplayObject && settings.displayObjectType == DisplayObjectType.STARLING)
+		{
+			settings.hasRadianRotation = true;
+		}
+		#end
+		
+		return settings;
+	}
+	
+	static public function getClassInteractiveSettings(type:Class<Dynamic>, settings:ValEditorClassSettings):Void
+	{
+		if (settings.isDisplayObject)
+		{
+			switch (settings.displayObjectType)
+			{
+				case DisplayObjectType.OPENFL :
+					settings.interactiveFactory = InteractiveFactories.openFL_default;
+				
+				case DisplayObjectType.STARLING :
+					settings.interactiveFactory = InteractiveFactories.starling_default;
+				
+				default :
+					// nothing
+			}
+		}
+	}
+	
+	static public function registerClass(type:Class<Dynamic>, settings:ValEditorClassSettings):ValEditorClass
 	{
 		var className:String = Type.getClassName(type);
 		if (_classMap.exists(className))
@@ -198,39 +234,24 @@ class ValEditor
 			_classNameToStringData.set(className, strClass);
 		}
 		
-		var v:ValEditorClass = new ValEditorClass();
+		var v:ValEditorClass = ValEditorClass.fromPool(type);
 		
-		var result:ValEditClass = ValEdit.registerClass(type, collection, canBeCreated, isDisplayObject, displayObjectType, constructorCollection, settings, categoryList, v);
-		if (result == null) return null;
+		var result:ValEditClass = ValEdit.registerClass(type, settings, v);
+		if (result == null)
+		{
+			v.pool();
+			return null;
+		}
 		
 		_classMap.set(className, v);
 		
-		if (settings != null)
+		v.canBeCreated = settings.canBeCreated;
+		for (category in settings.categories)
 		{
-			v.interactiveFactory = settings.interactiveFactory;
-			v.hasRadianRotation = settings.hasRadianRotation;
+			v.addCategory(category);
 		}
-		else
-		{
-			v.hasRadianRotation = v.isDisplayObject && v.displayObjectType == DisplayObjectType.STARLING;
-		}
-		
-		if (v.isDisplayObject && v.interactiveFactory == null)
-		{
-			switch (v.displayObjectType)
-			{
-				case DisplayObjectType.OPENFL :
-					v.interactiveFactory = InteractiveFactories.openFL_default;
-				
-				#if starling
-				case DisplayObjectType.STARLING :
-					v.interactiveFactory = InteractiveFactories.starling_default;
-				#end
-				
-				default :
-					throw new Error("ValEditor.registerClass ::: unknown display object type " + v.displayObjectType);
-			}
-		}
+		v.hasRadianRotation = settings.hasRadianRotation;
+		v.interactiveFactory = settings.interactiveFactory;
 		
 		v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
 		v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
@@ -243,31 +264,28 @@ class ValEditor
 		var templateCollection:ArrayCollection<ValEditorTemplate>;
 		var stringData:StringData;
 		
-		if (categoryList != null)
+		for (category in settings.categories)
 		{
-			for (category in categoryList)
+			if (!_categoryToClassCollection.exists(category))
 			{
-				if (!_categoryToClassCollection.exists(category))
-				{
-					stringData = StringData.fromPool(category);
-					_categoryToStringData.set(category, stringData);
-					categoryCollection.add(stringData);
-					
-					strCollection = new ArrayCollection<StringData>();
-					strCollection.sortCompareFunction = ArraySort.stringData;
-					_categoryToClassCollection.set(category, strCollection);
-					
-					objCollection = new ArrayCollection<ValEditorObject>();
-					objCollection.sortCompareFunction = ArraySort.object;
-					_categoryToObjectCollection.set(category, objCollection);
-					
-					templateCollection = new ArrayCollection<ValEditorTemplate>();
-					templateCollection.sortCompareFunction = ArraySort.template;
-					_categoryToTemplateCollection.set(category, templateCollection);
-				}
-				strCollection = _categoryToClassCollection.get(category);
-				strCollection.add(strClass);
+				stringData = StringData.fromPool(category);
+				_categoryToStringData.set(category, stringData);
+				categoryCollection.add(stringData);
+				
+				strCollection = new ArrayCollection<StringData>();
+				strCollection.sortCompareFunction = ArraySort.stringData;
+				_categoryToClassCollection.set(category, strCollection);
+				
+				objCollection = new ArrayCollection<ValEditorObject>();
+				objCollection.sortCompareFunction = ArraySort.object;
+				_categoryToObjectCollection.set(category, objCollection);
+				
+				templateCollection = new ArrayCollection<ValEditorTemplate>();
+				templateCollection.sortCompareFunction = ArraySort.template;
+				_categoryToTemplateCollection.set(category, templateCollection);
 			}
+			strCollection = _categoryToClassCollection.get(category);
+			strCollection.add(strClass);
 		}
 		
 		if (!_classToObjectCollection.exists(className))
@@ -306,12 +324,164 @@ class ValEditor
 			}
 		}
 		
-		if (canBeCreated)
+		if (v.canBeCreated)
 		{
 			classCollection.add(strClass);
 		}
 		
 		return v;
+	}
+	
+	static public function registerClassSimple(type:Class<Dynamic>, objectCollection:ExposedCollection, templateCollection:ExposedCollection = null,
+											   constructorCollection:ExposedCollection = null, canBeCreated:Bool = true, categories:Array<String> = null):ValEditorClass
+	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		settings.objectCollection = objectCollection;
+		settings.templateCollection = templateCollection;
+		settings.constructorCollection = constructorCollection;
+		getClassSettings(type, settings);
+		
+		if (categories != null)
+		{
+			for (category in categories)
+			{
+				settings.addCategory(category);
+			}
+		}
+		
+		var v:ValEditorClass = registerClass(type, settings);
+		
+		settings.pool();
+		return v;
+		
+		//var className:String = Type.getClassName(type);
+		//if (_classMap.exists(className))
+		//{
+			//trace("ValEditor.registerClass ::: Class " + className + " already registered");
+			//return null;
+		//}
+		//
+		//var strClass:StringData = _classNameToStringData.get(className);
+		//if (strClass == null)
+		//{
+			//strClass = StringData.fromPool(className);
+			//_classNameToStringData.set(className, strClass);
+		//}
+		//
+		//var v:ValEditorClass = new ValEditorClass();
+		//
+		//var result:ValEditClass = ValEdit.registerClass(type, collection, canBeCreated, isDisplayObject, displayObjectType, constructorCollection, settings, categoryList, v);
+		//if (result == null) return null;
+		//
+		//_classMap.set(className, v);
+		//
+		//if (settings != null)
+		//{
+			//v.interactiveFactory = settings.interactiveFactory;
+			//v.hasRadianRotation = settings.hasRadianRotation;
+		//}
+		//else
+		//{
+			//v.hasRadianRotation = v.isDisplayObject && v.displayObjectType == DisplayObjectType.STARLING;
+		//}
+		//
+		//if (v.isDisplayObject && v.interactiveFactory == null)
+		//{
+			//switch (v.displayObjectType)
+			//{
+				//case DisplayObjectType.OPENFL :
+					//v.interactiveFactory = InteractiveFactories.openFL_default;
+				//
+				//#if starling
+				//case DisplayObjectType.STARLING :
+					//v.interactiveFactory = InteractiveFactories.starling_default;
+				//#end
+				//
+				//default :
+					//throw new Error("ValEditor.registerClass ::: unknown display object type " + v.displayObjectType);
+			//}
+		//}
+		//
+		//v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
+		//v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
+		//v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
+		//v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
+		//v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
+		//
+		//var objCollection:ArrayCollection<ValEditorObject>;
+		//var strCollection:ArrayCollection<StringData>;
+		//var templateCollection:ArrayCollection<ValEditorTemplate>;
+		//var stringData:StringData;
+		//
+		//if (categoryList != null)
+		//{
+			//for (category in categoryList)
+			//{
+				//if (!_categoryToClassCollection.exists(category))
+				//{
+					//stringData = StringData.fromPool(category);
+					//_categoryToStringData.set(category, stringData);
+					//categoryCollection.add(stringData);
+					//
+					//strCollection = new ArrayCollection<StringData>();
+					//strCollection.sortCompareFunction = ArraySort.stringData;
+					//_categoryToClassCollection.set(category, strCollection);
+					//
+					//objCollection = new ArrayCollection<ValEditorObject>();
+					//objCollection.sortCompareFunction = ArraySort.object;
+					//_categoryToObjectCollection.set(category, objCollection);
+					//
+					//templateCollection = new ArrayCollection<ValEditorTemplate>();
+					//templateCollection.sortCompareFunction = ArraySort.template;
+					//_categoryToTemplateCollection.set(category, templateCollection);
+				//}
+				//strCollection = _categoryToClassCollection.get(category);
+				//strCollection.add(strClass);
+			//}
+		//}
+		//
+		//if (!_classToObjectCollection.exists(className))
+		//{
+			//objCollection = new ArrayCollection<ValEditorObject>();
+			//objCollection.sortCompareFunction = ArraySort.object;
+			//_classToObjectCollection.set(className, objCollection);
+		//}
+		//
+		//if (!_classToTemplateCollection.exists(className))
+		//{
+			//templateCollection = new ArrayCollection<ValEditorTemplate>();
+			//templateCollection.sortCompareFunction = ArraySort.template;
+			//_classToTemplateCollection.set(className, templateCollection);
+		//}
+		//
+		//for (superName in v.superClassNames)
+		//{
+			//if (!_classNameToStringData.exists(superName))
+			//{
+				//_classNameToStringData.set(superName, StringData.fromPool(superName));
+			//}
+			//
+			//if (!_classToObjectCollection.exists(superName))
+			//{
+				//objCollection = new ArrayCollection<ValEditorObject>();
+				//objCollection.sortCompareFunction = ArraySort.object;
+				//_classToObjectCollection.set(superName, objCollection);
+			//}
+			//
+			//if (!_classToTemplateCollection.exists(superName))
+			//{
+				//templateCollection = new ArrayCollection<ValEditorTemplate>();
+				//templateCollection.sortCompareFunction = ArraySort.template;
+				//_classToTemplateCollection.set(superName, templateCollection);
+			//}
+		//}
+		//
+		//if (canBeCreated)
+		//{
+			//classCollection.add(strClass);
+		//}
+		//
+		//return v;
 	}
 	
 	static public function unregisterClass(type:Class<Dynamic>):Void
@@ -643,7 +813,7 @@ class ValEditor
 			objCollection.add(valObject);
 		}
 		
-		for (category in valObject.clss.categories)
+		for (category in cast(valObject.clss, ValEditorClass).categories)
 		{
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.add(valObject);
@@ -665,7 +835,7 @@ class ValEditor
 			collection.add(template);
 		}
 		
-		for (category in template.clss.categories)
+		for (category in cast(template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.add(template);
@@ -684,9 +854,9 @@ class ValEditor
 			var func:Function = Reflect.field(valObject.object, valObject.clss.disposeFunctionName);
 			Reflect.callMethod(valObject.object, func, []);
 		}
-		else if (valObject.clss.disposeCustom != null)
+		else if (valObject.clss.disposeFunction != null)
 		{
-			Reflect.callMethod(valObject.clss.disposeCustom, valObject.clss.disposeCustom, [valObject.object]);
+			Reflect.callMethod(valObject.clss.disposeFunction, valObject.clss.disposeFunction, [valObject.object]);
 		}
 		
 		if (valObject.template != null)
@@ -717,7 +887,7 @@ class ValEditor
 			objCollection.remove(valObject);
 		}
 		
-		for (category in valObject.clss.categories)
+		for (category in cast(valObject.clss, ValEditorClass).categories)
 		{
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.remove(valObject);
@@ -753,7 +923,7 @@ class ValEditor
 			collection.remove(template);
 		}
 		
-		for (category in template.clss.categories)
+		for (category in cast(template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.remove(template);
