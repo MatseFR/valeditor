@@ -26,10 +26,9 @@ class ValEditorClass extends ValEditClass
 	public var hasRadianRotation:Bool;
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 
-	public function new(classReference:Class<Dynamic>)//, ?className:String, ?objectCollection:ExposedCollection, canBeCreated:Bool = true, isDisplayObject:Bool = false, ?constructorCollection:ExposedCollection)
+	public function new(classReference:Class<Dynamic>)
 	{
-		super(classReference, className, objectCollection, isDisplayObject, constructorCollection);
-		//this.canBeCreated = canBeCreated;
+		super(classReference);
 	}
 	
 	override public function clear():Void 
