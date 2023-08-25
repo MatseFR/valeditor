@@ -169,8 +169,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	{
 		super();
 		this._containerUI.addChild(this._pivotIndicator);
-		var layer:ValEditorLayer = new ValEditorLayer();
-		addLayer(layer);
 	}
 	
 	override public function clear():Void
