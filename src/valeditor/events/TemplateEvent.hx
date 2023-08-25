@@ -10,6 +10,8 @@ import valedit.ValEditTemplate;
  */
 class TemplateEvent extends Event 
 {
+	inline static public var INSTANCE_ADDED:String = "instance_added";
+	inline static public var INSTANCE_REMOVED:String = "instance_removed";
 	inline static public var RENAMED:String = "renamed";
 	
 	#if !flash
