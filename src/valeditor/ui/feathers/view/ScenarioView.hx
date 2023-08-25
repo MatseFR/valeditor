@@ -148,6 +148,7 @@ class ScenarioView extends LayoutGroup
 		this._timeLineMainGroup.addChild(this._timeLineGroup);
 		
 		this._vScrollBar = new VScrollBar();
+		this._vScrollBar.snapInterval = 1.0;
 		this._vScrollBar.layoutData = new AnchorLayoutData(0, 0, 0);
 		this._vScrollBar.addEventListener(Event.CHANGE, onVScrollBarChange);
 		this._timeLineGroup.addChild(this._vScrollBar);
@@ -169,6 +170,7 @@ class ScenarioView extends LayoutGroup
 		this._timeLineMainGroup.addChild(this._timeLineBottomGroup);
 		
 		this._hScrollBar = new HScrollBar();
+		this._hScrollBar.snapInterval = 1.0;
 		//this._hScrollBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
 		this._timeLineBottomGroup.addChild(this._hScrollBar);
