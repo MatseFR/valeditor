@@ -2,6 +2,7 @@ package valeditor;
 
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
+import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
@@ -63,6 +64,18 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function addInstance(instance:ValEditObject):Void 
+	{
+		super.addInstance(instance);
+		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_ADDED, this);
+	}
+	
+	override public function removeInstance(instance:ValEditObject):Void 
+	{
+		super.removeInstance(instance);
+		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
 	}
 	
 	private function onTemplateObjectPropertyChange(evt:ObjectEvent):Void
