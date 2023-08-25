@@ -24,6 +24,7 @@ import inputAction.Input;
 import inputAction.controllers.KeyboardController;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.events.EditorEvent;
+import valeditor.events.TemplateEvent;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.utils.ArraySort;
@@ -332,10 +333,11 @@ class ValEditor
 		return v;
 	}
 	
-	static public function registerClassSimple(type:Class<Dynamic>, objectCollection:ExposedCollection, templateCollection:ExposedCollection = null,
-											   constructorCollection:ExposedCollection = null, canBeCreated:Bool = true, categories:Array<String> = null):ValEditorClass
+	static public function registerClassSimple(type:Class<Dynamic>, canBeCreated:Bool = true, objectCollection:ExposedCollection, templateCollection:ExposedCollection = null,
+											   constructorCollection:ExposedCollection = null, categories:Array<String> = null):ValEditorClass
 	{
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		settings.canBeCreated = canBeCreated;
 		settings.objectCollection = objectCollection;
 		settings.templateCollection = templateCollection;
 		settings.constructorCollection = constructorCollection;
@@ -703,6 +705,9 @@ class ValEditor
 	{
 		ValEdit.registerTemplateInternal(template);
 		
+		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
+		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
+		template.addEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.className);
@@ -791,6 +796,9 @@ class ValEditor
 	{
 		ValEdit.unregisterTemplateInternal(template);
 		
+		template.removeEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
+		template.removeEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
+		template.removeEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.className);
@@ -889,6 +897,43 @@ class ValEditor
 	static public function willTrigger(type:String):Bool
 	{
 		return _eventDispatcher.willTrigger(type);
+	}
+	
+	static public function createContainer():ValEditorContainer
+	{
+		var container:ValEditorContainer = ValEditorContainer.fromPool();
+		container.addLayer(createLayer());
+		container.frameIndex = 0;
+		return container;
+	}
+	
+	static public function createLayer():ValEditorLayer
+	{
+		var layer:ValEditorLayer = ValEditorLayer.fromPool(createTimeLine());
+		return layer;
+	}
+	
+	static public function createTimeLine():ValEditorTimeLine
+	{
+		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(120);
+		timeLine.frameIndex = 0;
+		timeLine.insertKeyFrame();
+		return timeLine;
+	}
+	
+	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
+	{
+		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+	}
+	
+	static private function onTemplateInstanceRemoved(evt:TemplateEvent):Void
+	{
+		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+	}
+	
+	static private function onTemplateRenamed(evt:TemplateEvent):Void
+	{
+		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
 	}
 	
 }
