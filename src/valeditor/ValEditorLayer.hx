@@ -37,7 +37,7 @@ class ValEditorLayer extends ValEditLayer
 	
 	public function new(?timeLine:ValEditorTimeLine) 
 	{
-		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(120);
+		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(0);
 		super(timeLine);
 	}
 	
