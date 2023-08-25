@@ -299,7 +299,7 @@ class ScenarioView extends LayoutGroup
 		{
 			listsChangeDisable();
 			
-			var layer:ValEditorLayer = new ValEditorLayer();
+			var layer:ValEditorLayer = ValEditor.createLayer();
 			createTimeLineItem(cast layer.timeLine, this._layerList.selectedIndex);
 			this._timeLineList.validateNow();
 			updateVScrollBar();
