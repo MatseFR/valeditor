@@ -45,7 +45,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.rootSceneStarling = starlingSprite;
 		#end
 		
-		var container:ValEditorContainer = new ValEditorContainer();
+		var container:ValEditorContainer = ValEditor.createContainer();
 		ValEditor.rootContainer = container;
 		
 		ValEditor.init();
@@ -71,9 +71,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.exposeData();
 		
-		ValEditor.registerClassSimple(ValEditorContainer, ContainerData.exposeValEditorContainer());
-		ValEditor.registerClassSimple(ValEditorKeyFrame, ContainerData.exposeValEditKeyFrame());
-		ValEditor.registerClassSimple(ExportSettings, SettingsData.exposeExportSettings());
+		ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
+		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditKeyFrame());
+		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
 	}
 	
 	override function ready():Void 
