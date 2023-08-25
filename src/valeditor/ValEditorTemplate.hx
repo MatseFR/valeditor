@@ -3,6 +3,7 @@ package valeditor;
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
 import valedit.ValEditTemplate;
+import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
 import valeditor.events.ObjectEvent;
 import valeditor.events.TemplateEvent;
@@ -86,9 +87,11 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	private function onTemplateObjectFunctionCalled(evt:ObjectEvent):Void
 	{
+		var func:ExposedFunction;
 		for (instance in this._instances)
 		{
-			Reflect.callMethod(instance.object, Reflect.getProperty(instance.object, evt.propertyName), evt.parameters);
+			func = cast instance.collection.getValue(evt.propertyName);
+			func.executeWithParameters(evt.parameters);
 		}
 	}
 	
