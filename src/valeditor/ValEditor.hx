@@ -353,135 +353,6 @@ class ValEditor
 		
 		settings.pool();
 		return v;
-		
-		//var className:String = Type.getClassName(type);
-		//if (_classMap.exists(className))
-		//{
-			//trace("ValEditor.registerClass ::: Class " + className + " already registered");
-			//return null;
-		//}
-		//
-		//var strClass:StringData = _classNameToStringData.get(className);
-		//if (strClass == null)
-		//{
-			//strClass = StringData.fromPool(className);
-			//_classNameToStringData.set(className, strClass);
-		//}
-		//
-		//var v:ValEditorClass = new ValEditorClass();
-		//
-		//var result:ValEditClass = ValEdit.registerClass(type, collection, canBeCreated, isDisplayObject, displayObjectType, constructorCollection, settings, categoryList, v);
-		//if (result == null) return null;
-		//
-		//_classMap.set(className, v);
-		//
-		//if (settings != null)
-		//{
-			//v.interactiveFactory = settings.interactiveFactory;
-			//v.hasRadianRotation = settings.hasRadianRotation;
-		//}
-		//else
-		//{
-			//v.hasRadianRotation = v.isDisplayObject && v.displayObjectType == DisplayObjectType.STARLING;
-		//}
-		//
-		//if (v.isDisplayObject && v.interactiveFactory == null)
-		//{
-			//switch (v.displayObjectType)
-			//{
-				//case DisplayObjectType.OPENFL :
-					//v.interactiveFactory = InteractiveFactories.openFL_default;
-				//
-				//#if starling
-				//case DisplayObjectType.STARLING :
-					//v.interactiveFactory = InteractiveFactories.starling_default;
-				//#end
-				//
-				//default :
-					//throw new Error("ValEditor.registerClass ::: unknown display object type " + v.displayObjectType);
-			//}
-		//}
-		//
-		//v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
-		//v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
-		//v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
-		//v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
-		//v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
-		//
-		//var objCollection:ArrayCollection<ValEditorObject>;
-		//var strCollection:ArrayCollection<StringData>;
-		//var templateCollection:ArrayCollection<ValEditorTemplate>;
-		//var stringData:StringData;
-		//
-		//if (categoryList != null)
-		//{
-			//for (category in categoryList)
-			//{
-				//if (!_categoryToClassCollection.exists(category))
-				//{
-					//stringData = StringData.fromPool(category);
-					//_categoryToStringData.set(category, stringData);
-					//categoryCollection.add(stringData);
-					//
-					//strCollection = new ArrayCollection<StringData>();
-					//strCollection.sortCompareFunction = ArraySort.stringData;
-					//_categoryToClassCollection.set(category, strCollection);
-					//
-					//objCollection = new ArrayCollection<ValEditorObject>();
-					//objCollection.sortCompareFunction = ArraySort.object;
-					//_categoryToObjectCollection.set(category, objCollection);
-					//
-					//templateCollection = new ArrayCollection<ValEditorTemplate>();
-					//templateCollection.sortCompareFunction = ArraySort.template;
-					//_categoryToTemplateCollection.set(category, templateCollection);
-				//}
-				//strCollection = _categoryToClassCollection.get(category);
-				//strCollection.add(strClass);
-			//}
-		//}
-		//
-		//if (!_classToObjectCollection.exists(className))
-		//{
-			//objCollection = new ArrayCollection<ValEditorObject>();
-			//objCollection.sortCompareFunction = ArraySort.object;
-			//_classToObjectCollection.set(className, objCollection);
-		//}
-		//
-		//if (!_classToTemplateCollection.exists(className))
-		//{
-			//templateCollection = new ArrayCollection<ValEditorTemplate>();
-			//templateCollection.sortCompareFunction = ArraySort.template;
-			//_classToTemplateCollection.set(className, templateCollection);
-		//}
-		//
-		//for (superName in v.superClassNames)
-		//{
-			//if (!_classNameToStringData.exists(superName))
-			//{
-				//_classNameToStringData.set(superName, StringData.fromPool(superName));
-			//}
-			//
-			//if (!_classToObjectCollection.exists(superName))
-			//{
-				//objCollection = new ArrayCollection<ValEditorObject>();
-				//objCollection.sortCompareFunction = ArraySort.object;
-				//_classToObjectCollection.set(superName, objCollection);
-			//}
-			//
-			//if (!_classToTemplateCollection.exists(superName))
-			//{
-				//templateCollection = new ArrayCollection<ValEditorTemplate>();
-				//templateCollection.sortCompareFunction = ArraySort.template;
-				//_classToTemplateCollection.set(superName, templateCollection);
-			//}
-		//}
-		//
-		//if (canBeCreated)
-		//{
-			//classCollection.add(strClass);
-		//}
-		//
-		//return v;
 	}
 	
 	static public function unregisterClass(type:Class<Dynamic>):Void
@@ -757,6 +628,7 @@ class ValEditor
 		ValEdit.createTemplateWithClassName(className, id, constructorCollection, template);
 		
 		template.object = createObjectWithTemplate(template, template.collection, false);
+		template.object.collection.readValues();
 		
 		registerTemplateInternal(template);
 		
@@ -767,6 +639,13 @@ class ValEditor
 	{
 		var valClass:ValEditorClass = _classMap.get(template.className);
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
+		
+		//valObject.hasPivotProperties = valClass.hasPivotProperties;
+		//valObject.hasScaleProperties = valClass.hasScaleProperties;
+		//valObject.hasTransformProperty = valClass.hasTransformProperty;
+		//valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+		//valObject.hasVisibleProperty = valClass.hasVisibleProperty;
+		//valObject.hasRadianRotation = valClass.hasRadianRotation;
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
 		
