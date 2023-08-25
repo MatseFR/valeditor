@@ -25,7 +25,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 	public var frameCollection(default, null):ArrayCollection<FrameData>;
 	public var lastKeyFrame(get, never):ValEditorKeyFrame;
 	public var nextKeyFrame(get, never):ValEditorKeyFrame;
-	public var numFrames(get, set):Int;
+	//public var numFrames(get, set):Int;
 	public var previousKeyFrame(get, never):ValEditorKeyFrame;
 	
 	override function set_frameIndex(value:Int):Int 
@@ -57,8 +57,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 		return null;
 	}
 	
-	private function get_numFrames():Int { return this._numFrames; }
-	private function set_numFrames(value:Int):Int
+	//private function get_numFrames():Int { return this._numFrames; }
+	override function set_numFrames(value:Int):Int
 	{
 		if (this._numFrames == value) return value;
 		if (value < this._numFrames)
@@ -69,6 +69,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				{
 					if (this._frames[i].indexStart == i)
 					{
+						unregisterKeyFrame(this._frames[i]);
 						this._frames[i].pool();
 					}
 					else
@@ -166,6 +167,11 @@ class ValEditorTimeLine extends ValEditTimeLine
 		keyFrame.addEventListener(Event.CHANGE, onKeyFrameChange);
 	}
 	
+	override public function unregisterKeyFrame(keyFrame:ValEditKeyFrame):Void
+	{
+		keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
+	}
+	
 	private function onKeyFrameChange(evt:Event):Void
 	{
 		var keyFrame:ValEditorKeyFrame = cast evt.target;
@@ -173,11 +179,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 		{
 			this.frameCollection.updateAt(i);
 		}
-	}
-	
-	public function unregisterKeyFrame(keyFrame:ValEditKeyFrame):Void
-	{
-		keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
 	}
 	
 	public function insertFrame():Void 
