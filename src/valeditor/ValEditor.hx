@@ -102,6 +102,7 @@ class ValEditor
 		if (_rootContainer != null)
 		{
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
+			_rootContainer.juggler = Juggler.root;
 			_rootContainer.rootContainer = _rootScene;
 			#if starling
 			_rootContainer.rootContainerStarling = _rootSceneStarling;
@@ -642,24 +643,18 @@ class ValEditor
 		var valClass:ValEditorClass = _classMap.get(template.className);
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
 		
-		//valObject.hasPivotProperties = valClass.hasPivotProperties;
-		//valObject.hasScaleProperties = valClass.hasScaleProperties;
-		//valObject.hasTransformProperty = valClass.hasTransformProperty;
-		//valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
-		//valObject.hasVisibleProperty = valClass.hasVisibleProperty;
-		//valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.hasPivotProperties = valClass.hasPivotProperties;
+		valObject.hasScaleProperties = valClass.hasScaleProperties;
+		valObject.hasTransformProperty = valClass.hasTransformProperty;
+		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
+		valObject.hasRadianRotation = valClass.hasRadianRotation;
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
 		
 		if (valClass.interactiveFactory != null)
 		{
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
-			valObject.hasPivotProperties = valClass.hasPivotProperties;
-			valObject.hasScaleProperties = valClass.hasScaleProperties;
-			valObject.hasTransformProperty = valClass.hasTransformProperty;
-			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
-			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
-			valObject.hasRadianRotation = valClass.hasRadianRotation;
 		}
 		
 		registerObjectInternal(valObject);
@@ -919,6 +914,23 @@ class ValEditor
 		timeLine.frameIndex = 0;
 		timeLine.insertKeyFrame();
 		return timeLine;
+	}
+	
+	static public function playStop():Void
+	{
+		if (!currentContainer.isPlaying)
+		{
+			currentContainer.timeLine.updateLastFrameIndex();
+			if (currentContainer.frameIndex == currentContainer.lastFrameIndex)
+			{
+				currentContainer.frameIndex = 0;
+			}
+			currentContainer.play();
+		}
+		else
+		{
+			currentContainer.stop();
+		}
 	}
 	
 	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
