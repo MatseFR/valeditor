@@ -7,6 +7,8 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
+import feathers.controls.ToggleButton;
+import feathers.controls.ToggleButtonState;
 import feathers.controls.VScrollBar;
 import feathers.data.ListViewItemState;
 import feathers.events.ScrollEvent;
@@ -22,6 +24,7 @@ import feathers.utils.DisplayObjectRecycler;
 import openfl.Lib;
 import openfl.events.Event;
 import valedit.ValEditLayer;
+import valedit.events.PlayEvent;
 import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
@@ -52,6 +55,9 @@ class ScenarioView extends LayoutGroup
 	private var _timeLineGroup:LayoutGroup;
 	private var _timeLineList:ScrollContainer;
 	private var _timeLineBottomGroup:LayoutGroup;
+	private var _timeLineControlsGroup:LayoutGroup;
+	
+	private var _playStopButton:ToggleButton;
 	
 	private var _timeLineItems:Array<TimeLineItem> = new Array<TimeLineItem>();
 	
@@ -117,7 +123,7 @@ class ScenarioView extends LayoutGroup
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
+		//hLayout.setPadding(Padding.DEFAULT);
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
 		this._layerBottomGroup.layout = hLayout;
 		this._layerGroup.addChild(this._layerBottomGroup);
@@ -174,6 +180,19 @@ class ScenarioView extends LayoutGroup
 		//this._hScrollBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
 		this._timeLineBottomGroup.addChild(this._hScrollBar);
+		
+		this._timeLineControlsGroup = new LayoutGroup();
+		this._timeLineControlsGroup.layoutData = new AnchorLayoutData(new Anchor(0, this._hScrollBar), 0, null, 0);
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		//hLayout.setPadding(Padding.DEFAULT);
+		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		this._timeLineControlsGroup.layout = hLayout;
+		this._timeLineBottomGroup.addChild(this._timeLineControlsGroup);
+		
+		this._playStopButton = new ToggleButton("P", false, onPlayStopButton);
+		this._timeLineControlsGroup.addChild(this._playStopButton);
 		
 		this._timeLineList.addEventListener(Event.RESIZE, onTimeLineResize);
 		
@@ -242,6 +261,8 @@ class ScenarioView extends LayoutGroup
 	private function onContainerClose(evt:EditorEvent):Void
 	{
 		this._container.removeEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
+		this._container.removeEventListener(PlayEvent.PLAY, onPlay);
+		this._container.removeEventListener(PlayEvent.STOP, onStop);
 		this._layerList.dataProvider = null;
 		for (item in this._timeLineItems)
 		{
@@ -256,6 +277,8 @@ class ScenarioView extends LayoutGroup
 	{
 		this._container = cast evt.object;
 		this._container.addEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
+		this._container.addEventListener(PlayEvent.PLAY, onPlay);
+		this._container.addEventListener(PlayEvent.STOP, onStop);
 		this._layerList.dataProvider = this._container.layerCollection;
 		
 		for (layer in this._container.layerCollection)
@@ -320,7 +343,6 @@ class ScenarioView extends LayoutGroup
 	
 	private function onLayerListScroll(evt:ScrollEvent):Void
 	{
-		//this._timeLineList.scrollY = this._layerList.scrollY;
 		this._vScrollBar.value = this._layerList.scrollY;
 	}
 	
@@ -352,6 +374,25 @@ class ScenarioView extends LayoutGroup
 		this._currentTimeLineItem.selectedIndex = layer.timeLine.frameIndex;
 	}
 	
+	private function onPlayStopButton(evt:Event):Void
+	{
+		ValEditor.playStop();
+	}
+	
+	private function onPlay(evt:PlayEvent):Void
+	{
+		this._playStopButton.removeEventListener(Event.CHANGE, onPlayStopButton);
+		this._playStopButton.selected = true;
+		this._playStopButton.addEventListener(Event.CHANGE, onPlayStopButton);
+	}
+	
+	private function onStop(evt:PlayEvent):Void
+	{
+		this._playStopButton.removeEventListener(Event.CHANGE, onPlayStopButton);
+		this._playStopButton.selected = false;
+		this._playStopButton.addEventListener(Event.CHANGE, onPlayStopButton);
+	}
+	
 	private function onTimeLineItemScroll(evt:Event):Void
 	{
 		var timeLineItem:TimeLineItem = cast evt.target;
@@ -366,7 +407,6 @@ class ScenarioView extends LayoutGroup
 	
 	private function onTimeLineListScroll(evt:ScrollEvent):Void
 	{
-		//this._layerList.scrollY = this._timeLineList.scrollY;
 		this._vScrollBar.value = this._timeLineList.scrollY;
 	}
 	
