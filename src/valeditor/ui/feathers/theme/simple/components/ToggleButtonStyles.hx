@@ -18,11 +18,11 @@ class ToggleButtonStyles
 		ToggleButtonStyles.theme = theme;
 		
 		if (styleProvider.getStyleFunction(ToggleButton, null) == null) {
-			styleProvider.setStyleFunction(ToggleButton, null, Default);
+			styleProvider.setStyleFunction(ToggleButton, null, default_style);
 		}
 	}
 	
-	static private function Default(button:ToggleButton):Void
+	static public function default_style(button:ToggleButton):Void
 	{
 		if (button.backgroundSkin == null) {
 			var skin = new RectangleSkin();
@@ -33,7 +33,8 @@ class ToggleButtonStyles
 			skin.setFillForState(ToggleButtonState.HOVER(true), theme.getThemeFillLight());
 			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
 			skin.setFillForState(ToggleButtonState.DOWN(true), theme.getThemeFill());
-			skin.border = theme.getLightBorderDarker();
+			skin.border = theme.getContrastBorderLight();
+			skin.disabledBorder = theme.getContrastBorderLighter();
 			skin.selectedBorder = theme.getThemeBorderDark();
 			skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getLightBorderDark());
 			skin.setBorderForState(ToggleButtonState.HOVER(true), theme.getThemeBorder());
