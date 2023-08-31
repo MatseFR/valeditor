@@ -2,7 +2,6 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import haxe.ds.ObjectMap;
-import inputAction.InputAction;
 import juggler.animation.IAnimatable;
 import juggler.animation.Juggler;
 import openfl.Lib;
@@ -22,7 +21,6 @@ import valedit.utils.RegularPropertyName;
 import valeditor.events.ContainerEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.SelectionEvent;
-import valeditor.input.InputActionID;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.controls.SelectionBox;
@@ -45,6 +43,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	public var selection(default, null):ValEditorObjectGroup = new ValEditorObjectGroup();
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
@@ -152,8 +151,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	private var _mouseObjectOffsetX:Float;
 	private var _mouseObjectOffsetY:Float;
 	
-	private var _selection:ValEditorObjectGroup = new ValEditorObjectGroup();
-	
 	private var _mouseDownOnObject:Bool;
 	private var _mouseDownWithCtrl:Bool;
 	private var _mouseDownWithShift:Bool;
@@ -167,6 +164,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	public function new() 
 	{
+		this.timeLine = new ValEditorTimeLine(0);
 		super();
 		this._containerUI.addChild(this._pivotIndicator);
 	}
@@ -185,7 +183,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		this._mouseObject = null;
 		
-		this._selection.clear();
+		this.selection.clear();
 		
 		this._layerNameIndex = 0;
 		
@@ -196,6 +194,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function play():Void 
+	{
+		this.timeLine.updateLastFrameIndex();
+		super.play();
 	}
 	
 	public function adjustView():Void
@@ -392,13 +396,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		this._mouseObject = object;
 		this._mouseObject.isMouseDown = true;
-		this._selection.isMouseDown = true;
+		this.selection.isMouseDown = true;
 		this._mouseObjectOffsetX = evt.localX;
 		this._mouseObjectOffsetY = evt.localY;
 		
-		if (this._selection.hasObject(this._mouseObject))
+		if (this.selection.hasObject(this._mouseObject))
 		{
-			for (object in this._selection)
+			for (object in this.selection)
 			{
 				if (object.isDisplayObject)
 				{
@@ -426,7 +430,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		if ((this._mouseDownWithCtrl && evt.ctrlKey) || (this._mouseDownWithShift && evt.shiftKey))
 		{
-			if (this._selection.hasObject(this._mouseObject))
+			if (this.selection.hasObject(this._mouseObject))
 			{
 				ValEditor.selection.removeObject(this._mouseObject);
 			}
@@ -435,20 +439,20 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				ValEditor.selection.addObject(this._mouseObject);
 			}
 		}
-		else if (!this._selection.hasObject(this._mouseObject))
+		else if (!this.selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = this._mouseObject;
 		}
 		
 		this._mouseObject.isMouseDown = false;
-		this._selection.isMouseDown = false;
+		this.selection.isMouseDown = false;
 		
 		if (ValEditor.isMouseOverUI)
 		{
 			// release outside
-			if (this._selection.hasObject(this._mouseObject))
+			if (this.selection.hasObject(this._mouseObject))
 			{
-				for (obj in this._selection)
+				for (obj in this.selection)
 				{
 					if (obj.isDisplayObject)
 					{
@@ -466,7 +470,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		this._mouseObject = null;
 		
-		for (obj in this._selection)
+		for (obj in this.selection)
 		{
 			obj.selectionBox.objectUpdate(obj);
 			obj.pivotIndicator.objectUpdate(obj);
@@ -480,12 +484,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
 		
 		this._mouseObject.isMouseDown = false;
-		this._selection.isMouseDown = false;
+		this.selection.isMouseDown = false;
 		
 		// cancel move
-		if (this._selection.hasObject(this._mouseObject))
+		if (this.selection.hasObject(this._mouseObject))
 		{
-			for (obj in this._selection)
+			for (obj in this.selection)
 			{
 				if (obj.isDisplayObject)
 				{
@@ -502,7 +506,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		this._mouseObject = null;
 		
-		for (obj in this._selection)
+		for (obj in this.selection)
 		{
 			obj.selectionBox.objectUpdate(obj);
 			obj.pivotIndicator.objectUpdate(obj);
@@ -521,7 +525,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		var moveX:Float = Lib.current.stage.mouseX - this._x - this._mouseObjectOffsetX + this._cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
 		var moveY:Float = Lib.current.stage.mouseY - this._y - this._mouseObjectOffsetY + this._cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 		
-		if (!this._selection.hasObject(this._mouseObject))
+		if (!this.selection.hasObject(this._mouseObject))
 		{
 			ValEditor.selection.object = null;
 			this._mouseObject.modifyProperty(RegularPropertyName.X, moveX);
@@ -529,8 +533,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		else
 		{
-			this._selection.modifyDisplayProperty(RegularPropertyName.X, moveX);
-			this._selection.modifyDisplayProperty(RegularPropertyName.Y, moveY);
+			this.selection.modifyDisplayProperty(RegularPropertyName.X, moveX);
+			this.selection.modifyDisplayProperty(RegularPropertyName.Y, moveY);
 		}
 	}
 	
@@ -553,7 +557,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 			this._mouseObject = object;
 			this._mouseObject.isMouseDown = true;
-			this._selection.isMouseDown = true;
+			this.selection.isMouseDown = true;
 			touch.getLocation(cast object.interactiveObject, _pt);
 			if (this._mouseObject.hasPivotProperties)
 			{
@@ -566,9 +570,9 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				this._mouseObjectOffsetY = _pt.y;
 			}
 			
-			if (this._selection.hasObject(this._mouseObject))
+			if (this.selection.hasObject(this._mouseObject))
 			{
-				for (obj in this._selection)
+				for (obj in this.selection)
 				{
 					if (obj.isDisplayObject)
 					{
@@ -595,7 +599,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			
 			if ((this._mouseDownWithCtrl && evt.ctrlKey) || (this._mouseDownWithShift && evt.shiftKey))
 			{
-				if (this._selection.hasObject(this._mouseObject))
+				if (this.selection.hasObject(this._mouseObject))
 				{
 					ValEditor.selection.removeObject(this._mouseObject);
 				}
@@ -604,20 +608,20 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					ValEditor.selection.addObject(this._mouseObject);
 				}
 			}
-			else if (!this._selection.hasObject(this._mouseObject))
+			else if (!this.selection.hasObject(this._mouseObject))
 			{
 				ValEditor.selection.object = this._mouseObject;
 			}
 			
 			this._mouseObject.isMouseDown = false;
-			this._selection.isMouseDown = false;
+			this.selection.isMouseDown = false;
 			
 			if (ValEditor.isMouseOverUI)
 			{
 				// release outside
-				if (this._selection.hasObject(this._mouseObject))
+				if (this.selection.hasObject(this._mouseObject))
 				{
-					for (obj in this._selection)
+					for (obj in this.selection)
 					{
 						if (obj.isDisplayObject)
 						{
@@ -635,7 +639,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			
 			this._mouseObject = null;
 			
-			for (obj in this._selection)
+			for (obj in this.selection)
 			{
 				obj.selectionBox.objectUpdate(obj);
 				obj.pivotIndicator.objectUpdate(obj);
@@ -672,7 +676,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			object.pivotIndicator = pivot;
 		}
 		
-		this._selection.addObject(object);
+		this.selection.addObject(object);
 	}
 	
 	private function unselect(object:ValEditorObject):Void
@@ -696,12 +700,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 		}
 		
-		this._selection.removeObject(object);
+		this.selection.removeObject(object);
 	}
 	
 	private function clearSelection():Void
 	{
-		for (object in this._selection)
+		for (object in this.selection)
 		{
 			this._objectsToDeselect.push(object);
 		}
@@ -722,9 +726,9 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		else if (Std.isOfType(evt.object, ValEditorObject))
 		{
 			var object:ValEditorObject = cast evt.object;
-			if (this._selection.hasObject(object))
+			if (this.selection.hasObject(object))
 			{
-				for (obj in this._selection)
+				for (obj in this.selection)
 				{
 					if (obj != object) this._objectsToDeselect.push(obj);
 				}
@@ -744,7 +748,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		else if (Std.isOfType(evt.object, ValEditorObjectGroup))
 		{
 			var group:ValEditorObjectGroup = cast evt.object;
-			for (obj in this._selection)
+			for (obj in this.selection)
 			{
 				if (!group.hasObject(obj))
 				{
@@ -760,7 +764,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			
 			for (obj in group)
 			{
-				if (!this._selection.hasObject(obj))
+				if (!this.selection.hasObject(obj))
 				{
 					select(obj);
 				}
@@ -776,7 +780,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	{
 		if (evt.target != Lib.current.stage) return;
 		if (this._mouseObject != null) return;
-		if (this._selection.numObjects == 0) return;
+		//if (this.selection.numObjects == 0) return;
 		ValEditor.selection.object = null;
 	}
 	
@@ -822,119 +826,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public function advanceTime(time:Float):Void
 	{
 		this._mouseDownOnObject = false;
-		
-		if (this._selection.numObjects != 0)
-		{
-			var action:InputAction;
-			
-			// Move down
-			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_1) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_1);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
-				}
-			}
-			
-			if (ValEditor.input.justDid(InputActionID.MOVE_DOWN_10) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_DOWN_10);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
-				}
-			}
-			
-			// Move left
-			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_1) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_1);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
-				}
-			}
-			
-			if (ValEditor.input.justDid(InputActionID.MOVE_LEFT_10) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_LEFT_10);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
-				}
-			}
-			
-			// Move right
-			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_1) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_1);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
-				}
-			}
-			
-			if (ValEditor.input.justDid(InputActionID.MOVE_RIGHT_10) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_RIGHT_10);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
-				}
-			}
-			
-			// Move up
-			if (ValEditor.input.justDid(InputActionID.MOVE_UP_1) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_1);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
-				}
-			}
-			
-			if (ValEditor.input.justDid(InputActionID.MOVE_UP_10) != null)
-			{
-				this._selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
-			}
-			else
-			{
-				action = ValEditor.input.isDoing(InputActionID.MOVE_UP_10);
-				if (action != null && action.canRepeat())
-				{
-					this._selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
-				}
-			}
-		}
 	}
 	
 }
