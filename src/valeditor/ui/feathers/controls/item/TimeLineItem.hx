@@ -2,22 +2,14 @@ package valeditor.ui.feathers.controls.item;
 
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
-import feathers.controls.ScrollPolicy;
-import feathers.data.ListViewItemState;
 import feathers.events.ScrollEvent;
 import feathers.layout.HorizontalAlign;
-import feathers.layout.HorizontalListLayout;
 import feathers.layout.VerticalLayout;
-import feathers.utils.DisplayObjectRecycler;
 import openfl.events.Event;
-import openfl.events.KeyboardEvent;
-import openfl.ui.Keyboard;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.events.DefaultEvent;
 import valeditor.events.TimeLineEvent;
-import valeditor.ui.feathers.renderers.FrameItemRenderer;
-import valeditor.ui.feathers.renderers.FrameItemState;
 import valeditor.ui.feathers.variant.ListViewVariant;
 
 /**
@@ -139,44 +131,12 @@ class TimeLineItem extends LayoutGroup
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(ScrollEvent.SCROLL, onListScroll);
 		addChild(this._list);
-		
-		this.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 	}
 	
 	private function setTo(timeLine:ValEditorTimeLine):TimeLineItem
 	{
 		this.timeLine = timeLine;
 		return this;
-	}
-	
-	private function onKeyDown(evt:KeyboardEvent):Void
-	{
-		switch (evt.keyCode)
-		{
-			case Keyboard.F5 :
-				if (evt.shiftKey)
-				{
-					this._timeLine.removeFrame();
-				}
-				else
-				{
-					this._timeLine.insertFrame();
-				}
-				ValEditor.selection.object = this._timeLine.frameCurrent;
-			
-			case Keyboard.F6 :
-				if (evt.shiftKey)
-				{
-					this._timeLine.removeKeyFrame();
-				}
-				else
-				{
-					this._timeLine.insertKeyFrame();
-				}
-				ValEditor.selection.object = this._timeLine.frameCurrent;
-		}
-		
-		evt.stopPropagation();
 	}
 	
 	private function onListChange(evt:Event):Void
