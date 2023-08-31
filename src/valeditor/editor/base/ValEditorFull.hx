@@ -100,6 +100,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 			case InputActionID.UNSELECT_ALL :
 				ValEditor.selection.object = null;
 			
+			case InputActionID.PLAY_STOP :
+				ValEditor.playStop();
+			
+			// file
 			case InputActionID.NEW_FILE :
 				trace("new file");
 			
@@ -128,6 +132,42 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		var firstRepeatDelay:Float = 0.5;
 		var repeatDelay:Float = 0.05;
+		
+		// play/stop
+		keyAction = new KeyAction(InputActionID.PLAY_STOP);
+		ValEditor.keyboardController.addKeyAction(Keyboard.ENTER, keyAction);
+		
+		// insert frame
+		keyAction = new KeyAction(InputActionID.INSERT_FRAME, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);
+		#if html5
+		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_5, keyAction);
+		#else
+		ValEditor.keyboardController.addKeyAction(Keyboard.F5, keyAction);
+		#end
+		
+		// insert keyframe
+		keyAction = new KeyAction(InputActionID.INSERT_KEYFRAME, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);
+		#if html5
+		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_6, keyAction);
+		#else
+		ValEditor.keyboardController.addKeyAction(Keyboard.F6, keyAction);
+		#end
+		
+		// remove frame
+		keyAction = new KeyAction(InputActionID.REMOVE_FRAME, false, false, true, 0, 0, firstRepeatDelay, repeatDelay);
+		#if html5
+		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_5, keyAction);
+		#else
+		ValEditor.keyboardController.addKeyAction(Keyboard.F5, keyAction);
+		#end
+		
+		// remove keyframe
+		keyAction = new KeyAction(InputActionID.REMOVE_KEYFRAME, false, false, true, 0, 0, firstRepeatDelay, repeatDelay);
+		#if html5
+		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_6, keyAction);
+		#else
+		ValEditor.keyboardController.addKeyAction(Keyboard.F6, keyAction);
+		#end
 		
 		// move selection
 		keyAction = new KeyAction(InputActionID.MOVE_DOWN_1, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);
