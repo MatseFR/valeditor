@@ -24,6 +24,8 @@ import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.variant.ButtonVariant;
+import valeditor.ui.feathers.variant.LayoutGroupVariant;
 
 /**
  * ...
@@ -52,24 +54,27 @@ class TemplateLibrary extends LayoutGroup
 		this.layout = new AnchorLayout();
 		
 		this._footer = new LayoutGroup();
-		this._footer.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._footer.variant = LayoutGroupVariant.TOOL_BAR;
 		this._footer.layoutData = new AnchorLayoutData(null, 0, 0, 0);
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(Padding.DEFAULT);
-		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		hLayout.verticalAlign = VerticalAlign.TOP;
+		hLayout.setPadding(Padding.MINIMAL);
+		hLayout.gap = Spacing.MINIMAL;
 		this._footer.layout = hLayout;
 		addChild(this._footer);
 		
-		this._templateAddButton = new Button("+", onTemplateAddButton);
+		this._templateAddButton = new Button(null, onTemplateAddButton);
+		this._templateAddButton.variant = ButtonVariant.ADD;
 		this._footer.addChild(this._templateAddButton);
 		
-		this._templateRemoveButton = new Button("-", onTemplateRemoveButton);
+		this._templateRemoveButton = new Button(null, onTemplateRemoveButton);
+		this._templateRemoveButton.variant = ButtonVariant.REMOVE;
 		this._templateRemoveButton.enabled = false;
 		this._footer.addChild(this._templateRemoveButton);
 		
-		this._templateRenameButton = new Button("A", onTemplateRenameButton);
+		this._templateRenameButton = new Button(null, onTemplateRenameButton);
+		this._templateRenameButton.variant = ButtonVariant.RENAME;
 		this._templateRenameButton.enabled = false;
 		this._footer.addChild(this._templateRenameButton);
 		
