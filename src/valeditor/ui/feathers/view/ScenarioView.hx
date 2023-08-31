@@ -17,6 +17,7 @@ import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
+import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
@@ -31,8 +32,13 @@ import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
 import valeditor.events.ContainerEvent;
 import valeditor.events.EditorEvent;
+import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.controls.item.LayerItem;
 import valeditor.ui.feathers.controls.item.TimeLineItem;
+import valeditor.ui.feathers.variant.ButtonVariant;
+import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.variant.ToggleButtonVariant;
 
 /**
  * ...
@@ -49,15 +55,23 @@ class ScenarioView extends LayoutGroup
 	
 	private var _layerAddButton:Button;
 	private var _layerRemoveButton:Button;
+	private var _layerRenameButton:Button;
 	
 	private var _timeLineMainGroup:LayoutGroup;
 	private var _timeLineTopGroup:LayoutGroup;
+	private var _timeLineTopControlsGroup:LayoutGroup;
+	private var _timeLineRulerList:ListView;
+	private var _timeLineNumberList:ListView;
 	private var _timeLineGroup:LayoutGroup;
 	private var _timeLineList:ScrollContainer;
 	private var _timeLineBottomGroup:LayoutGroup;
 	private var _timeLineControlsGroup:LayoutGroup;
 	
+	private var _frameFirstButton:Button;
+	private var _framePreviousButton:Button;
 	private var _playStopButton:ToggleButton;
+	private var _frameNextButton:Button;
+	private var _frameLastButton:Button;
 	
 	private var _timeLineItems:Array<TimeLineItem> = new Array<TimeLineItem>();
 	
@@ -98,8 +112,9 @@ class ScenarioView extends LayoutGroup
 		this._mainBox.addChild(this._layerGroup);
 		
 		this._layerTopGroup = new LayoutGroup();
-		this._layerTopGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._layerTopGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.RIGHT;
 		this._layerTopGroup.layout = hLayout;
 		this._layerGroup.addChild(this._layerTopGroup);
 		
@@ -119,20 +134,27 @@ class ScenarioView extends LayoutGroup
 		this._layerGroup.addChild(this._layerList);
 		
 		this._layerBottomGroup = new LayoutGroup();
-		this._layerBottomGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._layerBottomGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		//hLayout.setPadding(Padding.DEFAULT);
-		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		hLayout.verticalAlign = VerticalAlign.TOP;
+		hLayout.setPadding(Padding.MINIMAL);
+		hLayout.gap = Spacing.MINIMAL;
 		this._layerBottomGroup.layout = hLayout;
 		this._layerGroup.addChild(this._layerBottomGroup);
 		
-		this._layerAddButton = new Button("+", onLayerAddButton);
+		this._layerAddButton = new Button(null, onLayerAddButton);
+		this._layerAddButton.variant = ButtonVariant.ADD;
 		this._layerBottomGroup.addChild(this._layerAddButton);
 		
-		this._layerRemoveButton = new Button("-", onLayerRemoveButton);
+		this._layerRemoveButton = new Button(null, onLayerRemoveButton);
+		this._layerRemoveButton.variant = ButtonVariant.REMOVE;
+		this._layerRemoveButton.enabled = false;
 		this._layerBottomGroup.addChild(this._layerRemoveButton);
+		
+		this._layerRenameButton = new Button(null, null);
+		this._layerRenameButton.variant = ButtonVariant.RENAME;
+		this._layerBottomGroup.addChild(this._layerRenameButton);
 		
 		// TIMELINES
 		this._timeLineMainGroup = new LayoutGroup();
@@ -143,10 +165,27 @@ class ScenarioView extends LayoutGroup
 		this._mainBox.addChild(this._timeLineMainGroup);
 		
 		this._timeLineTopGroup = new LayoutGroup();
-		this._timeLineTopGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this._timeLineTopGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
+		hLayout.paddingBottom = 1;
+		hLayout.paddingTop = 8;
 		this._timeLineTopGroup.layout = hLayout;
+		//this._timeLineTopGroup.layout = new AnchorLayout();
 		this._timeLineMainGroup.addChild(this._timeLineTopGroup);
+		
+		this._timeLineTopControlsGroup = new LayoutGroup();
+		this._timeLineTopControlsGroup.layout = new AnchorLayout();
+		this._timeLineTopGroup.addChild(this._timeLineTopControlsGroup);
+		
+		this._timeLineRulerList = new ListView();
+		this._timeLineRulerList.variant = ListViewVariant.TIMELINE_RULER;
+		this._timeLineRulerList.layoutData = new AnchorLayoutData(null, 0, null, 0);
+		this._timeLineTopControlsGroup.addChild(this._timeLineRulerList);
+		
+		this._timeLineNumberList = new ListView();
+		this._timeLineNumberList.variant = ListViewVariant.TIMELINE_NUMBERS;
+		this._timeLineNumberList.layoutData = new AnchorLayoutData(null, 0, null, 0);
+		this._timeLineTopControlsGroup.addChild(this._timeLineNumberList);
 		
 		this._timeLineGroup = new LayoutGroup();
 		this._timeLineGroup.layoutData = new VerticalLayoutData(null, 100);
@@ -171,28 +210,48 @@ class ScenarioView extends LayoutGroup
 		this._timeLineGroup.addChild(this._timeLineList);
 		
 		this._timeLineBottomGroup = new LayoutGroup();
-		this._timeLineBottomGroup.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		this._timeLineBottomGroup.layout = new AnchorLayout();
-		this._timeLineMainGroup.addChild(this._timeLineBottomGroup);
-		
-		this._hScrollBar = new HScrollBar();
-		this._hScrollBar.snapInterval = 1.0;
-		//this._hScrollBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
-		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
-		this._timeLineBottomGroup.addChild(this._hScrollBar);
-		
-		this._timeLineControlsGroup = new LayoutGroup();
-		this._timeLineControlsGroup.layoutData = new AnchorLayoutData(new Anchor(0, this._hScrollBar), 0, null, 0);
+		this._timeLineBottomGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		//hLayout.setPadding(Padding.DEFAULT);
-		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		hLayout.paddingRight = 12;
+		this._timeLineBottomGroup.layout = hLayout;
+		this._timeLineMainGroup.addChild(this._timeLineBottomGroup);
+		
+		this._timeLineControlsGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.TOP;
+		hLayout.setPadding(Padding.MINIMAL);
+		hLayout.gap = Spacing.MINIMAL;
 		this._timeLineControlsGroup.layout = hLayout;
 		this._timeLineBottomGroup.addChild(this._timeLineControlsGroup);
 		
-		this._playStopButton = new ToggleButton("P", false, onPlayStopButton);
+		this._hScrollBar = new HScrollBar();
+		this._hScrollBar.snapInterval = 1.0;
+		this._hScrollBar.layoutData = new HorizontalLayoutData(100);
+		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
+		this._timeLineBottomGroup.addChild(this._hScrollBar);
+		
+		this._frameFirstButton = new Button(null, onFrameFirstButton);
+		this._frameFirstButton.variant = ButtonVariant.FRAME_FIRST;
+		this._timeLineControlsGroup.addChild(this._frameFirstButton);
+		
+		this._framePreviousButton = new Button(null, onFramePreviousButton);
+		this._framePreviousButton.variant = ButtonVariant.FRAME_PREVIOUS;
+		this._timeLineControlsGroup.addChild(this._framePreviousButton);
+		
+		this._playStopButton = new ToggleButton(null, false, onPlayStopButton);
+		this._playStopButton.variant = ToggleButtonVariant.PLAY_STOP;
 		this._timeLineControlsGroup.addChild(this._playStopButton);
+		
+		this._frameNextButton = new Button(null, onFrameNextButton);
+		this._frameNextButton.variant = ButtonVariant.FRAME_NEXT;
+		this._timeLineControlsGroup.addChild(this._frameNextButton);
+		
+		this._frameLastButton = new Button(null, onFramePreviousButton);
+		this._frameLastButton.variant = ButtonVariant.FRAME_LAST;
+		this._timeLineControlsGroup.addChild(this._frameLastButton);
 		
 		this._timeLineList.addEventListener(Event.RESIZE, onTimeLineResize);
 		
@@ -204,8 +263,10 @@ class ScenarioView extends LayoutGroup
 	
 	private function onTimeLineResize(evt:Event):Void
 	{
+		this._layerTopGroup.height = this._timeLineTopGroup.height;
+		this._timeLineTopControlsGroup.width = this._timeLineList.width;
+		
 		updateHScrollBar();
-		this._hScrollBar.width = this._timeLineList.width;
 		this._hScrollBar.page = this._timeLineList.width;
 		
 		updateVScrollBar();
@@ -239,17 +300,8 @@ class ScenarioView extends LayoutGroup
 	
 	private function updateHScrollBar():Void
 	{
-		var item:TimeLineItem = null;
-		if (this._timeLineItems.length != 0)
-		{
-			item = this._timeLineItems[0];
-		}
-		
-		if (item != null)
-		{
-			this._hScrollBar.minimum = item.minScrollX;
-			this._hScrollBar.maximum = item.maxScrollX;
-		}
+		this._hScrollBar.minimum = this._timeLineRulerList.minScrollX;
+		this._hScrollBar.maximum = this._timeLineRulerList.maxScrollX;
 	}
 	
 	private function updateVScrollBar():Void
@@ -260,10 +312,16 @@ class ScenarioView extends LayoutGroup
 	
 	private function onContainerClose(evt:EditorEvent):Void
 	{
+		this._container.removeEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
+		this._container.removeEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
 		this._container.removeEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
 		this._container.removeEventListener(PlayEvent.PLAY, onPlay);
 		this._container.removeEventListener(PlayEvent.STOP, onStop);
+		this._container.timeLine.removeEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
 		this._layerList.dataProvider = null;
+		this._timeLineRulerList.dataProvider = null;
+		this._timeLineNumberList.dataProvider = null;
+		
 		for (item in this._timeLineItems)
 		{
 			destroyTimeLineItem(item);
@@ -276,10 +334,15 @@ class ScenarioView extends LayoutGroup
 	private function onContainerOpen(evt:EditorEvent):Void
 	{
 		this._container = cast evt.object;
+		this._container.addEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
+		this._container.addEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
 		this._container.addEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
 		this._container.addEventListener(PlayEvent.PLAY, onPlay);
 		this._container.addEventListener(PlayEvent.STOP, onStop);
+		this._container.timeLine.addEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
 		this._layerList.dataProvider = this._container.layerCollection;
+		this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+		this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
 		
 		for (layer in this._container.layerCollection)
 		{
@@ -316,6 +379,26 @@ class ScenarioView extends LayoutGroup
 		item.pool();
 	}
 	
+	private function onFrameFirstButton(evt:TriggerEvent):Void
+	{
+		ValEditor.firstFrame();
+	}
+	
+	private function onFrameLastButton(evt:TriggerEvent):Void
+	{
+		ValEditor.lastFrame();
+	}
+	
+	private function onFrameNextButton(evt:TriggerEvent):Void
+	{
+		ValEditor.nextFrame();
+	}
+	
+	private function onFramePreviousButton(evt:TriggerEvent):Void
+	{
+		ValEditor.previousFrame();
+	}
+	
 	private function onLayerAddButton(evt:TriggerEvent):Void
 	{
 		if (this._layerList.selectedIndex != -1)
@@ -333,12 +416,18 @@ class ScenarioView extends LayoutGroup
 		}
 	}
 	
+	private function onLayerAdded(evt:ContainerEvent):Void
+	{
+		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+	}
+	
 	private function onLayerListChange(evt:Event):Void
 	{
 		if (this._layerList.selectedIndex != -1)
 		{
 			this._container.currentLayer = this._container.getLayerAt(this._layerList.selectedIndex);
 		}
+		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
 	}
 	
 	private function onLayerListScroll(evt:ScrollEvent):Void
@@ -353,10 +442,18 @@ class ScenarioView extends LayoutGroup
 			destroyTimeLineItem(this._currentTimeLineItem);
 			this._timeLineItems.remove(this._currentTimeLineItem);
 			this._timeLineList.removeChild(this._currentTimeLineItem);
+			this._timeLineList.validateNow();
 			this._currentTimeLineItem = null;
 			
 			this._container.removeLayerAt(this._layerList.selectedIndex);
+			
+			updateVScrollBar();
 		}
+	}
+	
+	private function onLayerRemoved(evt:ContainerEvent):Void
+	{
+		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
 	}
 	
 	private function onLayerSelected(evt:ContainerEvent):Void
@@ -372,6 +469,11 @@ class ScenarioView extends LayoutGroup
 		this._currentTimeLineItem = this._timeLineItems[layerIndex];
 		this._currentTimeLineItem.isCurrent = true;
 		this._currentTimeLineItem.selectedIndex = layer.timeLine.frameIndex;
+	}
+	
+	private function onNumFramesChange(evt:TimeLineEvent):Void
+	{
+		updateHScrollBar();
 	}
 	
 	private function onPlayStopButton(evt:Event):Void
@@ -412,10 +514,13 @@ class ScenarioView extends LayoutGroup
 	
 	private function onHScrollBarChange(evt:Event):Void
 	{
+		var scrollX:Float = this._hScrollBar.value;
 		for (item in this._timeLineItems)
 		{
-			item.scrollX = this._hScrollBar.value;
+			item.scrollX = scrollX;
 		}
+		this._timeLineNumberList.scrollX = scrollX;
+		this._timeLineRulerList.scrollX = scrollX;
 	}
 	
 	private function onVScrollBarChange(evt:Event):Void
