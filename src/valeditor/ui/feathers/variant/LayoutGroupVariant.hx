@@ -7,19 +7,19 @@ package valeditor.ui.feathers.variant;
 class LayoutGroupVariant 
 {
 	
-	static public inline var ARROW_DOWN_GROUP:String = "arrow-down-group";
-	static public inline var ARROW_RIGHT_GROUP:String = "arrow-right-group";
-	static public inline var ARROW_DOWN_OBJECT:String = "arrow-down-object";
-	static public inline var ARROW_RIGHT_OBJECT:String = "arrow-right-object";
-	static public inline var COLOR_PREVIEW:String = "color-preview";
-	static public inline var COLOR_PREVIEW_CONTAINER:String = "color-preview-container";
-	static public inline var CONTENT:String = "content";
-	static public inline var ITEM_PREVIEW:String = "item-preview";
-	static public inline var MENU_BAR:String = "menu-bar";
-	static public inline var OBJECT_TRAIL:String = "object-trail";
-	//static public inline var SCENE:String = "scene";
-	static public inline var TOGGLE_CUSTOM_CONTENT:String = "toggle-custom-content";
-	static public inline var VALUE:String = "value";
-	static public inline var VALUE_CONTAINER:String = "value-container";
+	inline static public var ARROW_DOWN_GROUP:String = "arrow-down-group";
+	inline static public var ARROW_RIGHT_GROUP:String = "arrow-right-group";
+	inline static public var ARROW_DOWN_OBJECT:String = "arrow-down-object";
+	inline static public var ARROW_RIGHT_OBJECT:String = "arrow-right-object";
+	inline static public var COLOR_PREVIEW:String = "color-preview";
+	inline static public var COLOR_PREVIEW_CONTAINER:String = "color-preview-container";
+	inline static public var CONTENT:String = "content";
+	inline static public var ITEM_PREVIEW:String = "item-preview";
+	inline static public var MENU_BAR:String = "menu-bar";
+	inline static public var OBJECT_TRAIL:String = "object-trail";
+	inline static public var TOGGLE_CUSTOM_CONTENT:String = "toggle-custom-content";
+	inline static public var TOOL_BAR:String = "tool_bar";
+	inline static public var VALUE:String = "value";
+	inline static public var VALUE_CONTAINER:String = "value-container";
 	
 }

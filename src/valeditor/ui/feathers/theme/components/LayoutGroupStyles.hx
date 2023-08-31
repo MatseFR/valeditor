@@ -49,12 +49,12 @@ class LayoutGroupStyles
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.OBJECT_TRAIL, object_trail);
 		
-		//styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.SCENE, scene);
-		
 		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT, toggleCustom_content);
+		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOOL_BAR, tool_bar);
 	}
 	
 	static private function arrow_down_group(group:LayoutGroup):Void
@@ -147,13 +147,6 @@ class LayoutGroupStyles
 		group.backgroundSkin = skin;
 	}
 	
-	//static private function scene(group:LayoutGroup):Void
-	//{
-		//var skin:RectangleSkin = new RectangleSkin();
-		//skin.fill = FillStyle.SolidColor(0xff0000, 0.25);
-		//group.backgroundSkin = skin;
-	//}
-	
 	static private function separatorUI(separator:SeparatorUI):Void
 	{
 		var skin:HorizontalLineSkin = new HorizontalLineSkin(null, theme.getContrastBorderLight());
@@ -170,7 +163,13 @@ class LayoutGroupStyles
 	static private function toggleCustom_content(group:LayoutGroup):Void
 	{
 		//group.width = UIConfig.VALUE_NAME_WIDTH;
-		//trace("pouet");
+	}
+	
+	static private function tool_bar(group:LayoutGroup):Void
+	{
+		var backgroundSkin = new RectangleSkin();
+		backgroundSkin.fill = theme.getLightFillDark();
+		group.backgroundSkin = backgroundSkin;
 	}
 	
 }
