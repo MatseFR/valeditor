@@ -25,7 +25,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 	public var frameCollection(default, null):ArrayCollection<FrameData>;
 	public var lastKeyFrame(get, never):ValEditorKeyFrame;
 	public var nextKeyFrame(get, never):ValEditorKeyFrame;
-	//public var numFrames(get, set):Int;
 	public var previousKeyFrame(get, never):ValEditorKeyFrame;
 	
 	override function set_frameIndex(value:Int):Int 
@@ -57,7 +56,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 		return null;
 	}
 	
-	//private function get_numFrames():Int { return this._numFrames; }
 	override function set_numFrames(value:Int):Int
 	{
 		if (this._numFrames == value) return value;
@@ -92,6 +90,15 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 			if (this.frameCollection != null) this.frameCollection.updateAll();
 		}
+		
+		// set numFrames on children too
+		for (child in this._children)
+		{
+			child.numFrames = value;
+		}
+		
+		TimeLineEvent.dispatch(this, TimeLineEvent.NUM_FRAMES_CHANGE);
+		
 		return this._numFrames = value;
 	}
 	
@@ -132,16 +139,10 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		if (this._isPlaying) return;
 		
-		var lastFrame:ValEditKeyFrame = null;
-		for (frame in this._frames)
+		for (frame in this._keyFrames)
 		{
-			if (frame != lastFrame)
-			{
-				cast(frame, ValEditorKeyFrame).isPlaying = true;
-				lastFrame = frame;
-			}
+			cast(frame, ValEditorKeyFrame).isPlaying = true;
 		}
-		updateLastFrameIndex();
 		super.play();
 	}
 	
@@ -149,14 +150,9 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		if (!this._isPlaying) return;
 		
-		var lastFrame:ValEditKeyFrame = null;
-		for (frame in this._frames)
+		for (frame in this._keyFrames)
 		{
-			if (frame != lastFrame)
-			{
-				cast(frame, ValEditorKeyFrame).isPlaying = false;
-				lastFrame = frame;
-			}
+			cast(frame, ValEditorKeyFrame).isPlaying = false;
 		}
 		super.stop();
 	}
@@ -169,6 +165,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 	
 	override public function unregisterKeyFrame(keyFrame:ValEditKeyFrame):Void
 	{
+		super.unregisterKeyFrame(keyFrame);
 		keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
 	}
 	
@@ -220,12 +217,12 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 			else
 			{
-				for (i in keyFrame.indexEnd...this._frameIndex)
+				for (i in keyFrame.indexEnd...this._frameIndex + 1)
 				{
 					this._frames[i] = keyFrame;
 					this._frameDatas[i].frame = cast keyFrame;
 				}
-				keyFrame.indexEnd = this._frameIndex - 1;
+				keyFrame.indexEnd = this._frameIndex;
 			}
 		}
 		this.frameCollection.updateAll();
