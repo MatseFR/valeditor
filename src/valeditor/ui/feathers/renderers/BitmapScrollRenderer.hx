@@ -43,10 +43,24 @@ class BitmapScrollRenderer extends Sprite
 		return this._scrollHeight;
 	}
 	
+	#if (flash && haxe_ver < 4.3) @:setter(height) #else override #end private function set_height(value:Float):#if (!flash || haxe_ver >= 4.3) Float #else Void #end
+	{
+		#if (!flash || haxe_ver >= 4.3)
+		return this._scrollHeight;
+		#end
+	}
+	
 	private var _scrollWidth:Float = 0;
 	#if (flash && haxe_ver < 4.3) @:getter(width) #else override #end private function get_width():Float
 	{
 		return this._scrollWidth;
+	}
+	
+	#if (flash && haxe_ver < 4.3) @:setter(width) #else override #end private function set_width(value:Float):#if (!flash || haxe_ver >= 4.3) Float #else Void #end
+	{
+		#if (!flash || haxe_ver >= 4.3)
+		return this._scrollWidth;
+		#end
 	}
 	
 	private var _bitmap:Bitmap;
@@ -62,10 +76,7 @@ class BitmapScrollRenderer extends Sprite
 	
 	public function pool():Void
 	{
-		// TODO : pooling disabled for now, need to investigate scrollRect glitches (at least on flash target)
-		//this.scrollRect = null;
-		//this._state = null;
-		//_POOL[_POOL.length] = this;
+		_POOL[_POOL.length] = this;
 	}
 	
 	private function reset():BitmapScrollRenderer
