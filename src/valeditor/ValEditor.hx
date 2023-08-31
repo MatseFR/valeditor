@@ -25,6 +25,7 @@ import inputAction.controllers.KeyboardController;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.events.EditorEvent;
 import valeditor.events.TemplateEvent;
+import valeditor.input.LiveInputActionManager;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.utils.ArraySort;
@@ -164,12 +165,16 @@ class ValEditor
 	static private var _displayMap:Map<DisplayObjectContainer, ValEditClass> = new Map<DisplayObjectContainer, ValEditClass>();
 	static private var _uiClassMap:Map<String, Void->IValueUI> = new Map<String, Void->IValueUI>();
 	
+	static private var _liveActionManager:LiveInputActionManager;
+	
 	static public function init():Void
 	{
 		keyboardController = new KeyboardController(Lib.current.stage);
 		input.addController(keyboardController);
+		_liveActionManager = new LiveInputActionManager();
 		Juggler.start();
 		Juggler.root.add(input);
+		Juggler.root.add(_liveActionManager);
 		libraryDragManager = new LibraryDragManager();
 		
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
@@ -897,8 +902,10 @@ class ValEditor
 	static public function createContainer():ValEditorContainer
 	{
 		var container:ValEditorContainer = ValEditorContainer.fromPool();
-		container.addLayer(createLayer());
+		container.numFrames = 120;
 		container.frameIndex = 0;
+		var layer:ValEditorLayer = createLayer();
+		container.addLayer(layer);
 		return container;
 	}
 	
@@ -916,12 +923,90 @@ class ValEditor
 		return timeLine;
 	}
 	
+	static public function insertFrame():Void
+	{
+		if (currentContainer == null) return;
+		if (currentContainer.isPlaying) return;
+		if (currentContainer.currentLayer == null) return;
+		
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame();
+	}
+	
+	static public function insertKeyFrame():Void
+	{
+		if (currentContainer == null) return;
+		if (currentContainer.isPlaying) return;
+		if (currentContainer.currentLayer == null) return;
+		
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame();
+	}
+	
+	static public function removeFrame():Void
+	{
+		if (currentContainer == null) return;
+		if (currentContainer.isPlaying) return;
+		if (currentContainer.currentLayer == null) return;
+		
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame();
+	}
+	
+	static public function removeKeyFrame():Void
+	{
+		if (currentContainer == null) return;
+		if (currentContainer.isPlaying) return;
+		if (currentContainer.currentLayer == null) return;
+		
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame();
+	}
+	
+	static public function firstFrame():Void
+	{
+		if (currentContainer.isPlaying)
+		{
+			currentContainer.stop();
+		}
+		currentContainer.frameIndex = 0;
+	}
+	
+	static public function lastFrame():Void
+	{
+		if (currentContainer.isPlaying)
+		{
+			currentContainer.stop();
+		}
+		currentContainer.frameIndex = currentContainer.lastFrameIndex;
+	}
+	
+	static public function nextFrame():Void
+	{
+		if (currentContainer.isPlaying)
+		{
+			currentContainer.stop();
+		}
+		if (currentContainer.frameIndex < currentContainer.lastFrameIndex)
+		{
+			currentContainer.frameIndex++;
+		}
+	}
+	
+	static public function previousFrame():Void
+	{
+		if (currentContainer.isPlaying)
+		{
+			currentContainer.stop();
+		}
+		if (currentContainer.frameIndex != 0)
+		{
+			currentContainer.frameIndex--;
+		}
+	}
+	
 	static public function playStop():Void
 	{
 		if (!currentContainer.isPlaying)
 		{
 			currentContainer.timeLine.updateLastFrameIndex();
-			if (currentContainer.frameIndex == currentContainer.lastFrameIndex)
+			if (currentContainer.frameIndex >= currentContainer.lastFrameIndex)
 			{
 				currentContainer.frameIndex = 0;
 			}
