@@ -36,6 +36,11 @@ class ToggleButtonStyles
 		{
 			styleProvider.setStyleFunction(ToggleButton, ToggleButtonVariant.PANEL, panel);
 		}
+		
+		if (styleProvider.getStyleFunction(ToggleButton, ToggleButtonVariant.PLAY_STOP) == null)
+		{
+			styleProvider.setStyleFunction(ToggleButton, ToggleButtonVariant.PLAY_STOP, playStop);
+		}
 	}
 	
 	static private function group(btn:ToggleButton):Void
@@ -112,7 +117,67 @@ class ToggleButtonStyles
 		}
 	}
 	
-	private static function drawDisclosureClosedIcon(icon:Shape, color:UInt):Void {
+	static private function playStop(btn:ToggleButton):Void
+	{
+		if (btn.backgroundSkin == null) {
+			var skin = new RectangleSkin();
+			skin.fill = theme.getLightFill();
+			skin.disabledFill = theme.getLightFillDark();
+			skin.selectedFill = theme.getLightFill();
+			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.HOVER(true), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+			skin.setFillForState(ToggleButtonState.DOWN(true), theme.getThemeFill());
+			skin.border = theme.getContrastBorderLight();
+			skin.disabledBorder = theme.getContrastBorderLighter();
+			skin.selectedBorder = theme.getContrastBorderLight();
+			//skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getLightBorderDark());
+			//skin.setBorderForState(ToggleButtonState.HOVER(true), theme.getThemeBorder());
+			skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorderDark());
+			skin.setBorderForState(ToggleButtonState.DOWN(true), theme.getThemeBorderDark());
+			skin.cornerRadius = 3.0;
+			btn.backgroundSkin = skin;
+		}
+		
+		var icon:Shape = new Shape();
+		drawPlayIcon(icon, theme.contrastColor);
+		btn.icon = icon;
+		
+		icon = new Shape();
+		drawPlayIcon(icon, theme.contrastColorLighter);
+		btn.disabledIcon = icon;
+		
+		icon = new Shape();
+		drawStopIcon(icon, theme.contrastColor);
+		btn.selectedIcon = icon;
+		
+		icon = new Shape();
+		drawStopIcon(icon, theme.contrastColorLighter);
+		btn.setIconForState(DISABLED(true), icon);
+		
+		if (btn.focusRectSkin == null) {
+			var focusRectSkin = new RectangleSkin();
+			focusRectSkin.fill = null;
+			focusRectSkin.border = theme.getFocusBorder();
+			focusRectSkin.cornerRadius = 3.0;
+			btn.focusRectSkin = focusRectSkin;
+		}
+		
+		//if (btn.textFormat == null) {
+			//btn.textFormat = theme.getTextFormat();
+		//}
+		//if (btn.disabledTextFormat == null) {
+			//btn.disabledTextFormat = theme.getTextFormat_disabled();
+		//}
+		
+		//btn.paddingTop = 4.0;
+		//btn.paddingRight = 10.0;
+		//btn.paddingBottom = 4.0;
+		//btn.paddingLeft = 10.0;
+		//btn.gap = 4.0;
+	}
+	
+	static private function drawDisclosureClosedIcon(icon:Shape, color:Int):Void {
 		icon.graphics.beginFill(0xff00ff, 0.0);
 		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
 		icon.graphics.endFill();
@@ -124,7 +189,7 @@ class ToggleButtonStyles
 		icon.graphics.endFill();
 	}
 
-	private static function drawDisclosureOpenIcon(icon:Shape, color:UInt):Void {
+	static private function drawDisclosureOpenIcon(icon:Shape, color:Int):Void {
 		icon.graphics.beginFill(0xff00ff, 0.0);
 		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
 		icon.graphics.endFill();
@@ -133,6 +198,29 @@ class ToggleButtonStyles
 		icon.graphics.lineTo(16.0, 4.0);
 		icon.graphics.lineTo(10.0, 16.0);
 		icon.graphics.lineTo(4.0, 4.0);
+		icon.graphics.endFill();
+	}
+	
+	static private function drawPlayIcon(icon:Shape, color:Int):Void
+	{
+		icon.graphics.beginFill(0xff00ff, 0.0);
+		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
+		icon.graphics.endFill();
+		icon.graphics.beginFill(color);
+		icon.graphics.moveTo(4.0, 4.0);
+		icon.graphics.lineTo(16.0, 10.0);
+		icon.graphics.lineTo(4.0, 16.0);
+		icon.graphics.lineTo(4.0, 4.0);
+		icon.graphics.endFill();
+	}
+	
+	static private function drawStopIcon(icon:Shape, color:Int):Void
+	{
+		icon.graphics.beginFill(0xff00ff, 0.0);
+		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
+		icon.graphics.endFill();
+		icon.graphics.beginFill(color);
+		icon.graphics.drawRect(4.0, 4.0, 12.0, 12.0);
 		icon.graphics.endFill();
 	}
 	
