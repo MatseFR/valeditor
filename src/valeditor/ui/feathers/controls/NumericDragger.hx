@@ -391,6 +391,8 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		this.addEventListener(FocusEvent.FOCUS_OUT, focusOutHandler);
 		this.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, keyFocusChangeHandler);
 		this.addEventListener(FocusEvent.MOUSE_FOCUS_CHANGE, mouseFocusChangeHandler);
+		
+		this.addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler); // in case the control is removed while dragging
 	}
 	
 	override function update():Void 
@@ -602,6 +604,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function stopDragging():Void
 	{
+		if (!this._isDragging) return;
 		this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
 		this.stage.removeEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
 		if (this._cancelDragWithRightClick)
@@ -801,6 +804,11 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 				this.stage.focus = null;
 			}
 		}
+	}
+	
+	private function removedFromStageHandler(evt:Event):Void
+	{
+		stopDragging();
 	}
 	
 }
