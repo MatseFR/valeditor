@@ -95,6 +95,7 @@ class ValEditorTemplate extends ValEditTemplate
 		for (instance in this._instances)
 		{
 			templateValue.applyToObject(instance.object);
+			cast(instance, ValEditorObject).registerForChangeUpdate();
 		}
 	}
 	
