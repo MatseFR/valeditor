@@ -3,13 +3,15 @@ package valeditor;
 import openfl.events.Event;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.DefaultEvent;
+import valeditor.events.ObjectEvent;
 
 /**
  * ...
  * @author Matse
  */
-class ValEditorKeyFrame extends ValEditKeyFrame 
+class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 {
 	static private var _POOL:Array<ValEditorKeyFrame> = new Array<ValEditorKeyFrame>();
 	
@@ -70,6 +72,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	{
 		for (object in this.objects)
 		{
+			unregisterObject(object);
 			ValEditor.destroyObject(cast object);
 		}
 		this.objects.resize(0);
@@ -82,7 +85,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function clone(?keyFrame:ValEditKeyFrame):ValEditKeyFrame
+	public function clone(?keyFrame:ValEditorKeyFrame):ValEditorKeyFrame
 	{
 		if (keyFrame == null) keyFrame = fromPool();
 		
@@ -102,28 +105,43 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 	override public function add(object:ValEditObject):Void 
 	{
 		super.add(object);
-		if (this._tween)
-		{
-			rebuildTweens();
-		}
+		rebuildTweens();
 		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
-		if (prevFrame != null && prevFrame._tween)
+		if (prevFrame != null)
 		{
 			prevFrame.rebuildTweens();
 		}
+		
+		registerObject(object);
+		
 		if (this.objects.length == 1) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
 	
 	override public function remove(object:ValEditObject):Void 
 	{
 		super.remove(object);
-		if (this._tween) rebuildTweens();
+		rebuildTweens();
 		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
-		if (prevFrame != null && prevFrame._tween)
+		if (prevFrame != null)
 		{
 			prevFrame.rebuildTweens();
 		}
+		
+		unregisterObject(object);
+		
 		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
+	}
+	
+	private function registerObject(object:ValEditObject):Void
+	{
+		object.addEventListener(ObjectEvent.PROPERTY_CHANGE, onObjectPropertyChange);
+		object.addEventListener(ObjectEvent.FUNCTION_CALLED, onObjectPropertyChange);
+	}
+	
+	private function unregisterObject(object:ValEditObject):Void
+	{
+		object.removeEventListener(ObjectEvent.PROPERTY_CHANGE, onObjectPropertyChange);
+		object.removeEventListener(ObjectEvent.FUNCTION_CALLED, onObjectPropertyChange);
 	}
 	
 	override public function exit():Void 
@@ -181,6 +199,22 @@ class ValEditorKeyFrame extends ValEditKeyFrame
 			{
 				cast(object, ValEditorObject).isSelectable = true;
 			}
+		}
+	}
+	
+	public function changeUpdate():Void
+	{
+		rebuildTweens();
+	}
+	
+	private function onObjectPropertyChange(evt:ObjectEvent):Void
+	{
+		ValEditor.registerForChangeUpdate(this);
+		
+		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
+		if (prevFrame != null && prevFrame._tween)
+		{
+			ValEditor.registerForChangeUpdate(cast prevFrame);
 		}
 	}
 	
