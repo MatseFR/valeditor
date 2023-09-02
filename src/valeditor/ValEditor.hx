@@ -22,6 +22,8 @@ import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import inputAction.Input;
 import inputAction.controllers.KeyboardController;
+import valeditor.editor.change.ChangeUpdateQueue;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.events.EditorEvent;
 import valeditor.events.TemplateEvent;
@@ -166,15 +168,18 @@ class ValEditor
 	static private var _uiClassMap:Map<String, Void->IValueUI> = new Map<String, Void->IValueUI>();
 	
 	static private var _liveActionManager:LiveInputActionManager;
+	static private var _changeUpdateQueue:ChangeUpdateQueue;
 	
 	static public function init():Void
 	{
 		keyboardController = new KeyboardController(Lib.current.stage);
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
+		_changeUpdateQueue = new ChangeUpdateQueue();
 		Juggler.start();
 		Juggler.root.add(input);
 		Juggler.root.add(_liveActionManager);
+		Juggler.root.add(_changeUpdateQueue);
 		libraryDragManager = new LibraryDragManager();
 		
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
@@ -1031,6 +1036,11 @@ class ValEditor
 	static private function onTemplateRenamed(evt:TemplateEvent):Void
 	{
 		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+	}
+	
+	static public function registerForChangeUpdate(object:IChangeUpdate):Void
+	{
+		_changeUpdateQueue.add(object);
 	}
 	
 }
