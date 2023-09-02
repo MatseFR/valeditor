@@ -8,6 +8,7 @@ import valedit.IValEditContainer;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.ObjectEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.controls.SelectionBox;
@@ -17,7 +18,7 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorObject extends ValEditObject 
+class ValEditorObject extends ValEditObject implements IChangeUpdate
 {
 	static private var _POOL:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
@@ -153,17 +154,6 @@ class ValEditorObject extends ValEditObject
 	{
 		super.clear();
 		
-		this.container = null;
-		this.getBoundsFunctionName = null;
-		this.hasPivotProperties = false;
-		this.hasScaleProperties = false;
-		this.hasTransformProperty = false;
-		this.hasTransformationMatrixProperty = false;
-		this.hasVisibleProperty = false;
-		this.hasRadianRotation = false;
-		this.isMouseDown = false;
-		this.isSelectable = true;
-		
 		if (this._interactiveObject != null)
 		{
 			this._interactiveObject.pool();
@@ -179,6 +169,17 @@ class ValEditorObject extends ValEditObject
 			this._selectionBox.pool();
 			this._selectionBox = null;
 		}
+		
+		this.container = null;
+		this.getBoundsFunctionName = null;
+		this.hasPivotProperties = false;
+		this.hasScaleProperties = false;
+		this.hasTransformProperty = false;
+		this.hasTransformationMatrixProperty = false;
+		this.hasVisibleProperty = false;
+		this.hasRadianRotation = false;
+		this.isMouseDown = false;
+		this.isSelectable = true;
 	}
 	
 	override public function pool():Void 
@@ -199,20 +200,7 @@ class ValEditorObject extends ValEditObject
 		this._regularPropertyName = this.propertyMap.getRegularPropertyName(propertyName);
 		if (this._regularPropertyName == null) this._regularPropertyName = propertyName;
 		
-		if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(this._regularPropertyName))
-		{
-			this._interactiveObject.objectUpdate(this);
-		}
-		
-		if (this._selectionBox != null && this._selectionBox.hasInterestIn(this._regularPropertyName))
-		{
-			this._selectionBox.objectUpdate(this);
-		}
-		
-		if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(this._regularPropertyName))
-		{
-			this._pivotIndicator.objectUpdate(this);
-		}
+		registerForChangeUpdate();
 		
 		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
 	}
@@ -222,20 +210,7 @@ class ValEditorObject extends ValEditObject
 		this._regularPropertyName = this.propertyMap.getRegularPropertyName(evt.value.propertyName);
 		if (this._regularPropertyName == null) this._regularPropertyName = evt.value.propertyName;
 		
-		if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(this._regularPropertyName))
-		{
-			this._interactiveObject.objectUpdate(this);
-		}
-		
-		if (this._selectionBox != null && this._selectionBox.hasInterestIn(this._regularPropertyName))
-		{
-			this._selectionBox.objectUpdate(this);
-		}
-		
-		if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(this._regularPropertyName))
-		{
-			this._pivotIndicator.objectUpdate(this);
-		}
+		registerForChangeUpdate();
 		
 		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
 	}
@@ -255,24 +230,10 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
-			{
-				this._interactiveObject.objectUpdate(this);
-			}
-			
-			if (!this.isMouseDown)
-			{
-				if (this._selectionBox != null && this._selectionBox.hasInterestIn(regularPropertyName))
-				{
-					this._selectionBox.objectUpdate(this);
-				}
-			}
-			
-			if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
-			{
-				this._pivotIndicator.objectUpdate(this);
-			}
+			registerForChangeUpdate();
 		}
+		
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
 	}
 	
 	public function setProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
@@ -290,23 +251,35 @@ class ValEditorObject extends ValEditObject
 		
 		if (!objectOnly)
 		{
-			if (this._interactiveObject != null && this._interactiveObject.hasInterestIn(regularPropertyName))
+			registerForChangeUpdate();
+		}
+		
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
+	}
+	
+	public function registerForChangeUpdate():Void
+	{
+		ValEditor.registerForChangeUpdate(this);
+	}
+	
+	public function changeUpdate():Void
+	{
+		if (this._interactiveObject != null)
+		{
+			this._interactiveObject.objectUpdate(this);
+		}
+		
+		if (!this.isMouseDown)
+		{
+			if (this._selectionBox != null)
 			{
-				this._interactiveObject.objectUpdate(this);
+				this._selectionBox.objectUpdate(this);
 			}
-			
-			if (!this.isMouseDown)
-			{
-				if (this._selectionBox != null && this._selectionBox.hasInterestIn(regularPropertyName))
-				{
-					this._selectionBox.objectUpdate(this);
-				}
-			}
-			
-			if (this._pivotIndicator != null && this._pivotIndicator.hasInterestIn(regularPropertyName))
-			{
-				this._pivotIndicator.objectUpdate(this);
-			}
+		}
+		
+		if (this._pivotIndicator != null)
+		{
+			this._pivotIndicator.objectUpdate(this);
 		}
 	}
 	
