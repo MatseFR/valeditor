@@ -22,6 +22,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 		return new ValEditorTimeLine(numFrames);
 	}
 	
+	public var autoIncreaseNumFrames:Bool = true;
 	public var frameCollection(default, null):ArrayCollection<FrameData>;
 	public var lastKeyFrame(get, never):ValEditorKeyFrame;
 	public var nextKeyFrame(get, never):ValEditorKeyFrame;
@@ -182,9 +183,23 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		if (this._frameCurrent != null)
 		{
-			if (this._frameCurrent.indexEnd == this._numFrames)
+			if (this._lastFrameIndex == this._numFrames - 1)
 			{
-				this.numFrames++;
+				if (this.autoIncreaseNumFrames)
+				{
+					if (this._parent != null)
+					{
+						this._parent.numFrames++;
+					}
+					else
+					{
+						this.numFrames++;
+					}
+				}
+				else
+				{
+					return;
+				}
 			}
 			this._frameCurrent.indexEnd++;
 			
@@ -226,6 +241,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 		}
 		this.frameCollection.updateAll();
+		updateLastFrameIndex();
 	}
 	
 	public function insertKeyFrame():Void 
@@ -237,9 +253,23 @@ class ValEditorTimeLine extends ValEditTimeLine
 			{
 				if (this._frameCurrent.indexEnd == this._frameIndex)
 				{
-					if (this._frameIndex == this._numFrames)
+					if (this._lastFrameIndex == this._numFrames - 1)
 					{
-						this.numFrames++;
+						if (this.autoIncreaseNumFrames)
+						{
+							if (this._parent != null)
+							{
+								this._parent.numFrames++;
+							}
+							else
+							{
+								this.numFrames++;
+							}
+						}
+						else
+						{
+							return;
+						}
 					}
 					
 					if (getNextKeyFrame(this._frameCurrent) == null)
@@ -325,6 +355,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 			setFrameCurrent(keyFrame);
 		}
 		this.frameCollection.updateAll();
+		updateLastFrameIndex();
 	}
 	
 	public function removeFrame():Void
@@ -371,6 +402,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				setFrameCurrent(this._frames[this._frameIndex]);
 			}
 			this.frameCollection.updateAll();
+			updateLastFrameIndex();
 		}
 	}
 	
@@ -415,6 +447,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 					}
 				}
 				this.frameCollection.updateAll();
+				updateLastFrameIndex();
 			}
 		}
 	}
