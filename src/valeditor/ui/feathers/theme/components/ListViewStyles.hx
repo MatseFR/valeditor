@@ -686,14 +686,6 @@ class ListViewStyles
 		list.scrollPolicyY = ScrollPolicy.OFF;
 		list.layout = new HorizontalListLayout();
 		
-		//if (list.backgroundSkin == null) {
-			//var backgroundSkin = new RectangleSkin();
-			//backgroundSkin.fill = theme.getLightFill();
-			//backgroundSkin.width = 10.0;
-			//backgroundSkin.height = 10.0;
-			//list.backgroundSkin = backgroundSkin;
-		//}
-		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return BitmapRenderer.fromPool(BMD_RULER);
 		});
