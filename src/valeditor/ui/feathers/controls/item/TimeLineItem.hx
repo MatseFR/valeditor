@@ -6,6 +6,7 @@ import feathers.events.ScrollEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.MouseEvent;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.events.DefaultEvent;
@@ -131,6 +132,8 @@ class TimeLineItem extends LayoutGroup
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(ScrollEvent.SCROLL, onListScroll);
 		addChild(this._list);
+		
+		addEventListener(MouseEvent.CLICK, onMouseClick);
 	}
 	
 	private function setTo(timeLine:ValEditorTimeLine):TimeLineItem
@@ -141,20 +144,7 @@ class TimeLineItem extends LayoutGroup
 	
 	private function onListChange(evt:Event):Void
 	{
-		if (this._list.selectedIndex != -1)
-		{
-			this._timeLine.parent.frameIndex = this._list.selectedIndex;
-			if (this._list.selectedItem.frame != null)
-			{
-				ValEditor.selection.object = this._list.selectedItem.frame;
-			}
-			
-			if (!this._isCurrent)
-			{
-				this._isCurrent = true;
-				DefaultEvent.dispatch(this, Event.SELECT);
-			}
-		}
+		handleListSelection();
 	}
 	
 	private function onListScroll(evt:ScrollEvent):Void
@@ -162,6 +152,36 @@ class TimeLineItem extends LayoutGroup
 		if (this._dispatchScrollEvents)
 		{
 			DefaultEvent.dispatch(this, Event.SCROLL);
+		}
+	}
+	
+	private function onMouseClick(evt:MouseEvent):Void
+	{
+		handleListSelection();
+	}
+	
+	private function handleListSelection():Void
+	{
+		if (this._list.selectedIndex != -1)
+		{
+			this._timeLine.parent.frameIndex = this._list.selectedIndex;
+			if (this.stage.focus == this._list)
+			{
+				if (this._list.selectedItem.frame != null)
+				{
+					ValEditor.selection.object = this._list.selectedItem.frame;
+				}
+				else
+				{
+					ValEditor.selection.object = null;
+				}
+			}
+			
+			if (!this._isCurrent)
+			{
+				this._isCurrent = true;
+				DefaultEvent.dispatch(this, Event.SELECT);
+			}
 		}
 	}
 	
