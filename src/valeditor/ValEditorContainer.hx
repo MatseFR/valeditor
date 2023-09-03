@@ -196,12 +196,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		_POOL[_POOL.length] = this;
 	}
 	
-	override public function play():Void 
-	{
-		this.timeLine.updateLastFrameIndex();
-		super.play();
-	}
-	
 	public function adjustView():Void
 	{
 		this.viewCenterX = this._viewCenterX;
