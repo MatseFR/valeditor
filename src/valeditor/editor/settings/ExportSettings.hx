@@ -46,4 +46,26 @@ class ExportSettings
 		#end
 	}
 	
+	public function fromJSON(json:Dynamic):Void
+	{
+		this.exportAssets = json.exportAssets;
+		this.fileName = json.fileName;
+		this.path = json.path;
+		this.useSimpleJSON = json.useSimpleJSON;
+		this.useZip = json.useZip;
+	}
+	
+	public function toJSON(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.exportAssets = this.exportAssets;
+		json.fileName = this.fileName;
+		json.path = this.path;
+		json.useSimpleJSON = this.useSimpleJSON;
+		json.useZip = this.useZip;
+		
+		return json;
+	}
+	
 }
