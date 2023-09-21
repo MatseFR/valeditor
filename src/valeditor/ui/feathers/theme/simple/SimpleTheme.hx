@@ -310,6 +310,31 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		if (!this._darkMode) styleChanged();
 		return this._lightThemeFocusColor;
 	}
+	
+	public var lightThemeFocusColorDarkenRatio(get, set):Float;
+	private var _lightThemeFocusColorDarkenRatio:Float = 0.5;
+	private function get_lightThemeFocusColorDarkenRatio():Float { return this._lightThemeFocusColorDarkenRatio; }
+	private function set_lightThemeFocusColorDarkenRatio(value:Float):Float
+	{
+		if (this._lightThemeFocusColorDarkenRatio == value) return value;
+		this._lightThemeFocusColorDarkenRatio = value;
+		refreshColors();
+		if (!this._darkMode) styleChanged();
+		return this._lightThemeFocusColorDarkenRatio;
+	}
+	
+	public var lightThemeFocusColorLightenRatio(get, set):Float;
+	private var _lightThemeFocusColorLightenRatio:Float = 0.5;
+	private function get_lightThemeFocusColorLightenRatio():Float { return this._lightThemeFocusColorLightenRatio; }
+	private function set_lightThemeFocusColorLightenRatio(value:Float):Float
+	{
+		if (this._lightThemeFocusColorLightenRatio == value) return value;
+		this._lightThemeFocusColorLightenRatio = value;
+		refreshColors();
+		if (!this._darkMode) styleChanged();
+		return this._lightThemeFocusColorLightenRatio;
+	}
+	
 	//##########################################################################################
 	//\LIGHT MODE
 	//##########################################################################################
@@ -508,6 +533,31 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		if (this._darkMode) styleChanged();
 		return this._darkThemeFocusColor;
 	}
+	
+	public var darkThemeFocusColorDarkenRatio(get, set):Float;
+	private var _darkThemeFocusColorDarkenRatio:Float = 0.5;
+	private function get_darkThemeFocusColorDarkenRatio():Float { return this._darkThemeFocusColorDarkenRatio; }
+	private function set_darkThemeFocusColorDarkenRatio(value:Float):Float
+	{
+		if (this._darkThemeFocusColorDarkenRatio == value) return value;
+		this._darkThemeFocusColorDarkenRatio = value;
+		refreshColors();
+		if (this._darkMode) styleChanged();
+		return this._darkThemeFocusColorDarkenRatio;
+	}
+	
+	public var darkThemeFocusColorLightenRatio(get, set):Float;
+	private var _darkThemeFocusColorLightenRatio:Float = 0.5;
+	private function get_darkThemeFocusColorLightenRatio():Float { return this._darkThemeFocusColorLightenRatio; }
+	private function set_darkThemeFocusColorLightenRatio(value:Float):Float
+	{
+		if (this._darkThemeFocusColorLightenRatio == value) return value;
+		this._darkThemeFocusColorLightenRatio = value;
+		refreshColors();
+		if (this._darkMode) styleChanged();
+		return this._darkThemeFocusColorLightenRatio;
+	}
+	
 	//##########################################################################################
 	//\DARK MODE
 	//##########################################################################################
@@ -534,6 +584,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	public var dangerColorLight(default, null):Int;
 	
 	public var focusColor(default, null):Int;
+	public var focusColorDark(default, null):Int;
+	public var focusColorLight(default, null):Int;
 	
 	private var _colorUpdateFunctions:Array<SimpleTheme->Void> = new Array<SimpleTheme->Void>();
 	
@@ -616,6 +668,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			this.dangerColorLight = ColorUtil.lightenByRatio(this.dangerColor, this._darkThemeDangerColorLightenRatio);
 			
 			this.focusColor = this._darkThemeFocusColor;
+			this.focusColorDark = ColorUtil.darkenByRatio(this.focusColor, this._darkThemeFocusColorDarkenRatio);
+			this.focusColorLight = ColorUtil.lightenByRatio(this.focusColor, this._darkThemeFocusColorLightenRatio);
 		}
 		else
 		{
@@ -641,6 +695,8 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			this.dangerColorLight = ColorUtil.lightenByRatio(this.dangerColor, this._lightThemeDangerColorLightenRatio);
 			
 			this.focusColor = this._lightThemeFocusColor;
+			this.focusColorDark = ColorUtil.darkenByRatio(this.focusColor, this._lightThemeFocusColorDarkenRatio);
+			this.focusColorLight = ColorUtil.lightenByRatio(this.focusColor, this._lightThemeFocusColorLightenRatio);
 		}
 		
 		for (func in this._colorUpdateFunctions)
@@ -648,18 +704,6 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 			func(this);
 		}
 	}
-	
-	//private function refreshFonts():Void
-	//{
-		//this.fontName = "_sans";
-		//this.refreshFontSizes();
-	//}
-	
-	//private function refreshFontSizes():Void
-	//{
-		//this.fontSizeGroup = 16;
-		//this.fontSizeValue = 14;
-	//}
 	
 	//####################################################################################################
 	// Fills & Borders
@@ -750,6 +794,13 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		return LineStyle.SolidColor(thickness, this.dangerColorDark);
 	}
 	
+	public function getDangerBorderLight(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.dangerColorLight);
+	}
+	
 	public function getDangerFill():FillStyle
 	{
 		return FillStyle.SolidColor(this.dangerColor);
@@ -767,14 +818,38 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	
 	public function getFocusBorder(?thickness:Float):LineStyle
 	{
-		if (thickness == null) thickness = _lineThickness;
+		if (thickness == null) thickness = this._lineThickness;
 		if (thickness == 0) return null;
 		return LineStyle.SolidColor(thickness, this.focusColor);
+	}
+	
+	public function getFocusBorderDark(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.focusColorDark);
+	}
+	
+	public function getFocusBorderLight(?thickness:Float):LineStyle
+	{
+		if (thickness == null) thickness = this._lineThickness;
+		if (thickness == 0) return null;
+		return LineStyle.SolidColor(thickness, this.focusColorLight);
 	}
 	
 	public function getFocusFill():FillStyle
 	{
 		return FillStyle.SolidColor(this.focusColor);
+	}
+	
+	public function getFocusFillDark():FillStyle
+	{
+		return FillStyle.SolidColor(this.focusColorDark);
+	}
+	
+	public function getFocusFillLight():FillStyle
+	{
+		return FillStyle.SolidColor(this.focusColorLight);
 	}
 	
 	public function getLightBorder(?thickness:Float):LineStyle
