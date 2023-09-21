@@ -59,6 +59,7 @@ class ValEditor
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
 	
 	static public var isMouseOverUI:Bool;
+	static public var juggler(default, null):Juggler;
 	
 	static private var _currentContainer:ValEditorContainer;
 	static private function get_currentContainer():ValEditorContainer
@@ -105,7 +106,7 @@ class ValEditor
 		if (_rootContainer != null)
 		{
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
-			_rootContainer.juggler = Juggler.root;
+			_rootContainer.juggler = juggler;
 			_rootContainer.rootContainer = _rootScene;
 			#if starling
 			_rootContainer.rootContainerStarling = _rootSceneStarling;
@@ -176,10 +177,12 @@ class ValEditor
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
 		_changeUpdateQueue = new ChangeUpdateQueue();
+		juggler = new Juggler();
 		Juggler.start();
-		Juggler.root.add(input);
-		Juggler.root.add(_liveActionManager);
-		Juggler.root.add(_changeUpdateQueue);
+		Juggler.root.add(juggler);
+		juggler.add(input);
+		juggler.add(_liveActionManager);
+		juggler.add(_changeUpdateQueue);
 		libraryDragManager = new LibraryDragManager();
 		
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
