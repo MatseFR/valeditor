@@ -98,6 +98,7 @@ class LibraryDragManager
 			ValEditor.currentContainer.add(this.object);
 			ValEditor.selection.object = this.object;
 			this.object = null;
+			Lib.current.stage.focus = null;
 		}
 		
 		stopDrag();
