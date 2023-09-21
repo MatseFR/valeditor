@@ -26,6 +26,7 @@ class LabelStyles
 		styleProvider.setStyleFunction(Label, LabelVariant.NOTE, note);
 		styleProvider.setStyleFunction(Label, LabelVariant.OBJECT_NAME, object_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.SUBVALUE_NAME, subValue_name);
+		styleProvider.setStyleFunction(Label, LabelVariant.TIMELINE, timeline);
 		styleProvider.setStyleFunction(Label, LabelVariant.VALUE_NAME, value_name);
 	}
 	
@@ -50,6 +51,11 @@ class LabelStyles
 		label.minWidth = UIConfig.VALUE_NAME_MIN_WIDTH;
 		label.maxWidth = UIConfig.VALUE_NAME_MAX_WIDTH;
 		label.wordWrap = true;
+	}
+	
+	static private function timeline(label:Label):Void
+	{
+		label.textFormat = theme.getTextFormat_small();
 	}
 	
 	static private function value_name(label:Label):Void
