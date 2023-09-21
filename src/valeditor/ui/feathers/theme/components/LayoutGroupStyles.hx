@@ -14,6 +14,7 @@ import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.value.SeparatorUI;
 import valeditor.ui.feathers.controls.value.SpacingUI;
+import valeditor.ui.feathers.skins.VerticalLineSkinWithOffset;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 
@@ -51,6 +52,8 @@ class LayoutGroupStyles
 		
 		styleProvider.setStyleFunction(SeparatorUI, null, separatorUI);
 		styleProvider.setStyleFunction(SpacingUI, null, spacingUI);
+		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TIMELINE_INDICATOR, timeline_indicator);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT, toggleCustom_content);
 		
@@ -158,6 +161,17 @@ class LayoutGroupStyles
 	static private function spacingUI(spacing:SpacingUI):Void
 	{
 		spacing.height = 16;
+	}
+	
+	static private function timeline_indicator(indicator:LayoutGroup):Void
+	{
+		var skin:VerticalLineSkinWithOffset = new VerticalLineSkinWithOffset(null, theme.getFocusBorder());
+		skin.lineOffset = -1;
+		skin.width = 8;
+		indicator.backgroundSkin = skin;
+		
+		indicator.mouseEnabled = false;
+		indicator.mouseChildren = false;
 	}
 	
 	static private function toggleCustom_content(group:LayoutGroup):Void
