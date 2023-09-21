@@ -774,7 +774,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	{
 		if (evt.target != Lib.current.stage) return;
 		if (this._mouseObject != null) return;
-		//if (this.selection.numObjects == 0) return;
+		
 		ValEditor.selection.object = null;
 	}
 	
