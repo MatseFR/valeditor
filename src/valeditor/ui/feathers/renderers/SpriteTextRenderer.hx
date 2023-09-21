@@ -2,6 +2,7 @@ package valeditor.ui.feathers.renderers;
 
 import feathers.controls.Label;
 import openfl.display.Sprite;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...
@@ -69,8 +70,9 @@ class SpriteTextRenderer extends Sprite
 		this._width = width;
 		this._height = height;
 		this._label = new Label();
+		this._label.variant = LabelVariant.TIMELINE;
 		this._label.mouseEnabled = false;
-		this._label.y = -4;
+		this._label.y = -2;
 		addChild(this._label);
 	}
 	
