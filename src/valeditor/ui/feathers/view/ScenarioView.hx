@@ -3,6 +3,7 @@ package valeditor.ui.feathers.view;
 import feathers.controls.Button;
 import feathers.controls.HDividedBox;
 import feathers.controls.HScrollBar;
+import feathers.controls.HSlider;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.ScrollContainer;
@@ -22,8 +23,12 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import feathers.utils.DisplayObjectRecycler;
+import juggler.animation.IAnimatable;
 import openfl.Lib;
+import openfl.display.Shape;
 import openfl.events.Event;
+import openfl.events.MouseEvent;
+import openfl.geom.Point;
 import valedit.ValEditLayer;
 import valedit.events.PlayEvent;
 import valeditor.ValEditor;
@@ -38,13 +43,14 @@ import valeditor.ui.feathers.controls.item.TimeLineItem;
 import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.variant.ScrollContainerVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
 
 /**
  * ...
  * @author Matse
  */
-class ScenarioView extends LayoutGroup 
+class ScenarioView extends LayoutGroup implements IAnimatable
 {
 	private var _mainBox:HDividedBox;
 	
@@ -80,6 +86,14 @@ class ScenarioView extends LayoutGroup
 	
 	private var _container:ValEditorContainer;
 	private var _currentTimeLineItem:TimeLineItem;
+	
+	// TESTING
+	private var _cursor:LayoutGroup;
+	private var _indicatorContainer:ScrollContainer;
+	private var _indicator:LayoutGroup;
+	
+	private var _pt:Point = new Point();
+	//\TESTING
 	
 	public function new() 
 	{
@@ -168,13 +182,15 @@ class ScenarioView extends LayoutGroup
 		this._timeLineTopGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.paddingBottom = 1;
-		hLayout.paddingTop = 8;
+		hLayout.paddingTop = 2;
 		this._timeLineTopGroup.layout = hLayout;
-		//this._timeLineTopGroup.layout = new AnchorLayout();
+		this._timeLineTopGroup.addEventListener(MouseEvent.MOUSE_DOWN, onRulerMouseDown);
 		this._timeLineMainGroup.addChild(this._timeLineTopGroup);
 		
 		this._timeLineTopControlsGroup = new LayoutGroup();
 		this._timeLineTopControlsGroup.layout = new AnchorLayout();
+		this._timeLineTopControlsGroup.mouseEnabled = false;
+		this._timeLineTopControlsGroup.mouseChildren = false;
 		this._timeLineTopGroup.addChild(this._timeLineTopControlsGroup);
 		
 		this._timeLineRulerList = new ListView();
@@ -184,7 +200,7 @@ class ScenarioView extends LayoutGroup
 		
 		this._timeLineNumberList = new ListView();
 		this._timeLineNumberList.variant = ListViewVariant.TIMELINE_NUMBERS;
-		this._timeLineNumberList.layoutData = new AnchorLayoutData(null, 0, null, 0);
+		this._timeLineNumberList.layoutData = new AnchorLayoutData(null, 0, 0, 0);
 		this._timeLineTopControlsGroup.addChild(this._timeLineNumberList);
 		
 		this._timeLineGroup = new LayoutGroup();
@@ -209,6 +225,16 @@ class ScenarioView extends LayoutGroup
 		this._timeLineList.addEventListener(ScrollEvent.SCROLL, onTimeLineListScroll);
 		this._timeLineGroup.addChild(this._timeLineList);
 		
+		this._indicatorContainer = new ScrollContainer();
+		this._indicatorContainer.variant = ScrollContainerVariant.TRANSPARENT;
+		this._indicatorContainer.mouseEnabled = false;
+		this._indicatorContainer.mouseChildren = false;
+		this._indicatorContainer.layoutData = new AnchorLayoutData(0, new Anchor(0, this._vScrollBar), 0, 0);
+		this._indicatorContainer.scrollPolicyX = ScrollPolicy.OFF;
+		this._indicatorContainer.scrollPolicyY = ScrollPolicy.OFF;
+		this._indicatorContainer.layout = new AnchorLayout();
+		this._timeLineGroup.addChild(this._indicatorContainer);
+		
 		this._timeLineBottomGroup = new LayoutGroup();
 		this._timeLineBottomGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
@@ -228,7 +254,7 @@ class ScenarioView extends LayoutGroup
 		this._timeLineBottomGroup.addChild(this._timeLineControlsGroup);
 		
 		this._hScrollBar = new HScrollBar();
-		this._hScrollBar.snapInterval = 1.0;
+		this._hScrollBar.snapInterval = 8.0;
 		this._hScrollBar.layoutData = new HorizontalLayoutData(100);
 		this._hScrollBar.addEventListener(Event.CHANGE, onHScrollBarChange);
 		this._timeLineBottomGroup.addChild(this._hScrollBar);
@@ -255,11 +281,72 @@ class ScenarioView extends LayoutGroup
 		
 		this._timeLineList.addEventListener(Event.RESIZE, onTimeLineResize);
 		
+		this._indicator = new LayoutGroup();
+		this._indicator.variant = LayoutGroupVariant.TIMELINE_INDICATOR;
+		this._indicator.layoutData = new AnchorLayoutData(0, null, 0);
+		this._indicatorContainer.addChild(this._indicator);
+		//\TESTING
+		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
 		
 		listsChangeEnable();
 	}
+	
+	// TESTING
+	private function onRulerMouseDown(evt:MouseEvent):Void
+	{
+		_pt.x = evt.stageX;
+		
+		if (this._currentTimeLineItem != null)
+		{
+			this._currentTimeLineItem.clearSelection();
+		}
+		
+		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, onRulerMouseMove);
+		this.stage.addEventListener(MouseEvent.MOUSE_UP, onRulerMouseUp);
+		ValEditor.juggler.add(this);
+	}
+	
+	private function onRulerMouseMove(evt:MouseEvent):Void
+	{
+		_pt.x = evt.stageX;
+	}
+	
+	public function advanceTime(time:Float):Void
+	{
+		var loc:Point = this._timeLineTopControlsGroup.globalToLocal(_pt);
+		var index:Int;
+		var indexMax:Int = this._timeLineRulerList.dataProvider.length - 1; // this._container.timeLine.lastFrameIndex;
+		
+		if (loc.x < 0.0)
+		{
+			loc.x = 0.0;
+			this._hScrollBar.value = Math.max(this._hScrollBar.value - 8.0, this._hScrollBar.minimum);
+		}
+		else if (loc.x > this._timeLineTopControlsGroup.width)
+		{
+			loc.x = this._timeLineTopControlsGroup.width;
+			this._hScrollBar.value = Math.min(this._hScrollBar.value + 8.0, this._hScrollBar.maximum);
+		}
+		index = Math.floor((this._hScrollBar.value + loc.x) / 8);
+		if (index > indexMax) index = indexMax;
+		setPlayHeadIndex(index);
+	}
+	
+	private function onRulerMouseUp(evt:MouseEvent):Void
+	{
+		this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onRulerMouseMove);
+		this.stage.removeEventListener(MouseEvent.MOUSE_UP, onRulerMouseUp);
+		ValEditor.juggler.remove(this);
+	}
+	
+	private function setPlayHeadIndex(index:Int):Void
+	{
+		this._timeLineRulerList.selectedIndex = index;
+		this._indicator.x = index * 8;
+	}
+	//\TESTING
 	
 	private function onTimeLineResize(evt:Event):Void
 	{
@@ -300,6 +387,7 @@ class ScenarioView extends LayoutGroup
 	
 	private function updateHScrollBar():Void
 	{
+		this._timeLineRulerList.validateNow();
 		this._hScrollBar.minimum = this._timeLineRulerList.minScrollX;
 		this._hScrollBar.maximum = this._timeLineRulerList.maxScrollX;
 	}
@@ -318,6 +406,7 @@ class ScenarioView extends LayoutGroup
 		this._container.removeEventListener(PlayEvent.PLAY, onPlay);
 		this._container.removeEventListener(PlayEvent.STOP, onStop);
 		this._container.timeLine.removeEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
+		this._container.timeLine.removeEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
 		this._layerList.dataProvider = null;
 		this._timeLineRulerList.dataProvider = null;
 		this._timeLineNumberList.dataProvider = null;
@@ -340,9 +429,12 @@ class ScenarioView extends LayoutGroup
 		this._container.addEventListener(PlayEvent.PLAY, onPlay);
 		this._container.addEventListener(PlayEvent.STOP, onStop);
 		this._container.timeLine.addEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
+		this._container.timeLine.addEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
 		this._layerList.dataProvider = this._container.layerCollection;
 		this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
 		this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+		
+		setPlayHeadIndex(this._container.frameIndex);
 		
 		for (layer in this._container.layerCollection)
 		{
@@ -495,6 +587,11 @@ class ScenarioView extends LayoutGroup
 		this._playStopButton.addEventListener(Event.CHANGE, onPlayStopButton);
 	}
 	
+	private function onTimeLineFrameIndexChange(evt:TimeLineEvent):Void
+	{
+		setPlayHeadIndex(this._container.frameIndex);
+	}
+	
 	private function onTimeLineItemScroll(evt:Event):Void
 	{
 		var timeLineItem:TimeLineItem = cast evt.target;
@@ -519,6 +616,7 @@ class ScenarioView extends LayoutGroup
 		{
 			item.scrollX = scrollX;
 		}
+		this._indicatorContainer.scrollX = scrollX;
 		this._timeLineNumberList.scrollX = scrollX;
 		this._timeLineRulerList.scrollX = scrollX;
 	}
