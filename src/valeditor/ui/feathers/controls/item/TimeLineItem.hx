@@ -10,7 +10,6 @@ import openfl.events.MouseEvent;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.events.DefaultEvent;
-import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.variant.ListViewVariant;
 
 /**
@@ -70,14 +69,8 @@ class TimeLineItem extends LayoutGroup
 	{
 		if (this._timeLine == value) return value;
 		
-		if (this._timeLine != null)
-		{
-			this._timeLine.removeEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
-		}
-		
 		if (value != null)
 		{
-			value.addEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
 			this._list.dataProvider = value.frameCollection;
 			this._list.validateNow();
 		}
@@ -136,6 +129,11 @@ class TimeLineItem extends LayoutGroup
 		addEventListener(MouseEvent.CLICK, onMouseClick);
 	}
 	
+	public function clearSelection():Void
+	{
+		this._list.selectedIndex = -1;
+	}
+	
 	private function setTo(timeLine:ValEditorTimeLine):TimeLineItem
 	{
 		this.timeLine = timeLine;
@@ -182,14 +180,6 @@ class TimeLineItem extends LayoutGroup
 				this._isCurrent = true;
 				DefaultEvent.dispatch(this, Event.SELECT);
 			}
-		}
-	}
-	
-	private function onTimeLineFrameIndexChange(evt:TimeLineEvent):Void
-	{
-		if (this._isCurrent)
-		{
-			this._list.selectedIndex = this._timeLine.frameIndex;
 		}
 	}
 	
