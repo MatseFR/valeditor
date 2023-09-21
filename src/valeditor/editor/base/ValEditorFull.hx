@@ -35,6 +35,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.editorSetup();
 		
+		ValEditor.init();
+		
 		var sprite:Sprite = new Sprite();
 		addChild(sprite);
 		ValEditor.rootScene = sprite;
@@ -48,7 +50,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 		var container:ValEditorContainer = ValEditor.createContainer();
 		ValEditor.rootContainer = container;
 		
-		ValEditor.init();
 		initInputActions();
 		ValEditor.input.addEventListener(InputActionEvent.ACTION_BEGIN, onInputActionBegin);
 	}
