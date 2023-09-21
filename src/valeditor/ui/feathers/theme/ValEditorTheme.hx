@@ -8,6 +8,7 @@ import valeditor.ui.feathers.theme.components.FrameItemRendererStyles;
 import valeditor.ui.feathers.theme.components.LabelStyles;
 import valeditor.ui.feathers.theme.components.LayerItemStyles;
 import valeditor.ui.feathers.theme.components.LayoutGroupStyles;
+import valeditor.ui.feathers.theme.components.ScrollContainerStyles;
 import valeditor.ui.feathers.theme.components.SelectionGroupStyles;
 import valeditor.ui.feathers.theme.components.TextInputStyles;
 import valeditor.ui.feathers.theme.components.ToggleButtonStyles;
@@ -43,6 +44,7 @@ class ValEditorTheme extends SimpleTheme
 		LayerItemStyles.initialize(this, this.styleProvider);
 		LayoutGroupStyles.initialize(this, this.styleProvider);
 		NumericDraggerStyles.initialize(this, this.styleProvider);
+		ScrollContainerStyles.initialize(this, this.styleProvider);
 		SelectionGroupStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
