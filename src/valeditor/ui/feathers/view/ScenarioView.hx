@@ -285,7 +285,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._indicator.variant = LayoutGroupVariant.TIMELINE_INDICATOR;
 		this._indicator.layoutData = new AnchorLayoutData(0, null, 0);
 		this._indicatorContainer.addChild(this._indicator);
-		//\TESTING
 		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
@@ -293,7 +292,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		listsChangeEnable();
 	}
 	
-	// TESTING
 	private function onRulerMouseDown(evt:MouseEvent):Void
 	{
 		_pt.x = evt.stageX;
@@ -345,8 +343,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		this._timeLineRulerList.selectedIndex = index;
 		this._indicator.x = index * 8;
+		this._container.frameIndex = index;
 	}
-	//\TESTING
 	
 	private function onTimeLineResize(evt:Event):Void
 	{
