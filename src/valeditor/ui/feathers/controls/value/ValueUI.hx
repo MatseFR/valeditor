@@ -11,6 +11,7 @@ import valedit.ui.IValueUI;
  * @author Matse
  */
 @:styleContext
+@:access(valedit.value.base.ExposedValue)
 abstract class ValueUI extends LayoutGroup implements IValueUI
 {
 	public var exposedValue(get, set):ExposedValue;
@@ -83,7 +84,7 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 	
 	public function initExposedValue():Void
 	{
-		this._readOnly = this._exposedValue.isReadOnly;
+		this._readOnly = this._exposedValue.isReadOnly || this._exposedValue.isReadOnlyInternal;
 	}
 	
 	public function updateExposedValue(exceptControl:IValueUI = null):Void
@@ -93,7 +94,7 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 	
 	private function onValueAccessChange(evt:ValueEvent):Void
 	{
-		if (evt.value.isReadOnly && this._controlsEnabled)
+		if ((evt.value.isReadOnly || evt.value.isReadOnlyInternal) && this._controlsEnabled)
 		{
 			controlsDisable();
 		}
