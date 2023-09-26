@@ -5,7 +5,6 @@ import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
 import openfl.display.Sprite;
 import openfl.ui.Keyboard;
-import valedit.ValEdit;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
@@ -92,6 +91,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		switch (action.actionID)
 		{
+			case InputActionID.COPY :
+				
+			
+			case InputActionID.CUT :
+				
+			
+			case InputActionID.PASTE :
+				
+			
 			case InputActionID.DELETE :
 				ValEditor.selection.delete();
 			
@@ -195,6 +203,18 @@ class ValEditorFull extends ValEditorBaseFeathers
 		// unselect all
 		keyAction = new KeyAction(InputActionID.UNSELECT_ALL, false, true, true);
 		ValEditor.keyboardController.addKeyAction(Keyboard.A, keyAction);
+		
+		// copy
+		keyAction = new KeyAction(InputActionID.COPY, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.C, keyAction);
+		
+		// cut
+		keyAction = new KeyAction(InputActionID.CUT, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.X, keyAction);
+		
+		// paste
+		keyAction = new KeyAction(InputActionID.PASTE, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.V, keyAction);
 		
 		// delete
 		keyAction = new KeyAction(InputActionID.DELETE);
