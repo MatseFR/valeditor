@@ -157,6 +157,9 @@ class IntRangeUI extends ValueUI
 			this._input.restrict = "0123456789";
 		}
 		
+		this._slider.enabled = !this._readOnly;
+		this._input.editable = !this._readOnly;
+		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
 		if (this._exposedValue.isNullable && !this._readOnly)
 		{

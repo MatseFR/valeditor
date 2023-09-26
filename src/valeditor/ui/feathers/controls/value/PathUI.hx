@@ -109,6 +109,7 @@ class PathUI extends ValueUI
 		
 		this._pathLabel = new Label();
 		this._pathLabel.variant = LabelVariant.VALUE;
+		this._pathLabel.selectable = true;
 		this._pathLabel.wordWrap = true;
 		this._pathLabel.layoutData = new HorizontalLayoutData(100);
 		this._mainGroup.addChild(this._pathLabel);

@@ -181,7 +181,8 @@ class IntUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._input.enabled = this._exposedValue.isEditable;
+		this._input.editable = !this._readOnly;
 		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	

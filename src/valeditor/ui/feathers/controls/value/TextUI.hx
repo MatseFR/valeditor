@@ -152,7 +152,8 @@ class TextUI extends ValueUI
 	
 	private function updateEditable():Void
 	{
-		this._textArea.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._textArea.enabled = this._exposedValue.isEditable;
+		this._textArea.editable = !this._readOnly;
 		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
 	

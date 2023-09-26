@@ -164,7 +164,8 @@ class StringUI extends ValueUI
 	private function updateEditable():Void
 	{
 		this._label.enabled = this._exposedValue.isEditable;
-		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
+		this._input.enabled = this._exposedValue.isEditable;
+		this._input.editable = !this._readOnly;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 

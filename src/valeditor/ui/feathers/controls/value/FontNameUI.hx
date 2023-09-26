@@ -151,6 +151,8 @@ class FontNameUI extends ValueUI
 		}
 		this._collection.array = this._fontStringDataList;
 		
+		this._list.enabled = !this._readOnly;
+		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
 		if (this._exposedValue.isNullable && !this._readOnly)
 		{
