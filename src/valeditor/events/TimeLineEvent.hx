@@ -18,7 +18,7 @@ class TimeLineEvent extends Event
 	static private function fromPool(type:String, bubbles:Bool, cancelable:Bool):TimeLineEvent
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(type, bubbles, cancelable);
-		return new ContainerEvent(type, bubbles, cancelable);
+		return new TimeLineEvent(type, bubbles, cancelable);
 	}
 	#end
 	
