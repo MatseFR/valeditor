@@ -3,6 +3,8 @@ package valeditor;
 import feathers.data.ArrayCollection;
 import openfl.events.Event;
 import valedit.ValEditKeyFrame;
+import valedit.ValEditObject;
+import valedit.ValEditTemplate;
 import valedit.ValEditTimeLine;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.data.FrameData;
@@ -116,6 +118,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 	}
 	
 	private var _frameDatas:Array<FrameData> = new Array<FrameData>();
+	
+	private var _tempObjectMap:Map<ValEditObject, ValEditObject> = new Map<ValEditObject, ValEditObject>();
 
 	public function new(numFrames:Int) 
 	{
@@ -450,6 +454,38 @@ class ValEditorTimeLine extends ValEditTimeLine
 				updateLastFrameIndex();
 			}
 		}
+	}
+	
+	public function getReusableObjectsWithTemplateForKeyFrame(template:ValEditTemplate, keyFrame:ValEditKeyFrame):Array<ValEditObject>
+	{
+		var reusableObjects:Array<ValEditObject> = new Array<ValEditObject>();
+		
+		// take note of eligible objects in the specified frame so we can discard them
+		for (object in keyFrame.objects)
+		{
+			if (object.template == template)
+			{
+				this._tempObjectMap.set(object, object);
+			}
+		}
+		
+		for (frame in this._keyFrames)
+		{
+			if (frame == keyFrame) continue;
+			
+			for (object in frame.objects)
+			{
+				if (object.template != template) continue;
+				if (this._tempObjectMap.exists(object)) continue;
+				
+				reusableObjects[reusableObjects.length] = object;
+				this._tempObjectMap.set(object, object);
+			}
+		}
+		
+		this._tempObjectMap.clear();
+		
+		return reusableObjects;
 	}
 	
 	private function setTo(numFrames:Int):ValEditorTimeLine

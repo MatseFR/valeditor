@@ -2,10 +2,13 @@ package valeditor.editor.drag;
 import openfl.Lib;
 import openfl.errors.Error;
 import openfl.events.MouseEvent;
+import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
+import valeditor.ValEditorTimeLine;
 import valeditor.ui.InteractiveObjectVisible;
+import valeditor.ui.feathers.FeathersWindows;
 
 /**
  * ...
@@ -17,6 +20,9 @@ class LibraryDragManager
 	public var object(default, null):ValEditorObject;
 	public var objectIndicator(default, null):InteractiveObjectVisible = new InteractiveObjectVisible();
 	public var template(default, null):ValEditorTemplate;
+	
+	private var _mouseX:Float;
+	private var _mouseY:Float;
 
 	public function new() 
 	{
@@ -88,20 +94,54 @@ class LibraryDragManager
 	{
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject())
 		{
-			this.object = ValEditor.createObjectWithTemplate(this.template);
-			if (this.object.isDisplayObject)
-			{
-				this.object.setProperty(RegularPropertyName.X, evt.stageX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
-				this.object.setProperty(RegularPropertyName.Y, evt.stageY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
-			}
+			this._mouseX = evt.stageX;
+			this._mouseY = evt.stageY;
 			
-			ValEditor.currentContainer.add(this.object);
-			ValEditor.selection.object = this.object;
-			this.object = null;
-			Lib.current.stage.focus = null;
+			// look for reusable objects
+			var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(this.template, ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			
+			if (reusableObjects.length != 0)
+			{
+				FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
+			}
+			else
+			{
+				onNewObject();
+			}
 		}
 		
 		stopDrag();
+	}
+	
+	private function onNewObject():Void
+	{
+		this.object = ValEditor.createObjectWithTemplate(this.template);
+		if (this.object.isDisplayObject)
+		{
+			this.object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
+			this.object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
+		}
+		
+		ValEditor.currentContainer.add(this.object);
+		ValEditor.selection.object = this.object;
+		this.object = null;
+		Lib.current.stage.focus = null;
+	}
+	
+	private function onReuseObject(object:ValEditorObject):Void
+	{
+		ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
+		
+		if (object.isDisplayObject)
+		{
+			object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
+			object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
+		}
+	}
+	
+	private function onCancelObject():Void
+	{
+		
 	}
 	
 	private function onRightClick(evt:MouseEvent):Void

@@ -24,6 +24,7 @@ import inputAction.Input;
 import inputAction.controllers.KeyboardController;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
+import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.events.EditorEvent;
 import valeditor.events.TemplateEvent;
@@ -39,6 +40,7 @@ import valeditor.utils.ArraySort;
 @:access(valedit.ValEdit)
 class ValEditor
 {
+	static public var clipboard:ValEditorClipboard;
 	static public var currentContainer(get, set):ValEditorContainer;
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var file(default, null):ValEditorFile = new ValEditorFile();
@@ -477,7 +479,7 @@ class ValEditor
 		if (Std.isOfType(object, ValEditObject))
 		{
 			valClass = cast(object, ValEditObject).clss;
-			collection = cast(object, ValEditObject).collection;
+			collection = cast(object, ValEditObject).currentCollection;
 		}
 		else
 		{
@@ -644,7 +646,7 @@ class ValEditor
 		ValEdit.createTemplateWithClassName(className, id, constructorCollection, template);
 		
 		template.object = createObjectWithTemplate(template, template.collection, false);
-		template.object.collection.readValues();
+		template.object.currentCollection.readValues();
 		
 		registerTemplateInternal(template);
 		
@@ -680,11 +682,11 @@ class ValEditor
 		var newObject:ValEditObject;
 		if (object.template != null)
 		{
-			newObject = createObjectWithTemplate(cast object.template, id, object.collection.clone(true));
+			newObject = createObjectWithTemplate(cast object.template, id, object.currentCollection.clone(true));
 		}
 		else
 		{
-			newObject = createObjectWithClassName(object.className, id, object.collection.clone(true));
+			newObject = createObjectWithClassName(object.className, id, object.currentCollection.clone(true));
 		}
 		return newObject;
 	}

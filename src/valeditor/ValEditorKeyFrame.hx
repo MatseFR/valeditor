@@ -1,5 +1,6 @@
 package valeditor;
 
+import feathers.data.ArrayCollection;
 import openfl.events.Event;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
@@ -22,6 +23,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	}
 	
 	public var isPlaying(get, set):Bool;
+	public var objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection();
 	
 	override function set_indexCurrent(value:Int):Int 
 	{
@@ -96,9 +98,19 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	
 	public function copyObjectsFrom(keyFrame:ValEditKeyFrame):Void
 	{
-		for (object in keyFrame.objects)
+		if (keyFrame.timeLine == this.timeLine)
 		{
-			add(ValEditor.cloneObject(object));
+			for (object in keyFrame.objects)
+			{
+				add(object);
+			}
+		}
+		else
+		{
+			for (object in keyFrame.objects)
+			{
+				add(ValEditor.cloneObject(object));
+			}
 		}
 	}
 	
@@ -112,9 +124,17 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			prevFrame.rebuildTweens();
 		}
 		
-		registerObject(object);
+		if (this.isActive)
+		{
+			registerObject(object);
+		}
 		
 		if (this.objects.length == 1) DefaultEvent.dispatch(this, Event.CHANGE);
+	}
+	
+	public function hasObject(object:ValEditObject):Bool
+	{
+		return this.objects.indexOf(object) != -1;
 	}
 	
 	override public function remove(object:ValEditObject):Void 
@@ -127,7 +147,10 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			prevFrame.rebuildTweens();
 		}
 		
-		unregisterObject(object);
+		if (this.isActive)
+		{
+			unregisterObject(object);
+		}
 		
 		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
 	}
@@ -144,13 +167,26 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		object.removeEventListener(ObjectEvent.FUNCTION_CALLED, onObjectPropertyChange);
 	}
 	
+	override public function enter():Void 
+	{
+		super.enter();
+		
+		// register objects
+		for (object in this.objects)
+		{
+			registerObject(object);
+		}
+	}
+	
 	override public function exit():Void 
 	{
 		super.exit();
 		
-		// unselect objects if needed
+		// unregister & unselect objects if needed
 		for (object in this.objects)
 		{
+			unregisterObject(object);
+			
 			if (ValEditor.selection.hasObject(cast object))
 			{
 				ValEditor.selection.removeObject(cast object);

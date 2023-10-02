@@ -1,10 +1,12 @@
 package valeditor.ui.feathers;
 import feathers.core.PopUpManager;
 import openfl.Lib;
+import valedit.ValEditObject;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
+import valeditor.ui.feathers.window.ObjectAddWindow;
 import valeditor.ui.feathers.window.ObjectCreationWindow;
 import valeditor.ui.feathers.window.ObjectRenameWindow;
 import valeditor.ui.feathers.window.ObjectSelectWindow;
@@ -48,6 +50,7 @@ class FeathersWindows
 	
 	static private var _exportSettings:ExportSettingsWindow;
 	
+	static private var _objectAdd:ObjectAddWindow;
 	static private var _objectCreate:ObjectCreationWindow;
 	static private var _objectEdit:ObjectEditWindow;
 	static private var _objectRename:ObjectRenameWindow;
@@ -205,6 +208,26 @@ class FeathersWindows
 		_exportSettings.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
 		
 		PopUpManager.addPopUp(_exportSettings, Lib.current.stage);
+	}
+	
+	static public function showObjectAddWindow(reusableObjects:Array<ValEditObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
+	{
+		if (_objectAdd == null)
+		{
+			_objectAdd = new ObjectAddWindow();
+		}
+		
+		_objectAdd.title = title;
+		_objectAdd.newObjectCallback = newObjectCallback;
+		_objectAdd.reuseObjectCallback = reuseObjectCallback;
+		_objectAdd.reusableObjects = reusableObjects;
+		_objectAdd.cancelCallback = cancelCallback;
+		_objectAdd.reset();
+		
+		_objectAdd.width = Lib.current.stage.stageWidth / 2;
+		_objectAdd.height = Lib.current.stage.stageHeight / 2;
+		
+		PopUpManager.addPopUp(_objectAdd, Lib.current.stage);
 	}
 	
 	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void

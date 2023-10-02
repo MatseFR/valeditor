@@ -57,7 +57,7 @@ class ObjectUI extends ValueUI
 			}
 			else
 			{
-				this._objectCollection.object = value.value;
+				this._objectCollection.readAndSetObject(value.value);
 			}
 			if (this._objectCollection != null)
 			{
@@ -221,7 +221,7 @@ class ObjectUI extends ValueUI
 		}
 		else
 		{
-			this._objectCollection.object = this._exposedObject.value;
+			this._objectCollection.readAndSetObject(this._exposedObject.value);
 		}
 		super.onValueObjectChange(evt);
 	}

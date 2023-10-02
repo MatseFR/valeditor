@@ -80,7 +80,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	private function onTemplateObjectPropertyChange(evt:ObjectEvent):Void
 	{
-		var templateValue:ExposedValue = evt.object.collection.getValue(evt.propertyName);
+		var templateValue:ExposedValue = evt.object.currentCollection.getValue(evt.propertyName);
 		
 		// check for corresponding constructor value
 		if (this.constructorCollection != null)
@@ -94,18 +94,15 @@ class ValEditorTemplate extends ValEditTemplate
 		
 		for (instance in this._instances)
 		{
-			templateValue.applyToObject(instance.object);
-			cast(instance, ValEditorObject).registerForChangeUpdate();
+			cast(instance, ValEditorObject).templatePropertyChange(templateValue);
 		}
 	}
 	
 	private function onTemplateObjectFunctionCalled(evt:ObjectEvent):Void
 	{
-		var func:ExposedFunction;
 		for (instance in this._instances)
 		{
-			func = cast instance.collection.getValue(evt.propertyName);
-			func.executeWithParameters(evt.parameters);
+			cast(instance, ValEditorObject).templateFunctionCall(evt.propertyName, evt.parameters);
 		}
 	}
 	

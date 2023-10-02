@@ -3,6 +3,8 @@ package valeditor;
 import haxe.Constraints.Function;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
+import valedit.ValEditKeyFrame;
+import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
 import valedit.IValEditContainer;
 import valedit.ValEditClass;
@@ -44,14 +46,6 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var pivotIndicator(get, set):PivotIndicator;
 	public var selectionBox(get, set):SelectionBox;
 	
-	override function set_collection(value:ExposedCollection):ExposedCollection 
-	{
-		if (value == this._collection) return value;
-		if (this._collection != null) this._collection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
-		if (value != null) value.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
-		return super.set_collection(value);
-	}
-	
 	private var _container:IValEditContainer;
 	private function get_container():IValEditContainer { return this._container; }
 	private function set_container(value:IValEditContainer):IValEditContainer
@@ -59,6 +53,21 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (value == this._container) return value;
 		
 		return this._container = value;
+	}
+	
+	override function set_defaultCollection(value:ExposedCollection):ExposedCollection 
+	{
+		if (this._defaultCollection == value) return value;
+		
+		if (this._defaultCollection != null)
+		{
+			this._defaultCollection.valEditorObject = null;
+		}
+		if (value != null)
+		{
+			value.valEditorObject = this;
+		}
+		return super.set_defaultCollection(value);
 	}
 	
 	private var _getBoundsFunctionName:String = "getBounds";
@@ -194,6 +203,65 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this._boundsFunction = Reflect.field(this.object, this.getBoundsFunctionName);
 	}
 	
+	override public function addKeyFrame(keyFrame:ValEditKeyFrame, collection:ExposedCollection = null):Void 
+	{
+		super.addKeyFrame(keyFrame, collection);
+		this._keyFrameToCollection.get(keyFrame).valEditorObject = this;
+	}
+	
+	override public function removeKeyFrame(keyFrame:ValEditKeyFrame, poolCollection:Bool = true):Void 
+	{
+		if (!poolCollection)
+		{
+			this._keyFrameToCollection.get(keyFrame).valEditorObject = null;
+		}
+		super.removeKeyFrame(keyFrame, poolCollection);
+	}
+	
+	override public function setKeyFrame(keyFrame:ValEditKeyFrame):Void 
+	{
+		if (this.currentKeyFrame == keyFrame) return;
+		if (this.currentCollection != null)
+		{
+			this.currentCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
+		}
+		super.setKeyFrame(keyFrame);
+		if (this.currentCollection != null)
+		{
+			this.currentCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
+		}
+		if (this._interactiveObject != null)
+		{
+			this._interactiveObject.objectUpdate(this);
+		}
+		if (this._selectionBox != null)
+		{
+			this._selectionBox.objectUpdate(this);
+		}
+	}
+	
+	public function templateFunctionCall(propertyName:String, parameters:Array<Dynamic>):Void
+	{
+		var func:ExposedFunction = cast this._defaultCollection.getValue(propertyName);
+		func.executeWithParameters(parameters);
+		
+		for (collection in this._keyFrameToCollection)
+		{
+			func = cast collection.getValue(propertyName);
+			func.executeWithParameters(parameters);
+		}
+	}
+	
+	public function templatePropertyChange(templateValue:ExposedValue):Void
+	{
+		this._defaultCollection.getValue(templateValue.propertyName).value = templateValue.value;
+		
+		for (collection in this._keyFrameToCollection)
+		{
+			collection.getValue(templateValue.propertyName).value = templateValue.value;
+		}
+	}
+	
 	public function valueChange(propertyName:String):Void
 	{
 		// this value changed on object, reflect changes on interactiveObject & realObject if needed
@@ -221,11 +289,11 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
 		Reflect.setProperty(this.object, this._realPropertyName, Reflect.getProperty(this.object, this._realPropertyName) + value);
 		
-		if (dispatchValueChange && this._collection != null)
+		if (dispatchValueChange && this.currentCollection != null)
 		{
-			var value:ExposedValue = this._collection.getValue(this._realPropertyName);
+			var value:ExposedValue = this.currentCollection.getValue(this._realPropertyName);
 			value.valueChanged();
-			this._collection.readValues();
+			this.currentCollection.readValues();
 		}
 		
 		if (!objectOnly)
@@ -233,7 +301,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			registerForChangeUpdate();
 		}
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, regularPropertyName);
 	}
 	
 	public function setProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
@@ -242,11 +310,11 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (this._realPropertyName == null) this._realPropertyName = regularPropertyName;
 		Reflect.setProperty(this.object, this._realPropertyName, value);
 		
-		if (dispatchValueChange && this._collection != null)
+		if (dispatchValueChange && this.currentCollection != null)
 		{
-			var value:ExposedValue = this._collection.getValue(this._realPropertyName);
+			var value:ExposedValue = this.currentCollection.getValue(this._realPropertyName);
 			value.valueChanged();
-			this._collection.readValues();
+			this.currentCollection.readValues();
 		}
 		
 		if (!objectOnly)
@@ -254,7 +322,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			registerForChangeUpdate();
 		}
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
+		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, regularPropertyName);
 	}
 	
 	public function registerForChangeUpdate():Void
