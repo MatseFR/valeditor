@@ -211,7 +211,7 @@ class ObjectSelectWindow extends Panel
 		this._objectCollection.removeAll();
 		if (this._classPicker.selectedItem != null)
 		{
-			this._objectCollection.addAll(ValEditor.getObjectCollectionForClassName(this._classPicker.selectedItem.value));
+			this._objectCollection.addAll(ValEditor.getObjectUICollectionForClassName(this._classPicker.selectedItem.value));
 		}
 	}
 	

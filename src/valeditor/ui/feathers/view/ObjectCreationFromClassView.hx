@@ -255,7 +255,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		}
 		else
 		{
-			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem.value));
+			this._classCollection.addAll(ValEditor.getClassUICollectionForCategory(this._categoryPicker.selectedItem.value));
 		}
 		
 		if (selectedItem != null)

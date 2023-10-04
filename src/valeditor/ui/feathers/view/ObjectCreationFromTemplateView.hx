@@ -252,7 +252,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		}
 		else
 		{
-			this._classCollection.addAll(ValEditor.getClassCollectionForCategory(this._categoryPicker.selectedItem.value));
+			this._classCollection.addAll(ValEditor.getClassUICollectionForCategory(this._categoryPicker.selectedItem.value));
 		}
 		
 		if (selectedItem != null)
@@ -273,18 +273,18 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 			}
 			else
 			{
-				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForClassName(this._classPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateUICollectionForClassName(this._classPicker.selectedItem);
 			}
 		}
 		else
 		{
 			if (this._classPicker.selectedItem == null)
 			{
-				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForCategory(this._categoryPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateUICollectionForCategory(this._categoryPicker.selectedItem);
 			}
 			else
 			{
-				this._templateGrid.dataProvider = ValEditor.getTemplateCollectionForClassName(this._classPicker.selectedItem);
+				this._templateGrid.dataProvider = ValEditor.getTemplateUICollectionForClassName(this._classPicker.selectedItem);
 			}
 		}
 		
