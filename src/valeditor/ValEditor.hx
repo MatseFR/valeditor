@@ -459,7 +459,7 @@ class ValEditor
 	   @param	object	instance of a registered Class
 	   @param	uiContainer	if left null uiContainerDefault is used
 	**/
-	static public function edit(object:Dynamic, ?container:DisplayObjectContainer, ?parentValue:ExposedValueWithChildren):ExposedCollection
+	static public function edit(object:Dynamic, collection:ExposedCollection = null, container:DisplayObjectContainer = null, parentValue:ExposedValueWithChildren = null):ExposedCollection
 	{
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
@@ -473,7 +473,7 @@ class ValEditor
 		
 		var clss:Class<Dynamic> = Type.getClass(object);
 		var className:String = Type.getClassName(clss);
-		var collection:ExposedCollection = null;
+		//var collection:ExposedCollection = null;
 		var valClass:ValEditClass = _classMap[className];
 		
 		if (Std.isOfType(object, ValEditObject))
@@ -844,7 +844,7 @@ class ValEditor
 		return _categoryToStringData.get(category);
 	}
 	
-	static public function getClassCollectionForCategory(category:String):ArrayCollection<StringData>
+	static public function getClassUICollectionForCategory(category:String):ArrayCollection<StringData>
 	{
 		return _categoryToClassCollection.get(category);
 	}
@@ -852,6 +852,16 @@ class ValEditor
 	static public function getClassStringData(className:String):StringData
 	{
 		return _classNameToStringData.get(className);
+	}
+	
+	static public function getCollectionForObject(object:Dynamic):ExposedCollection
+	{
+		var valClass:ValEditorClass = getValEditClassByClass(ValEdit.getObjectClass(object));
+		if (valClass != null)
+		{
+			return valClass.getCollection();
+		}
+		return null;
 	}
 	
 	static public function getValEditClassByClass(clss:Class<Dynamic>):ValEditorClass
@@ -864,22 +874,22 @@ class ValEditor
 		return _classMap.get(className);
 	}
 	
-	static public function getObjectCollectionForClass(clss:Class<Dynamic>):ArrayCollection<ValEditorObject>
+	static public function getObjectUICollectionForClass(clss:Class<Dynamic>):ArrayCollection<ValEditorObject>
 	{
 		return _classToObjectCollection.get(Type.getClassName(clss));
 	}
 	
-	static public function getObjectCollectionForClassName(className:String):ArrayCollection<ValEditorObject>
+	static public function getObjectUICollectionForClassName(className:String):ArrayCollection<ValEditorObject>
 	{
 		return _classToObjectCollection.get(className);
 	}
 	
-	static public function getTemplateCollectionForClassName(className:String):ArrayCollection<ValEditorTemplate>
+	static public function getTemplateUICollectionForClassName(className:String):ArrayCollection<ValEditorTemplate>
 	{
 		return _classToTemplateCollection.get(className);
 	}
 	
-	static public function getTemplateCollectionForCategory(category:String):ArrayCollection<ValEditorTemplate>
+	static public function getTemplateUICollectionForCategory(category:String):ArrayCollection<ValEditorTemplate>
 	{
 		return _categoryToTemplateCollection.get(category);
 	}
