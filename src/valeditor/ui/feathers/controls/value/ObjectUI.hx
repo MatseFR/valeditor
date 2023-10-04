@@ -7,7 +7,6 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
-import valedit.ExposedCollection;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObject;
@@ -42,34 +41,20 @@ class ObjectUI extends ValueUI
 		if (value == null)
 		{
 			this._exposedObject = null;
-			if (this._objectCollection != null)
-			{
-				ValEditor.edit(null, this._valueGroup);
-				this._objectCollection = null;
-			}
+			ValEditor.edit(null, this._valueGroup);
 		}
 		else
 		{
 			this._exposedObject = cast value;
-			if (this._objectCollection == null)
+			if (this._exposedObject.objectCollection.uiContainer == null)
 			{
-				this._objectCollection = ValEditor.edit(value.value, this._valueGroup, cast value);
-			}
-			else
-			{
-				this._objectCollection.readAndSetObject(value.value);
-			}
-			if (this._objectCollection != null)
-			{
-				this._objectCollection.isEditable = value.isEditable;
-				this._objectCollection.isReadOnly = value.isReadOnly;
+				ValEditor.edit(value.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
 			}
 		}
 		return super.set_exposedValue(value);
 	}
 	
 	private var _exposedObject:ExposedObject;
-	private var _objectCollection:ExposedCollection;
 	
 	private var _topButton:ToggleCustom;
 	private var _arrowDown:LayoutGroup;
@@ -91,11 +76,18 @@ class ObjectUI extends ValueUI
 	override public function clear():Void 
 	{
 		super.clear();
-		this._exposedObject = null;
-		if (this._objectCollection != null)
+		if (this._exposedObject != null)
 		{
-			ValEditor.edit(null, this._valueGroup);
-			this._objectCollection = null;
+			if (this._exposedObject.objectCollection.uiContainer != null)
+			{
+				ValEditor.edit(null, this._valueGroup);
+			}
+			this._exposedObject = null;
+		}
+		this._topButton.selected = false;
+		if (this._bottomGroup.parent != null)
+		{
+			removeChild(this._bottomGroup);
 		}
 	}
 	
@@ -166,15 +158,26 @@ class ObjectUI extends ValueUI
 		super.initExposedValue();
 		
 		this._topButton.text = this._exposedValue.name;
-		if (this._objectCollection == null)
+		
+		if (this._exposedObject.isUIOpen)
+		{
+			if (this._bottomGroup.parent == null)
+			{
+				addChild(this._bottomGroup);
+			}
+		}
+		else
+		{
+			if (this._bottomGroup.parent != null)
+			{
+				removeChild(this._bottomGroup);
+			}
+		}
+		
+		if (this._exposedObject.objectCollection.uiContainer == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			this._objectCollection = ValEditor.edit(this._exposedValue.value, this._valueGroup, cast this._exposedValue);
-		}
-		if (this._objectCollection != null)
-		{
-			this._objectCollection.isEditable = this._exposedValue.isEditable;
-			this._objectCollection.isReadOnly = this._readOnly;
+			ValEditor.edit(this._exposedValue.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
 		}
 		
 		updateEditable();
@@ -203,8 +206,6 @@ class ObjectUI extends ValueUI
 		this._topButton.enabled = this._exposedValue.isEditable;
 		this._trailGroup.enabled = this._exposedValue.isEditable;
 		this._valueGroup.enabled = this._exposedValue.isEditable;
-		
-		if (this._objectCollection != null) this._objectCollection.isEditable = this._exposedValue.isEditable;
 	}
 	
 	override function onValueEditableChange(evt:ValueEvent):Void 
@@ -215,13 +216,13 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		if (this._objectCollection == null)
+		if (this._exposedObject.objectCollection.uiContainer == null)
 		{
-			this._objectCollection = ValEditor.edit(this._exposedObject.value, this._valueGroup, this._exposedObject);
+			ValEditor.edit(this._exposedObject.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
 		}
 		else
 		{
-			this._objectCollection.readAndSetObject(this._exposedObject.value);
+			this._exposedObject.objectCollection.readAndSetObject(this._exposedObject.value);
 		}
 		super.onValueObjectChange(evt);
 	}
@@ -247,10 +248,12 @@ class ObjectUI extends ValueUI
 		if (this._topButton.selected)
 		{
 			addChild(this._bottomGroup);
+			this._exposedObject.isUIOpen = true;
 		}
 		else
 		{
 			removeChild(this._bottomGroup);
+			this._exposedObject.isUIOpen = false;
 		}
 	}
 	
