@@ -39,6 +39,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var hasVisibleProperty:Bool;
 	public var hasRadianRotation:Bool;
 	public var interactiveObject(get, set):IInteractiveObject;
+	public var isInClipboard:Bool;
 	public var isMouseDown:Bool;
 	public var isSelectable(get, set):Bool;
 	public var mouseRestoreX:Float;
@@ -187,6 +188,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.hasTransformationMatrixProperty = false;
 		this.hasVisibleProperty = false;
 		this.hasRadianRotation = false;
+		this.isInClipboard = false;
 		this.isMouseDown = false;
 		this.isSelectable = true;
 	}
@@ -195,6 +197,11 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function canBeDestroyed():Bool 
+	{
+		return this.numKeyFrames == 0 && !this.isInClipboard;
 	}
 	
 	override public function ready():Void 
