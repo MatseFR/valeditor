@@ -19,7 +19,7 @@ class TemplateEvent extends Event
 	
 	static private function fromPool(type:String, template:ValEditTemplate, bubbles:Bool, cancelable:Bool):TemplateEvent
 	{
-		if (_POOL.length != null) return _POOL.pop().setTo(type, template, bubbles, cancelable);
+		if (_POOL.length != 0) return _POOL.pop().setTo(type, template, bubbles, cancelable);
 		return new TemplateEvent(type, template, bubbles, cancelable);
 	}
 	#end
