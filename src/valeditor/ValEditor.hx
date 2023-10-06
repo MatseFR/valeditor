@@ -40,7 +40,7 @@ import valeditor.utils.ArraySort;
 @:access(valedit.ValEdit)
 class ValEditor
 {
-	static public var clipboard:ValEditorClipboard;
+	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var currentContainer(get, set):ValEditorContainer;
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var file(default, null):ValEditorFile = new ValEditorFile();

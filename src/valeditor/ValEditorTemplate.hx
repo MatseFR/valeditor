@@ -24,6 +24,8 @@ class ValEditorTemplate extends ValEditTemplate
 		return new ValEditorTemplate(clss, id, collection, constructorCollection);
 	}
 	
+	public var isInClipboard:Bool = false;
+	
 	override function set_id(value:String):String 
 	{
 		super.set_id(value);
@@ -57,6 +59,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	override public function clear():Void 
 	{
+		this.isInClipboard = false;
 		super.clear();
 	}
 	
@@ -64,6 +67,11 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function canBeDestroyed():Bool 
+	{
+		return super.canBeDestroyed() && !this.isInClipboard;
 	}
 	
 	override public function addInstance(instance:ValEditObject):Void 

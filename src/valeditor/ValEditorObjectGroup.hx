@@ -45,8 +45,20 @@ class ValEditorObjectGroup
 		var objectsToDelete:Array<ValEditorObject> = this._objects.copy();
 		for (object in objectsToDelete)
 		{
-			ValEditor.destroyObject(object);
+			if (object.currentKeyFrame != null)
+			{
+				object.currentKeyFrame.remove(object);
+			}
+			if (object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(object);
+			}
+			else
+			{
+				ValEditor.selection.removeObject(object);
+			}
 		}
+		this._objects.resize(0);
 		clear();
 	}
 	

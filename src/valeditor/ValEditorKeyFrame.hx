@@ -22,6 +22,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		return new ValEditorKeyFrame();
 	}
 	
+	public var isInClipboard:Bool = false;
 	public var isPlaying(get, set):Bool;
 	public var objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection();
 	
@@ -72,6 +73,8 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	
 	override public function clear():Void 
 	{
+		this.isInClipboard = false;
+		this._isPlaying = false;
 		for (object in this.objects)
 		{
 			unregisterObject(object);
@@ -85,6 +88,11 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override public function canBeDestroyed():Bool 
+	{
+		return super.canBeDestroyed() && !this.isInClipboard;
 	}
 	
 	public function clone(?keyFrame:ValEditorKeyFrame):ValEditorKeyFrame

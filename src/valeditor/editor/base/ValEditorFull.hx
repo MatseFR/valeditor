@@ -92,13 +92,16 @@ class ValEditorFull extends ValEditorBaseFeathers
 		switch (action.actionID)
 		{
 			case InputActionID.COPY :
-				
+				ValEditor.clipboard.clear();
+				ValEditor.selection.copyToClipboard(ValEditor.clipboard);
 			
 			case InputActionID.CUT :
-				
+				ValEditor.clipboard.clear();
+				ValEditor.selection.cutToClipboard(ValEditor.clipboard);
+				ValEditor.selection.clear();
 			
 			case InputActionID.PASTE :
-				
+				ValEditor.clipboard.paste();
 			
 			case InputActionID.DELETE :
 				ValEditor.selection.delete();

@@ -2,6 +2,7 @@ package valeditor.editor;
 import openfl.events.EventDispatcher;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorFrameGroup;
+import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.events.SelectionEvent;
 
 /**
@@ -10,7 +11,16 @@ import valeditor.events.SelectionEvent;
  */
 class Selection extends EventDispatcher
 {
+	public var numObjects(get, never):Int;
 	public var object(get, set):Dynamic;
+	
+	private function get_numObjects():Int
+	{
+		if (this._frameGroup.numFrames != 0) return this._frameGroup.numFrames;
+		if (this._templateGroup.numTemplates != 0) return this._templateGroup.numTemplates;
+		return this._objectGroup.numObjects;
+	}
+	
 	private function get_object():Dynamic 
 	{
 		if (this._frameGroup.numFrames == 0 && this._objectGroup.numObjects == 0 && this._templateGroup.numTemplates == 0) return null;
@@ -49,14 +59,6 @@ class Selection extends EventDispatcher
 		return value;
 	}
 	
-	public var numObjects(get, never):Int;
-	private function get_numObjects():Int
-	{
-		if (this._frameGroup.numFrames != 0) return this._frameGroup.numFrames;
-		if (this._templateGroup.numTemplates != 0) return this._templateGroup.numTemplates;
-		return this._objectGroup.numObjects;
-	}
-	
 	private var _frameGroup:ValEditorFrameGroup = new ValEditorFrameGroup();
 	private var _objectGroup:ValEditorObjectGroup = new ValEditorObjectGroup();
 	private var _templateGroup:ValEditorTemplateGroup = new ValEditorTemplateGroup();
@@ -66,7 +68,15 @@ class Selection extends EventDispatcher
 		super();
 	}
 	
-	public function addFrame(frame:ValEditKeyFrame):Void
+	public function clear():Void
+	{
+		this._frameGroup.clear();
+		this._objectGroup.clear();
+		this._templateGroup.clear();
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, null);
+	}
+	
+	public function addFrame(frame:ValEditorKeyFrame):Void
 	{
 		if (frame == null) return;
 		this._objectGroup.clear();
@@ -75,7 +85,7 @@ class Selection extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function addFrames(frames:Array<ValEditKeyFrame>):Void
+	public function addFrames(frames:Array<ValEditorKeyFrame>):Void
 	{
 		if (frames == null || frames.length == 0) return;
 		this._objectGroup.clear();
@@ -150,7 +160,40 @@ class Selection extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function hasFrame(frame:ValEditKeyFrame):Bool
+	public function copyToClipboard(clipboard:ValEditorClipboard):Void
+	{
+		for (frame in this._frameGroup)
+		{
+			clipboard.addFrame(frame);
+		}
+		for (object in this._objectGroup)
+		{
+			clipboard.addObject(object);
+		}
+		for (template in this._templateGroup)
+		{
+			clipboard.addTemplate(template);
+		}
+	}
+	
+	public function cutToClipboard(clipboard:ValEditorClipboard):Void
+	{
+		for (frame in this._frameGroup)
+		{
+			clipboard.addFrame(frame);
+		}
+		for (object in this._objectGroup)
+		{
+			clipboard.addObject(object);
+			object.currentKeyFrame.remove(object);
+		}
+		for (template in this._templateGroup)
+		{
+			clipboard.addTemplate(template);
+		}
+	}
+	
+	public function hasFrame(frame:ValEditorKeyFrame):Bool
 	{
 		return this._frameGroup.hasFrame(frame);
 	}
@@ -165,7 +208,7 @@ class Selection extends EventDispatcher
 		return this._templateGroup.hasTemplate(template);
 	}
 	
-	public function removeFrame(frame:ValEditKeyFrame):Void
+	public function removeFrame(frame:ValEditorKeyFrame):Void
 	{
 		var removed:Bool = this._frameGroup.removeFrame(frame);
 		if (removed)
@@ -174,7 +217,7 @@ class Selection extends EventDispatcher
 		}
 	}
 	
-	public function removeFrames(frames:Array<ValEditKeyFrame>):Void
+	public function removeFrames(frames:Array<ValEditorKeyFrame>):Void
 	{
 		var frameRemoved:Bool = false;
 		var removed:Bool;
