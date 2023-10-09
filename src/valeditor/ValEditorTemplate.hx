@@ -4,7 +4,6 @@ import valedit.ExposedCollection;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
-import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
 import valeditor.events.ObjectEvent;
 import valeditor.events.TemplateEvent;
@@ -25,6 +24,7 @@ class ValEditorTemplate extends ValEditTemplate
 	}
 	
 	public var isInClipboard:Bool = false;
+	public var isInLibrary:Bool = false;
 	
 	override function set_id(value:String):String 
 	{
@@ -60,6 +60,7 @@ class ValEditorTemplate extends ValEditTemplate
 	override public function clear():Void 
 	{
 		this.isInClipboard = false;
+		this.isInLibrary = false;
 		super.clear();
 	}
 	
@@ -71,7 +72,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	override public function canBeDestroyed():Bool 
 	{
-		return super.canBeDestroyed() && !this.isInClipboard;
+		return super.canBeDestroyed() && !this.isInLibrary && !this.isInClipboard;
 	}
 	
 	override public function addInstance(instance:ValEditObject):Void 
