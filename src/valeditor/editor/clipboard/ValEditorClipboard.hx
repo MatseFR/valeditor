@@ -73,18 +73,16 @@ class ValEditorClipboard
 		return value;
 	}
 	
-	private var _frameGroup:ValEditorFrameGroup = new ValEditorFrameGroup();
+	private var _frameGroup:ValEditorFrameCopyGroup = new ValEditorFrameCopyGroup();
 	private var _objectGroup:ValEditorObjectCopyGroup = new ValEditorObjectCopyGroup();
-	private var _templateGroup:ValEditorTemplateGroup = new ValEditorTemplateGroup();
+	private var _templateGroup:ValEditorTemplateCopyGroup = new ValEditorTemplateCopyGroup();
 	
 	private var _pasteCount:Int;
 	private var _pasteIndex:Int;
 
 	public function new() 
 	{
-		this._frameGroup.isInClipboard = true;
-		//this._objectGroup.isInClipboard = true;
-		this._templateGroup.isInClipboard = true;
+		
 	}
 	
 	public function clear():Void
