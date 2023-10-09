@@ -734,6 +734,8 @@ class ValEditor
 			collection = _categoryToTemplateCollection.get(category);
 			collection.add(template);
 		}
+		
+		template.isInLibrary = true;
 	}
 	
 	static public function destroyObject(valObject:ValEditorObject):Void
@@ -825,6 +827,8 @@ class ValEditor
 			collection = _categoryToTemplateCollection.get(category);
 			collection.remove(template);
 		}
+		
+		template.isInLibrary = false;
 	}
 	
 	static public function checkForClassProperty(clss:ValEditorClass, propertyName:String):Bool
