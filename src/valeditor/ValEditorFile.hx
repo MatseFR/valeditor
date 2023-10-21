@@ -20,6 +20,7 @@ class ValEditorFile
 	public var exportSettings(default, null):ExportSettings = new ExportSettings();
 	public var fileName:String;
 	public var filePath:String;
+	public var frameRateDefault:Float = 60;
 	public var fullPath(get, set):String;
 	public var numFramesAutoIncrease:Bool = true;
 	public var numFramesDefault:Int = 120;
@@ -50,7 +51,11 @@ class ValEditorFile
 	public function clear():Void
 	{
 		this.exportSettings.clear();
+		this.frameRateDefault = 60;
+		this.numFramesAutoIncrease = true;
+		this.numFramesDefault = 120;
 		this.fullPath = null;
+		this.tweenTransitionDefault = Transitions.LINEAR;
 	}
 	
 	public function pool():Void
