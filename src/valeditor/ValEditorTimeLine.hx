@@ -183,6 +183,16 @@ class ValEditorTimeLine extends ValEditTimeLine
 		}
 	}
 	
+	override public function addKeyFrame(keyFrame:ValEditKeyFrame):Void 
+	{
+		super.addKeyFrame(keyFrame);
+		for (i in keyFrame.indexStart...keyFrame.indexEnd + 1)
+		{
+			this._frames[i] = keyFrame;
+			this._frameDatas[i].frame = cast keyFrame;
+		}
+	}
+	
 	public function insertFrame():Void 
 	{
 		if (this._frameCurrent != null)
@@ -492,6 +502,47 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		this.numFrames = numFrames;
 		return this;
+	}
+	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.frameRate = json.frameRate;
+		this.loop = json.loop;
+		this.numFrames = json.numFrames;
+		this.numLoops = json.numLoops;
+		this.reverse = json.reverse;
+		
+		var keyFrame:ValEditorKeyFrame;
+		var frameList:Array<Dynamic> = json.keyFrames;
+		for (node in frameList)
+		{
+			keyFrame = ValEditorKeyFrame.fromPool();
+			keyFrame.fromJSONSave(node);
+			addKeyFrame(keyFrame);
+		}
+		
+		updateLastFrameIndex();
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.frameIndex = this._frameIndex;
+		json.frameRate = this._frameRate;
+		json.loop = this._loop;
+		json.numFrames = this._numFrames;
+		json.numLoops = this._numLoops;
+		json.reverse = this._reverse;
+		
+		var frameList:Array<Dynamic> = [];
+		for (keyFrame in this._keyFrames)
+		{
+			frameList.push(cast(keyFrame, ValEditorKeyFrame).toJSONSave());
+		}
+		json.keyFrames = frameList;
+		
+		return json;
 	}
 	
 }

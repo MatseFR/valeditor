@@ -28,6 +28,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	override function set_id(value:String):String 
 	{
+		if (this._id == value) return value;
 		super.set_id(value);
 		TemplateEvent.dispatch(this, TemplateEvent.RENAMED, this);
 		return this._id;
@@ -113,6 +114,39 @@ class ValEditorTemplate extends ValEditTemplate
 		{
 			cast(instance, ValEditorObject).templateFunctionCall(evt.propertyName, evt.parameters);
 		}
+	}
+	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.id = json.id;
+		this.className = json.clss;
+		this.collection.fromJSONSave(json.collection);
+		this.constructorCollection.fromJSONSave(json.constructorCollection);
+		
+		var instance:ValEditorObject;
+		var instances:Array<Dynamic> = json.instances;
+		for (node in instances)
+		{
+			instance = ValEditor.createObjectWithTemplate(this, node.id);
+		}
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		json.id = this.id;
+		json.clss = this.className;
+		json.collection = this.collection.toJSONSave();
+		json.constructorCollection = this.constructorCollection.toJSONSave();
+		
+		var instances:Array<Dynamic> = [];
+		for (instance in this._instances)
+		{
+			instances.push(cast(instance, ValEditorObject).toJSONSave());
+		}
+		json.instances = instances;
+		
+		return json;
 	}
 	
 }

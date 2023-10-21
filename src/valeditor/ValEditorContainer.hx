@@ -112,19 +112,19 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	}
 	
 	private var _viewCenterX:Float = 0;
-	private function get_viewCenterX():Float { return this._viewCenterX; }
+	private function get_viewCenterX():Float { return this._viewCenterX; }//this.cameraX + this._viewWidth / 2; }
 	private function set_viewCenterX(value:Float):Float
 	{
 		this.cameraX = value - this._viewWidth / 2;
-		return this._viewCenterX;
+		return this._viewCenterX = value;
 	}
 	
 	private var _viewCenterY:Float = 0;
-	private function get_viewCenterY():Float { return this._viewCenterY; }
+	private function get_viewCenterY():Float { return this._viewCenterY; }//this.cameraY + this._viewHeight / 2; }
 	private function set_viewCenterY(value:Float):Float
 	{
 		this.cameraY = value - this._viewHeight / 2;
-		return this._viewCenterX;
+		return this._viewCenterY = value;
 	}
 	
 	private var _viewHeight:Float = 0;
@@ -820,6 +820,61 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public function advanceTime(time:Float):Void
 	{
 		this._mouseDownOnObject = false;
+	}
+	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.autoPlay = json.autoPlay;
+		//this.cameraX = json.cameraX;
+		//this.cameraY = json.cameraY;
+		this.visible = json.visible;
+		this.x = json.x;
+		this.y = json.y;
+		this.viewCenterX = json.viewCenterX;
+		this.viewCenterY = json.viewCenterY;
+		//this.viewHeight = json.viewHeight;
+		//this.viewWidth = json.viewWidth;
+		
+		cast(this.timeLine, ValEditorTimeLine).fromJSONSave(json.timeLine);
+		
+		var layer:ValEditorLayer;
+		var layers:Array<Dynamic> = json.layers;
+		for (node in layers)
+		{
+			layer = ValEditorLayer.fromPool();
+			layer.fromJSONSave(node);
+			addLayer(layer);
+		}
+		
+		this.frameIndex = json.frameIndex;
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.autoPlay = this.autoPlay;
+		//json.cameraX = this.cameraX;
+		//json.cameraY = this.cameraY;
+		json.frameIndex = this.frameIndex;
+		json.visible = this.visible;
+		json.x = this.x;
+		json.y = this.y;
+		json.viewCenterX = this.viewCenterX;
+		json.viewCenterY = this.viewCenterY;
+		//json.viewHeight = this.viewHeight;
+		//json.viewWidth = this.viewWidth;
+		
+		json.timeLine = cast(this.timeLine, ValEditorTimeLine).toJSONSave();
+		
+		var layers:Array<Dynamic> = [];
+		for (layer in this._layers)
+		{
+			layers.push(cast(layer, ValEditorLayer).toJSONSave());
+		}
+		json.layers = layers;
+		
+		return json;
 	}
 	
 }

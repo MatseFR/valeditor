@@ -2,6 +2,8 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import openfl.events.Event;
+import valedit.ExposedCollection;
+import valedit.ValEdit;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
 import valeditor.editor.change.IChangeUpdate;
@@ -122,14 +124,18 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		}
 	}
 	
-	override public function add(object:ValEditObject):Void 
+	override public function add(object:ValEditObject, collection:ExposedCollection = null):Void 
 	{
-		super.add(object);
+		super.add(object, collection);
 		rebuildTweens();
-		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
-		if (prevFrame != null)
+		
+		if (this.timeLine != null)
 		{
-			prevFrame.rebuildTweens();
+			var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
+			if (prevFrame != null)
+			{
+				prevFrame.rebuildTweens();
+			}
 		}
 		
 		if (this.isActive)
@@ -149,10 +155,14 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	{
 		super.remove(object);
 		rebuildTweens();
-		var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
-		if (prevFrame != null)
+		
+		if (this.timeLine != null)
 		{
-			prevFrame.rebuildTweens();
+			var prevFrame:ValEditKeyFrame = this.timeLine.getPreviousKeyFrame(this);
+			if (prevFrame != null)
+			{
+				prevFrame.rebuildTweens();
+			}
 		}
 		
 		if (this.isActive)
@@ -260,6 +270,49 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		{
 			ValEditor.registerForChangeUpdate(cast prevFrame);
 		}
+	}
+	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.indexStart = json.indexStart;
+		this.indexEnd = json.indexEnd;
+		
+		var collection:ExposedCollection;
+		var object:ValEditorObject;
+		var template:ValEditorTemplate;
+		var objects:Array<Dynamic> = json.objects;
+		for (node in objects)
+		{
+			template = cast ValEdit.getTemplate(node.templateID);
+			object = cast template.getInstance(node.id);
+			collection = template.clss.getCollection();
+			collection.readAndSetObject(object.object);
+			collection.fromJSONSave(node.collection);
+			add(object, collection);
+		}
+		
+		this.transition = json.transition;
+		this._tween = json.tween;
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.indexStart = this.indexStart;
+		json.indexEnd = this.indexEnd;
+		
+		var objects:Array<Dynamic> = [];
+		for (object in this.objects)
+		{
+			objects.push(cast(object, ValEditorObject).toJSONSaveKeyFrame(this));
+		}
+		json.objects = objects;
+		
+		json.transition = this._transition;
+		json.tween = this._tween;
+		
+		return json;
 	}
 	
 }

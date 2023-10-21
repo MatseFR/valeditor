@@ -16,7 +16,7 @@ class FileSaverDesktop
 	
 	private var _data:Dynamic;
 	
-	private var _completeCallback:Void->Void;
+	private var _completeCallback:String->Void;
 	private var _cancelCallback:Void->Void;
 	
 	public function new() 
@@ -24,7 +24,14 @@ class FileSaverDesktop
 		
 	}
 	
-	public function start(data:Dynamic, completeCallback:Void->Void, cancelCallback:Void->Void, path:String = null, dialogTitle:String = "Save as"):Void
+	public function clear():Void
+	{
+		this._data = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
+	}
+	
+	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, path:String = null, browseForSave:Bool = true, dialogTitle:String = "Save as"):Void
 	{
 		this._data = data;
 		this._completeCallback = completeCallback;
@@ -33,8 +40,19 @@ class FileSaverDesktop
 		this._file.addEventListener(Event.SELECT, onFileSelected);
 		this._file.addEventListener(Event.CANCEL, onFileCancelled);
 		
-		this._file.resolvePath(path);
-		this._file.browseForSave(dialogTitle);
+		if (path != null)
+		{
+			this._file.resolvePath(path);
+		}
+		
+		if (browseForSave)
+		{
+			this._file.browseForSave(dialogTitle);
+		}
+		else
+		{
+			onFileSelected(null);
+		}
 	}
 	
 	private function onFileSelected(evt:Event):Void
@@ -42,21 +60,21 @@ class FileSaverDesktop
 		this._file.removeEventListener(Event.SELECT, onFileSelected);
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
 		
-		_fileStream.open(_file, FileMode.WRITE);
+		this._fileStream.open(this._file, FileMode.WRITE);
 		
-		if (Std.isOfType(_data, String))
+		if (Std.isOfType(this._data, String))
 		{
-			_fileStream.writeUTFBytes(data);
+			this._fileStream.writeUTFBytes(this._data);
 		}
-		else if (Std.isOfType(_data, ByteArray))
+		else if (Std.isOfType(_data, ByteArrayData))
 		{
-			_fileStream.writeBytes(_data);
+			this._fileStream.writeBytes(this._data);
 		}
 		
-		_fileStream.close();
-		_data = null;
+		this._fileStream.close();
+		this._data = null;
 		
-		this._completeCallback();
+		this._completeCallback(this._file.nativePath);
 	}
 	
 	private function onFileCancelled(evt:Event):Void

@@ -9,6 +9,7 @@ import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
+import valeditor.editor.file.FileController;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.input.InputActionID;
 import valeditor.ui.feathers.view.EditorView;
@@ -120,7 +121,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 				trace("new file");
 			
 			case InputActionID.OPEN :
-				trace("open");
+				FileController.open();
 			
 			case InputActionID.EXPORT :
 				trace("export");
@@ -129,10 +130,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 				trace("export as");
 			
 			case InputActionID.SAVE :
-				trace("save");
+				FileController.save();
 			
 			case InputActionID.SAVE_AS :
-				trace("save as");
+				FileController.save(true);
 		}
 		
 	}

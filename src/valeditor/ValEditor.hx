@@ -47,11 +47,14 @@ class ValEditor
 	static public var input(default, null):Input = new Input();
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
+	static public var openedContainers(default, null):Array<ValEditorContainer> = new Array<ValEditorContainer>();
 	static public var rootContainer(get, set):ValEditorContainer;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
 	#end
+	/** can be either the root container or an open container template */
+	static public var sceneContainer(get, set):ValEditorContainer;
 	static public var selection(default, null):Selection = new Selection();
 	static public var uiContainerDefault:DisplayObjectContainer;
 	static public var viewPort(default, null):ViewPort = new ViewPort();
@@ -102,7 +105,7 @@ class ValEditor
 		{
 			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
 			_rootContainer.close();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _rootContainer);
 		}
 		_rootContainer = value;
 		if (_rootContainer != null)
@@ -119,7 +122,7 @@ class ValEditor
 			_rootContainer.viewHeight = viewPort.height;
 			_rootContainer.adjustView();
 			_rootContainer.open();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
+			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _rootContainer);
 		}
 		return _rootContainer;
 	}
@@ -147,6 +150,13 @@ class ValEditor
 		return _rootSceneStarling = value;
 	}
 	#end
+	
+	static private var _sceneContainer:ValEditorContainer;
+	static private function get_sceneContainer():ValEditorContainer { return _sceneContainer; }
+	static private function set_sceneContainer(value:ValEditorContainer):ValEditorContainer
+	{
+		return _sceneContainer = value;
+	}
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
@@ -196,7 +206,14 @@ class ValEditor
 	static public function reset():Void
 	{
 		file.clear();
-		_rootContainer.clear();
+		currentContainer = null;
+		_rootContainer.pool();
+		rootContainer = null;
+		
+		for (clss in _classMap)
+		{
+			clss.reset();
+		}
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -1060,6 +1077,48 @@ class ValEditor
 	static public function registerForChangeUpdate(object:IChangeUpdate):Void
 	{
 		_changeUpdateQueue.add(object);
+	}
+	
+	static public function fromJSONSave(json:Dynamic):Void
+	{
+		reset();
+		
+		var container:ValEditorContainer = ValEditorContainer.fromPool();
+		
+		var clss:ValEditorClass;
+		var classList:Array<Dynamic> = json.classes;
+		for (node in classList)
+		{
+			clss = _classMap.get(node.clss);
+			if (clss == null)
+			{
+				throw new Error("missing Class ::: " + node.clss);
+			}
+			clss.fromJSONSave(node);
+		}
+		
+		container.fromJSONSave(json.root);
+		
+		rootContainer = container;
+	}
+	
+	static public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		var classList:Array<Dynamic> = [];
+		for (clss in _classMap)
+		{
+			if (clss.numTemplates != 0)
+			{
+				classList.push(clss.toJSONSave());
+			}
+		}
+		json.classes = classList;
+		
+		json.root = _rootContainer.toJSONSave();
+		
+		return json;
 	}
 	
 }

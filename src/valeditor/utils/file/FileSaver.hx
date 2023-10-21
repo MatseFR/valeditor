@@ -10,7 +10,7 @@ class FileSaver
 {
 	private var _fileReference:FileReference = new FileReference();
 	
-	private var _completeCallback:Void->Void;
+	private var _completeCallback:String->Void;
 	private var _cancelCallback:Void->Void;
 	
 	public function new() 
@@ -18,7 +18,13 @@ class FileSaver
 		
 	}
 	
-	public function start(data:Dynamic, completeCallback:Void->Void, cancelCallback:Void->Void, defaultFileName:String = null):Void
+	public function clear():Void
+	{
+		this._completeCallback = null;
+		this._cancelCallback = null;
+	}
+	
+	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, defaultFileName:String = null):Void
 	{
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
@@ -49,7 +55,7 @@ class FileSaver
 	{
 		this._fileReference.removeEventListener(Event.COMPLETE, onFileCompleted);
 		
-		this._completeCallback();
+		this._completeCallback(this._fileReference.name);
 	}
 	
 }

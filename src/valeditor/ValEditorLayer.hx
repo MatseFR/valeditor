@@ -130,4 +130,28 @@ class ValEditorLayer extends ValEditLayer
 		this.objectCollection.remove(editorObject);
 	}
 	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.name = json.name;
+		this.visible = json.visible;
+		this.x = json.x;
+		this.y = json.y;
+		
+		cast(this.timeLine, ValEditorTimeLine).fromJSONSave(json.timeLine);
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.name = this.name;
+		json.visible = this.visible;
+		json.x = this.x;
+		json.y = this.y;
+		
+		json.timeLine = cast(this.timeLine, ValEditorTimeLine).toJSONSave();
+		
+		return json;
+	}
+	
 }

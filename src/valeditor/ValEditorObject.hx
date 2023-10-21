@@ -368,4 +368,57 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		return Reflect.callMethod(this.object, this._boundsFunction, [targetSpace]);
 	}
 	
+	public function fromJSONSave(json:Dynamic):Void
+	{
+		this.id = json.id;
+		if (json.defaultCollection != null)
+		{
+			if (this.defaultCollection == null)
+			{
+				this.defaultCollection = ExposedCollection.fromPool();
+			}
+			this.defaultCollection.fromJSONSave(json.defaultCollection);
+		}
+	}
+	
+	public function toJSONSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.id = this.id;
+		if (this._defaultCollection != null && this.numKeyFrames == 0)
+		{
+			if (this.template != null)
+			{
+				json.defaultCollection = this._defaultCollection.toJSONSave(null, false, this.template.collection);
+			}
+			else
+			{
+				json.defaultCollection = this._defaultCollection.toJSONSave();
+			}
+		}
+		
+		return json;
+	}
+	
+	public function toJSONSaveKeyFrame(keyFrame:ValEditorKeyFrame, json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.id = this.id;
+		json.templateID = this.template.id;
+		var collection:ExposedCollection = this._keyFrameToCollection.get(keyFrame);
+		
+		if (this.template != null)
+		{
+			json.collection = collection.toJSONSave(null, false, this.template.collection);
+		}
+		else
+		{
+			json.collection = collection.toJSONSave();
+		}
+		
+		return json;
+	}
+	
 }

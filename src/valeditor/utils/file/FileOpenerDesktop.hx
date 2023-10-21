@@ -19,6 +19,12 @@ class FileOpenerDesktop
 		
 	}
 	
+	public function clear():Void
+	{
+		this._completeCallback = null;
+		this._cancelCallback = null;
+	}
+	
 	public function start(completeCallback:File->Void, cancelCallback:Void->Void, filterList:Array<FileFilter> = null, path:String = null, dialogTitle:String = "Select file"):Void
 	{
 		this._completeCallback = completeCallback;
@@ -27,7 +33,10 @@ class FileOpenerDesktop
 		this._file.addEventListener(Event.SELECT, onFileSelected);
 		this._file.addEventListener(Event.CANCEL, onFileCancelled);
 		
-		this._file.resolvePath(path);
+		if (path != null)
+		{
+			this._file.resolvePath(path);
+		}
 		this._file.browseForOpen(dialogTitle, filterList);
 	}
 	
