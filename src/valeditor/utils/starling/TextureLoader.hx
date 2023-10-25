@@ -9,7 +9,7 @@ import valedit.asset.BitmapAsset;
  */
 class TextureLoader 
 {
-	private var _textureCallback:Texture->BitmapAsset->Void;
+	private var _textureCallback:Texture->TextureCreationParameters->BitmapAsset->Void;
 	private var _completeCallback:Void->Void;
 	private var _cancelCallback:Void->Void;
 	
@@ -22,44 +22,44 @@ class TextureLoader
 		
 	}
 	
-	public function start(textureCallback:Texture->BitmapAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
+	public function start(textureCallback:Texture->TextureCreationParameters->BitmapAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
 	{
-		_textureCallback = textureCallback;
-		_completeCallback = completeCallback;
-		_cancelCallback = cancelCallback;
+		this._textureCallback = textureCallback;
+		this._completeCallback = completeCallback;
+		this._cancelCallback = cancelCallback;
 		
 		FeathersWindows.showBitmapAssets(bitmapAssetSelected, cancel, "Select Bitmap source for Texture");
 	}
 	
 	private function bitmapAssetSelected(asset:BitmapAsset):Void
 	{
-		_bitmapAsset = asset;
-		_textureParams.reset();
+		this._bitmapAsset = asset;
+		this._textureParams.reset();
 		
 		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, cancel, "Texture options");
 	}
 	
 	private function textureParamsConfirm():Void
 	{
-		var texture:Texture = Texture.fromBitmapData(_bitmapAsset.content, _textureParams.generateMipMaps, _textureParams.optimizeForRenderToTexture, _textureParams.scale, _textureParams.format, _textureParams.forcePotTexture);
-		_textureCallback(texture, _bitmapAsset);
+		var texture:Texture = Texture.fromBitmapData(this._bitmapAsset.content, this._textureParams.generateMipMaps, this._textureParams.optimizeForRenderToTexture, this._textureParams.scale, this._textureParams.format, this._textureParams.forcePotTexture);
+		this._textureCallback(texture, this._textureParams.clone(), this._bitmapAsset);
 		
-		var completeCallback:Void->Void = _completeCallback;
-		_bitmapAsset = null;
-		_textureCallback = null;
-		_completeCallback = null;
-		_cancelCallback = null;
+		var completeCallback:Void->Void = this._completeCallback;
+		this._bitmapAsset = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
 		
 		completeCallback();
 	}
 	
 	private function cancel():Void
 	{
-		var cancelCallback:Void->Void = _cancelCallback;
-		_bitmapAsset = null;
-		_textureCallback = null;
-		_completeCallback = null;
-		_cancelCallback = null;
+		var cancelCallback:Void->Void = this._cancelCallback;
+		this._bitmapAsset = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
 		
 		cancelCallback();
 	}
