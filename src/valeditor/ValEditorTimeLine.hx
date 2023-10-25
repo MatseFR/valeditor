@@ -131,6 +131,10 @@ class ValEditorTimeLine extends ValEditTimeLine
 	override public function clear():Void 
 	{
 		this.frameCollection.removeAll();
+		for (keyFrame in this._keyFrames)
+		{
+			keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
+		}
 		super.clear();
 	}
 	
@@ -176,6 +180,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 	
 	private function onKeyFrameChange(evt:Event):Void
 	{
+		//if (this.frameCollection.length == 0) return;
+		
 		var keyFrame:ValEditorKeyFrame = cast evt.target;
 		for (i in keyFrame.indexStart...keyFrame.indexEnd + 1)
 		{
