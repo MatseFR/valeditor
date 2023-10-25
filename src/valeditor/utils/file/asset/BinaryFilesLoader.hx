@@ -24,31 +24,31 @@ class BinaryFilesLoader
 	
 	public function start(files:Array<FileReference>, binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
 	{
-		_files = files;
-		_binaryCallback = binaryCallback;
-		_completeCallback = completeCallback;
+		this._files = files;
+		this._binaryCallback = binaryCallback;
+		this._completeCallback = completeCallback;
 		
-		_fileIndex = -1;
+		this._fileIndex = -1;
 		nextFile();
 	}
 	
 	private function nextFile():Void
 	{
-		_fileIndex++;
-		if (_fileIndex < _files.length)
+		this._fileIndex++;
+		if (this._fileIndex < this._files.length)
 		{
-			_fileCurrent = _files[_fileIndex];
-			_fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
-			_fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-			_fileCurrent.load();
+			this._fileCurrent = this._files[this._fileIndex];
+			this._fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
+			this._fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+			this._fileCurrent.load();
 		}
 		else
 		{
-			var completeCallback:Void->Void = _completeCallback;
-			_files = null;
-			_fileCurrent = null;
-			_binaryCallback = null;
-			_completeCallback = null;
+			var completeCallback:Void->Void = this._completeCallback;
+			this._files = null;
+			this._fileCurrent = null;
+			this._binaryCallback = null;
+			this._completeCallback = null;
 			
 			completeCallback();
 		}
@@ -56,19 +56,19 @@ class BinaryFilesLoader
 	
 	private function onFileLoadComplete(evt:Event):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		_binaryCallback(_fileCurrent.name, _fileCurrent.data);
+		this._binaryCallback(this._fileCurrent.name, this._fileCurrent.data);
 		nextFile();
 	}
 	
 	private function onFileLoadError(evt:IOErrorEvent):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		trace("BinaryFilesLoader failed to load " + _fileCurrent.name);
+		trace("BinaryFilesLoader failed to load " + this._fileCurrent.name);
 		nextFile();
 	}
 	
