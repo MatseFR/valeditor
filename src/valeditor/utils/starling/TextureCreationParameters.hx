@@ -18,6 +18,19 @@ class TextureCreationParameters
 		
 	}
 	
+	public function clone(toParams:TextureCreationParameters = null):TextureCreationParameters
+	{
+		if (toParams == null) toParams = new TextureCreationParameters();
+		
+		toParams.generateMipMaps = this.generateMipMaps;
+		toParams.optimizeForRenderToTexture = this.optimizeForRenderToTexture;
+		toParams.scale = this.scale;
+		toParams.format = this.format;
+		toParams.forcePotTexture = this.forcePotTexture;
+		
+		return toParams;
+	}
+	
 	public function reset():Void
 	{
 		this.generateMipMaps = true;
@@ -25,6 +38,28 @@ class TextureCreationParameters
 		this.scale = 1;
 		this.format = Context3DTextureFormat.BGRA;
 		this.forcePotTexture = false;
+	}
+	
+	public function fromJSON(json:Dynamic):Void
+	{
+		this.generateMipMaps = json.generateMipMaps;
+		this.optimizeForRenderToTexture = json.optimizeForRenderToTexture;
+		this.scale = json.scale;
+		this.format = json.format;
+		this.forcePotTexture = json.forcePotTexture;
+	}
+	
+	public function toJSON(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		
+		json.generateMipMaps = this.generateMipMaps;
+		json.optimizeForRenderToTexture = this.optimizeForRenderToTexture;
+		json.scale = this.scale;
+		json.format = this.format;
+		json.forcePotTexture = this.forcePotTexture;
+		
+		return json;
 	}
 	
 }
