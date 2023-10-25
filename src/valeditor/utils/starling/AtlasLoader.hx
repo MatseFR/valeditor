@@ -11,8 +11,8 @@ import valedit.asset.TextAsset;
  */
 class AtlasLoader 
 {
-	private var _atlasCallback:TextureAtlas->BitmapAsset->TextAsset->Void;
-	private var _textureCallback:Texture-> BitmapAsset->Void;
+	private var _atlasCallback:TextureAtlas->TextureCreationParameters->BitmapAsset->TextAsset->Void;
+	private var _textureCallback:Texture->TextureCreationParameters->BitmapAsset->Void;
 	private var _completeCallback:Void->Void;
 	private var _cancelCallback:Void->Void;
 	
@@ -26,57 +26,57 @@ class AtlasLoader
 		
 	}
 	
-	public function start(atlasCallback:TextureAtlas->BitmapAsset->TextAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
+	public function start(atlasCallback:TextureAtlas->TextureCreationParameters->BitmapAsset->TextAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
 	{
-		_atlasCallback = atlasCallback;
-		_completeCallback = completeCallback;
-		_cancelCallback = cancelCallback;
+		this._atlasCallback = atlasCallback;
+		this._completeCallback = completeCallback;
+		this._cancelCallback = cancelCallback;
 		
 		FeathersWindows.showBitmapAssets(bitmapAssetSelected, cancel, "Select Bitmap source for Atlas");
 	}
 	
 	private function bitmapAssetSelected(asset:BitmapAsset):Void
 	{
-		_bitmapAsset = asset;
+		this._bitmapAsset = asset;
 		
 		FeathersWindows.showTextAssets(textAssetSelected, cancel, "Select Xml source for Atlas");
 	}
 	
 	private function textAssetSelected(asset:TextAsset):Void
 	{
-		_textAsset = asset;
-		_textureParams.reset();
+		this._textAsset = asset;
+		this._textureParams.reset();
 		
-		FeathersWindows.showObjectEditWindow(_textureParams, textureParamsConfirm, cancel);
+		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, cancel);
 	}
 	
 	private function textureParamsConfirm():Void
 	{
-		var texture:Texture = Texture.fromBitmapData(_bitmapAsset.content, _textureParams.generateMipMaps, _textureParams.optimizeForRenderToTexture, _textureParams.scale, _textureParams.format, _textureParams.forcePotTexture);
+		var texture:Texture = Texture.fromBitmapData(this._bitmapAsset.content, this._textureParams.generateMipMaps, this._textureParams.optimizeForRenderToTexture, this._textureParams.scale, this._textureParams.format, this._textureParams.forcePotTexture);
 		
-		var atlas:TextureAtlas = new TextureAtlas(texture, _textAsset.content);
-		_atlasCallback(atlas, _bitmapAsset, _textAsset);
+		var atlas:TextureAtlas = new TextureAtlas(texture, this._textAsset.content);
+		this._atlasCallback(atlas, this._textureParams.clone(), this._bitmapAsset, this._textAsset);
 		
-		var completeCallback:Void->Void = _completeCallback;
-		_bitmapAsset = null;
-		_textAsset = null;
-		_atlasCallback = null;
-		_textureCallback = null;
-		_completeCallback = null;
-		_cancelCallback = null;
+		var completeCallback:Void->Void = this._completeCallback;
+		this._bitmapAsset = null;
+		this._textAsset = null;
+		this._atlasCallback = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
 		
 		completeCallback();
 	}
 	
 	private function cancel():Void
 	{
-		var cancelCallback:Void->Void = _cancelCallback;
-		_bitmapAsset = null;
-		_textAsset = null;
-		_atlasCallback = null;
-		_textureCallback = null;
-		_completeCallback = null;
-		_cancelCallback = null;
+		var cancelCallback:Void->Void = this._cancelCallback;
+		this._bitmapAsset = null;
+		this._textAsset = null;
+		this._atlasCallback = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
 		
 		cancelCallback();
 	}
