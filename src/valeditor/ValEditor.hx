@@ -223,20 +223,30 @@ class ValEditor
 		templateCollection.sortCompareFunction = ArraySort.template;
 	}
 	
-	
+	static public function newFile():Void
+	{
+		reset();
+		rootContainer = createContainer();
+	}
 	
 	/** Creates an empty "new file" but does not clear exposed data */
 	static public function reset():Void
 	{
-		file.clear();
-		currentContainer = null;
-		_rootContainer.pool();
-		rootContainer = null;
-		
 		for (clss in _classMap)
 		{
 			clss.reset();
 		}
+		
+		currentContainer = null;
+		if (_rootContainer != null)
+		{
+			_rootContainer.pool();
+			rootContainer = null;
+		}
+		
+		AssetLib.reset();
+		
+		file.clear();
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -838,6 +848,7 @@ class ValEditor
 	static private function destroyTemplateInternal(template:ValEditorTemplate):Void
 	{
 		destroyObject(cast template.object);
+		template.object = null;
 		
 		unregisterTemplateInternal(template);
 		
