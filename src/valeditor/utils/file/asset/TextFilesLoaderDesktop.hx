@@ -2,7 +2,6 @@ package valeditor.utils.file.asset;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;
-import openfl.utils.ByteArray;
 
 /**
  * ...
@@ -25,34 +24,34 @@ class TextFilesLoaderDesktop
 	
 	public function start(files:Array<File>, textCallback:String->String->Void, completeCallback:Void->Void):Void
 	{
-		_files = files;
-		_textCallback = textCallback;
-		_completeCallback = completeCallback;
+		this._files = files;
+		this._textCallback = textCallback;
+		this._completeCallback = completeCallback;
 		
-		_fileIndex = -1;
+		this._fileIndex = -1;
 		nextFile();
 	}
 	
 	private function nextFile():Void
 	{
-		_fileIndex++;
-		if (_fileIndex < _files.length)
+		this._fileIndex++;
+		if (this._fileIndex < this._files.length)
 		{
-			_fileCurrent = _files[_fileIndex];
-			_fileStream.open(_fileCurrent, FileMode.READ);
-			var str:String = _fileStream.readUTFBytes(_fileStream.bytesAvailable);
-			_fileStream.close();
+			this._fileCurrent = this._files[_fileIndex];
+			this._fileStream.open(this._fileCurrent, FileMode.READ);
+			var str:String = this._fileStream.readUTFBytes(this._fileStream.bytesAvailable);
+			this._fileStream.close();
 			
-			_textCallback(_fileCurrent.nativePath, str);
+			this._textCallback(this._fileCurrent.nativePath, str);
 			nextFile();
 		}
 		else
 		{
-			var completeCallback:Void->Void = _completeCallback;
-			_files = null;
-			_fileCurrent = null;
-			_textCallback = null;
-			_completeCallback = null;
+			var completeCallback:Void->Void = this._completeCallback;
+			this._files = null;
+			this._fileCurrent = null;
+			this._textCallback = null;
+			this._completeCallback = null;
 			
 			completeCallback();
 		}
