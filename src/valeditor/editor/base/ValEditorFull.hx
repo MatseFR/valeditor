@@ -118,7 +118,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 			
 			// file
 			case InputActionID.NEW_FILE :
-				trace("new file");
+				ValEditor.newFile();
 			
 			case InputActionID.OPEN :
 				FileController.open();
