@@ -5,6 +5,7 @@ import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.display.BitmapData;
 import openfl.net.FileFilter;
+import openfl.utils.ByteArray;
 import valeditor.ui.feathers.renderers.BitmapAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
@@ -60,9 +61,9 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		controlsEnable();
 	}
 	
-	private function bitmapDataLoadComplete(path:String, bmd:BitmapData):Void
+	private function bitmapDataLoadComplete(path:String, bmd:BitmapData, data:ByteArray):Void
 	{
-		AssetLib.createBitmap(path, bmd);
+		AssetLib.createBitmap(path, bmd, data);
 	}
 	
 	#if desktop
