@@ -825,15 +825,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.autoPlay = json.autoPlay;
-		//this.cameraX = json.cameraX;
-		//this.cameraY = json.cameraY;
 		this.visible = json.visible;
 		this.x = json.x;
 		this.y = json.y;
 		this.viewCenterX = json.viewCenterX;
 		this.viewCenterY = json.viewCenterY;
-		//this.viewHeight = json.viewHeight;
-		//this.viewWidth = json.viewWidth;
 		
 		cast(this.timeLine, ValEditorTimeLine).fromJSONSave(json.timeLine);
 		
@@ -854,16 +850,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (json == null) json = {};
 		
 		json.autoPlay = this.autoPlay;
-		//json.cameraX = this.cameraX;
-		//json.cameraY = this.cameraY;
 		json.frameIndex = this.frameIndex;
 		json.visible = this.visible;
 		json.x = this.x;
 		json.y = this.y;
 		json.viewCenterX = this.viewCenterX;
 		json.viewCenterY = this.viewCenterY;
-		//json.viewHeight = this.viewHeight;
-		//json.viewWidth = this.viewWidth;
 		
 		json.timeLine = cast(this.timeLine, ValEditorTimeLine).toJSONSave();
 		
