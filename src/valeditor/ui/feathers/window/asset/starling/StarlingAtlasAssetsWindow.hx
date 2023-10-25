@@ -12,6 +12,7 @@ import valedit.asset.AssetLib;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingAtlasAsset;
+import valeditor.utils.starling.TextureCreationParameters;
 
 /**
  * ...
@@ -70,9 +71,9 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		this._addAtlasButton.addEventListener(TriggerEvent.TRIGGER, onAddAtlasbutton);
 	}
 	
-	private function atlasLoadComplete(atlas:TextureAtlas, bitmapAsset:BitmapAsset, textAsset:TextAsset):Void
+	private function atlasLoadComplete(atlas:TextureAtlas, textureParams:TextureCreationParameters, bitmapAsset:BitmapAsset, textAsset:TextAsset):Void
 	{
-		AssetLib.createStarlingAtlas(bitmapAsset.path, atlas, bitmapAsset, textAsset);
+		AssetLib.createStarlingAtlas(bitmapAsset.path, atlas, textureParams, bitmapAsset, textAsset);
 	}
 	
 	private function onAddAtlasbutton(evt:TriggerEvent):Void
