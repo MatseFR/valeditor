@@ -11,6 +11,7 @@ import valeditor.utils.file.FileOpener;
 import valeditor.utils.file.FileSaver;
 #end
 import openfl.filesystem.FileMode;
+import openfl.utils.ByteArray;
 
 /**
  * ...
@@ -39,19 +40,17 @@ class FileController
 	#if desktop
 	static private function onOpenComplete(file:File):Void
 	{
+		var ba:ByteArray = new ByteArray();
 		_fileStream.open(file, FileMode.READ);
-		var str:String = _fileStream.readUTFBytes(_fileStream.bytesAvailable);
+		_fileStream.readBytes(ba, 0, _fileStream.bytesAvailable);
 		_fileStream.close();
-		var json:Dynamic = Json.parse(str);
-		ValEditor.fromJSONSave(json);
+		ValEditor.fromZipSave(ba);
 		_fileOpener.clear();
 	}
 	#else
 	static private function onOpenComplete(file:FileReference):Void
 	{
-		var str:String = file.data.readUTFBytes(file.data.bytesAvailable);
-		var json:Dynamic = Json.parse(str);
-		ValEditor.fromJSONSave(json);
+		ValEditor.fromZipSave(file.data);
 		_fileOpener.clear();
 	}
 	#end
@@ -63,8 +62,7 @@ class FileController
 	
 	static public function save(forceBrowse:Bool = false):Void
 	{
-		var json:Dynamic = ValEditor.toJSONSave();
-		var data:String = Json.stringify(json);
+		var data:Dynamic = ValEditor.toZipSave();
 		
 		#if desktop
 		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.file.fullPath, ValEditor.file.fullPath == null || forceBrowse);
