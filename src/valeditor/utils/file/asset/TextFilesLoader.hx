@@ -23,31 +23,31 @@ class TextFilesLoader
 	
 	public function start(files:Array<FileReference>, textCallback:String->String->Void, completeCallback:Void->Void):Void
 	{
-		_files = files;
-		_textCallback = textCallback;
-		_completeCallback = completeCallback;
+		this._files = files;
+		this._textCallback = textCallback;
+		this._completeCallback = completeCallback;
 		
-		_fileIndex = -1;
+		this._fileIndex = -1;
 		nextFile();
 	}
 	
 	private function nextFile():Void
 	{
-		_fileIndex++;
-		if (_fileIndex < _files.length)
+		this._fileIndex++;
+		if (this._fileIndex < this._files.length)
 		{
-			_fileCurrent = _files[_fileIndex];
-			_fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
-			_fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-			_fileCurrent.load();
+			this._fileCurrent = this._files[this._fileIndex];
+			this._fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
+			this._fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+			this._fileCurrent.load();
 		}
 		else
 		{
-			var completeCallback:Void->Void = _completeCallback;
-			_files = null;
-			_fileCurrent = null;
-			_textCallback = null;
-			_completeCallback = null;
+			var completeCallback:Void->Void = this._completeCallback;
+			this._files = null;
+			this._fileCurrent = null;
+			this._textCallback = null;
+			this._completeCallback = null;
 			
 			completeCallback();
 		}
@@ -55,19 +55,19 @@ class TextFilesLoader
 	
 	private function onFileLoadComplete(evt:Event):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		var str:String = _fileCurrent.data.readUTFBytes(_fileCurrent.data.bytesAvailable);
-		_textCallback(_fileCurrent.name, str);
+		var str:String = this._fileCurrent.data.readUTFBytes(this._fileCurrent.data.bytesAvailable);
+		this._textCallback(this._fileCurrent.name, str);
 		
 		nextFile();
 	}
 	
 	private function onFileLoadError(evt:IOErrorEvent):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
 		trace("TextFilesLoader failed to load " + _fileCurrent.name);
 	}
