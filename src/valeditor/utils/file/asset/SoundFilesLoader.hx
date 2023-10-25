@@ -1,9 +1,11 @@
 package valeditor.utils.file.asset;
 import haxe.io.Path;
+import lime.media.AudioBuffer;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.net.FileReference;
+import openfl.utils.ByteArray;
 
 /**
  * ...
@@ -15,7 +17,7 @@ class SoundFilesLoader
 	private var _fileIndex:Int;
 	private var _fileCurrent:FileReference;
 	
-	private var _soundCallback:String->Sound->Void;
+	private var _soundCallback:String->Sound->ByteArray->Void;
 	private var _completeCallback:Void->Void;
 
 	public function new() 
@@ -23,62 +25,67 @@ class SoundFilesLoader
 		
 	}
 	
-	public function start(files:Array<FileReference>, soundCallback:String->Sound->Void, completeCallback:Void->Void):Void
+	public function start(files:Array<FileReference>, soundCallback:String->Sound->ByteArray->Void, completeCallback:Void->Void):Void
 	{
-		_files = files;
-		_soundCallback = soundCallback;
-		_completeCallback = completeCallback;
+		this._files = files;
+		this._soundCallback = soundCallback;
+		this._completeCallback = completeCallback;
 		
-		_fileIndex = -1;
+		this._fileIndex = -1;
 		nextFile();
 	}
 	
 	private function nextFile():Void
 	{
-		_fileIndex++;
-		if (_fileIndex < _files.length)
+		this._fileIndex++;
+		if (this._fileIndex < this._files.length)
 		{
-			_fileCurrent = _files[_fileIndex];
-			_fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
-			_fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-			_fileCurrent.load();
+			this._fileCurrent = this._files[this._fileIndex];
+			this._fileCurrent.addEventListener(Event.COMPLETE, onFileLoadComplete);
+			this._fileCurrent.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+			this._fileCurrent.load();
 		}
 		else
 		{
-			_completeCallback();
+			var completeCallback:Void->Void = this._completeCallback;
+			this._files = null;
+			this._fileCurrent = null;
+			this._soundCallback = null;
+			this._completeCallback = null;
 			
-			_files = null;
-			_fileCurrent = null;
-			_soundCallback = null;
-			_completeCallback = null;
+			completeCallback();
 		}
 	}
 	
 	private function onFileLoadComplete(evt:Event):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		var sound:Sound = new Sound();
-		var extension:String = Path.extension(_fileCurrent.name).toLowerCase();
-		if (extension == "wav")
-		{
-			//sound.loadPCMFromByteArray(_fileCurrent.data, 
-		}
-		else
-		{
-			sound.loadCompressedDataFromByteArray(_fileCurrent.data, _fileCurrent.data.bytesAvailable);
-		}
-		_soundCallback(_fileCurrent.name, sound);
+		var buffer:AudioBuffer = AudioBuffer.fromBytes(this._fileCurrent.data);
+		var sound:Sound = Sound.fromAudioBuffer(buffer);
+		
+		//var sound:Sound = new Sound();
+		//var extension:String = Path.extension(_fileCurrent.name).toLowerCase();
+		//if (extension == "wav")
+		//{
+			//// TODO : find how to load a WAV file on html5 target
+			////sound.loadPCMFromByteArray(_fileCurrent.data,
+		//}
+		//else
+		//{
+			//sound.loadCompressedDataFromByteArray(_fileCurrent.data, _fileCurrent.data.bytesAvailable);
+		//}
+		this._soundCallback(this._fileCurrent.name, sound, this._fileCurrent.data);
 		nextFile();
 	}
 	
 	private function onFileLoadError(evt:IOErrorEvent):Void
 	{
-		_fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
-		_fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
+		this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
+		this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		trace("SoundFilesLoader failed to load " + _fileCurrent.name);
+		trace("SoundFilesLoader failed to load " + this._fileCurrent.name);
 		
 		nextFile();
 	}
