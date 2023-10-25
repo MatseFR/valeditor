@@ -28,7 +28,10 @@ class FilesOpenerDesktop
 		this._file.addEventListener(FileListEvent.SELECT_MULTIPLE, onFilesSelected);
 		this._file.addEventListener(Event.CANCEL, onFilesCancelled);
 		
-		this._file.resolvePath(path);
+		if (path != null)
+		{
+			this._file.resolvePath(path);
+		}
 		this._file.browseForOpenMultiple(dialogTitle, filterList);
 	}
 	
