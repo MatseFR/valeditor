@@ -1,5 +1,6 @@
 package valeditor.ui.feathers.window.asset;
 import feathers.events.TriggerEvent;
+import openfl.utils.ByteArray;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valedit.asset.AssetLib;
 import feathers.data.ListViewItemState;
@@ -64,9 +65,9 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		controlsEnable();
 	}
 	
-	private function soundLoadComplete(path:String, sound:Sound):Void
+	private function soundLoadComplete(path:String, sound:Sound, data:ByteArray):Void
 	{
-		AssetLib.createSound(path, sound);
+		AssetLib.createSound(path, sound, data);
 	}
 	
 	#if desktop
