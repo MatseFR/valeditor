@@ -27,37 +27,37 @@ class BinaryFilesLoaderDesktop
 	
 	public function start(files:Array<File>, binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
 	{
-		_files = files;
-		_binaryCallback = binaryCallback;
-		_completeCallback = completeCallback;
+		this._files = files;
+		this._binaryCallback = binaryCallback;
+		this._completeCallback = completeCallback;
 		
-		_fileIndex = -1;
+		this._fileIndex = -1;
 		nextFile();
 	}
 	
 	private function nextFile():Void
 	{
-		_fileIndex++;
-		if (_fileIndex < _files.length)
+		this._fileIndex++;
+		if (this._fileIndex < this._files.length)
 		{
-			_fileCurrent = _files[_fileIndex];
-			_fileStream.open(_fileCurrent, FileMode.READ);
-			_bytes = new ByteArray();
-			_fileStream.readBytes(_bytes, 0, _fileStream.bytesAvailable);
-			_fileStream.close();
+			this._fileCurrent = this._files[this._fileIndex];
+			this._fileStream.open(this._fileCurrent, FileMode.READ);
+			this._bytes = new ByteArray();
+			this._fileStream.readBytes(this._bytes, 0, this._fileStream.bytesAvailable);
+			this._fileStream.close();
 			
-			_binaryCallback(_fileCurrent.nativePath, _bytes);
-			_bytes = null;
+			this._binaryCallback(this._fileCurrent.nativePath, this._bytes);
+			this._bytes = null;
 			
 			nextFile();
 		}
 		else
 		{
-			var completeCallback:Void->Void = _completeCallback;
-			_files = null;
-			_fileCurrent = null;
-			_binaryCallback = null;
-			_completeCallback = null;
+			var completeCallback:Void->Void = this._completeCallback;
+			this._files = null;
+			this._fileCurrent = null;
+			this._binaryCallback = null;
+			this._completeCallback = null;
 			
 			completeCallback();
 		}
