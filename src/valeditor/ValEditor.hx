@@ -1,6 +1,19 @@
 package valeditor;
 import feathers.data.ArrayCollection;
 import haxe.Constraints.Function;
+import haxe.Json;
+import haxe.crypto.Crc32;
+import haxe.ds.List;
+import haxe.ds.StringMap;
+import haxe.io.Bytes;
+import haxe.io.BytesInput;
+import haxe.io.BytesOutput;
+import haxe.zip.Compress;
+import haxe.zip.Entry;
+import haxe.zip.Reader;
+import haxe.zip.Tools;
+import haxe.zip.Uncompress;
+import haxe.zip.Writer;
 import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.display.DisplayObjectContainer;
@@ -8,14 +21,19 @@ import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
+import openfl.utils.ByteArray;
+import openfl.utils.CompressionAlgorithm;
 import valedit.ExposedCollection;
 import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
+import valedit.asset.AssetLib;
+import valedit.asset.AssetSource;
 import valedit.ui.IValueUI;
 import valedit.utils.RegularPropertyName;
+import valedit.utils.ZipUtil;
 import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;
@@ -26,6 +44,7 @@ import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.editor.drag.LibraryDragManager;
+import valeditor.editor.file.ZipSaveLoader;
 import valeditor.events.EditorEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
@@ -182,6 +201,7 @@ class ValEditor
 	
 	static private var _liveActionManager:LiveInputActionManager;
 	static private var _changeUpdateQueue:ChangeUpdateQueue;
+	static private var _zipSaveLoader:ZipSaveLoader;
 	
 	static public function init():Void
 	{
@@ -189,6 +209,7 @@ class ValEditor
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
 		_changeUpdateQueue = new ChangeUpdateQueue();
+		_zipSaveLoader = new ZipSaveLoader();
 		juggler = new Juggler();
 		Juggler.start();
 		Juggler.root.add(juggler);
@@ -201,6 +222,8 @@ class ValEditor
 		classCollection.sortCompareFunction = ArraySort.stringData;
 		templateCollection.sortCompareFunction = ArraySort.template;
 	}
+	
+	
 	
 	/** Creates an empty "new file" but does not clear exposed data */
 	static public function reset():Void
@@ -1081,8 +1104,6 @@ class ValEditor
 	
 	static public function fromJSONSave(json:Dynamic):Void
 	{
-		reset();
-		
 		var container:ValEditorContainer = ValEditorContainer.fromPool();
 		
 		var clss:ValEditorClass;
@@ -1119,6 +1140,157 @@ class ValEditor
 		json.root = _rootContainer.toJSONSave();
 		
 		return json;
+	}
+	
+	static public function fromZipSave(bytes:Bytes):Void
+	{
+		reset();
+		
+		_zipSaveLoader.addEventListener(Event.COMPLETE, fromZipSaveComplete);
+		_zipSaveLoader.load(bytes);
+	}
+	
+	static private function fromZipSaveComplete(evt:Event):Void
+	{
+		_zipSaveLoader.removeEventListener(Event.COMPLETE, fromZipSaveComplete);
+		_zipSaveLoader.clear();
+	}
+	
+	static public function toZipSave():ByteArray
+	{
+		var bytes:Bytes;
+		var entries:List<Entry> = new List<Entry>();
+		var entry:Entry;
+		var json:Dynamic = toJSONSave();
+		
+		bytes = Bytes.ofString(Json.stringify(json));
+		entry = {
+			fileName:"valedit_data.json",
+			fileSize:bytes.length,
+			fileTime:Date.now(),
+			compressed:false,
+			dataSize:bytes.length,
+			data:bytes,
+			crc32:Crc32.make(bytes)
+		};
+		ZipUtil.compressEntry(entry);
+		entries.push(entry);
+		
+		// ASSETS
+		var assets:Dynamic = {};
+		// binary
+		var binaryList:Array<Dynamic> = [];
+		for (asset in AssetLib.binaryList)
+		{
+			if (asset.source == AssetSource.EXTERNAL)
+			{
+				binaryList.push(asset.toJSONSave());
+				entry = asset.toZIPEntry();
+				entries.push(entry);
+			}
+		}
+		if (binaryList.length != 0)
+		{
+			assets.binary = binaryList;
+		}
+		
+		// bitmap
+		var bitmapList:Array<Dynamic> = [];
+		for (asset in AssetLib.bitmapList)
+		{
+			if (asset.source == AssetSource.EXTERNAL)
+			{
+				bitmapList.push(asset.toJSONSave());
+				entry = asset.toZIPEntry();
+				entries.push(entry);
+			}
+		}
+		if (bitmapList.length != 0)
+		{
+			assets.bitmap = bitmapList;
+		}
+		
+		// sound
+		var soundList:Array<Dynamic> = [];
+		for (asset in AssetLib.soundList)
+		{
+			if (asset.source == AssetSource.EXTERNAL)
+			{
+				soundList.push(asset.toJSONSave());
+				entry = asset.toZIPEntry();
+				entries.push(entry);
+			}
+		}
+		if (soundList.length != 0)
+		{
+			assets.sound = soundList;
+		}
+		
+		// text
+		var textList:Array<Dynamic> = [];
+		for (asset in AssetLib.textList)
+		{
+			if (asset.source == AssetSource.EXTERNAL)
+			{
+				textList.push(asset.toJSONSave());
+				entry = asset.toZIPEntry();
+				ZipUtil.compressEntry(entry);
+				entries.push(entry);
+			}
+		}
+		if (textList.length != 0)
+		{
+			assets.text = textList;
+		}
+		
+		#if starling
+		// starling_atlas
+		var starlingAtlasList:Array<Dynamic> = [];
+		for (asset in AssetLib.starlingAtlasList)
+		{
+			starlingAtlasList.push(asset.toJSONSave());
+		}
+		if (starlingAtlasList.length != 0)
+		{
+			assets.starling_atlas = starlingAtlasList;
+		}
+		// starling_texture
+		var starlingTextureList:Array<Dynamic> = [];
+		for (asset in AssetLib.starlingTextureList)
+		{
+			if (asset.path.indexOf(ValEdit.STARLING_SUBTEXTURE_MARKER) == -1)
+			{
+				starlingTextureList.push(asset.toJSONSave());
+			}
+		}
+		if (starlingTextureList.length != 0)
+		{
+			assets.starling_texture = starlingTextureList;
+		}
+		#end
+		
+		bytes = Bytes.ofString(Json.stringify(assets));
+		entry = {
+			fileName:"valedit_assets.json",
+			fileSize:bytes.length,
+			fileTime:Date.now(),
+			compressed:false,
+			dataSize:bytes.length,
+			data:bytes,
+			crc32:Crc32.make(bytes)
+		};
+		ZipUtil.compressEntry(entry);
+		entries.push(entry);
+		//\ASSETS
+		
+		var output:BytesOutput = new BytesOutput();
+		var zip:Writer = new Writer(output);
+		zip.write(entries);
+		output.close();
+		
+		var ba:ByteArray = ByteArray.fromBytes(output.getBytes());
+		
+		return ba;
 	}
 	
 }
