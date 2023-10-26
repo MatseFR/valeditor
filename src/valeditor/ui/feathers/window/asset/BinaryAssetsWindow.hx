@@ -54,8 +54,6 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	private function binaryLoadComplete(path:String, bytes:ByteArray):Void

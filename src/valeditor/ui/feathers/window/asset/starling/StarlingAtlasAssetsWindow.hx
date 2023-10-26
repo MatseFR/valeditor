@@ -53,8 +53,6 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	override function controlsDisable():Void 

@@ -60,8 +60,6 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	override function controlsDisable():Void 

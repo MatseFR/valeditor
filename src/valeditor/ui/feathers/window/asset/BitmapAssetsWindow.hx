@@ -57,8 +57,6 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	private function bitmapDataLoadComplete(path:String, bmd:BitmapData, data:ByteArray):Void

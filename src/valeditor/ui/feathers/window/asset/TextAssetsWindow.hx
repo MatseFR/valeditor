@@ -54,8 +54,6 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	private function textLoadComplete(path:String, text:String):Void

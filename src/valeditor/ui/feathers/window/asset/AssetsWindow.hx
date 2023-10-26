@@ -136,6 +136,7 @@ class AssetsWindow<T> extends Panel
 	public function new() 
 	{
 		super();
+		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
 	override function initialize():Void 
@@ -201,8 +202,23 @@ class AssetsWindow<T> extends Panel
 		this._assetList.layout = listLayout;
 		this._assetList.allowMultipleSelection = this._removeEnabled;
 		addChild(this._assetList);
+	}
+	
+	private function onAddedToStage(evt:Event):Void
+	{
+		removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 		
-		//controlsEnable();
+		controlsEnable();
+	}
+	
+	private function onRemovedFromStage(evt:Event):Void
+	{
+		removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		
+		controlsDisable();
+		this._selectionCallback = null;
 	}
 	
 	public function reset():Void

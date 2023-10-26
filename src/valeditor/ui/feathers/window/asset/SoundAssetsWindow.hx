@@ -61,8 +61,6 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		{
 			return item.name;
 		};
-		
-		controlsEnable();
 	}
 	
 	private function soundLoadComplete(path:String, sound:Sound, data:ByteArray):Void
