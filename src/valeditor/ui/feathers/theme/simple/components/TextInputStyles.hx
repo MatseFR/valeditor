@@ -43,7 +43,8 @@ class TextInputStyles
 					input.disabledTextFormat = theme.getTextFormat_disabled();
 				}
 				if (input.promptTextFormat == null) {
-					input.promptTextFormat = theme.getTextFormat_note();
+					input.promptTextFormat = theme.getTextFormat();
+					input.promptTextFormat.italic = true;
 				}
 				
 				input.paddingTop = 6.0;
@@ -81,7 +82,8 @@ class TextInputStyles
 			input.disabledTextFormat = theme.getTextFormat_disabled();
 		}
 		if (input.promptTextFormat == null) {
-			input.promptTextFormat = theme.getTextFormat_note();
+			input.promptTextFormat = theme.getTextFormat();
+			input.promptTextFormat.italic = true;
 		}
 		
 		input.paddingTop = 6.0;
