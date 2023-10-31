@@ -132,6 +132,8 @@ class ExportSettingsWindow extends Panel
 		if (this._settings != null)
 		{
 			this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
+			var exposedString:ExposedString = cast this._settingsCollection.getValue("fileName");
+			exposedString.prompt = ValEditor.fileSettings.fileName;
 		}
 	}
 	
