@@ -156,6 +156,7 @@ class StringUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
+			this._input.prompt = this._stringValue.prompt;
 			this._input.text = this._exposedValue.value;
 			if (controlsEnabled) controlsEnable();
 		}
