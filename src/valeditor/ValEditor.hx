@@ -991,6 +991,13 @@ class ValEditor
 		return container;
 	}
 	
+	static public function createKeyFrame():ValEditorKeyFrame
+	{
+		var keyFrame:ValEditorKeyFrame = ValEditorKeyFrame.fromPool();
+		keyFrame.transition = fileSettings.tweenTransitionDefault;
+		return keyFrame;
+	}
+	
 	static public function createLayer():ValEditorLayer
 	{
 		var layer:ValEditorLayer = ValEditorLayer.fromPool(createTimeLine());
@@ -1001,6 +1008,7 @@ class ValEditor
 	{
 		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
 		timeLine.frameIndex = 0;
+		timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		timeLine.insertKeyFrame();
 		return timeLine;
 	}
