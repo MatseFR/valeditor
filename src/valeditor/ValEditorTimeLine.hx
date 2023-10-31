@@ -240,7 +240,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 			var keyFrame:ValEditKeyFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
 			if (keyFrame == null)
 			{
-				keyFrame = ValEditorKeyFrame.fromPool();
+				keyFrame = ValEditor.createKeyFrame();
 				registerKeyFrame(keyFrame);
 				keyFrame.indexStart = 0;
 				keyFrame.indexEnd = this._frameIndex - 1;
@@ -294,7 +294,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 					
 					if (getNextKeyFrame(this._frameCurrent) == null)
 					{
-						keyFrame = ValEditorKeyFrame.fromPool();
+						keyFrame = ValEditor.createKeyFrame();
 						registerKeyFrame(keyFrame);
 						keyFrame.indexStart = keyFrame.indexEnd = this._frameIndex + 1;
 						keyFrame.copyObjectsFrom(this._frameCurrent);
@@ -304,7 +304,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				}
 				else
 				{
-					keyFrame = ValEditorKeyFrame.fromPool();
+					keyFrame = ValEditor.createKeyFrame();
 					registerKeyFrame(keyFrame);
 					keyFrame.indexStart = this._frameIndex + 1;
 					keyFrame.indexEnd = this._frameCurrent.indexEnd;
@@ -320,7 +320,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 			else
 			{
-				keyFrame = ValEditorKeyFrame.fromPool();
+				keyFrame = ValEditor.createKeyFrame();
 				registerKeyFrame(keyFrame);
 				keyFrame.indexStart = this._frameIndex;
 				keyFrame.indexEnd = this._frameCurrent.indexEnd;
@@ -343,7 +343,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 				prevFrame = getPreviousKeyFrameFromIndex(this._frameIndex);
 				if (prevFrame == null)
 				{
-					keyFrame = ValEditorKeyFrame.fromPool();
+					keyFrame = ValEditor.createKeyFrame();
 					registerKeyFrame(keyFrame);
 					keyFrame.indexStart = 0;
 					keyFrame.indexEnd = this._frameIndex - 1;
@@ -363,7 +363,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 					prevFrame.indexEnd = this._frameIndex - 1;
 				}
 			}
-			keyFrame = ValEditorKeyFrame.fromPool();
+			keyFrame = ValEditor.createKeyFrame();
 			registerKeyFrame(keyFrame);
 			keyFrame.indexStart = keyFrame.indexEnd = this._frameIndex;
 			if (prevFrame != null)
