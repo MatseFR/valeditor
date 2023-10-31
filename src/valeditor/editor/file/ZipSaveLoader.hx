@@ -294,6 +294,20 @@ class ZipSaveLoader extends EventDispatcher
 	
 	private function allAssetsLoaded():Void
 	{
+		this._entry = this._entryMap.get("valedit_fileSettings.json");
+		if (this._entry != null)
+		{
+			this._dataJson = Json.parse(this._entry.data.toString());
+			ValEditor.fileSettings.fromJSON(this._dataJson);
+		}
+		
+		this._entry = this._entryMap.get("valedit_exportSettings.json");
+		if (this._entry != null)
+		{
+			this._dataJson = Json.parse(this._entry.data.toString());
+			ValEditor.exportSettings.fromJSON(this._dataJson);
+		}
+		
 		this._entry = this._entryMap.get("valedit_data.json");
 		if (this._entry == null)
 		{

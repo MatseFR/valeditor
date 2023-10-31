@@ -13,22 +13,20 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import openfl.events.Event;
 import valedit.ExposedCollection;
-import valedit.value.ExposedString;
-import valeditor.ValEditor;
-import valeditor.editor.settings.ExportSettings;
+import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
  * ...
  * @author Matse
  */
-class ExportSettingsWindow extends Panel 
+class FileSettingsWindow extends Panel 
 {
 	public var cancelCallback(get, set):Void->Void;
 	public var confirmCallback(get, set):Void->Void;
-	public var settings(get, set):ExportSettings;
+	public var settings(get, set):FileSettings;
+	public var title(get, set):String;
 	
 	private var _cancelCallback:Void->Void;
 	private function get_cancelCallback():Void->Void { return this._cancelCallback; }
@@ -44,9 +42,9 @@ class ExportSettingsWindow extends Panel
 		return this._confirmCallback = value;
 	}
 	
-	private var _settings:ExportSettings;
-	private function get_settings():ExportSettings { return this._settings; }
-	private function set_settings(value:ExportSettings):ExportSettings
+	private var _settings:FileSettings;
+	private function get_settings():FileSettings { return this._settings; }
+	private function set_settings(value:FileSettings):FileSettings
 	{
 		if (value != null)
 		{
@@ -56,8 +54,6 @@ class ExportSettingsWindow extends Panel
 			{
 				//ValEditor.edit(null, null, this._editContainer);
 				this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
-				var exposedString:ExposedString = cast this._settingsCollection.getValue("fileName");
-				exposedString.prompt = ValEditor.fileSettings.fileName;
 			}
 		}
 		else
@@ -68,7 +64,20 @@ class ExportSettingsWindow extends Panel
 				this._settingsCollection = null;
 			}
 		}
+		
 		return this._settings = value;
+	}
+	
+	private var _title:String;
+	private function get_title():String { return this._title; }
+	private function set_title(value:String):String
+	{
+		if (this._title == value) return value;
+		if (this._initialized)
+		{
+			this._headerGroup.text = value;
+		}
+		return this._title = value;
 	}
 	
 	private var _headerGroup:Header;
@@ -78,7 +87,7 @@ class ExportSettingsWindow extends Panel
 	private var _cancelButton:Button;
 	private var _confirmButton:Button;
 	
-	private var _editSettings:ExportSettings = ExportSettings.fromPool();
+	private var _editSettings:FileSettings = FileSettings.fromPool();
 	private var _settingsCollection:ExposedCollection;
 
 	public function new() 
@@ -95,7 +104,7 @@ class ExportSettingsWindow extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		this._headerGroup = new Header("Export Settings");
+		this._headerGroup = new Header(this._title);
 		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = this._headerGroup;
 		

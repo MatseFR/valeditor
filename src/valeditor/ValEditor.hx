@@ -45,10 +45,13 @@ import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.editor.file.ZipSaveLoader;
+import valeditor.editor.settings.ExportSettings;
+import valeditor.editor.settings.FileSettings;
 import valeditor.events.EditorEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
 import valeditor.ui.InteractiveFactories;
+import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.utils.ArraySort;
 
@@ -62,7 +65,8 @@ class ValEditor
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var currentContainer(get, set):ValEditorContainer;
 	static public var eventDispatcher(get, never):EventDispatcher;
-	static public var file(default, null):ValEditorFile = new ValEditorFile();
+	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
+	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
@@ -225,13 +229,16 @@ class ValEditor
 	
 	static public function newFile():Void
 	{
-		reset();
 		rootContainer = createContainer();
 	}
 	
 	/** Creates an empty "new file" but does not clear exposed data */
 	static public function reset():Void
 	{
+		FeathersWindows.closeAll();
+		
+		selection.clear();
+		
 		for (clss in _classMap)
 		{
 			clss.reset();
@@ -246,7 +253,7 @@ class ValEditor
 		
 		AssetLib.reset();
 		
-		file.clear();
+		fileSettings.clear();
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -977,7 +984,7 @@ class ValEditor
 	static public function createContainer():ValEditorContainer
 	{
 		var container:ValEditorContainer = ValEditorContainer.fromPool();
-		container.numFrames = 120;
+		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
 		var layer:ValEditorLayer = createLayer();
 		container.addLayer(layer);
@@ -992,7 +999,7 @@ class ValEditor
 	
 	static public function createTimeLine():ValEditorTimeLine
 	{
-		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(120);
+		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
 		timeLine.frameIndex = 0;
 		timeLine.insertKeyFrame();
 		return timeLine;
@@ -1184,7 +1191,10 @@ class ValEditor
 			data:bytes,
 			crc32:Crc32.make(bytes)
 		};
-		ZipUtil.compressEntry(entry);
+		if (fileSettings.compress)
+		{
+			ZipUtil.compressEntry(entry);
+		}
 		entries.push(entry);
 		
 		// ASSETS
@@ -1290,9 +1300,44 @@ class ValEditor
 			data:bytes,
 			crc32:Crc32.make(bytes)
 		};
-		ZipUtil.compressEntry(entry);
+		if (fileSettings.compress)
+		{
+			ZipUtil.compressEntry(entry);
+		}
 		entries.push(entry);
 		//\ASSETS
+		
+		// SETTINGS
+		bytes = Bytes.ofString(Json.stringify(fileSettings.toJSON()));
+		entry = {
+			fileName:"valedit_fileSettings.json",
+			fileSize:bytes.length,
+			fileTime:Date.now(),
+			compressed:false,
+			dataSize:bytes.length,
+			data:bytes,
+			crc32:Crc32.make(bytes)
+		};
+		if (fileSettings.compress)
+		{
+			ZipUtil.compressEntry(entry);
+		}
+		
+		bytes = Bytes.ofString(Json.stringify(exportSettings.toJSON()));
+		entry = {
+			fileName:"valedit_exportSettings.json",
+			fileSize:bytes.length,
+			fileTime:Date.now(),
+			compressed:false,
+			dataSize:bytes.length,
+			data:bytes,
+			crc32:Crc32.make(bytes)
+		};
+		if (fileSettings.compress)
+		{
+			ZipUtil.compressEntry(entry);
+		}
+		//\SETTINGS
 		
 		var output:BytesOutput = new BytesOutput();
 		var zip:Writer = new Writer(output);

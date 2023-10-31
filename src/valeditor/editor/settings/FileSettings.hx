@@ -1,24 +1,23 @@
-package valeditor;
+package valeditor.editor.settings;
 import haxe.io.Path;
 import juggler.animation.Transitions;
-import valeditor.editor.settings.ExportSettings;
 
 /**
  * ...
  * @author Matse
  */
-class ValEditorFile 
+class FileSettings 
 {
-	static private var _POOL:Array<ValEditorFile> = new Array<ValEditorFile>();
+	static private var _POOL:Array<FileSettings> = new Array<FileSettings>();
 	
-	static public function fromPool():ValEditorFile
+	static public function fromPool():FileSettings
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new ValEditorFile();
+		return new FileSettings();
 	}
 	
-	public var exportSettings(default, null):ExportSettings = new ExportSettings();
-	public var fileName:String;
+	public var compress:Bool;
+	public var fileName:String = "untitled";
 	public var filePath:String;
 	public var frameRateDefault:Float = 60;
 	public var fullPath(get, set):String;
@@ -50,11 +49,12 @@ class ValEditorFile
 	
 	public function clear():Void
 	{
-		this.exportSettings.clear();
+		this.compress = false;
+		this.fileName = "untitled";
+		this.filePath = null;
 		this.frameRateDefault = 60;
 		this.numFramesAutoIncrease = true;
 		this.numFramesDefault = 120;
-		this.fullPath = null;
 		this.tweenTransitionDefault = Transitions.LINEAR;
 	}
 	
@@ -64,9 +64,25 @@ class ValEditorFile
 		_POOL.push(this);
 	}
 	
+	public function clone(toSettings:FileSettings = null):FileSettings
+	{
+		if (toSettings == null) toSettings = fromPool();
+		
+		toSettings.compress = this.compress;
+		toSettings.fileName = this.fileName;
+		toSettings.filePath = this.filePath;
+		toSettings.frameRateDefault = this.frameRateDefault;
+		toSettings.numFramesAutoIncrease = this.numFramesAutoIncrease;
+		toSettings.numFramesDefault = this.numFramesDefault;
+		toSettings.tweenTransitionDefault = this.tweenTransitionDefault;
+		
+		return toSettings;
+	}
+	
 	public function fromJSON(json:Dynamic):Void
 	{
-		this.exportSettings.fromJSON(json.exportSettings);
+		this.compress = json.compress;
+		this.frameRateDefault = json.frameRateDefault;
 		this.numFramesAutoIncrease = json.numFramesAutoIncrease;
 		this.numFramesDefault = json.numFramesDefault;
 		this.tweenTransitionDefault = json.tweenTransitionDefault;
@@ -76,7 +92,8 @@ class ValEditorFile
 	{
 		if (json == null) json = {};
 		
-		json.exportSettings = this.exportSettings.toJSON();
+		json.compress = this.compress;
+		json.frameRateDefault = this.frameRateDefault;
 		json.numFramesAutoIncrease = this.numFramesAutoIncrease;
 		json.numFramesDefault = this.numFramesDefault;
 		json.tweenTransitionDefault = this.tweenTransitionDefault;

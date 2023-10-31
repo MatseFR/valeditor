@@ -26,6 +26,7 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 			this._exposedValue.removeEventListener(ValueEvent.ACCESS_CHANGE, onValueAccessChange);
 			this._exposedValue.removeEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
 			this._exposedValue.removeEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+			this._exposedValue.removeEventListener(ValueEvent.PROPERTY_CHANGE, onValuePropertyChange);
 		}
 		this._exposedValue = value;
 		if (this._exposedValue != null)
@@ -33,6 +34,7 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 			this._exposedValue.addEventListener(ValueEvent.ACCESS_CHANGE, onValueAccessChange);
 			this._exposedValue.addEventListener(ValueEvent.EDITABLE_CHANGE, onValueEditableChange);
 			this._exposedValue.addEventListener(ValueEvent.OBJECT_CHANGE, onValueObjectChange);
+			this._exposedValue.addEventListener(ValueEvent.PROPERTY_CHANGE, onValuePropertyChange);
 			initExposedValue();
 			updateExposedValue();
 		}
@@ -107,6 +109,11 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 	}
 	
 	private function onValueObjectChange(evt:ValueEvent):Void
+	{
+		updateExposedValue();
+	}
+	
+	private function onValuePropertyChange(evt:ValueEvent):Void
 	{
 		updateExposedValue();
 	}

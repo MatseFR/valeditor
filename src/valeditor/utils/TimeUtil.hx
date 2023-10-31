@@ -17,7 +17,6 @@ class TimeUtil
 		var seconds:Int = Math.floor(ms / 1000);
 		var numSeconds:Int = seconds % 60;
 		var minutes:Int = Math.floor(seconds / 60);
-		//var numMinutes = minutes % 60;
 		
 		return  minutes + ":" + numSeconds + ":" + numMS;
 	}

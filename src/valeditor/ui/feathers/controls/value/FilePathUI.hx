@@ -1,4 +1,6 @@
 package valeditor.ui.feathers.controls.value;
+import openfl.events.Event;
+import feathers.controls.TextInput;
 #if desktop
 import feathers.controls.Button;
 import feathers.controls.Label;
@@ -53,7 +55,7 @@ class FilePathUI extends ValueUI
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
-	private var _pathLabel:Label;
+	private var _pathInput:TextInput;
 	
 	private var _controlGroup:LayoutGroup;
 	private var _wedge:ValueWedge;
@@ -107,11 +109,10 @@ class FilePathUI extends ValueUI
 		this._label.variant = LabelVariant.VALUE_NAME;
 		this._mainGroup.addChild(this._label);
 		
-		this._pathLabel = new Label();
-		this._pathLabel.variant = LabelVariant.VALUE;
-		this._pathLabel.wordWrap = true;
-		this._pathLabel.layoutData = new HorizontalLayoutData(100);
-		this._mainGroup.addChild(this._pathLabel);
+		this._pathInput = new TextInput();
+		//this._pathInput.restrict = "a-Z A-Z 0-9 /\\:_-.";
+		this._pathInput.layoutData = new HorizontalLayoutData(100);
+		this._mainGroup.addChild(this._pathInput);
 		
 		this._controlGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
@@ -169,7 +170,7 @@ class FilePathUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
-			this._pathLabel.text = this._exposedValue.value;
+			this._pathInput.text = this._exposedValue.value;
 		}
 	}
 	
@@ -177,7 +178,7 @@ class FilePathUI extends ValueUI
 	{
 		this.enabled = this._exposedValue.isEditable;
 		this._label.enabled = this._exposedValue.isEditable;
-		this._pathLabel.enabled = this._exposedValue.isEditable;
+		this._pathInput.enabled = this._exposedValue.isEditable;
 		this._setButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
 	}
@@ -193,6 +194,7 @@ class FilePathUI extends ValueUI
 		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
+		this._pathInput.removeEventListener(Event.CHANGE, onPathInputChange);
 		this._setButton.removeEventListener(TriggerEvent.TRIGGER, onSetButton);
 		this._clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
@@ -202,6 +204,7 @@ class FilePathUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
+		this._pathInput.addEventListener(Event.CHANGE, onPathInputChange);
 		this._setButton.addEventListener(TriggerEvent.TRIGGER, onSetButton);
 		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
 	}
@@ -213,17 +216,23 @@ class FilePathUI extends ValueUI
 	
 	private function onSetButton(evt:TriggerEvent):Void
 	{
-		this._fileSelector.start(this.onFileSelected, this.onFileCancelled, this._filePathValue.fileMustExist, this._filePathValue.fileFilters, this._filePathValue.dialogTitle);
+		this._fileSelector.start(this.onFileSelected, this.onFileCancelled, this._filePathValue.fileMustExist, this._exposedValue.value, this._filePathValue.fileFilters, this._filePathValue.dialogTitle);
 	}
 	
 	private function onFileSelected(path:String):Void
 	{
 		this._exposedValue.value = path;
+		this._pathInput.text = path;
 	}
 	
 	private function onFileCancelled():Void
 	{
 		
+	}
+	
+	private function onPathInputChange(evt:Event):Void
+	{
+		this._exposedValue.value = this._pathInput.text;
 	}
 	
 }

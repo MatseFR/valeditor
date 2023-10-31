@@ -20,13 +20,18 @@ class FileSelectorDesktop
 		
 	}
 	
-	public function start(completeCallback:String->Void, cancelCallback:Void->Void, fileMustExist:Bool, ?filterList:Array<FileFilter>, dialogTitle:String = "select file"):Void
+	public function start(completeCallback:String->Void, cancelCallback:Void->Void, fileMustExist:Bool, path:String = null, ?filterList:Array<FileFilter>, dialogTitle:String = "select file"):Void
 	{
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
 		this._file.addEventListener(Event.SELECT, onFileSelected);
 		this._file.addEventListener(Event.CANCEL, onFileCancelled);
+		
+		if (path != null)
+		{
+			this._file.resolvePath(path);
+		}
 		
 		if (fileMustExist)
 		{

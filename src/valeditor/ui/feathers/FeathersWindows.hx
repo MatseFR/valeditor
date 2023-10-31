@@ -5,11 +5,14 @@ import valedit.ValEditObject;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.settings.ExportSettings;
+import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
+import valeditor.ui.feathers.window.FileSettingsWindow;
 import valeditor.ui.feathers.window.ObjectAddWindow;
 import valeditor.ui.feathers.window.ObjectCreationWindow;
 import valeditor.ui.feathers.window.ObjectRenameWindow;
 import valeditor.ui.feathers.window.ObjectSelectWindow;
+import valeditor.ui.feathers.window.StartMenuWindow;
 import valeditor.ui.feathers.window.TemplateCreationWindow;
 import valeditor.ui.feathers.window.TemplateRenameWindow;
 import valeditor.ui.feathers.window.asset.AssetBrowser;
@@ -49,6 +52,7 @@ class FeathersWindows
 	#end
 	
 	static private var _exportSettings:ExportSettingsWindow;
+	static private var _fileSettings:FileSettingsWindow;
 	
 	static private var _objectAdd:ObjectAddWindow;
 	static private var _objectCreate:ObjectCreationWindow;
@@ -56,8 +60,15 @@ class FeathersWindows
 	static private var _objectRename:ObjectRenameWindow;
 	static private var _objectSelect:ObjectSelectWindow;
 	
+	static private var _startMenu:StartMenuWindow;
+	
 	static private var _templateCreate:TemplateCreationWindow;
 	static private var _templateRename:TemplateRenameWindow;
+	
+	static public function closeAll():Void
+	{
+		PopUpManager.removeAllPopUps();
+	}
 	
 	static public function showAssetBrowser():Void
 	{
@@ -194,7 +205,7 @@ class FeathersWindows
 	}
 	#end
 	
-	static public function showExportSettingsWindow(settings:ExportSettings, ?confirmCallback:Void->Void):Void
+	static public function showExportSettingsWindow(settings:ExportSettings, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
 	{
 		if (_exportSettings == null)
 		{
@@ -202,12 +213,31 @@ class FeathersWindows
 		}
 		
 		_exportSettings.settings = settings;
+		_exportSettings.cancelCallback = cancelCallback;
 		_exportSettings.confirmCallback = confirmCallback;
 		
 		_exportSettings.width = Lib.current.stage.stageWidth / 2;
-		_exportSettings.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		_exportSettings.height = Lib.current.stage.stageHeight / 2;
 		
 		PopUpManager.addPopUp(_exportSettings, Lib.current.stage);
+	}
+	
+	static public function showFileSettingsWindow(settings:FileSettings, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
+	{
+		if (_fileSettings == null)
+		{
+			_fileSettings = new FileSettingsWindow();
+		}
+		
+		_fileSettings.settings = settings;
+		_fileSettings.title = title;
+		_fileSettings.cancelCallback = cancelCallback;
+		_fileSettings.confirmCallback = confirmCallback;
+		
+		_fileSettings.width = Lib.current.stage.stageWidth / 2;
+		_fileSettings.height = Lib.current.stage.stageHeight / 2;
+		
+		PopUpManager.addPopUp(_fileSettings, Lib.current.stage);
 	}
 	
 	static public function showObjectAddWindow(reusableObjects:Array<ValEditObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
@@ -298,6 +328,22 @@ class FeathersWindows
 		_objectSelect.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
 		
 		PopUpManager.addPopUp(_objectSelect, Lib.current.stage);
+	}
+	
+	static public function showStartMenuWindow(newFileCallback:Void->Void, loadFileCallback:Void->Void):Void
+	{
+		if (_startMenu == null)
+		{
+			_startMenu = new StartMenuWindow();
+		}
+		
+		_startMenu.newFileCallback = newFileCallback;
+		_startMenu.loadFileCallback = loadFileCallback;
+		
+		_startMenu.width = Lib.current.stage.stageWidth / 2;
+		_startMenu.height = Lib.current.stage.stageHeight / 2;
+		
+		PopUpManager.addPopUp(_startMenu, Lib.current.stage);
 	}
 	
 	static public function showTemplateCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Template"):Void

@@ -2,8 +2,6 @@ package valeditor.ui.feathers.window.asset;
 
 import feathers.controls.Button;
 import feathers.controls.Header;
-import feathers.controls.Label;
-import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.controls.navigators.StackItem;
@@ -11,20 +9,19 @@ import feathers.controls.navigators.StackNavigator;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
-import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
+import valedit.asset.AssetType;
 import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 #if starling
 import valeditor.ui.feathers.window.asset.starling.StarlingAtlasAssetsWindow;
 import valeditor.ui.feathers.window.asset.starling.StarlingTextureAssetsWindow;
 #end
-import valedit.asset.AssetType;
-import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
  * ...

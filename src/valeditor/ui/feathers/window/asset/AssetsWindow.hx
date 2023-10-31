@@ -2,7 +2,6 @@ package valeditor.ui.feathers.window.asset;
 
 import feathers.controls.Button;
 import feathers.controls.Header;
-import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.Panel;
@@ -18,6 +17,9 @@ import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.net.FileFilter;
+import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 #if desktop
 import valeditor.utils.file.FilesOpenerDesktop;
 import valeditor.utils.file.FolderOpenerDesktop;
@@ -26,9 +28,6 @@ import openfl.filesystem.File;
 import valeditor.utils.file.FilesOpener;
 import openfl.net.FileReference;
 #end
-import valeditor.ui.feathers.Padding;
-import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
  * ...

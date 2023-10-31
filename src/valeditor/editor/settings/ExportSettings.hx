@@ -7,10 +7,19 @@ import haxe.io.Path;
  */
 class ExportSettings 
 {
+	static private var _POOL:Array<ExportSettings> = new Array<ExportSettings>();
+	
+	static public function fromPool():ExportSettings
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new ExportSettings();
+	}
+	
+	public var compress:Bool;
 	public var exportAssets:Bool;
 	public var fileName:String;
+	public var filePath:String;
 	public var fullPath(get, set):String;
-	public var path:String;
 	public var useSimpleJSON:Bool;
 	public var useZip:Bool #if !desktop = true#end;
 	
@@ -21,12 +30,12 @@ class ExportSettings
 		if (value == null)
 		{
 			this.fileName = null;
-			this.path = null;
+			this.filePath = null;
 		}
 		else
 		{
 			this.fileName = Path.withoutDirectory(value);
-			this.path = Path.directory(value);
+			this.filePath = Path.directory(value);
 		}
 		return this._fullPath = value;
 	}
@@ -38,6 +47,7 @@ class ExportSettings
 	
 	public function clear():Void
 	{
+		this.compress = false;
 		this.exportAssets = false;
 		this.fullPath = null;
 		this.useSimpleJSON = false;
@@ -46,11 +56,32 @@ class ExportSettings
 		#end
 	}
 	
+	public function pool():Void
+	{
+		clear();
+		_POOL.push(this);
+	}
+	
+	public function clone(toSettings:ExportSettings = null):ExportSettings
+	{
+		if (toSettings == null) toSettings = fromPool();
+		
+		toSettings.compress = this.compress;
+		toSettings.exportAssets = this.exportAssets;
+		toSettings.fileName = this.fileName;
+		toSettings.filePath = this.filePath;
+		toSettings.useSimpleJSON = this.useSimpleJSON;
+		toSettings.useZip = this.useZip;
+		
+		return toSettings;
+	}
+	
 	public function fromJSON(json:Dynamic):Void
 	{
+		this.compress = json.compress;
 		this.exportAssets = json.exportAssets;
 		this.fileName = json.fileName;
-		this.path = json.path;
+		this.filePath = json.filePath;
 		this.useSimpleJSON = json.useSimpleJSON;
 		this.useZip = json.useZip;
 	}
@@ -59,9 +90,10 @@ class ExportSettings
 	{
 		if (json == null) json = {};
 		
+		json.compress = this.compress;
 		json.exportAssets = this.exportAssets;
 		json.fileName = this.fileName;
-		json.path = this.path;
+		json.filePath = this.filePath;
 		json.useSimpleJSON = this.useSimpleJSON;
 		json.useZip = this.useZip;
 		

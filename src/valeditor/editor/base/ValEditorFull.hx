@@ -3,16 +3,45 @@ import feathers.controls.navigators.StackItem;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
+import openfl.Lib;
+import openfl.display.Bitmap;
 import openfl.display.Sprite;
+import openfl.filters.BlurFilter;
+import openfl.filters.DropShadowFilter;
+import openfl.filters.GlowFilter;
+import openfl.geom.ColorTransform;
+import openfl.geom.Matrix;
+import openfl.geom.Point;
+import openfl.geom.Rectangle;
+import openfl.geom.Transform;
+import openfl.text.Font;
+import openfl.text.TextField;
+import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
+import starling.display.Image;
+import starling.display.Quad;
+import valedit.DisplayObjectType;
+import valedit.data.feathers.themes.SimpleThemeData;
+import valedit.data.openfl.display.DisplayData;
+import valedit.data.openfl.filters.FiltersData;
+import valedit.data.openfl.geom.GeomData;
+import valedit.data.openfl.text.TextData;
+import valedit.data.starling.display.StarlingDisplayData;
+import valedit.data.starling.texture.StarlingTextureData;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
 import valeditor.editor.file.FileController;
 import valeditor.editor.settings.ExportSettings;
+import valeditor.editor.settings.FileSettings;
+import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;
+import valeditor.ui.InteractiveFactories;
+import valeditor.ui.feathers.FeathersWindows;
+import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.view.EditorView;
+import valeditor.utils.starling.TextureCreationParameters;
 
 #if starling
 import starling.core.Starling;
@@ -25,6 +54,9 @@ import starling.core.Starling;
 class ValEditorFull extends ValEditorBaseFeathers
 {
 	public var editView(default, null):EditorView;
+	
+	private var _fileSettings:FileSettings = new FileSettings();
+	private var _isStartUp:Bool = true;
 
 	public function new() 
 	{
@@ -47,9 +79,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.rootSceneStarling = starlingSprite;
 		#end
 		
-		var container:ValEditorContainer = ValEditor.createContainer();
-		ValEditor.rootContainer = container;
-		
 		initInputActions();
 		ValEditor.input.addEventListener(InputActionEvent.ACTION_BEGIN, onInputActionBegin);
 	}
@@ -66,15 +95,135 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);
+		
+		var fileItems:Array<Dynamic> = [
+			{text:"New (Ctrl+N)", id:"new"},
+			{text:"Open (Ctrl+O)", id:"open"},
+			{text:"Save (Ctrl+S)", id:"save"},
+			{text:"Save As (Ctrl+Shift+S)", id:"save as"},
+			{text:"File Settings", id:"file settings"},
+			{text:"Export Settings", id:"export settings"}
+		];
+		this.editView.addMenu("file", "File", onFileMenuCallback, fileItems);
+		
+		var assetItems:Array<Dynamic> = [
+			{text:"Browser", id:"browser"}
+		];
+		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, assetItems);
+		
+		var themeItems:Array<Dynamic> = [
+			{text:"Light mode", id:"light mode"},
+			{text:"Dark mode", id:"dark mode"},
+			{text:"Edit", id:"edit"}
+		];
+		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, themeItems);
 	}
 	
 	override function exposeData():Void 
 	{
 		super.exposeData();
 		
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		
+		// UI Theme
+		ValEditor.registerClassSimple(ValEditorTheme, false, SimpleThemeData.exposeSimpleTheme());
+		
+		// OpenFL Display
+		settings.canBeCreated = false;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.objectCollection = DisplayData.exposeSprite();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(Sprite, settings);
+		settings.clear();
+		
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.objectCollection = DisplayData.exposeBitmapInstance();
+		settings.templateCollection = DisplayData.exposeBitmapTemplate();
+		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(Bitmap, settings);
+		settings.clear();
+		
+		// OpenFL Filters
+		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), null, FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), null, FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), null, FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		
+		// OpenFL Geom
+		ValEditor.registerClassSimple(ColorTransform, false, GeomData.exposeColorTransform());
+		ValEditor.registerClassSimple(Matrix, false, GeomData.exposeMatrix());
+		ValEditor.registerClassSimple(Transform, false, GeomData.exposeTransform());
+		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), null, GeomData.exposePointConstructor());
+		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), null, GeomData.exposeRectangleConstructor());
+		
+		// OpenFL Text
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_TEXT);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.objectCollection = TextData.exposeTextField();
+		settings.interactiveFactory = InteractiveFactories.openFL_visible;
+		ValEditor.registerClass(TextField, settings);
+		settings.clear();
+		
+		ValEditor.registerClassSimple(Font, false, TextData.exposeFont());
+		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), null, TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
+		
+		#if starling
+		// Starling Texture Creation
+		ValEditor.registerClassSimple(TextureCreationParameters, false, StarlingTextureData.exposeTextureCreationParameters());
+		
+		// Starling Display
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.objectCollection = StarlingDisplayData.exposeQuadInstance();
+		settings.templateCollection = StarlingDisplayData.exposeQuadTemplate();
+		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_default;
+		settings.hasRadianRotation = true;
+		ValEditor.registerClass(Quad, settings);
+		settings.clear();
+		
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.objectCollection = StarlingDisplayData.exposeImageInstance();
+		settings.templateCollection = StarlingDisplayData.exposeImageTemplate();
+		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_default;
+		settings.hasRadianRotation = true;
+		ValEditor.registerClass(Image, settings);
+		
+		// Starling Filters
+		
+		// Starling Text
+		#end
+		
+		#if massive_starling
+		//ValEditor.registerClass(FrameProxy, MassiveData.exposeFrameProxy());
+		//ValEditor.registerClass(ImageDataProxy, MassiveData.exposeImageDataProxy(), true, true, DisplayObjectType.STARLING);
+		//ValEditor.registerClass(QuadDataProxy, MassiveData.exposeQuadDataProxy(), true, true, DisplayObjectType.STARLING);
+		#end
+		
+		settings.pool();
+		
 		ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditKeyFrame());
 		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
+		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
 	}
 	
 	override function ready():Void 
@@ -83,11 +232,135 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		this.screenNavigator.rootItemID = EditorView.ID;
 		
-		ValEditor.currentContainer = ValEditor.rootContainer;
+		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
+		
+		FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
+	}
+	
+	private function onNewFile():Void
+	{
+		FeathersWindows.showFileSettingsWindow(this._fileSettings, "New File", onFileSettingsConfirm, onFileSettingsCancel);
+	}
+	
+	private function onFileSettingsConfirm():Void
+	{
+		ValEditor.reset();
+		this._fileSettings.clone(ValEditor.fileSettings);
+		ValEditor.newFile();
+		this._isStartUp = false;
+	}
+	
+	private function onFileSettingsCancel():Void
+	{
+		if (this._isStartUp)
+		{
+			FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
+		}
+	}
+	
+	private function onLoadFile():Void
+	{
+		FileController.open(onLoadFileConfirm, onLoadFileCancel);
+	}
+	
+	private function onLoadFileConfirm(filePath:String):Void
+	{
+		this._isStartUp = false;
+	}
+	
+	private function onLoadFileCancel():Void
+	{
+		if (this._isStartUp)
+		{
+			FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
+		}
+	}
+	
+	private function onSelectionChange(evt:SelectionEvent):Void
+	{
+		if (evt == null || evt.object == null)
+		{
+			ValEditor.edit(ValEditor.currentContainer);
+		}
+		else
+		{
+			if (Std.isOfType(evt.object, ValEditorObject))
+			{
+				ValEditor.edit(evt.object);
+			}
+			else if (Std.isOfType(evt.object, ValEditorTemplate))
+			{
+				ValEditor.editTemplate(evt.object);
+			}
+			else if (Std.isOfType(evt.object, ValEditorKeyFrame))
+			{
+				ValEditor.edit(evt.object);
+			}
+			else
+			{
+				ValEditor.edit(null);
+			}
+		}
+	}
+	
+	private function onFileMenuCallback(item:Dynamic):Void
+	{
+		switch (item.id)
+		{
+			case "new" :
+				onNewFile();
+			
+			case "open" :
+				onLoadFile();
+			
+			case "save" :
+				FileController.save();
+			
+			case "save as" :
+				FileController.save(true);
+			
+			case "file settings" :
+				FeathersWindows.showFileSettingsWindow(ValEditor.fileSettings, "File Settings");
+			
+			case "export settings" :
+				FeathersWindows.showExportSettingsWindow(ValEditor.exportSettings);
+		}
+		
+		Lib.current.stage.focus = null;
+	}
+	
+	private function onAssetMenuCallback(item:Dynamic):Void
+	{
+		switch (item.id)
+		{
+			case "browser" :
+				FeathersWindows.showAssetBrowser();
+		}
+		
+		Lib.current.stage.focus = null;
+	}
+	
+	private function onThemeMenuCallback(item:Dynamic):Void
+	{
+		switch (item.id)
+		{
+			case "light mode" :
+				this.theme.darkMode = false;
+			
+			case "dark mode" :
+				this.theme.darkMode = true;
+			
+			case "edit" :
+				ValEditor.edit(this.theme);
+		}
+		
+		Lib.current.stage.focus = null;
 	}
 	
 	private function onInputActionBegin(evt:InputActionEvent):Void
 	{
+		if (this._isStartUp) return;
+		
 		var action:InputAction = evt.action;
 		
 		switch (action.actionID)
@@ -118,10 +391,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 			
 			// file
 			case InputActionID.NEW_FILE :
-				ValEditor.newFile();
+				onNewFile();
 			
 			case InputActionID.OPEN :
-				FileController.open();
+				onLoadFile();
 			
 			case InputActionID.EXPORT :
 				trace("export");
@@ -152,35 +425,19 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		// insert frame
 		keyAction = new KeyAction(InputActionID.INSERT_FRAME, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);
-		#if html5
-		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_5, keyAction);
-		#else
 		ValEditor.keyboardController.addKeyAction(Keyboard.F5, keyAction);
-		#end
 		
 		// insert keyframe
 		keyAction = new KeyAction(InputActionID.INSERT_KEYFRAME, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);
-		#if html5
-		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_6, keyAction);
-		#else
 		ValEditor.keyboardController.addKeyAction(Keyboard.F6, keyAction);
-		#end
 		
 		// remove frame
 		keyAction = new KeyAction(InputActionID.REMOVE_FRAME, false, false, true, 0, 0, firstRepeatDelay, repeatDelay);
-		#if html5
-		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_5, keyAction);
-		#else
 		ValEditor.keyboardController.addKeyAction(Keyboard.F5, keyAction);
-		#end
 		
 		// remove keyframe
 		keyAction = new KeyAction(InputActionID.REMOVE_KEYFRAME, false, false, true, 0, 0, firstRepeatDelay, repeatDelay);
-		#if html5
-		ValEditor.keyboardController.addKeyAction(Keyboard.NUMBER_6, keyAction);
-		#else
 		ValEditor.keyboardController.addKeyAction(Keyboard.F6, keyAction);
-		#end
 		
 		// move selection
 		keyAction = new KeyAction(InputActionID.MOVE_DOWN_1, false, false, false, 0, 0, firstRepeatDelay, repeatDelay);

@@ -19,13 +19,18 @@ class FolderSelectorDesktop
 		
 	}
 	
-	public function start(completeCallback:String->Void, cancelCallback:Void->Void, dialogTitle:String = "select folder"):Void
+	public function start(completeCallback:String->Void, cancelCallback:Void->Void, path:String = null, dialogTitle:String = "select folder"):Void
 	{
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
 		this._file.addEventListener(Event.SELECT, onFolderSelected);
 		this._file.addEventListener(Event.CANCEL, onFolderCancelled);
+		
+		if (path != null)
+		{
+			this._file.resolvePath(path);
+		}
 		
 		this._file.browseForDirectory(dialogTitle);
 	}
