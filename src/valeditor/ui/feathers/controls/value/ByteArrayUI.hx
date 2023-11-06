@@ -9,14 +9,14 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.utils.ByteArray;
-import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.asset.AssetLib;
+import valedit.ValEdit;
 import valedit.asset.BinaryAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...
@@ -144,7 +144,7 @@ class ByteArrayUI extends ValueUI
 			var value:ByteArray = this._exposedValue.value;
 			if (value != null)
 			{
-				assetUpdate(AssetLib.getBinaryFromByteArray(cast value));
+				assetUpdate(ValEdit.assetLib.getBinaryFromByteArray(cast value));
 			}
 			else
 			{

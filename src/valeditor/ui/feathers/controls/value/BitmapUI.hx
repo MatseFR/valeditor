@@ -1,5 +1,4 @@
 package valeditor.ui.feathers.controls.value;
-import valedit.asset.AssetLib;
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
@@ -11,13 +10,14 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import valedit.ValEdit;
+import valedit.asset.BitmapAsset;
+import valedit.events.ValueEvent;
+import valedit.ui.IValueUI;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.asset.BitmapAsset;
-import valedit.events.ValueEvent;
-import valedit.ui.IValueUI;
 
 /**
  * ...
@@ -164,11 +164,11 @@ class BitmapUI extends ValueUI
 			{
 				if (Std.isOfType(value, Bitmap))
 				{
-					assetUpdate(AssetLib.getBitmapFromBitmapData(cast(value, Bitmap).bitmapData));
+					assetUpdate(ValEdit.assetLib.getBitmapFromBitmapData(cast(value, Bitmap).bitmapData));
 				}
 				else if (Std.isOfType(value, BitmapData))
 				{
-					assetUpdate(AssetLib.getBitmapFromBitmapData(cast value));
+					assetUpdate(ValEdit.assetLib.getBitmapFromBitmapData(cast value));
 				}
 			}
 			else

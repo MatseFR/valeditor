@@ -11,15 +11,15 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.display.Bitmap;
 import starling.textures.TextureAtlas;
-import valeditor.ui.feathers.controls.value.ValueUI;
-import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.asset.AssetLib;
+import valedit.ValEdit;
 import valedit.asset.starling.StarlingAtlasAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...
@@ -164,7 +164,7 @@ class StarlingAtlasUI extends ValueUI
 			var value:TextureAtlas = this._exposedValue.value;
 			if (value != null)
 			{
-				assetUpdate(AssetLib.getStarlingAtlasAssetFromAtlas(value));
+				assetUpdate(ValEdit.assetLib.getStarlingAtlasAssetFromAtlas(value));
 			}
 			else
 			{

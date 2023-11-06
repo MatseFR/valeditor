@@ -8,20 +8,18 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import feathers.utils.ScaleUtil;
 import openfl.display.Bitmap;
-import starling.textures.SubTexture;
 import starling.textures.Texture;
-import valeditor.ui.feathers.FeathersWindows;
-import valeditor.ui.feathers.Padding;
-import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.asset.AssetLib;
+import valedit.ValEdit;
 import valedit.asset.starling.StarlingTextureAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.UIConfig;
+import valeditor.ui.feathers.FeathersWindows;
+import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...
@@ -166,7 +164,7 @@ class StarlingTextureUI extends ValueUI
 			var value:Texture = this._exposedValue.value;
 			if (value != null)
 			{
-				assetUpdate(AssetLib.getStarlingTextureAssetFromTexture(value));
+				assetUpdate(ValEdit.assetLib.getStarlingTextureAssetFromTexture(value));
 			}
 			else
 			{

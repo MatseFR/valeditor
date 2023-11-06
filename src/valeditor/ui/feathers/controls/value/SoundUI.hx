@@ -1,7 +1,4 @@
 package valeditor.ui.feathers.controls.value;
-import openfl.media.Sound;
-import openfl.media.SoundChannel;
-import valedit.asset.AssetLib;
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
@@ -11,14 +8,17 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import valeditor.ui.feathers.Padding;
-import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.variant.LabelVariant;
-import valeditor.utils.TimeUtil;
+import openfl.media.Sound;
+import openfl.media.SoundChannel;
+import valedit.ValEdit;
 import valedit.asset.SoundAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.FeathersWindows;
+import valeditor.ui.feathers.Padding;
+import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.utils.TimeUtil;
 
 /**
  * ...
@@ -171,7 +171,7 @@ class SoundUI extends ValueUI
 			var value:Dynamic = this._exposedValue.value;
 			if (value != null)
 			{
-				assetUpdate(AssetLib.getSoundFromSound(cast value));
+				assetUpdate(ValEdit.assetLib.getSoundFromSound(cast value));
 			}
 			else
 			{
