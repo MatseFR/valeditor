@@ -4,16 +4,12 @@ import haxe.Constraints.Function;
 import haxe.Json;
 import haxe.crypto.Crc32;
 import haxe.ds.List;
-import haxe.ds.StringMap;
 import haxe.io.Bytes;
-import haxe.io.BytesInput;
 import haxe.io.BytesOutput;
-import haxe.zip.Compress;
 import haxe.zip.Entry;
-import haxe.zip.Reader;
-import haxe.zip.Tools;
-import haxe.zip.Uncompress;
 import haxe.zip.Writer;
+import inputAction.Input;
+import inputAction.controllers.KeyboardController;
 import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.display.DisplayObjectContainer;
@@ -22,9 +18,8 @@ import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
 import openfl.utils.ByteArray;
-import openfl.utils.CompressionAlgorithm;
-import valedit.ExposedCollection;
 import valedit.DisplayObjectType;
+import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
@@ -38,8 +33,6 @@ import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
-import inputAction.Input;
-import inputAction.controllers.KeyboardController;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
@@ -54,6 +47,8 @@ import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.utils.ArraySort;
+import valeditor.utils.file.asset.AssetFilesLoader;
+import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
 
 /**
  * ...
@@ -62,10 +57,16 @@ import valeditor.utils.ArraySort;
 @:access(valedit.ValEdit)
 class ValEditor
 {
+	#if desktop
+	static public var assetFileLoader:AssetFilesLoaderDesktop;
+	#else
+	static public var assetFileLoader:AssetFilesLoader;
+	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var currentContainer(get, set):ValEditorContainer;
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
+	static public var fileExtension:String = "ves";
 	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
 	static public var keyboardController(default, null):KeyboardController;
@@ -207,8 +208,16 @@ class ValEditor
 	static private var _changeUpdateQueue:ChangeUpdateQueue;
 	static private var _zipSaveLoader:ZipSaveLoader;
 	
-	static public function init():Void
+	static public function init(completeCallback:Void->Void):Void
 	{
+		if (assetFileLoader == null)
+		{
+			#if desktop
+			assetFileLoader = new AssetFilesLoaderDesktop();
+			#else
+			assetFileLoader = new AssetFilesLoader();
+			#end
+		}
 		keyboardController = new KeyboardController(Lib.current.stage);
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
@@ -225,6 +234,14 @@ class ValEditor
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
 		classCollection.sortCompareFunction = ArraySort.stringData;
 		templateCollection.sortCompareFunction = ArraySort.template;
+		
+		if (ValEdit.assetLib == null)
+		{
+			ValEdit.assetLib = new AssetLib();
+			ValEdit.assetLib.init(true);
+		}
+		
+		ValEdit.init(completeCallback);
 	}
 	
 	static public function newFile():Void
@@ -236,7 +253,7 @@ class ValEditor
 	static public function reset():Void
 	{
 		FeathersWindows.closeAll();
-		
+		assetFileLoader.clear();
 		selection.clear();
 		
 		for (clss in _classMap)
@@ -251,7 +268,7 @@ class ValEditor
 			rootContainer = null;
 		}
 		
-		AssetLib.reset();
+		ValEdit.assetLib.reset();
 		
 		fileSettings.clear();
 	}
@@ -1209,7 +1226,7 @@ class ValEditor
 		var assets:Dynamic = {};
 		// binary
 		var binaryList:Array<Dynamic> = [];
-		for (asset in AssetLib.binaryList)
+		for (asset in ValEdit.assetLib.binaryList)
 		{
 			if (asset.source == AssetSource.EXTERNAL)
 			{
@@ -1225,7 +1242,7 @@ class ValEditor
 		
 		// bitmap
 		var bitmapList:Array<Dynamic> = [];
-		for (asset in AssetLib.bitmapList)
+		for (asset in ValEdit.assetLib.bitmapList)
 		{
 			if (asset.source == AssetSource.EXTERNAL)
 			{
@@ -1241,7 +1258,7 @@ class ValEditor
 		
 		// sound
 		var soundList:Array<Dynamic> = [];
-		for (asset in AssetLib.soundList)
+		for (asset in ValEdit.assetLib.soundList)
 		{
 			if (asset.source == AssetSource.EXTERNAL)
 			{
@@ -1257,7 +1274,7 @@ class ValEditor
 		
 		// text
 		var textList:Array<Dynamic> = [];
-		for (asset in AssetLib.textList)
+		for (asset in ValEdit.assetLib.textList)
 		{
 			if (asset.source == AssetSource.EXTERNAL)
 			{
@@ -1275,7 +1292,7 @@ class ValEditor
 		#if starling
 		// starling_atlas
 		var starlingAtlasList:Array<Dynamic> = [];
-		for (asset in AssetLib.starlingAtlasList)
+		for (asset in ValEdit.assetLib.starlingAtlasList)
 		{
 			starlingAtlasList.push(asset.toJSONSave());
 		}
@@ -1285,7 +1302,7 @@ class ValEditor
 		}
 		// starling_texture
 		var starlingTextureList:Array<Dynamic> = [];
-		for (asset in AssetLib.starlingTextureList)
+		for (asset in ValEdit.assetLib.starlingTextureList)
 		{
 			if (asset.path.indexOf(ValEdit.STARLING_SUBTEXTURE_MARKER) == -1)
 			{
