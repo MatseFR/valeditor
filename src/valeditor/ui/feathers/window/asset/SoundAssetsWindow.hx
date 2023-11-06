@@ -1,13 +1,14 @@
 package valeditor.ui.feathers.window.asset;
-import feathers.events.TriggerEvent;
-import openfl.utils.ByteArray;
-import valeditor.ui.feathers.window.asset.AssetsWindow;
-import valedit.asset.AssetLib;
 import feathers.data.ListViewItemState;
+import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
+import haxe.io.Bytes;
 import openfl.media.Sound;
 import openfl.net.FileFilter;
+import valedit.ValEdit;
+import valedit.asset.SoundAsset;
 import valeditor.ui.feathers.renderers.SoundAssetItemRenderer;
+import valeditor.ui.feathers.window.asset.AssetsWindow;
 #if desktop
 import openfl.filesystem.File;
 import valeditor.utils.file.asset.SoundFilesLoaderDesktop;
@@ -15,7 +16,6 @@ import valeditor.utils.file.asset.SoundFilesLoaderDesktop;
 import openfl.net.FileReference;
 import valeditor.utils.file.asset.SoundFilesLoader;
 #end
-import valedit.asset.SoundAsset;
 
 /**
  * ...
@@ -46,7 +46,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		this._filterList = [new FileFilter("Sounds (*.ogg, *.wav)", "*.ogg;*.wav")];
 		#end
 		
-		this._assetList.dataProvider = AssetLib.soundCollection;
+		this._assetList.dataProvider = ValEdit.assetLib.soundCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new SoundAssetItemRenderer();
@@ -63,25 +63,29 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		};
 	}
 	
-	private function soundLoadComplete(path:String, sound:Sound, data:ByteArray):Void
+	private function soundLoadComplete(path:String, sound:Sound, data:Bytes):Void
 	{
-		AssetLib.createSound(path, sound, data);
+		ValEdit.assetLib.createSound(path, sound, data);
 	}
 	
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		this._soundLoader.start(files, soundLoadComplete, enableUI);
+		this._soundLoader.addFiles(files);
+		this._soundLoader.start(soundLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		this._soundLoader.start(files, soundLoadComplete, enableUI);
+		this._soundLoader.addFiles(files);
+		this._soundLoader.start(soundLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		this._soundLoader.start(files, soundLoadComplete, enableUI);
+		disableUI();
+		this._soundLoader.addFiles(files);
+		this._soundLoader.start(soundLoadComplete, enableUI);
 	}
 	#end
 	
@@ -90,7 +94,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
-			AssetLib.removeSound(item);
+			ValEdit.assetLib.removeSound(item);
 		}
 	}
 	

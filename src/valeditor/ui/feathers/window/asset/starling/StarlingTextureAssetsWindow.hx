@@ -5,15 +5,15 @@ import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
-import valeditor.ui.feathers.renderers.starling.StarlingTextureAssetItemRenderer;
-import valeditor.utils.starling.AtlasLoader;
-import valeditor.utils.starling.TextureCreationParameters;
-import valeditor.utils.starling.TextureLoader;
-import valedit.asset.AssetLib;
+import valedit.ValEdit;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingTextureAsset;
+import valeditor.ui.feathers.renderers.starling.StarlingTextureAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
+import valeditor.utils.starling.AtlasLoader;
+import valeditor.utils.starling.TextureCreationParameters;
+import valeditor.utils.starling.TextureLoader;
 
 /**
  * ...
@@ -45,7 +45,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		this._footerGroup.addChildAt(this._addTextureButton, 1);
 		this._buttonList.push(this._addTextureButton);
 		
-		this._assetList.dataProvider = AssetLib.starlingTextureCollection;
+		this._assetList.dataProvider = ValEdit.assetLib.starlingTextureCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new StarlingTextureAssetItemRenderer();
@@ -80,12 +80,12 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 	
 	private function atlasLoadComplete(atlas:TextureAtlas, textureParams:TextureCreationParameters, bitmapAsset:BitmapAsset, textAsset:TextAsset):Void
 	{
-		AssetLib.createStarlingAtlas(bitmapAsset.path, atlas, textureParams, bitmapAsset, textAsset);
+		ValEdit.assetLib.createStarlingAtlas(bitmapAsset.path, atlas, textureParams, bitmapAsset, textAsset);
 	}
 	
 	private function textureLoadComplete(texture:Texture, textureParams:TextureCreationParameters, bitmapAsset:BitmapAsset):Void
 	{
-		AssetLib.createStarlingTexture(bitmapAsset.path, texture, textureParams, bitmapAsset);
+		ValEdit.assetLib.createStarlingTexture(bitmapAsset.path, texture, textureParams, bitmapAsset);
 	}
 	
 	private function onAddAtlasButton(evt:TriggerEvent):Void
@@ -105,7 +105,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
-			AssetLib.removeStarlingTexture(item);
+			ValEdit.assetLib.removeStarlingTexture(item);
 		}
 	}
 	

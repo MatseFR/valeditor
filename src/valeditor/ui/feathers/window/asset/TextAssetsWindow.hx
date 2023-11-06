@@ -3,10 +3,10 @@ import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.net.FileFilter;
+import valedit.ValEdit;
+import valedit.asset.TextAsset;
 import valeditor.ui.feathers.renderers.TextAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-import valedit.asset.AssetLib;
-import valedit.asset.TextAsset;
 #if desktop
 import openfl.filesystem.File;
 import valeditor.utils.file.asset.TextFilesLoaderDesktop;
@@ -39,7 +39,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		this._extensionList = ["txt", "xml", "json"];
 		this._filterList = [new FileFilter("Text", "*.txt;*.xml;*.json")];
 		
-		this._assetList.dataProvider = AssetLib.textCollection;
+		this._assetList.dataProvider = ValEdit.assetLib.textCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new TextAssetItemRenderer();
@@ -58,23 +58,27 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	
 	private function textLoadComplete(path:String, text:String):Void
 	{
-		AssetLib.createText(path, text);
+		ValEdit.assetLib.createText(path, text);
 	}
 	
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		this._textLoader.start(files, textLoadComplete, enableUI);
+		this._textLoader.addFiles(files);
+		this._textLoader.start(textLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		this._textLoader.start(files, textLoadComplete, enableUI);
+		this._textLoader.addFiles(files);
+		this._textLoader.start(textLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		this._textLoader.start(files, textLoadComplete, enableUI);
+		disableUI();
+		this._textLoader.addFiles(files);
+		this._textLoader.start(textLoadComplete, enableUI);
 	}
 	#end
 	
@@ -83,7 +87,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
-			AssetLib.removeText(item);
+			ValEdit.assetLib.removeText(item);
 		}
 	}
 	

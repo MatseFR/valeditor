@@ -3,10 +3,10 @@ import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.utils.ByteArray;
+import valedit.ValEdit;
+import valedit.asset.BinaryAsset;
 import valeditor.ui.feathers.renderers.BinaryAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-import valedit.asset.AssetLib;
-import valedit.asset.BinaryAsset;
 #if desktop
 import openfl.filesystem.File;
 import valeditor.utils.file.asset.BinaryFilesLoaderDesktop;
@@ -39,7 +39,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		this._extensionList = [];
 		this._filterList = [];
 		
-		this._assetList.dataProvider = AssetLib.binaryCollection;
+		this._assetList.dataProvider = ValEdit.assetLib.binaryCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BinaryAssetItemRenderer();
@@ -58,23 +58,27 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 	
 	private function binaryLoadComplete(path:String, bytes:ByteArray):Void
 	{
-		AssetLib.createBinary(path, bytes);
+		ValEdit.assetLib.createBinary(path, bytes);
 	}
 	
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
+		this._binaryLoader.addFiles(files);
+		this._binaryLoader.start(binaryLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
+		this._binaryLoader.addFiles(files);
+		this._binaryLoader.start(binaryLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void
 	{
-		this._binaryLoader.start(files, binaryLoadComplete, enableUI);
+		disableUI();
+		this._binaryLoader.addFiles(files);
+		this._binaryLoader.start(binaryLoadComplete, enableUI);
 	}
 	#end
 	
@@ -83,7 +87,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
-			AssetLib.removeBinary(item);
+			ValEdit.assetLib.removeBinary(item);
 		}
 	}
 	

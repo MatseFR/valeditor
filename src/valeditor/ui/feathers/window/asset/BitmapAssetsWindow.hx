@@ -3,13 +3,13 @@ package valeditor.ui.feathers.window.asset;
 import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.utils.DisplayObjectRecycler;
+import haxe.io.Bytes;
 import openfl.display.BitmapData;
 import openfl.net.FileFilter;
-import openfl.utils.ByteArray;
+import valedit.ValEdit;
+import valedit.asset.BitmapAsset;
 import valeditor.ui.feathers.renderers.BitmapAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-import valedit.asset.AssetLib;
-import valedit.asset.BitmapAsset;
 #if desktop
 import openfl.filesystem.File;
 import valeditor.utils.file.asset.BitmapFilesLoaderDesktop;
@@ -42,7 +42,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		this._extensionList = ["jpg", "jpeg", "png", "gif"];
 		this._filterList = [new FileFilter("Images (*.jpeg, *.jpg, *.gif, *.png)", "*.jpeg;*.jpg;*.gif;*.png")];
 		
-		this._assetList.dataProvider = AssetLib.bitmapCollection;
+		this._assetList.dataProvider = ValEdit.assetLib.bitmapCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return new BitmapAssetItemRenderer();
@@ -59,25 +59,29 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		};
 	}
 	
-	private function bitmapDataLoadComplete(path:String, bmd:BitmapData, data:ByteArray):Void
+	private function bitmapDataLoadComplete(path:String, bmd:BitmapData, data:Bytes):Void
 	{
-		AssetLib.createBitmap(path, bmd, data);
+		ValEdit.assetLib.createBitmap(path, bmd, data);
 	}
 	
 	#if desktop
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
-		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		this._imageLoader.addFiles(files);
+		this._imageLoader.start(bitmapDataLoadComplete, enableUI);
 	}
 	
 	override function onAddFolderComplete(files:Array<File>):Void 
 	{
-		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		this._imageLoader.addFiles(files);
+		this._imageLoader.start(bitmapDataLoadComplete, enableUI);
 	}
 	#else
 	override function onAddFilesComplete(files:Array<FileReference>):Void 
 	{
-		this._imageLoader.start(files, bitmapDataLoadComplete, enableUI);
+		disableUI();
+		this._imageLoader.addFiles(files);
+		this._imageLoader.start(bitmapDataLoadComplete, enableUI);
 	}
 	#end
 	
@@ -86,7 +90,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
-			AssetLib.removeBitmap(item);
+			ValEdit.assetLib.removeBitmap(item);
 		}
 	}
 	
