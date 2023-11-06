@@ -14,6 +14,7 @@ import openfl.media.Sound;
 import openfl.utils.ByteArray;
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
+import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
@@ -103,7 +104,7 @@ class ZipSaveLoader extends EventDispatcher
 			this._assetNode = this._assetList[i];
 			this._entry = this._entryMap.get(this._assetNode.path);
 			this._ba = this._entry.data;
-			AssetLib.createBinary(this._assetNode.path, this._ba);
+			ValEdit.assetLib.createBinary(this._assetNode.path, this._ba);
 		}
 		
 		loadBitmapAssets();
@@ -143,7 +144,7 @@ class ZipSaveLoader extends EventDispatcher
 	
 	private function onBitmapLoadComplete(bmd:BitmapData):Void
 	{
-		AssetLib.createBitmap(this._assetNode.path, bmd, this._ba);
+		ValEdit.assetLib.createBitmap(this._assetNode.path, bmd, this._ba);
 		nextBitmapAsset();
 	}
 	
@@ -176,9 +177,14 @@ class ZipSaveLoader extends EventDispatcher
 		{
 			this._assetNode = this._assetList[i];
 			this._entry = this._entryMap.get(this._assetNode.path);
+			#if air
+			sound = new Sound();
+			sound.loadCompressedDataFromByteArray(this._entry.data, this._entry.data.length);
+			#else
 			buffer = AudioBuffer.fromBytes(this._entry.data);
 			sound = Sound.fromAudioBuffer(buffer);
-			AssetLib.createSound(this._assetNode.path, sound, this._entry.data);
+			#end
+			ValEdit.assetLib.createSound(this._assetNode.path, sound, this._entry.data);
 		}
 		
 		loadTextAssets();
@@ -209,7 +215,7 @@ class ZipSaveLoader extends EventDispatcher
 		{
 			this._assetNode = this._assetList[i];
 			this._entry = this._entryMap.get(this._assetNode.path);
-			AssetLib.createText(this._assetNode.path, this._entry.data.toString());
+			ValEdit.assetLib.createText(this._assetNode.path, this._entry.data.toString());
 		}
 		
 		#if starling
@@ -247,11 +253,11 @@ class ZipSaveLoader extends EventDispatcher
 			this._assetNode = this._assetList[i];
 			textureParams = new TextureCreationParameters();
 			textureParams.fromJSON(this._assetNode.textureParams);
-			bitmapAsset = AssetLib.getBitmapFromPath(this._assetNode.bitmapPath);
-			textAsset = AssetLib.getTextFromPath(this._assetNode.textPath);
+			bitmapAsset = ValEdit.assetLib.getBitmapFromPath(this._assetNode.bitmapPath);
+			textAsset = ValEdit.assetLib.getTextFromPath(this._assetNode.textPath);
 			texture = Texture.fromBitmapData(bitmapAsset.content, textureParams.generateMipMaps, textureParams.optimizeForRenderToTexture, textureParams.scale, textureParams.format, textureParams.forcePotTexture);
 			atlas = new TextureAtlas(texture, textAsset.content);
-			AssetLib.createStarlingAtlas(this._assetNode.path, atlas, textureParams, bitmapAsset, textAsset);
+			ValEdit.assetLib.createStarlingAtlas(this._assetNode.path, atlas, textureParams, bitmapAsset, textAsset);
 		}
 		
 		loadStarlingTextureAssets();
@@ -282,9 +288,9 @@ class ZipSaveLoader extends EventDispatcher
 			this._assetNode = this._assetList[i];
 			textureParams = new TextureCreationParameters();
 			textureParams.fromJSON(this._assetNode.textureParams);
-			bitmapAsset = AssetLib.getBitmapFromPath(this._assetNode.bitmapPath);
+			bitmapAsset = ValEdit.assetLib.getBitmapFromPath(this._assetNode.bitmapPath);
 			texture = Texture.fromBitmapData(bitmapAsset.content, textureParams.generateMipMaps, textureParams.optimizeForRenderToTexture, textureParams.scale, textureParams.format, textureParams.forcePotTexture);
-			AssetLib.createStarlingTexture(this._assetNode.path, texture, textureParams, bitmapAsset);
+			ValEdit.assetLib.createStarlingTexture(this._assetNode.path, texture, textureParams, bitmapAsset);
 		}
 		
 		allAssetsLoaded();
