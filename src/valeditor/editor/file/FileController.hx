@@ -32,12 +32,24 @@ class FileController
 	
 	static public function open(?completeCallback:String->Void, ?cancelCallback:Void->Void):Void
 	{
+		_completeCallback = completeCallback;
+		_cancelCallback = cancelCallback;
 		#if desktop
 		_fileOpener.start(onOpenComplete, onOpenCancel);
 		#else
 		_fileOpener.start(onOpenComplete, onOpenCancel);
 		#end
 	}
+	
+	#if desktop
+	static public function openFile(file:File, ?completeCallback:String->Void):Void
+	{
+		_completeCallback = completeCallback;
+		onOpenComplete(file);
+	}
+	#else
+	
+	#end
 	
 	#if desktop
 	static private function onOpenComplete(file:File):Void
