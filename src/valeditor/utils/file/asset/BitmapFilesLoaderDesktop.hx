@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+import haxe.io.Bytes;
 import openfl.display.BitmapData;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
@@ -11,14 +12,16 @@ import openfl.utils.ByteArray;
  */
 class BitmapFilesLoaderDesktop 
 {
-	private var _files:Array<File>;
+	public var isRunning(default, null):Bool;
+	
+	private var _files:Array<File> = new Array<File>();
 	private var _fileIndex:Int;
 	private var _fileCurrent:File;
 	private var _fileStream:FileStream = new FileStream();
 	
 	private var _bytes:ByteArray;// = new ByteArray();
 	
-	private var _imageCallback:String->BitmapData->ByteArray->Void;
+	private var _imageCallback:String->BitmapData->Bytes->Void;
 	private var _completeCallback:Void->Void;
 
 	public function new() 
@@ -26,12 +29,36 @@ class BitmapFilesLoaderDesktop
 		
 	}
 	
-	public function start(files:Array<File>, imageCallback:String->BitmapData->ByteArray->Void, completeCallback:Void->Void):Void
+	public function clear():Void
 	{
-		this._files = files;
+		this.isRunning = false;
+		
+		this._files.resize(0);
+		this._fileCurrent = null;
+		this._bytes = null;
+		this._imageCallback = null;
+		this._completeCallback = null;
+	}
+	
+	public function addFile(file:File):Void
+	{
+		this._files[this._files.length] = file;
+	}
+	
+	public function addFiles(files:Array<File>):Void
+	{
+		for (file in files)
+		{
+			this._files[this._files.length] = file;
+		}
+	}
+	
+	public function start(imageCallback:String->BitmapData->Bytes->Void, completeCallback:Void->Void):Void
+	{
 		this._imageCallback = imageCallback;
 		this._completeCallback = completeCallback;
 		
+		this.isRunning = true;
 		this._fileIndex = -1;
 		nextFile();
 	}
@@ -52,26 +79,35 @@ class BitmapFilesLoaderDesktop
 		else
 		{
 			var completeCallback:Void->Void = this._completeCallback;
-			this._files = null;
-			this._fileCurrent = null;
-			this._bytes = null;
-			this._imageCallback = null;
-			this._completeCallback = null;
+			clear();
 			
-			completeCallback();
+			if (completeCallback != null)
+			{
+				completeCallback();
+			}
 		}
 	}
 	
 	private function onImageLoadComplete(bmd:BitmapData):Void
 	{
-		this._imageCallback(this._fileCurrent.nativePath, bmd, this._bytes);
-		nextFile();
+		if (this.isRunning)
+		{
+			this._imageCallback(this._fileCurrent.nativePath, bmd, this._bytes);
+			nextFile();
+		}
+		else
+		{
+			bmd.dispose();
+		}
 	}
 	
 	private function onImageLoadError(error:Dynamic):Void
 	{
 		trace("ImageFilesLoaderDesktop failed to load " + this._fileCurrent.name);
-		nextFile();
+		if (this.isRunning)
+		{
+			nextFile();
+		}
 	}
 	
 }

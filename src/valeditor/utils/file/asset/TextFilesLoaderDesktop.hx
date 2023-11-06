@@ -9,7 +9,9 @@ import openfl.filesystem.FileStream;
  */
 class TextFilesLoaderDesktop 
 {
-	private var _files:Array<File>;
+	public var isRunning(default, null):Bool;
+	
+	private var _files:Array<File> = new Array<File>();
 	private var _fileIndex:Int;
 	private var _fileCurrent:File;
 	private var _fileStream:FileStream = new FileStream();
@@ -22,12 +24,35 @@ class TextFilesLoaderDesktop
 		
 	}
 	
-	public function start(files:Array<File>, textCallback:String->String->Void, completeCallback:Void->Void):Void
+	public function clear():Void
 	{
-		this._files = files;
+		this.isRunning = false;
+		
+		this._files.resize(0);
+		this._fileCurrent = null;
+		this._textCallback = null;
+		this._completeCallback = null;
+	}
+	
+	public function addFile(file:File):Void
+	{
+		this._files[this._files.length] = file;
+	}
+	
+	public function addFiles(files:Array<File>):Void
+	{
+		for (file in files)
+		{
+			this._files[this._files.length] = file;
+		}
+	}
+	
+	public function start(textCallback:String->String->Void, completeCallback:Void->Void):Void
+	{
 		this._textCallback = textCallback;
 		this._completeCallback = completeCallback;
 		
+		this.isRunning = true;
 		this._fileIndex = -1;
 		nextFile();
 	}
@@ -48,12 +73,12 @@ class TextFilesLoaderDesktop
 		else
 		{
 			var completeCallback:Void->Void = this._completeCallback;
-			this._files = null;
-			this._fileCurrent = null;
-			this._textCallback = null;
-			this._completeCallback = null;
+			clear();
 			
-			completeCallback();
+			if (completeCallback != null)
+			{
+				completeCallback();
+			}
 		}
 	}
 	

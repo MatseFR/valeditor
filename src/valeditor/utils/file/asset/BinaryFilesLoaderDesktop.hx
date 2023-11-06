@@ -10,7 +10,9 @@ import openfl.utils.ByteArray;
  */
 class BinaryFilesLoaderDesktop 
 {
-	private var _files:Array<File>;
+	public var isRunnning(default, null):Bool;
+	
+	private var _files:Array<File> = new Array<File>();
 	private var _fileIndex:Int;
 	private var _fileCurrent:File;
 	private var _fileStream:FileStream = new FileStream();
@@ -25,12 +27,35 @@ class BinaryFilesLoaderDesktop
 		
 	}
 	
-	public function start(files:Array<File>, binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
+	public function clear():Void
 	{
-		this._files = files;
+		this.isRunnning = false;
+		
+		this._files.resize(0);
+		this._fileCurrent = null;
+		this._binaryCallback = null;
+		this._completeCallback = null;
+	}
+	
+	public function addFile(file:File):Void
+	{
+		this._files[this._files.length] = file;
+	}
+	
+	public function addFiles(files:Array<File>):Void
+	{
+		for (file in files)
+		{
+			this._files[this._files.length] = file;
+		}
+	}
+	
+	public function start(binaryCallback:String->ByteArray->Void, completeCallback:Void->Void):Void
+	{
 		this._binaryCallback = binaryCallback;
 		this._completeCallback = completeCallback;
 		
+		this.isRunnning = true;
 		this._fileIndex = -1;
 		nextFile();
 	}
@@ -54,12 +79,12 @@ class BinaryFilesLoaderDesktop
 		else
 		{
 			var completeCallback:Void->Void = this._completeCallback;
-			this._files = null;
-			this._fileCurrent = null;
-			this._binaryCallback = null;
-			this._completeCallback = null;
+			clear();
 			
-			completeCallback();
+			if (completeCallback != null)
+			{
+				completeCallback();
+			}
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package valeditor.utils.file.asset;
 import flash.filesystem.FileStream;
+import haxe.io.Bytes;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.media.Sound;
@@ -11,14 +12,16 @@ import openfl.utils.ByteArray;
  */
 class SoundFilesLoaderDesktop 
 {
-	private var _files:Array<File>;
+	public var isRunning(default, null):Bool;
+	
+	private var _files:Array<File> = new Array<File>();
 	private var _fileIndex:Int;
 	private var _fileCurrent:File;
 	private var _fileStream:FileStream = new FileStream();
 	
 	private var _bytes:ByteArray;
 	
-	private var _soundCallback:String->Sound->ByteArray->Void;
+	private var _soundCallback:String->Sound->Bytes->Void;
 	private var _completeCallback:Void->Void;
 
 	public function new() 
@@ -26,12 +29,35 @@ class SoundFilesLoaderDesktop
 		
 	}
 	
-	public function start(files:Array<File>, soundCallback:String->Sound->ByteArray->Void, completeCallback:Void->Void):Void
+	public function clear():Void
 	{
-		this._files = files;
+		this.isRunning = false;
+		
+		this._files.resize(0);
+		this._fileCurrent = null;
+		this._soundCallback = null;
+		this._completeCallback = null;
+	}
+	
+	public function addFile(file:File):Void
+	{
+		this._files[this._files.length] = file;
+	}
+	
+	public function addFiles(files:Array<File>):Void
+	{
+		for (file in files)
+		{
+			this._files[this._files.length] = file;
+		}
+	}
+	
+	public function start(soundCallback:String->Sound->Bytes->Void, completeCallback:Void->Void):Void
+	{
 		this._soundCallback = soundCallback;
 		this._completeCallback = completeCallback;
 		
+		this.isRunning = true;
 		this._fileIndex = -1;
 		nextFile();
 	}
@@ -51,25 +77,31 @@ class SoundFilesLoaderDesktop
 		else
 		{
 			var completeCallback:Void->Void = this._completeCallback;
-			this._files = null;
-			this._fileCurrent = null;
-			this._soundCallback = null;
-			this._completeCallback = null;
+			clear();
 			
-			completeCallback();
+			if (completeCallback != null)
+			{
+				completeCallback();
+			}
 		}
 	}
 	
 	private function onSoundLoadComplete(sound:Sound):Void
 	{
-		this._soundCallback(this._fileCurrent.nativePath, sound, this._bytes);
-		nextFile();
+		if (this.isRunning)
+		{
+			this._soundCallback(this._fileCurrent.nativePath, sound, this._bytes);
+			nextFile();
+		}
 	}
 	
 	private function onSoundLoadError(error:Dynamic):Void
 	{
 		trace("SoundFilesLoaderDesktop failed to load " + this._fileCurrent.name);
-		nextFile();
+		if (this.isRunning)
+		{
+			nextFile();
+		}
 	}
 	
 }
