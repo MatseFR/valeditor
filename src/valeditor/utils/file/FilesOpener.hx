@@ -10,7 +10,7 @@ import openfl.net.FileReferenceList;
  */
 class FilesOpener
 {
-	private var _fileRefList:FileReferenceList = new FileReferenceList();
+	private var _fileRefList:FileReferenceList;
 	
 	private var _completeCallback:Array<FileReference>->Void;
 	private var _cancelCallback:Void->Void;
@@ -25,6 +25,7 @@ class FilesOpener
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
+		this._fileRefList = new FileReferenceList();
 		this._fileRefList.addEventListener(Event.SELECT, onFilesSelected);
 		this._fileRefList.addEventListener(Event.CANCEL, onFilesCancelled);
 		this._fileRefList.browse(filterList);
