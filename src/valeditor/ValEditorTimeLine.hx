@@ -528,6 +528,11 @@ class ValEditorTimeLine extends ValEditTimeLine
 		}
 		
 		updateLastFrameIndex();
+		
+		for (keyFrame in this._keyFrames)
+		{
+			keyFrame.buildTweens();
+		}
 	}
 	
 	public function toJSONSave(json:Dynamic = null):Dynamic
