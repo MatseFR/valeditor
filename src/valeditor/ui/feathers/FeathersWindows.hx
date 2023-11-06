@@ -83,6 +83,25 @@ class FeathersWindows
 		PopUpManager.addPopUp(_assetBrowser, Lib.current.stage);
 	}
 	
+	static public function toggleAssetBrowser():Void
+	{
+		if (_assetBrowser == null)
+		{
+			showAssetBrowser();
+		}
+		else
+		{
+			if (_assetBrowser.stage == null)
+			{
+				showAssetBrowser();
+			}
+			else
+			{
+				PopUpManager.removePopUp(_assetBrowser);
+			}
+		}
+	}
+	
 	static public function showBinaryAssets(?selectionCallback:BinaryAsset->Void, ?cancelCallback:Void->Void, title:String = "Binary assets"):Void
 	{
 		if (_binaryAssets == null)
@@ -344,6 +363,19 @@ class FeathersWindows
 		_startMenu.height = Lib.current.stage.stageHeight / 2;
 		
 		PopUpManager.addPopUp(_startMenu, Lib.current.stage);
+	}
+	
+	static public function closeStartMenuWindow():Void
+	{
+		if (_startMenu == null)
+		{
+			return;
+		}
+		
+		if (_startMenu.stage != null)
+		{
+			PopUpManager.removePopUp(_startMenu);
+		}
 	}
 	
 	static public function showTemplateCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Template"):Void
