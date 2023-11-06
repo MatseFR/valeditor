@@ -73,8 +73,7 @@ class ValEditorBaseFeathers extends Application
 		theme = new ValEditorTheme();
 		Theme.setTheme(theme);
 		
-		AssetLib.init();
-		AssetLib.load(assetsLoaded);
+		ValEditor.init(assetsLoaded);
 	}
 	
 	private function assetsLoaded():Void
