@@ -79,13 +79,11 @@ class StartMenuWindow extends Panel
 	private function onNewFileButton(evt:TriggerEvent):Void
 	{
 		this._newFileCallback();
-		PopUpManager.removePopUp(this);
 	}
 	
 	private function onLoadFileButton(evt:TriggerEvent):Void
 	{
 		this._loadFileCallback();
-		PopUpManager.removePopUp(this);
 	}
 	
 }
