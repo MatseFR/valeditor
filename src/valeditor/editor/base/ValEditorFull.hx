@@ -21,6 +21,8 @@ import openfl.ui.Keyboard;
 import starling.display.Image;
 import starling.display.Quad;
 import valedit.DisplayObjectType;
+import valedit.ValEdit;
+import valedit.asset.AssetType;
 import valedit.data.feathers.themes.SimpleThemeData;
 import valedit.data.openfl.display.DisplayData;
 import valedit.data.openfl.filters.FiltersData;
@@ -42,6 +44,13 @@ import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.view.EditorView;
 import valeditor.utils.starling.TextureCreationParameters;
+
+#if air
+import flash.desktop.ClipboardFormats;
+import flash.desktop.NativeDragManager;
+import flash.events.NativeDragEvent;
+import flash.filesystem.File;
+#end
 
 #if starling
 import starling.core.Starling;
@@ -67,7 +76,22 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.editorSetup();
 		
-		ValEditor.init();
+		// register assets file extensions
+		ValEdit.assetLib.registerExtension("bmp", AssetType.BITMAP);
+		ValEdit.assetLib.registerExtension("jpg", AssetType.BITMAP);
+		ValEdit.assetLib.registerExtension("jpeg", AssetType.BITMAP);
+		ValEdit.assetLib.registerExtension("png", AssetType.BITMAP);
+		
+		ValEdit.assetLib.registerExtension("wav", AssetType.SOUND);
+		#if air
+		ValEdit.assetLib.registerExtension("mp3", AssetType.SOUND);
+		#else
+		ValEdit.assetLib.registerExtension("ogg", AssetType.SOUND);
+		#end
+		
+		ValEdit.assetLib.registerExtension("txt", AssetType.TEXT);
+		ValEdit.assetLib.registerExtension("xml", AssetType.TEXT);
+		ValEdit.assetLib.registerExtension("json", AssetType.TEXT);
 		
 		var sprite:Sprite = new Sprite();
 		addChild(sprite);
@@ -107,7 +131,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		this.editView.addMenu("file", "File", onFileMenuCallback, fileItems);
 		
 		var assetItems:Array<Dynamic> = [
-			{text:"Browser", id:"browser"}
+			{text:"Browser (Ctrl+B)", id:"browser"}
 		];
 		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, assetItems);
 		
@@ -235,10 +259,21 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 		
 		FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
+		
+		#if air
+		Lib.current.stage.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, onFileDragIn);
+		Lib.current.stage.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, onFileDrop);
+		#else
+		Lib.current.stage.window.onDropFile.add(onFileDrop);
+		#end
 	}
 	
 	private function onNewFile():Void
 	{
+		if (this._isStartUp)
+		{
+			FeathersWindows.closeStartMenuWindow();
+		}
 		FeathersWindows.showFileSettingsWindow(this._fileSettings, "New File", onFileSettingsConfirm, onFileSettingsCancel);
 	}
 	
@@ -265,15 +300,19 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onLoadFileConfirm(filePath:String):Void
 	{
+		if (this._isStartUp)
+		{
+			FeathersWindows.closeStartMenuWindow();
+		}
 		this._isStartUp = false;
 	}
 	
 	private function onLoadFileCancel():Void
 	{
-		if (this._isStartUp)
-		{
-			FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
-		}
+		//if (this._isStartUp)
+		//{
+			//FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
+		//}
 	}
 	
 	private function onSelectionChange(evt:SelectionEvent):Void
@@ -365,6 +404,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		switch (action.actionID)
 		{
+			case InputActionID.ASSET_BROWSER :
+				FeathersWindows.toggleAssetBrowser();
+			
 			case InputActionID.COPY :
 				ValEditor.clipboard.clear();
 				ValEditor.selection.copyToClipboard(ValEditor.clipboard);
@@ -501,6 +543,68 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.keyboardController.addKeyAction(Keyboard.E, keyAction);
 		keyAction = new KeyAction(InputActionID.EXPORT_AS, false, true, true);
 		ValEditor.keyboardController.addKeyAction(Keyboard.E, keyAction);
+		
+		// asset browser
+		keyAction = new KeyAction(InputActionID.ASSET_BROWSER, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.B, keyAction);
+	}
+	
+	#if air
+	private function onFileDragIn(evt:NativeDragEvent):Void
+	{
+		trace("fileDragIn");
+		
+		var fileList:Array<File> = evt.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
+		for (file in fileList)
+		{
+			if (file.extension == ValEditor.fileExtension || ValEdit.assetLib.isValidExtension(file.extension))
+			{
+				NativeDragManager.acceptDragDrop(Lib.current.stage);
+				break;
+			}
+		}
+	}
+	
+	private function onFileDrop(evt:NativeDragEvent):Void
+	{
+		trace("fileDrop");
+		
+		var fileList:Array<File> = evt.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
+		// look for source file
+		for (file in fileList)
+		{
+			if (file.extension == ValEditor.fileExtension)
+			{
+				FileController.openFile(file, onSourceFileLoadComplete);
+				return;
+			}
+		}
+		
+		// look for asset file
+		for (file in fileList)
+		{
+			if (ValEdit.assetLib.isValidExtension(file.extension))
+			{
+				ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
+			}
+		}
+		ValEditor.assetFileLoader.load(null);
+	}
+	#elseif desktop
+	private function onFileDrop(filePath:String):Void
+	{
+		trace("fileDrop");
+	}
+	#else
+	private function onFileDrop(filePath:String):Void
+	{
+		
+	}
+	#end
+	
+	private function onSourceFileLoadComplete(filePath:String):Void
+	{
+		this._isStartUp = false;
 	}
 	
 	public function exposeAll():Void
