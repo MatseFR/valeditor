@@ -330,13 +330,13 @@ class AssetsWindow<T> extends Panel
 	#else
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
-		disableUI();
+		//disableUI(); // there is a known bug on html5 target where cancelling the file dialog won't result in an Event.CANCEL being dispatched
 		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList);
 	}
 	
 	private function onAddFilesCancel():Void
 	{
-		enableUI();
+		//enableUI();
 	}
 	
 	private function onAddFilesComplete(files:Array<FileReference>):Void
