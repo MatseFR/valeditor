@@ -12,7 +12,7 @@ class FileOpener
 {
 	public var loadFile:Bool;
 	
-	private var _fileReference:FileReference = new FileReference();
+	private var _fileReference:FileReference;
 	
 	private var _completeCallback:FileReference->Void;
 	private var _cancelCallback:Void->Void;
@@ -36,6 +36,7 @@ class FileOpener
 		this._cancelCallback = cancelCallback;
 		this._errorCallback = errorCallback;
 		
+		this._fileReference = new FileReference();
 		this._fileReference.addEventListener(Event.SELECT, onFileSelected);
 		this._fileReference.addEventListener(Event.CANCEL, onFileCancelled);
 		
@@ -47,7 +48,7 @@ class FileOpener
 		this._fileReference.removeEventListener(Event.SELECT, onFileSelected);
 		this._fileReference.removeEventListener(Event.CANCEL, onFileCancelled);
 		
-		if (this.loadFile)
+		if (this.loadFile && this._fileReference.data == null)
 		{
 			this._fileReference.addEventListener(Event.COMPLETE, onFileLoadComplete);
 			this._fileReference.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
