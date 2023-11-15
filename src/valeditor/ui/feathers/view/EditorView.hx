@@ -2,6 +2,7 @@ package valeditor.ui.feathers.view;
 
 import feathers.controls.HDividedBox;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
 import feathers.controls.PopUpListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
@@ -15,6 +16,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalListLayout;
 import openfl.Lib;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
@@ -115,6 +117,16 @@ class EditorView extends LayoutGroup
 		var itemToText:Dynamic->String;
 		var collection:ArrayCollection<Dynamic> = this._menuCollections.get(menuID);
 		var menu:PopUpListView = new PopUpListView(collection, onMenuChange);
+		
+		menu.listViewFactory = function():ListView
+		{
+			var layout:VerticalListLayout = new VerticalListLayout();
+			layout.requestedRowCount = collection.length;
+			var listView:ListView = new ListView();
+			listView.layout = layout;
+			return listView;
+		}
+		
 		menu.name = menuID;
 		menu.prompt = this._menuIDToText.get(menuID);
 		menu.selectedIndex = -1;
