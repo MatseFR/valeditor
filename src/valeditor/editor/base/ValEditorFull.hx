@@ -1,5 +1,6 @@
 package valeditor.editor.base;
 import feathers.controls.navigators.StackItem;
+import haxe.io.Path;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
@@ -50,6 +51,8 @@ import flash.desktop.ClipboardFormats;
 import flash.desktop.NativeDragManager;
 import flash.events.NativeDragEvent;
 import flash.filesystem.File;
+#else
+import openfl.filesystem.File;
 #end
 
 #if starling
@@ -552,12 +555,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 	#if air
 	private function onFileDragIn(evt:NativeDragEvent):Void
 	{
-		trace("fileDragIn");
-		
 		var fileList:Array<File> = evt.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
 		for (file in fileList)
 		{
-			if (file.extension == ValEditor.fileExtension || ValEdit.assetLib.isValidExtension(file.extension))
+			if (file.extension == ValEditor.fileExtension)
+			{
+				NativeDragManager.acceptDragDrop(Lib.current.stage);
+				break;
+			}
+			else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(file.extension))
 			{
 				NativeDragManager.acceptDragDrop(Lib.current.stage);
 				break;
@@ -567,8 +573,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onFileDrop(evt:NativeDragEvent):Void
 	{
-		trace("fileDrop");
-		
 		var fileList:Array<File> = evt.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT);
 		// look for source file
 		for (file in fileList)
@@ -583,17 +587,33 @@ class ValEditorFull extends ValEditorBaseFeathers
 		// look for asset file
 		for (file in fileList)
 		{
-			if (ValEdit.assetLib.isValidExtension(file.extension))
+			if (!this._isStartUp && ValEdit.assetLib.isValidExtension(file.extension))
 			{
 				ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
 			}
 		}
-		ValEditor.assetFileLoader.load(null);
+		FeathersWindows.showMessageWindow("Assets", "importing assets");
+		ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
 	}
 	#elseif desktop
 	private function onFileDrop(filePath:String):Void
 	{
-		trace("fileDrop");
+		var file:File;
+		if (Path.extension(filePath) == ValEditor.fileExtension)
+		{
+			file = new File(filePath);
+			FileController.openFile(file, onSourceFileLoadComplete);
+		}
+		else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(Path.extension(filePath)))
+		{
+			file = new File(filePath);
+			ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension);
+			if (!ValEditor.assetFileLoader.isRunning)
+			{
+				FeathersWindows.showMessageWindow("Assets", "importing assets");
+				ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
+			}
+		}
 	}
 	#else
 	private function onFileDrop(filePath:String):Void
@@ -601,6 +621,11 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 	}
 	#end
+	
+	private function onAssetFilesLoadComplete():Void
+	{
+		FeathersWindows.hideMessageWindow();
+	}
 	
 	private function onSourceFileLoadComplete(filePath:String):Void
 	{
