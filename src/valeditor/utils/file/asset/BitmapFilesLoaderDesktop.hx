@@ -103,7 +103,7 @@ class BitmapFilesLoaderDesktop
 	
 	private function onImageLoadError(error:Dynamic):Void
 	{
-		trace("ImageFilesLoaderDesktop failed to load " + this._fileCurrent.name);
+		trace("ImageFilesLoaderDesktop failed to load " + this._fileCurrent.name + " error : " + error);
 		if (this.isRunning)
 		{
 			nextFile();

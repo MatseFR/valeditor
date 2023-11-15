@@ -112,7 +112,7 @@ class BitmapFilesLoader
 			this._fileCurrent.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 			this._fileCurrent.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 			
-			trace("ImageFilesLoader failed to load " + this._fileCurrent.name);
+			trace("BitmapFilesLoader failed to load " + this._fileCurrent.name);
 			
 			nextFile();
 		}
@@ -135,7 +135,7 @@ class BitmapFilesLoader
 	{
 		if (this.isRunning)
 		{
-			trace("ImageFilesLoader failed to load " + this._fileCurrent.name);
+			trace("BitmapFilesLoader failed to load " + this._fileCurrent.name);
 			nextFile();
 		}
 	}
