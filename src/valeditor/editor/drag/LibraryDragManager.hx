@@ -37,7 +37,10 @@ class LibraryDragManager
 		}
 		this.isDragging = true;
 		this.template = template;
+		var wasUpdateLocked:Bool = template.lockInstanceUpdates;
+		if (!wasUpdateLocked) template.lockInstanceUpdates = true;
 		this.objectIndicator.objectUpdate(cast this.template.object);
+		template.lockInstanceUpdates = wasUpdateLocked;
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		Lib.current.stage.addEventListener(MouseEvent.RIGHT_CLICK, onRightClick);
