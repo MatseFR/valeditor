@@ -252,20 +252,33 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		var func:ExposedFunction = cast this._defaultCollection.getValue(propertyName);
 		func.executeWithParameters(parameters);
 		
-		for (collection in this._keyFrameToCollection)
+		if (this.currentCollection != null)
 		{
-			func = cast collection.getValue(propertyName);
-			func.executeWithParameters(parameters);
+			this.currentCollection.object = null;
 		}
-	}
-	
-	public function templatePropertyChange(templateValue:ExposedValue):Void
-	{
-		this._defaultCollection.getValue(templateValue.propertyName).value = templateValue.value;
 		
 		for (collection in this._keyFrameToCollection)
 		{
-			collection.getValue(templateValue.propertyName).value = templateValue.value;
+			collection.applyAndSetObject(this.object);
+			func = cast collection.getValue(propertyName);
+			func.executeWithParameters(parameters);
+			collection.object = null;
+		}
+		
+		if (this.currentCollection != null)
+		{
+			this.currentCollection.applyAndSetObject(this.object);
+		}
+	}
+	
+	@:access(valedit.value.base.ExposedValue)
+	public function templatePropertyChange(templateValue:ExposedValue):Void
+	{
+		templateValue.cloneValue(this._defaultCollection.getValue(templateValue.propertyName));
+		
+		for (collection in this._keyFrameToCollection)
+		{
+			templateValue.cloneValue(collection.getValue(templateValue.propertyName));
 		}
 	}
 	
