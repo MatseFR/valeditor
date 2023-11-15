@@ -20,17 +20,15 @@ class BitmapAssetItemRenderer extends AssetItemRenderer
 	private function get_asset():BitmapAsset { return this._asset; }
 	private function set_asset(value:BitmapAsset):BitmapAsset
 	{
-		if (this._asset == value) return value;
-		
 		if (value != null)
 		{
-			_preview.bitmapData = value.preview;
-			_previewGroup.setInvalid();
+			this._preview.bitmapData = value.preview;
+			this._previewGroup.setInvalid();
 			
-			_nameLabel.text = value.name;
+			this._nameLabel.text = value.name;
 			if (value.content != null)
 			{
-				_sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
+				this._sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
 			}
 		}
 		
@@ -57,20 +55,20 @@ class BitmapAssetItemRenderer extends AssetItemRenderer
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_previewGroup = new LayoutGroup();
-		_previewGroup.variant = LayoutGroupVariant.ITEM_PREVIEW;
-		addChild(_previewGroup);
+		this._previewGroup = new LayoutGroup();
+		this._previewGroup.variant = LayoutGroupVariant.ITEM_PREVIEW;
+		addChild(this._previewGroup);
 		
-		_preview = new Bitmap();
-		_previewGroup.addChild(_preview);
+		this._preview = new Bitmap();
+		this._previewGroup.addChild(this._preview);
 		
-		_nameLabel = new Label();
-		_nameLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._nameLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._nameLabel);
 		
-		_sizeLabel = new Label();
-		_sizeLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_sizeLabel);
+		this._sizeLabel = new Label();
+		this._sizeLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._sizeLabel);
 	}
 	
 }

@@ -17,8 +17,6 @@ class BinaryAssetItemRenderer extends AssetItemRenderer
 	private function get_asset():BinaryAsset { return this._asset; }
 	private function set_asset(value:BinaryAsset):BinaryAsset
 	{
-		if (this._asset == value) return value;
-		
 		if (value != null)
 		{
 			_nameLabel.text = value.name;

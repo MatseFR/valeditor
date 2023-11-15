@@ -23,14 +23,12 @@ class SoundAssetItemRenderer extends AssetItemRenderer
 	private function get_asset():SoundAsset { return this._asset; }
 	private function set_asset(value:SoundAsset):SoundAsset
 	{
-		if (this._asset == value) return value;
-		
 		if (value != null)
 		{
-			_nameLabel.text = value.name;
+			this._nameLabel.text = value.name;
 			if (value.content != null)
 			{
-				_durationLabel.text = TimeUtil.msToString(value.content.length);
+				this._durationLabel.text = TimeUtil.msToString(value.content.length);
 			}
 		}
 		
@@ -59,40 +57,44 @@ class SoundAssetItemRenderer extends AssetItemRenderer
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_nameLabel = new Label();
-		_nameLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._nameLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._nameLabel);
 		
-		_durationLabel = new Label();
-		_durationLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_durationLabel);
+		this._durationLabel = new Label();
+		this._durationLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._durationLabel);
 		
-		_playButton = new Button("play", onPlayButton);
+		this._playButton = new Button("play", onPlayButton);
 		// prevent item selection when button is clicked
-		_playButton.addEventListener(MouseEvent.CLICK, onClick);
-		addChild(_playButton);
+		this._playButton.addEventListener(MouseEvent.CLICK, onClick);
+		addChild(this._playButton);
 		
-		_stopButton = new Button("stop", onStopButton);
+		this._stopButton = new Button("stop", onStopButton);
 		// prevent item selection when button is clicked
-		_stopButton.addEventListener(MouseEvent.CLICK, onClick);
-		addChild(_stopButton);
+		this._stopButton.addEventListener(MouseEvent.CLICK, onClick);
+		addChild(this._stopButton);
 	}
 	
 	private function onPlayButton(evt:TriggerEvent):Void
 	{
-		if (_soundChannel != null) _soundChannel.stop();
-		_soundChannel = _asset.content.play();
-		_soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
+		if (this._soundChannel != null) this._soundChannel.stop();
+		this._soundChannel = this._asset.content.play();
+		this._soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundComplete);
 	}
 	
 	private function onStopButton(evt:TriggerEvent):Void
 	{
-		if (_soundChannel != null) _soundChannel.stop();
+		if (this._soundChannel != null) 
+		{
+			this._soundChannel.stop();
+			this._soundChannel = null;
+		}
 	}
 	
 	private function onSoundComplete(evt:Event):Void
 	{
-		_soundChannel = null;
+		this._soundChannel = null;
 	}
 	
 	private function onClick(evt:MouseEvent):Void

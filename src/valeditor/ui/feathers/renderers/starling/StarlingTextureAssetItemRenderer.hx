@@ -22,45 +22,29 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 	private function get_asset():StarlingTextureAsset { return this._asset; }
 	private function set_asset(value:StarlingTextureAsset):StarlingTextureAsset
 	{
-		if (this._asset == value) return value;
-		
 		if (value != null)
 		{
-			//var scale:Float;
-			//_preview.bitmapData = value.bitmapAsset.content;
-			//if (Std.isOfType(value.content, SubTexture))
-			//{
-				//var sub:SubTexture = cast value.content;
-				//_preview.scrollRect = sub.region;
-				//scale = ScaleUtil.scaleToFit(_preview.scrollRect.width, _preview.scrollRect.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			//}
-			//else
-			//{
-				//_preview.scrollRect = null;
-				//scale = ScaleUtil.scaleToFit(_preview.bitmapData.width, _preview.bitmapData.height, UIConfig.ASSET_PREVIEW_SIZE, UIConfig.ASSET_PREVIEW_SIZE);
-			//}
-			//_preview.scaleX = _preview.scaleY = scale;
-			_preview.bitmapData = value.preview;
-			_previewGroup.setInvalid();
+			this._preview.bitmapData = value.preview;
+			this._previewGroup.setInvalid();
 			
-			_nameLabel.text = value.name;
-			_sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
+			this._nameLabel.text = value.name;
+			this._sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
 			
 			if (Std.isOfType(value.content, SubTexture))
 			{
 				var sub:SubTexture = cast value.content;
 				if (sub.rotated)
 				{
-					_rotatedLabel.text = "rotated";
+					this._rotatedLabel.text = "rotated";
 				}
 				else
 				{
-					_rotatedLabel.text = "";
+					this._rotatedLabel.text = "";
 				}
 			}
 			else
 			{
-				_rotatedLabel.text = "";
+				this._rotatedLabel.text = "";
 			}
 		}
 		
@@ -88,24 +72,24 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_previewGroup = new LayoutGroup();
-		_previewGroup.variant = LayoutGroupVariant.ITEM_PREVIEW;
-		addChild(_previewGroup);
+		this._previewGroup = new LayoutGroup();
+		this._previewGroup.variant = LayoutGroupVariant.ITEM_PREVIEW;
+		addChild(this._previewGroup);
 		
-		_preview = new Bitmap();
-		_previewGroup.addChild(_preview);
+		this._preview = new Bitmap();
+		this._previewGroup.addChild(this._preview);
 		
-		_nameLabel = new Label();
-		_nameLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._nameLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._nameLabel);
 		
-		_sizeLabel = new Label();
-		_sizeLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_sizeLabel);
+		this._sizeLabel = new Label();
+		this._sizeLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._sizeLabel);
 		
-		_rotatedLabel = new Label();
-		_rotatedLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_rotatedLabel);
+		this._rotatedLabel = new Label();
+		this._rotatedLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._rotatedLabel);
 	}
 	
 }

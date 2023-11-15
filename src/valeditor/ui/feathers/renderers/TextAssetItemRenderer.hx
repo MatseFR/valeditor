@@ -17,11 +17,9 @@ class TextAssetItemRenderer extends AssetItemRenderer
 	private function get_asset():TextAsset { return this._asset; }
 	private function set_asset(value:TextAsset):TextAsset
 	{
-		if (this._asset == value) return value;
-		
 		if (value != null)
 		{
-			_nameLabel.text = value.name;
+			this._nameLabel.text = value.name;
 		}
 		
 		return this._asset = value;
@@ -43,9 +41,9 @@ class TextAssetItemRenderer extends AssetItemRenderer
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_nameLabel = new Label();
-		_nameLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._nameLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._nameLabel);
 	}
 
 }
