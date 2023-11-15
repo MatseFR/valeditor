@@ -122,12 +122,12 @@ class AssetsWindow<T> extends Panel
 	private var _filterList:Array<FileFilter>;
 	
 	#if desktop
-	private var _fileOpener:FilesOpenerDesktop = new FilesOpenerDesktop();
-	private var _fileDialogTitle:String = "Select file(s)";
+	private var _filesOpener:FilesOpenerDesktop = new FilesOpenerDesktop();
+	private var _filesDialogTitle:String = "Select file(s)";
 	private var _folderOpener:FolderOpenerDesktop = new FolderOpenerDesktop();
 	private var _folderDialogTitle:String = "Select folder";
 	#else
-	private var _fileOpener:FilesOpener = new FilesOpener();
+	private var _filesOpener:FilesOpener = new FilesOpener();
 	#end
 	
 	private var _controlsEnabled:Bool;
@@ -299,7 +299,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		disableUI();
-		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList, null, this._fileDialogTitle);
+		this._filesOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList, null, this._filesDialogTitle);
 	}
 	
 	private function onAddFilesCancel():Void
@@ -331,7 +331,7 @@ class AssetsWindow<T> extends Panel
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		//disableUI(); // there is a known bug on html5 target where cancelling the file dialog won't result in an Event.CANCEL being dispatched
-		this._fileOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList);
+		this._filesOpener.start(onAddFilesComplete, onAddFilesCancel, this._filterList);
 	}
 	
 	private function onAddFilesCancel():Void
