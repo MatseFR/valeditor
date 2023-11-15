@@ -288,9 +288,9 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			template = cast ValEdit.getTemplate(node.templateID);
 			object = cast template.getInstance(node.id);
 			collection = template.clss.getCollection();
-			collection.readAndSetObject(object.object);
+			collection.readValuesFromObject(object.object);
 			collection.fromJSONSave(node.collection);
-			collection.object = null;
+			collection.apply();
 			add(object, collection);
 		}
 		
@@ -302,8 +302,11 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	{
 		if (json == null) json = {};
 		
-		// reset tweens to avoid messing up collection values
-		resetTweens();
+		if (this.isActive)
+		{
+			// reset tweens to avoid messing up collection values
+			resetTweens();
+		}
 		
 		json.indexStart = this.indexStart;
 		json.indexEnd = this.indexEnd;
@@ -318,8 +321,11 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		json.transition = this._transition;
 		json.tween = this._tween;
 		
-		// restore tweens progress
-		updateTweens();
+		if (this.isActive)
+		{
+			// restore tweens progress
+			updateTweens();
+		}
 		
 		return json;
 	}
