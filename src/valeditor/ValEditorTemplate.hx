@@ -25,6 +25,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	public var isInClipboard:Bool = false;
 	public var isInLibrary:Bool = false;
+	public var lockInstanceUpdates:Bool = false;
 	
 	override function set_id(value:String):String 
 	{
@@ -62,6 +63,7 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		this.isInClipboard = false;
 		this.isInLibrary = false;
+		this.lockInstanceUpdates = false;
 		super.clear();
 	}
 	
@@ -88,8 +90,14 @@ class ValEditorTemplate extends ValEditTemplate
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
 	}
 	
+	@:access(valedit.value.base.ExposedValue)
 	private function onTemplateObjectPropertyChange(evt:ObjectEvent):Void
 	{
+		if (this.lockInstanceUpdates)
+		{
+			return;
+		}
+		
 		var templateValue:ExposedValue = evt.object.currentCollection.getValue(evt.propertyName);
 		
 		// check for corresponding constructor value
@@ -98,7 +106,7 @@ class ValEditorTemplate extends ValEditTemplate
 			var value:ExposedValue = this.constructorCollection.getValue(templateValue.propertyName);
 			if (value != null)
 			{
-				value.value = templateValue.value;
+				templateValue.cloneValue(value);
 			}
 		}
 		
@@ -110,6 +118,11 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	private function onTemplateObjectFunctionCalled(evt:ObjectEvent):Void
 	{
+		if (this.lockInstanceUpdates)
+		{
+			return;
+		}
+		
 		for (instance in this._instances)
 		{
 			cast(instance, ValEditorObject).templateFunctionCall(evt.propertyName, evt.parameters);
@@ -121,6 +134,7 @@ class ValEditorTemplate extends ValEditTemplate
 		this.id = json.id;
 		this.className = json.clss;
 		this.collection.fromJSONSave(json.collection);
+		this.collection.apply();
 		this.constructorCollection.fromJSONSave(json.constructorCollection);
 		
 		var instance:ValEditorObject;
