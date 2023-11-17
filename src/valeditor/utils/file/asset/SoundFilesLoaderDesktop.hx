@@ -72,6 +72,7 @@ class SoundFilesLoaderDesktop
 			this._bytes = new ByteArray();
 			this._fileStream.readBytes(this._bytes, 0, this._fileStream.bytesAvailable);
 			this._fileStream.close();
+			
 			Sound.loadFromFile(this._fileCurrent.nativePath).onComplete(onSoundLoadComplete).onError(onSoundLoadError);
 		}
 		else
@@ -97,7 +98,7 @@ class SoundFilesLoaderDesktop
 	
 	private function onSoundLoadError(error:Dynamic):Void
 	{
-		trace("SoundFilesLoaderDesktop failed to load " + this._fileCurrent.name);
+		trace("SoundFilesLoaderDesktop failed to load " + this._fileCurrent.nativePath);
 		if (this.isRunning)
 		{
 			nextFile();
