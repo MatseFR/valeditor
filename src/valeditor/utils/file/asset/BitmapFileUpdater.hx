@@ -3,6 +3,7 @@ import openfl.display.BitmapData;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import openfl.net.FileReference;
+import valedit.ValEdit;
 import valedit.asset.BitmapAsset;
 
 /**
@@ -75,9 +76,7 @@ class BitmapFileUpdater
 	
 	private function onImageLoadComplete(bmd:BitmapData):Void
 	{
-		this._asset.content = bmd;
-		this._asset.data = this._bytes;
-		this._asset.update();
+		ValEdit.assetLib.updateBitmap(this._asset, this._file.name, bmd, this._file.data);
 		
 		complete();
 	}
