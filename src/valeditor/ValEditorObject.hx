@@ -46,6 +46,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
 	public var selectionBox(get, set):SelectionBox;
+	public var usePivotScaling:Bool;
 	
 	private var _container:IValEditContainer;
 	private function get_container():IValEditContainer { return this._container; }
@@ -191,6 +192,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.isInClipboard = false;
 		this.isMouseDown = false;
 		this.isSelectable = true;
+		this.usePivotScaling = false;
 	}
 	
 	override public function pool():Void 

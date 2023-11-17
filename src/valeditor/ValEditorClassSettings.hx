@@ -30,6 +30,10 @@ class ValEditorClassSettings extends ValEditClassSettings
 	/** function that will create the clickable/touchable object for that object.
 	 *  this is only useful if isDisplayObject is set to true **/
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
+	
+	/** tells if pivot values should be scaled when clicking/moving object
+	 *  @default false */
+	public var usePivotScaling:Bool;
 
 	public function new() 
 	{
@@ -44,6 +48,7 @@ class ValEditorClassSettings extends ValEditClassSettings
 		this.categories.resize(0);
 		this.hasRadianRotation = false;
 		this.interactiveFactory = null;
+		this.usePivotScaling = false;
 	}
 	
 	override public function pool():Void 

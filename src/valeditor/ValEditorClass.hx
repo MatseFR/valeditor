@@ -27,6 +27,7 @@ class ValEditorClass extends ValEditClass
 	public var hasVisibleProperty:Bool;	
 	public var hasRadianRotation:Bool;
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
+	public var usePivotScaling:Bool;
 
 	public function new(classReference:Class<Dynamic>)
 	{
@@ -44,6 +45,7 @@ class ValEditorClass extends ValEditClass
 		this.hasVisibleProperty = false;
 		this.hasRadianRotation = false;
 		this.interactiveFactory = null;
+		this.usePivotScaling = false;
 		
 		super.clear();
 	}

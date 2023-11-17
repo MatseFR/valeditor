@@ -285,6 +285,7 @@ class ValEditor
 		if (settings.isDisplayObject && settings.displayObjectType == DisplayObjectType.STARLING)
 		{
 			settings.hasRadianRotation = true;
+			settings.usePivotScaling = true;
 		}
 		#end
 		
@@ -343,6 +344,7 @@ class ValEditor
 		}
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
+		v.usePivotScaling = settings.usePivotScaling;
 		
 		v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
 		v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
@@ -700,6 +702,7 @@ class ValEditor
 			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 			valObject.hasRadianRotation = valClass.hasRadianRotation;
+			valObject.usePivotScaling = valClass.usePivotScaling;
 		}
 		
 		registerObjectInternal(valObject);
@@ -738,6 +741,7 @@ class ValEditor
 		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.usePivotScaling = valClass.usePivotScaling;
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
 		

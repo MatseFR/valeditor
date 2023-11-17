@@ -391,8 +391,25 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._mouseObject = object;
 		this._mouseObject.isMouseDown = true;
 		this.selection.isMouseDown = true;
-		this._mouseObjectOffsetX = evt.localX;
-		this._mouseObjectOffsetY = evt.localY;
+		
+		if (this._mouseObject.hasPivotProperties)
+			{
+				if (this._mouseObject.usePivotScaling)
+				{
+					this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
+					this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
+				}
+				else
+				{
+					this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
+					this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+			}
+			else
+			{
+				this._mouseObjectOffsetX = evt.localX;
+				this._mouseObjectOffsetY = evt.localY;
+			}
 		
 		if (this.selection.hasObject(this._mouseObject))
 		{
@@ -555,8 +572,16 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			touch.getLocation(cast object.interactiveObject, _pt);
 			if (this._mouseObject.hasPivotProperties)
 			{
-				this._mouseObjectOffsetX = _pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
-				this._mouseObjectOffsetY = _pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
+				if (this._mouseObject.usePivotScaling)
+				{
+					this._mouseObjectOffsetX = _pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
+					this._mouseObjectOffsetY = _pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
+				}
+				else
+				{
+					this._mouseObjectOffsetX = _pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
+					this._mouseObjectOffsetY = _pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
+				}
 			}
 			else
 			{

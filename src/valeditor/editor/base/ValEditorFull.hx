@@ -219,6 +219,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_default;
 		settings.hasRadianRotation = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(Quad, settings);
 		settings.clear();
 		
@@ -232,6 +233,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_default;
 		settings.hasRadianRotation = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(Image, settings);
 		
 		// Starling Filters
