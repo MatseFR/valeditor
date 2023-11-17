@@ -44,13 +44,21 @@ class TextureLoader
 		var texture:Texture = Texture.fromBitmapData(this._bitmapAsset.content, this._textureParams.generateMipMaps, this._textureParams.optimizeForRenderToTexture, this._textureParams.scale, this._textureParams.format, this._textureParams.forcePotTexture);
 		this._textureCallback(texture, this._textureParams.clone(), this._bitmapAsset);
 		
+		complete();
+	}
+	
+	private function complete():Void
+	{
 		var completeCallback:Void->Void = this._completeCallback;
 		this._bitmapAsset = null;
 		this._textureCallback = null;
 		this._completeCallback = null;
 		this._cancelCallback = null;
 		
-		completeCallback();
+		if (completeCallback != null)
+		{
+			completeCallback();
+		}
 	}
 	
 	private function cancel():Void
@@ -61,7 +69,10 @@ class TextureLoader
 		this._completeCallback = null;
 		this._cancelCallback = null;
 		
-		cancelCallback();
+		if (cancelCallback != null)
+		{
+			cancelCallback();
+		}
 	}
 	
 }
