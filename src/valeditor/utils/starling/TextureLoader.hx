@@ -15,7 +15,7 @@ class TextureLoader
 	
 	private var _bitmapAsset:BitmapAsset;
 	
-	private var _textureParams:TextureCreationParameters = new TextureCreationParameters();
+	private var _textureParams:TextureCreationParameters = TextureCreationParameters.fromPool();
 
 	public function new() 
 	{

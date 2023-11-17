@@ -7,6 +7,14 @@ import openfl.display3D.Context3DTextureFormat;
  */
 class TextureCreationParameters 
 {
+	static private var _POOL:Array<TextureCreationParameters> = new Array<TextureCreationParameters>();
+	
+	static public function fromPool():TextureCreationParameters
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new TextureCreationParameters();
+	}
+	
 	public var generateMipMaps:Bool = true;
 	public var optimizeForRenderToTexture:Bool = false;
 	public var scale:Float = 1;
@@ -18,9 +26,15 @@ class TextureCreationParameters
 		
 	}
 	
+	public function pool():Void
+	{
+		reset();
+		_POOL[_POOL.length] = this;
+	}
+	
 	public function clone(toParams:TextureCreationParameters = null):TextureCreationParameters
 	{
-		if (toParams == null) toParams = new TextureCreationParameters();
+		if (toParams == null) toParams = fromPool();
 		
 		toParams.generateMipMaps = this.generateMipMaps;
 		toParams.optimizeForRenderToTexture = this.optimizeForRenderToTexture;

@@ -251,7 +251,7 @@ class ZipSaveLoader extends EventDispatcher
 		for (i in 0...this._assetCount)
 		{
 			this._assetNode = this._assetList[i];
-			textureParams = new TextureCreationParameters();
+			textureParams = TextureCreationParameters.fromPool();
 			textureParams.fromJSON(this._assetNode.textureParams);
 			bitmapAsset = ValEdit.assetLib.getBitmapFromPath(this._assetNode.bitmapPath);
 			textAsset = ValEdit.assetLib.getTextFromPath(this._assetNode.textPath);
@@ -286,7 +286,7 @@ class ZipSaveLoader extends EventDispatcher
 		for (i in 0...this._assetCount)
 		{
 			this._assetNode = this._assetList[i];
-			textureParams = new TextureCreationParameters();
+			textureParams = TextureCreationParameters.fromPool();
 			textureParams.fromJSON(this._assetNode.textureParams);
 			bitmapAsset = ValEdit.assetLib.getBitmapFromPath(this._assetNode.bitmapPath);
 			texture = Texture.fromBitmapData(bitmapAsset.content, textureParams.generateMipMaps, textureParams.optimizeForRenderToTexture, textureParams.scale, textureParams.format, textureParams.forcePotTexture);
