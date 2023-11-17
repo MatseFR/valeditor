@@ -95,6 +95,7 @@ class LayerItem extends LayoutGroupItemRenderer
 	
 	private function onVisibleToggle(evt:Event):Void
 	{
+		if (this._layer == null) return;
 		this._layer.visible = this._visibleToggle.selected;
 	}
 	
