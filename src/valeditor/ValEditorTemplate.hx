@@ -132,7 +132,6 @@ class ValEditorTemplate extends ValEditTemplate
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.id = json.id;
-		this.className = json.clss;
 		this.collection.fromJSONSave(json.collection);
 		this.collection.apply();
 		this.constructorCollection.fromJSONSave(json.constructorCollection);
@@ -149,7 +148,6 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		if (json == null) json = {};
 		json.id = this.id;
-		json.clss = this.className;
 		json.collection = this.collection.toJSONSave();
 		json.constructorCollection = this.constructorCollection.toJSONSave();
 		

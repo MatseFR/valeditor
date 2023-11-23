@@ -137,7 +137,7 @@ class SelectionInfo extends LayoutGroup
 			{
 				var template:ValEditorTemplate = cast this._object;
 				this._idValue.text = template.id;
-				this._classValue.text = template.className;
+				this._classValue.text = template.clss.className;
 				this._typeValue.text = "Template";
 			}
 			else if (Std.isOfType(this._object, ValEditorTemplateGroup))
@@ -149,9 +149,9 @@ class SelectionInfo extends LayoutGroup
 				{
 					if (className == null)
 					{
-						className = template.className;
+						className = template.clss.className;
 					}
-					else if (template.className != className)
+					else if (template.clss.className != className)
 					{
 						singleClass = false;
 						break;

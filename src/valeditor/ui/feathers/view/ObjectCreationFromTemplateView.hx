@@ -328,7 +328,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._selectedTemplate = _templateGrid.selectedItem;
 		if (this._selectedTemplate != null)
 		{
-			this._valEditClass = ValEditor.getValEditClassByClassName(this._selectedTemplate.className);
+			this._valEditClass = cast this._selectedTemplate.clss;
 		}
 		else
 		{

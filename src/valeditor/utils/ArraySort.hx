@@ -80,8 +80,8 @@ class ArraySort
 	
 	inline static public function template(a:ValEditorTemplate, b:ValEditorTemplate):Int
 	{
-		var strA:String = a.className.toLowerCase();
-		var strB:String = b.className.toLowerCase();
+		var strA:String = a.clss.className.toLowerCase();
+		var strB:String = b.clss.className.toLowerCase();
 		if (strA < strB) return -1;
 		if (strA > strB) return 1;
 		strA = a.id.toLowerCase();

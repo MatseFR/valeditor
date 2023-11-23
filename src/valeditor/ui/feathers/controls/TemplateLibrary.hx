@@ -80,7 +80,7 @@ class TemplateLibrary extends LayoutGroup
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			new GridViewColumn("id", (item)->cast(item, ValEditorTemplate).id),
-			new GridViewColumn("class", (item)->item.className),
+			new GridViewColumn("class", (item)->item.clss.className),
 			new GridViewColumn("#", (item)->Std.string(item.numInstances))
 		]);
 		
