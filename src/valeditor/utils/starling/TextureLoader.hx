@@ -22,21 +22,43 @@ class TextureLoader
 		
 	}
 	
+	private function clear():Void
+	{
+		this._bitmapAsset = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
+	}
+	
+	public function resetTextureParams():Void
+	{
+		this._textureParams.reset();
+	}
+	
 	public function start(textureCallback:Texture->TextureCreationParameters->BitmapAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
 	{
 		this._textureCallback = textureCallback;
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
+		selectBitmapAsset();
+	}
+	
+	private function selectBitmapAsset():Void
+	{
 		FeathersWindows.showBitmapAssets(bitmapAssetSelected, cancel, "Select Bitmap source for Texture");
 	}
 	
 	private function bitmapAssetSelected(asset:BitmapAsset):Void
 	{
 		this._bitmapAsset = asset;
-		this._textureParams.reset();
 		
-		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, cancel, "Texture options");
+		selectTextureParameters();
+	}
+	
+	private function selectTextureParameters():Void
+	{
+		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, selectBitmapAsset, "Texture options");
 	}
 	
 	private function textureParamsConfirm():Void
@@ -50,10 +72,7 @@ class TextureLoader
 	private function complete():Void
 	{
 		var completeCallback:Void->Void = this._completeCallback;
-		this._bitmapAsset = null;
-		this._textureCallback = null;
-		this._completeCallback = null;
-		this._cancelCallback = null;
+		clear();
 		
 		if (completeCallback != null)
 		{
@@ -64,10 +83,7 @@ class TextureLoader
 	private function cancel():Void
 	{
 		var cancelCallback:Void->Void = this._cancelCallback;
-		this._bitmapAsset = null;
-		this._textureCallback = null;
-		this._completeCallback = null;
-		this._cancelCallback = null;
+		clear();
 		
 		if (cancelCallback != null)
 		{
