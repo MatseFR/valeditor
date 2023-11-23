@@ -71,7 +71,7 @@ class RulerItemRenderer extends Sprite
 	public function new(bitmapData:BitmapData, defaultRect:Rectangle, selectedRect:Rectangle)
 	{
 		super();
-		this._bitmap = new Bitmap(bitmapData, PixelSnapping.AUTO);
+		this._bitmap = new Bitmap(bitmapData, PixelSnapping.AUTO, true);
 		addChild(this._bitmap);
 		this._defaultRect = defaultRect;
 		this._selectedRect = selectedRect;

@@ -68,7 +68,7 @@ class BitmapScrollRenderer extends Sprite
 	public function new(bitmapData:BitmapData, rectMap:Map<FrameItemState, Rectangle>) 
 	{
 		super();
-		this._bitmap = new Bitmap(bitmapData, PixelSnapping.AUTO);
+		this._bitmap = new Bitmap(bitmapData, PixelSnapping.AUTO, true);
 		addChild(this._bitmap);
 		this.rectMap = rectMap;
 		this.state = FrameItemState.FRAME(false);

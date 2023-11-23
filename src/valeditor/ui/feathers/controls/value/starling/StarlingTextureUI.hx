@@ -94,7 +94,8 @@ class StarlingTextureUI extends ValueUI
 		addChild(this._contentGroup);
 		
 		this._previewGroup = new LayoutGroup();
-		this._previewGroup.maxHeight = UIConfig.ASSET_PREVIEW_SIZE;
+		this._previewGroup.maxWidth = UIConfig.ASSET_PREVIEW_WIDTH;
+		this._previewGroup.maxHeight = UIConfig.ASSET_PREVIEW_HEIGHT;
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.CENTER;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
@@ -102,6 +103,7 @@ class StarlingTextureUI extends ValueUI
 		this._contentGroup.addChild(this._previewGroup);
 		
 		this._preview = new Bitmap();
+		this._preview.smoothing = true;
 		this._previewGroup.addChild(this._preview);
 		
 		this._nameLabel = new Label();

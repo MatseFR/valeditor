@@ -102,6 +102,7 @@ class StarlingAtlasUI extends ValueUI
 		this._contentGroup.addChild(this._previewGroup);
 		
 		this._preview = new Bitmap();
+		this._preview.smoothing = true;
 		this._previewGroup.addChild(this._preview);
 		
 		this._nameLabel = new Label();
