@@ -15,7 +15,8 @@ import openfl.geom.Point;
 import openfl.net.FileFilter;
 import valedit.ValEdit;
 import valedit.asset.TextAsset;
-import valeditor.ui.feathers.renderers.TextAssetItemRenderer;
+import valeditor.ui.feathers.data.AssetMenuItem;
+import valeditor.ui.feathers.renderers.asset.TextAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 #if desktop
 import openfl.filesystem.File;
@@ -51,6 +52,13 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	private var _dummySprite:Sprite;
 	private var _pt:Point = new Point();
 	
+	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
+	#if desktop
+	private var _refreshMenuItem:AssetMenuItem;
+	#end
+	private var _importMenuItem:AssetMenuItem;
+	private var _removeMenuItem:AssetMenuItem;
+	
 	public function new() 
 	{
 		super();
@@ -75,26 +83,40 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 			itemRenderer.asset = state.data;
 		};
 		
+		recycler.reset = (itemRenderer:TextAssetItemRenderer, state:ListViewItemState) -> {
+			itemRenderer.clear();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
 		
-		var data:ArrayCollection<Dynamic>;
 		#if desktop
-		data = new ArrayCollection<Dynamic>([{id:"refresh", name:"refresh"}, {id:"import", name:"import"}, {id:"remove", name:"remove"}]);
-		#else
-		data = new ArrayCollection<Dynamic>([{id:"import", name:"import"}, {id:"remove", name:"remove"}]);
+		this._refreshMenuItem = new AssetMenuItem("refresh", "refresh");
 		#end
-		this._contextMenu = new ListView(data);
+		this._importMenuItem = new AssetMenuItem("import", "import");
+		this._removeMenuItem = new AssetMenuItem("remove", "remove");
+		
+		#if desktop
+		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._refreshMenuItem, this._importMenuItem, this._removeMenuItem]);
+		#else
+		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
+		#end
+		this._contextMenu = new ListView(this._contextMenuData);
 		var listLayout:VerticalListLayout = new VerticalListLayout();
-		listLayout.requestedRowCount = data.length;
+		listLayout.requestedRowCount = this._contextMenuData.length;
 		this._contextMenu.layout = listLayout;
 		
 		this._contextMenu.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
+		};
+		
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool
+		{
+			return item.enabled;
 		};
 		
 		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);

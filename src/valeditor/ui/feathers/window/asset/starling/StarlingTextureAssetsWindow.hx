@@ -19,11 +19,13 @@ import valedit.ValEdit;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingTextureAsset;
-import valeditor.ui.feathers.renderers.starling.StarlingTextureAssetItemRenderer;
+import valeditor.ui.feathers.data.AssetMenuItem;
+import valeditor.ui.feathers.renderers.asset.starling.StarlingTextureAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valeditor.utils.starling.AtlasLoader;
 import valeditor.utils.starling.TextureCreationParameters;
 import valeditor.utils.starling.TextureLoader;
+import valeditor.utils.starling.TextureSourceUpdater;
 
 /**
  * ...
@@ -36,12 +38,17 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 	
 	private var _atlasLoader:AtlasLoader = new AtlasLoader();
 	private var _textureLoader:TextureLoader = new TextureLoader();
+	private var _textureUpdater:TextureSourceUpdater = new TextureSourceUpdater();
 	
 	private var _contextMenu:ListView;
 	private var _contextMenuAsset:StarlingTextureAsset;
 	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
 	private var _dummySprite:Sprite;
 	private var _pt:Point = new Point();
+	
+	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
+	private var _sourceMenuItem:AssetMenuItem;
+	private var _removeMenuItem:AssetMenuItem;
 	
 	public function new() 
 	{
@@ -73,26 +80,34 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 			itemRenderer.asset = state.data;
 		};
 		
+		recycler.reset = (itemRenderer:StarlingTextureAssetItemRenderer, state:ListViewItemState) -> {
+			itemRenderer.clear();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
 		
-		var data:ArrayCollection<Dynamic>;
-		#if desktop
-		data = new ArrayCollection<Dynamic>([{id:"remove", name:"remove"}]);
-		#else
-		data = new ArrayCollection<Dynamic>([{id:"remove", name:"remove"}]);
-		#end
-		this._contextMenu = new ListView(data);
+		this._sourceMenuItem = new AssetMenuItem("source asset", "source asset");
+		this._removeMenuItem = new AssetMenuItem("remove", "remove");
+		
+		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._sourceMenuItem, this._removeMenuItem]);
+		
+		this._contextMenu = new ListView(this._contextMenuData);
 		var listLayout:VerticalListLayout = new VerticalListLayout();
-		listLayout.requestedRowCount = data.length;
+		listLayout.requestedRowCount = this._contextMenuData.length;
 		this._contextMenu.layout = listLayout;
 		
 		this._contextMenu.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
+		};
+		
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool
+		{
+			return item.enabled;
 		};
 		
 		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
@@ -157,6 +172,9 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		
 		switch (this._contextMenu.selectedItem.id)
 		{
+			case "source asset" :
+				this._textureUpdater.start(this._contextMenuAsset, null, null);
+			
 			case "remove" :
 				ValEdit.assetLib.removeStarlingTexture(this._contextMenuAsset);
 		}
@@ -171,6 +189,9 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 	{
 		var renderer:StarlingTextureAssetItemRenderer = cast evt.currentTarget;
 		this._contextMenuAsset = renderer.asset;
+		this._removeMenuItem.enabled = !this._contextMenuAsset.isFromAtlas;
+		this._contextMenuData.updateAt(this._contextMenuData.indexOf(this._removeMenuItem));
+		
 		var object:DisplayObject = cast evt.target;
 		this._pt.x = evt.localX;
 		this._pt.y = evt.localY;
@@ -193,6 +214,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		var items:Array<Dynamic> = this._assetList.selectedItems.copy();
 		for (item in items)
 		{
+			if (item.isFromAtlas) continue;
 			ValEdit.assetLib.removeStarlingTexture(item);
 		}
 	}

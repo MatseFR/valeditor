@@ -19,9 +19,11 @@ import valedit.ValEdit;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingAtlasAsset;
-import valeditor.ui.feathers.renderers.starling.StarlingAtlasAssetItemRenderer;
+import valeditor.ui.feathers.data.AssetMenuItem;
+import valeditor.ui.feathers.renderers.asset.starling.StarlingAtlasAssetItemRenderer;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valeditor.utils.starling.AtlasLoader;
+import valeditor.utils.starling.AtlasSourceUpdater;
 import valeditor.utils.starling.TextureCreationParameters;
 
 /**
@@ -33,12 +35,17 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 	private var _addAtlasButton:Button;
 	
 	private var _atlasLoader:AtlasLoader = new AtlasLoader();
+	private var _atlasUpdater:AtlasSourceUpdater = new AtlasSourceUpdater();
 	
 	private var _contextMenu:ListView;
 	private var _contextMenuAsset:StarlingAtlasAsset;
 	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
 	private var _dummySprite:Sprite;
 	private var _pt:Point = new Point();
+	
+	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
+	private var _sourceMenuItem:AssetMenuItem;
+	private var _removeMenuItem:AssetMenuItem;
 
 	public function new() 
 	{
@@ -66,26 +73,34 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 			itemRenderer.asset = state.data;
 		};
 		
+		recycler.reset = (itemRenderer:StarlingAtlasAssetItemRenderer, state:ListViewItemState) -> {
+			itemRenderer.clear();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
 		};
 		
-		var data:ArrayCollection<Dynamic>;
-		#if desktop
-		data = new ArrayCollection<Dynamic>([{id:"remove", name:"remove"}]);
-		#else
-		data = new ArrayCollection<Dynamic>([{id:"remove", name:"remove"}]);
-		#end
-		this._contextMenu = new ListView(data);
+		this._sourceMenuItem = new AssetMenuItem("source assets", "source assets");
+		this._removeMenuItem = new AssetMenuItem("remove", "remove");
+		
+		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._sourceMenuItem, this._removeMenuItem]);
+		
+		this._contextMenu = new ListView(this._contextMenuData);
 		var listLayout:VerticalListLayout = new VerticalListLayout();
-		listLayout.requestedRowCount = data.length;
+		listLayout.requestedRowCount = this._contextMenuData.length;
 		this._contextMenu.layout = listLayout;
 		
 		this._contextMenu.itemToText = function(item:Dynamic):String
 		{
 			return item.name;
+		};
+		
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool
+		{
+			return item.enabled;
 		};
 		
 		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
@@ -137,6 +152,9 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		
 		switch (this._contextMenu.selectedItem.id)
 		{
+			case "source assets" :
+				this._atlasUpdater.start(this._contextMenuAsset, null, null);
+			
 			case "remove" :
 				ValEdit.assetLib.removeStarlingAtlas(this._contextMenuAsset);
 		}
