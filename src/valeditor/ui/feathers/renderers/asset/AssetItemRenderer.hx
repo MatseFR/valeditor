@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.renderers;
+package valeditor.ui.feathers.renderers.asset;
 
 import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import openfl.events.MouseEvent;

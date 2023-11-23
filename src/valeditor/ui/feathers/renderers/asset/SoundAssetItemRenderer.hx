@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.renderers;
+package valeditor.ui.feathers.renderers.asset;
 
 import feathers.controls.Button;
 import feathers.controls.Label;
@@ -9,6 +9,7 @@ import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.media.SoundChannel;
+import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
 import valeditor.utils.TimeUtil;
 import valedit.asset.SoundAsset;
 
@@ -31,6 +32,11 @@ class SoundAssetItemRenderer extends AssetItemRenderer
 				this._durationLabel.text = TimeUtil.msToString(value.content.length);
 			}
 		}
+		else
+		{
+			this._nameLabel.text = "";
+			this._durationLabel.text = "";
+		}
 		
 		return this._asset = value;
 	}
@@ -46,6 +52,11 @@ class SoundAssetItemRenderer extends AssetItemRenderer
 	public function new() 
 	{
 		super();
+	}
+	
+	public function clear():Void
+	{
+		this.asset = null;
 	}
 	
 	override function initialize():Void 

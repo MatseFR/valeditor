@@ -1,6 +1,6 @@
 package valeditor.ui.feathers.theme.components;
 import feathers.style.ClassVariantStyleProvider;
-import valeditor.ui.feathers.renderers.AssetItemRenderer;
+import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.theme.simple.components.LayoutGroupItemRendererStyles;
 

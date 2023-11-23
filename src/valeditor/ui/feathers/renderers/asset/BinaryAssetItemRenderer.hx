@@ -1,10 +1,11 @@
-package valeditor.ui.feathers.renderers;
+package valeditor.ui.feathers.renderers.asset;
 
 import feathers.controls.Label;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import valedit.asset.BinaryAsset;
+import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
 
 /**
  * ...
@@ -19,7 +20,11 @@ class BinaryAssetItemRenderer extends AssetItemRenderer
 	{
 		if (value != null)
 		{
-			_nameLabel.text = value.name;
+			this._nameLabel.text = value.name;
+		}
+		else
+		{
+			this._nameLabel.text = "";
 		}
 		
 		return this._asset = value;
@@ -32,6 +37,11 @@ class BinaryAssetItemRenderer extends AssetItemRenderer
 		super();
 	}
 	
+	public function clear():Void
+	{
+		this.asset = null;
+	}
+	
 	override function initialize():Void 
 	{
 		super.initialize();
@@ -41,9 +51,9 @@ class BinaryAssetItemRenderer extends AssetItemRenderer
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		this.layout = vLayout;
 		
-		_nameLabel = new Label();
-		_nameLabel.variant = Label.VARIANT_DETAIL;
-		addChild(_nameLabel);
+		this._nameLabel = new Label();
+		this._nameLabel.variant = Label.VARIANT_DETAIL;
+		addChild(this._nameLabel);
 	}
 	
 }

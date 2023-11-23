@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.renderers.starling;
+package valeditor.ui.feathers.renderers.asset;
 
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
@@ -6,21 +6,20 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.display.Bitmap;
-import starling.textures.SubTexture;
-import valeditor.ui.feathers.renderers.AssetItemRenderer;
+import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valedit.asset.starling.StarlingTextureAsset;
+import valedit.asset.BitmapAsset;
 
 /**
  * ...
  * @author Matse
  */
-class StarlingTextureAssetItemRenderer extends AssetItemRenderer 
+class BitmapAssetItemRenderer extends AssetItemRenderer 
 {
-	public var asset(get, set):StarlingTextureAsset;
-	private var _asset:StarlingTextureAsset;
-	private function get_asset():StarlingTextureAsset { return this._asset; }
-	private function set_asset(value:StarlingTextureAsset):StarlingTextureAsset
+	public var asset(get, set):BitmapAsset;
+	private var _asset:BitmapAsset;
+	private function get_asset():BitmapAsset { return this._asset; }
+	private function set_asset(value:BitmapAsset):BitmapAsset
 	{
 		if (value != null)
 		{
@@ -28,24 +27,16 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 			this._previewGroup.setInvalid();
 			
 			this._nameLabel.text = value.name;
-			this._sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
-			
-			if (Std.isOfType(value.content, SubTexture))
+			if (value.content != null)
 			{
-				var sub:SubTexture = cast value.content;
-				if (sub.rotated)
-				{
-					this._rotatedLabel.text = "rotated";
-				}
-				else
-				{
-					this._rotatedLabel.text = "";
-				}
+				this._sizeLabel.text = Std.string(value.content.width) + "x" + Std.string(value.content.height);
 			}
-			else
-			{
-				this._rotatedLabel.text = "";
-			}
+		}
+		else
+		{
+			this._preview.bitmapData = null;
+			this._nameLabel.text = "";
+			this._sizeLabel.text = "";
 		}
 		
 		return this._asset = value;
@@ -56,11 +47,15 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 	
 	private var _nameLabel:Label;
 	private var _sizeLabel:Label;
-	private var _rotatedLabel:Label;
-	
+
 	public function new() 
 	{
 		super();
+	}
+	
+	public function clear():Void
+	{
+		this.asset = null;
 	}
 	
 	override function initialize():Void 
@@ -77,6 +72,7 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 		addChild(this._previewGroup);
 		
 		this._preview = new Bitmap();
+		this._preview.smoothing = true;
 		this._previewGroup.addChild(this._preview);
 		
 		this._nameLabel = new Label();
@@ -86,10 +82,6 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 		this._sizeLabel = new Label();
 		this._sizeLabel.variant = Label.VARIANT_DETAIL;
 		addChild(this._sizeLabel);
-		
-		this._rotatedLabel = new Label();
-		this._rotatedLabel.variant = Label.VARIANT_DETAIL;
-		addChild(this._rotatedLabel);
 	}
 	
 }
