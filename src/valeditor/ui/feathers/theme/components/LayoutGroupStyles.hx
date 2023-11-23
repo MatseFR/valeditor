@@ -126,7 +126,8 @@ class LayoutGroupStyles
 	
 	static private function item_preview(group:LayoutGroup):Void
 	{
-		group.width = group.height = UIConfig.ASSET_PREVIEW_SIZE;
+		group.width = UIConfig.ASSET_PREVIEW_WIDTH;
+		group.height = UIConfig.ASSET_PREVIEW_HEIGHT;
 		
 		var hLayout:HorizontalLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.CENTER;

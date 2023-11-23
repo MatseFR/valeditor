@@ -7,7 +7,8 @@ package valeditor.ui;
 class UIConfig 
 {
 	
-	static public var ASSET_PREVIEW_SIZE:Int = 64;
+	static public var ASSET_PREVIEW_WIDTH:Int = 96;
+	static public var ASSET_PREVIEW_HEIGHT:Int = 64;
 	
 	static public var CONTAINER_PIVOT_COLOR:Int = 0xffffff;
 	static public var CONTAINER_PIVOT_ALPHA:Float = 1;
