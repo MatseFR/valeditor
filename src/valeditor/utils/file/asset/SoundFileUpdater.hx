@@ -63,7 +63,7 @@ class SoundFileUpdater
 		this._file.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		this._file.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
-		var bytes:Bytes = this._fileCurrent.data;
+		var bytes:Bytes = this._file.data;
 		var buffer:AudioBuffer = AudioBuffer.fromBytes(bytes);
 		var sound:Sound = Sound.fromAudioBuffer(buffer);
 		
