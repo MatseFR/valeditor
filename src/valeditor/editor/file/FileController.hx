@@ -48,7 +48,11 @@ class FileController
 		onOpenComplete(file);
 	}
 	#else
-	
+	static public function openFile(file:FileReference, ?completeCallback:String->Void):Void
+	{
+		_completeCallback = completeCallback;
+		onOpenComplete(file);
+	}
 	#end
 	
 	#if desktop
