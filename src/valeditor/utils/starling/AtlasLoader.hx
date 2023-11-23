@@ -26,12 +26,32 @@ class AtlasLoader
 		
 	}
 	
+	private function clear():Void
+	{
+		this._bitmapAsset = null;
+		this._textAsset = null;
+		this._atlasCallback = null;
+		this._textureCallback = null;
+		this._completeCallback = null;
+		this._cancelCallback = null;
+	}
+	
+	public function resetTextureParams():Void
+	{
+		this._textureParams.reset();
+	}
+	
 	public function start(atlasCallback:TextureAtlas->TextureCreationParameters->BitmapAsset->TextAsset->Void, completeCallback:Void->Void, cancelCallback:Void->Void):Void
 	{
 		this._atlasCallback = atlasCallback;
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
+		selectBitmapAsset();
+	}
+	
+	private function selectBitmapAsset():Void
+	{
 		FeathersWindows.showBitmapAssets(bitmapAssetSelected, cancel, "Select Bitmap source for Atlas");
 	}
 	
@@ -39,15 +59,26 @@ class AtlasLoader
 	{
 		this._bitmapAsset = asset;
 		
-		FeathersWindows.showTextAssets(textAssetSelected, cancel, "Select Xml source for Atlas");
+		selectTextAsset();
+	}
+	
+	private function selectTextAsset():Void
+	{
+		FeathersWindows.showTextAssets(textAssetSelected, selectBitmapAsset, "Select Xml source for Atlas");
 	}
 	
 	private function textAssetSelected(asset:TextAsset):Void
 	{
 		this._textAsset = asset;
+		
+		selectTextureParameters();
+	}
+	
+	private function selectTextureParameters():Void
+	{
 		this._textureParams.reset();
 		
-		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, cancel);
+		FeathersWindows.showObjectEditWindow(this._textureParams, textureParamsConfirm, selectTextAsset);
 	}
 	
 	private function textureParamsConfirm():Void
@@ -57,28 +88,29 @@ class AtlasLoader
 		var atlas:TextureAtlas = new TextureAtlas(texture, this._textAsset.content);
 		this._atlasCallback(atlas, this._textureParams.clone(), this._bitmapAsset, this._textAsset);
 		
+		complete();
+	}
+	
+	private function complete():Void
+	{
 		var completeCallback:Void->Void = this._completeCallback;
-		this._bitmapAsset = null;
-		this._textAsset = null;
-		this._atlasCallback = null;
-		this._textureCallback = null;
-		this._completeCallback = null;
-		this._cancelCallback = null;
+		clear();
 		
-		completeCallback();
+		if (completeCallback != null)
+		{
+			completeCallback();
+		}
 	}
 	
 	private function cancel():Void
 	{
 		var cancelCallback:Void->Void = this._cancelCallback;
-		this._bitmapAsset = null;
-		this._textAsset = null;
-		this._atlasCallback = null;
-		this._textureCallback = null;
-		this._completeCallback = null;
-		this._cancelCallback = null;
+		clear();
 		
-		cancelCallback();
+		if (cancelCallback != null)
+		{
+			cancelCallback();
+		}
 	}
 	
 }
