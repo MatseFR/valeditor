@@ -4,7 +4,6 @@ import haxe.io.Path;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
-import js.html.URL;
 import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
