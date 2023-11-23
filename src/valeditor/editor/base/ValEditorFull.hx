@@ -4,6 +4,7 @@ import haxe.io.Path;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
+import js.html.URL;
 import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
@@ -51,8 +52,12 @@ import flash.desktop.ClipboardFormats;
 import flash.desktop.NativeDragManager;
 import flash.events.NativeDragEvent;
 import flash.filesystem.File;
-#else
+#elseif desktop
 import openfl.filesystem.File;
+#else
+import js.html.FileList;
+import openfl.net.FileReference;
+import valeditor.utils.file.FileReaderLoader;
 #end
 
 #if starling
@@ -69,6 +74,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private var _fileSettings:FileSettings = new FileSettings();
 	private var _isStartUp:Bool = true;
+	
+	#if html5
+	private var _fileReaderLoader:FileReaderLoader = new FileReaderLoader();
+	#end
 
 	public function new() 
 	{
@@ -620,7 +629,55 @@ class ValEditorFull extends ValEditorBaseFeathers
 	#else
 	private function onFileDrop(filePath:String):Void
 	{
+		var fileList:FileList = cast filePath;
 		
+		// look for source file
+		for (file in fileList)
+		{
+			if (Path.extension(file.name) == ValEditor.fileExtension)
+			{
+				this._fileReaderLoader.addFile(file);
+				this._fileReaderLoader.start(onSourceFileReady);
+				return;
+			}
+		}
+		
+		if (!this._isStartUp)
+		{
+			// look for asset file
+			for (file in fileList)
+			{
+				if (ValEdit.assetLib.isValidExtension(Path.extension(file.name)))
+				{
+					this._fileReaderLoader.addFile(file);
+				}
+			}
+			
+			if (!ValEditor.assetFileLoader.isRunning)
+			{
+				FeathersWindows.showMessageWindow("Assets", "importing assets");
+				this._fileReaderLoader.start(onAssetFilesReady);
+			}
+		}
+	}
+	
+	private function onSourceFileReady(files:Array<FileReference>):Void
+	{
+		FileController.openFile(files[0], onSourceFileLoadComplete);
+	}
+	
+	private function onAssetFilesReady(files:Array<FileReference>):Void
+	{
+		for (file in files)
+		{
+			ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
+		}
+		
+		if (!ValEditor.assetFileLoader.isRunning)
+		{
+			FeathersWindows.showMessageWindow("Assets", "importing assets");
+			ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
+		}
 	}
 	#end
 	
