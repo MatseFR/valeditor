@@ -8,6 +8,7 @@ import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.FileSettingsWindow;
+import valeditor.ui.feathers.window.MessageConfirmWindow;
 import valeditor.ui.feathers.window.MessageWindow;
 import valeditor.ui.feathers.window.ObjectAddWindow;
 import valeditor.ui.feathers.window.ObjectCreationWindow;
@@ -56,6 +57,7 @@ class FeathersWindows
 	static private var _fileSettings:FileSettingsWindow;
 	
 	static private var _messageWindow:MessageWindow;
+	static private var _messageConfirmWindow:MessageConfirmWindow;
 	
 	static private var _objectAdd:ObjectAddWindow;
 	static private var _objectCreate:ObjectCreationWindow;
@@ -283,6 +285,23 @@ class FeathersWindows
 		if (_messageWindow == null) return;
 		
 		PopUpManager.removePopUp(_messageWindow);
+	}
+	
+	static public function showMessageConfirmWindow(title:String, message:String, confirmCallback:Void->Void):Void
+	{
+		if (_messageConfirmWindow == null)
+		{
+			_messageConfirmWindow = new MessageConfirmWindow();
+		}
+		
+		_messageConfirmWindow.title = title;
+		_messageConfirmWindow.message = message;
+		_messageConfirmWindow.confirmCallback = confirmCallback;
+		
+		_messageConfirmWindow.width = Lib.current.stage.stageWidth / 3;
+		_messageConfirmWindow.validateNow();
+		
+		PopUpManager.addPopUp(_messageConfirmWindow, Lib.current.stage);
 	}
 	
 	static public function showObjectAddWindow(reusableObjects:Array<ValEditObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
