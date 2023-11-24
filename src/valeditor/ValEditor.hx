@@ -6,6 +6,7 @@ import haxe.crypto.Crc32;
 import haxe.ds.List;
 import haxe.io.Bytes;
 import haxe.io.BytesOutput;
+import haxe.macro.Compiler;
 import haxe.zip.Entry;
 import haxe.zip.Writer;
 import inputAction.Input;
@@ -47,8 +48,11 @@ import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.utils.ArraySort;
-import valeditor.utils.file.asset.AssetFilesLoader;
+#if desktop
 import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
+#else
+import valeditor.utils.file.asset.AssetFilesLoader;
+#end
 
 /**
  * ...
@@ -57,6 +61,8 @@ import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
 @:access(valedit.ValEdit)
 class ValEditor
 {
+	static public var VERSION:String = Compiler.getDefine("valeditor");
+	
 	#if desktop
 	static public var assetFileLoader:AssetFilesLoaderDesktop;
 	#else
@@ -641,7 +647,7 @@ class ValEditor
 		
 		if (template == null) return;
 		
-		var valClass:ValEditClass = _classMap.get(template.className);
+		var valClass:ValEditClass = template.clss;
 		_displayMap[container] = valClass;
 		valClass.addTemplateContainer(container, template);
 	}
@@ -732,7 +738,7 @@ class ValEditor
 	
 	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, registerToTemplate:Bool = true):ValEditorObject
 	{
-		var valClass:ValEditorClass = _classMap.get(template.className);
+		var valClass:ValEditorClass = cast template.clss;
 		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
 		
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
@@ -798,7 +804,7 @@ class ValEditor
 		template.addEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
 		
-		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.className);
+		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.add(template);
 		
 		for (className in template.clss.superClassNames)
@@ -892,7 +898,7 @@ class ValEditor
 		template.removeEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
 		
-		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.className);
+		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.remove(template);
 		
 		for (className in template.clss.superClassNames)
@@ -1174,6 +1180,13 @@ class ValEditor
 	{
 		if (json == null) json = {};
 		
+		json.valeditVersion = ValEdit.VERSION;
+		json.valeditorVersion = VERSION;
+		
+		#if flash
+		json.flash = true;
+		#end
+		
 		var classList:Array<Dynamic> = [];
 		for (clss in _classMap)
 		{
@@ -1308,7 +1321,7 @@ class ValEditor
 		var starlingTextureList:Array<Dynamic> = [];
 		for (asset in ValEdit.assetLib.starlingTextureList)
 		{
-			if (asset.path.indexOf(ValEdit.STARLING_SUBTEXTURE_MARKER) == -1)
+			if (!asset.isFromAtlas)
 			{
 				starlingTextureList.push(asset.toJSONSave());
 			}
