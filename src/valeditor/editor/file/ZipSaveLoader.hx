@@ -20,6 +20,7 @@ import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.utils.ZipUtil;
 import valeditor.events.DefaultEvent;
+import valeditor.ui.feathers.FeathersWindows;
 import valeditor.utils.starling.TextureCreationParameters;
 
 /**
@@ -321,9 +322,72 @@ class ZipSaveLoader extends EventDispatcher
 		}
 		this._dataJson = Json.parse(this._entry.data.toString());
 		
+		var flash:Bool = false;
+		if (this._dataJson.flash != null)
+		{
+			flash = this._dataJson.flash;
+		}
+		
+		#if flash
+		if (!flash)
+		{
+			FeathersWindows.showMessageConfirmWindow("OpenFL to Flash", "This file was not created with a Flash/Air build of ValEditor. openfl.* class paths are gonna be renamed to flash.* - it should work unless some class has no Flash/Air equivalent.", openFLToFlash);
+		}
+		else
+		{
+			completeLoading();
+		}
+		#else
+		if (flash)
+		{
+			FeathersWindows.showMessageConfirmWindow("Flash to OpenFL", "This file was created with a Flash/Air build of ValEditor. flash.* class paths are gonna be renamed to openfl.* - it should work unless some class has no OpenFL equivalent.", flashToOpenFL);
+		}
+		else
+		{
+			completeLoading();
+		}
+		#end
+	}
+	
+	private function completeLoading():Void
+	{
 		ValEditor.fromJSONSave(this._dataJson);
 		
 		DefaultEvent.dispatch(this, Event.COMPLETE);
+	}
+	
+	private function flashToOpenFL():Void
+	{
+		var name:String;
+		var data:Array<Dynamic> = this._dataJson.classes;
+		for (node in data)
+		{
+			name = node.clss;
+			if (name.indexOf("flash.") == 0)
+			{
+				name = StringTools.replace(name, "flash.", "openfl.");
+				node.clss = name;
+			}
+		}
+		
+		completeLoading();
+	}
+	
+	private function openFLToFlash():Void
+	{
+		var name:String;
+		var data:Array<Dynamic> = this._dataJson.classes;
+		for (node in data)
+		{
+			name = node.clss;
+			if (name.indexOf("openfl.") == 0)
+			{
+				name = StringTools.replace(name, "openfl.", "flash.");
+				node.clss = name;
+			}
+		}
+		
+		completeLoading();
 	}
 	
 }
