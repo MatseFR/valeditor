@@ -35,7 +35,7 @@ class ValEditorTemplate extends ValEditTemplate
 		return this._id;
 	}
 	
-	override function set_object(value:Dynamic):Dynamic 
+	override function set_object(value:ValEditObject):ValEditObject 
 	{
 		if (this._object == value) return value;
 		
