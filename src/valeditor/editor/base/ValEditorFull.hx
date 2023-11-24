@@ -617,7 +617,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(Path.extension(filePath)))
 		{
 			file = new File(filePath);
-			ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension);
+			ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
 			if (!ValEditor.assetFileLoader.isRunning)
 			{
 				FeathersWindows.showMessageWindow("Assets", "importing assets");
