@@ -15,13 +15,13 @@ class ExportSettings
 		return new ExportSettings();
 	}
 	
-	public var compress:Bool;
-	public var exportAssets:Bool;
+	public var compress:Bool = false;
+	public var exportAssets:Bool = true;
 	public var fileName:String;
 	public var filePath:String;
 	public var fullPath(get, set):String;
-	public var useSimpleJSON:Bool;
-	public var useZip:Bool #if !desktop = true#end;
+	public var useSimpleJSON:Bool = false;
+	public var useZip:Bool = true;
 	
 	private var _fullPath:String;
 	private function get_fullPath():String { return this._fullPath; }
@@ -48,12 +48,10 @@ class ExportSettings
 	public function clear():Void
 	{
 		this.compress = false;
-		this.exportAssets = false;
+		this.exportAssets = true;
 		this.fullPath = null;
 		this.useSimpleJSON = false;
-		#if desktop
-		this.useZip = false;
-		#end
+		this.useZip = true;
 	}
 	
 	public function pool():Void

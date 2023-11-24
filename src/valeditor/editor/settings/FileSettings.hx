@@ -16,7 +16,7 @@ class FileSettings
 		return new FileSettings();
 	}
 	
-	public var compress:Bool;
+	public var compress:Bool = false;
 	public var fileName:String = "untitled";
 	public var filePath:String;
 	public var frameRateDefault:Float = 60;
