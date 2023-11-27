@@ -318,6 +318,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 			FeathersWindows.closeStartMenuWindow();
 		}
 		this._isStartUp = false;
+		
+		ValEditor.fileSettings.fileName = Path.withoutDirectory(filePath);
+		ValEditor.fileSettings.filePath = Path.directory(filePath);
 	}
 	
 	private function onLoadFileCancel():Void
@@ -589,7 +592,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		{
 			if (file.extension == ValEditor.fileExtension)
 			{
-				FileController.openFile(file, onSourceFileLoadComplete);
+				FileController.openFile(file, onLoadFileConfirm);
 				return;
 			}
 		}
@@ -612,7 +615,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		if (Path.extension(filePath) == ValEditor.fileExtension)
 		{
 			file = new File(filePath);
-			FileController.openFile(file, onSourceFileLoadComplete);
+			FileController.openFile(file, onLoadFileConfirm);
 		}
 		else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(Path.extension(filePath)))
 		{
@@ -662,7 +665,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onSourceFileReady(files:Array<FileReference>):Void
 	{
-		FileController.openFile(files[0], onSourceFileLoadComplete);
+		FileController.openFile(files[0], onLoadFileConfirm);
 	}
 	
 	private function onAssetFilesReady(files:Array<FileReference>):Void
@@ -683,11 +686,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private function onAssetFilesLoadComplete():Void
 	{
 		FeathersWindows.hideMessageWindow();
-	}
-	
-	private function onSourceFileLoadComplete(filePath:String):Void
-	{
-		this._isStartUp = false;
 	}
 	
 	public function exposeAll():Void
