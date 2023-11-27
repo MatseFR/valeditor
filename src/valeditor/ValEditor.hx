@@ -1364,6 +1364,7 @@ class ValEditor
 		{
 			ZipUtil.compressEntry(entry);
 		}
+		entries.push(entry);
 		
 		bytes = Bytes.ofString(Json.stringify(exportSettings.toJSON()));
 		entry = {
@@ -1379,6 +1380,7 @@ class ValEditor
 		{
 			ZipUtil.compressEntry(entry);
 		}
+		entries.push(entry);
 		//\SETTINGS
 		
 		var output:BytesOutput = new BytesOutput();
