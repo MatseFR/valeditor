@@ -9,7 +9,6 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
-import starling.utils.Padding;
 import valedit.value.base.ExposedValue;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;

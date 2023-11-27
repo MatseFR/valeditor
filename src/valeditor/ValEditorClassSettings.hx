@@ -1,5 +1,6 @@
 package valeditor;
 
+import openfl.display.BitmapData;
 import valedit.ValEditClassSettings;
 import valeditor.ui.IInteractiveObject;
 
@@ -27,6 +28,8 @@ class ValEditorClassSettings extends ValEditClassSettings
 	 *  @default false */
 	public var hasRadianRotation:Bool;
 	
+	public var iconBitmapData:BitmapData;
+	
 	/** function that will create the clickable/touchable object for that object.
 	 *  this is only useful if isDisplayObject is set to true **/
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
@@ -47,6 +50,7 @@ class ValEditorClassSettings extends ValEditClassSettings
 		this.canBeCreated = true;
 		this.categories.resize(0);
 		this.hasRadianRotation = false;
+		this.iconBitmapData = null;
 		this.interactiveFactory = null;
 		this.usePivotScaling = false;
 	}

@@ -11,9 +11,6 @@ import openfl.errors.Error;
 import openfl.events.EventDispatcher;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
-import starling.events.Touch;
-import starling.events.TouchEvent;
-import starling.events.TouchPhase;
 import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
@@ -25,6 +22,12 @@ import valeditor.ui.IInteractiveObject;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
+
+#if starling
+import starling.events.Touch;
+import starling.events.TouchEvent;
+import starling.events.TouchPhase;
+#end
 
 /**
  * ...

@@ -12,16 +12,18 @@ import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.media.Sound;
 import openfl.utils.ByteArray;
-import starling.textures.Texture;
-import starling.textures.TextureAtlas;
 import valedit.ValEdit;
-import valedit.asset.AssetLib;
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.utils.ZipUtil;
 import valeditor.events.DefaultEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.utils.starling.TextureCreationParameters;
+
+#if starling
+import starling.textures.Texture;
+import starling.textures.TextureAtlas;
+#end
 
 /**
  * ...

@@ -308,8 +308,10 @@ class ValEditor
 				case DisplayObjectType.OPENFL :
 					settings.interactiveFactory = InteractiveFactories.openFL_default;
 				
+				#if starling
 				case DisplayObjectType.STARLING :
 					settings.interactiveFactory = InteractiveFactories.starling_default;
+				#end
 				
 				default :
 					// nothing

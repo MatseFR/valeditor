@@ -19,8 +19,6 @@ import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
-import starling.display.Image;
-import starling.display.Quad;
 import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.asset.AssetType;
@@ -29,8 +27,6 @@ import valedit.data.openfl.display.DisplayData;
 import valedit.data.openfl.filters.FiltersData;
 import valedit.data.openfl.geom.GeomData;
 import valedit.data.openfl.text.TextData;
-import valedit.data.starling.display.StarlingDisplayData;
-import valedit.data.starling.texture.StarlingTextureData;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
@@ -44,7 +40,6 @@ import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.view.EditorView;
-import valeditor.utils.starling.TextureCreationParameters;
 
 #if air
 import flash.desktop.ClipboardFormats;
@@ -61,6 +56,11 @@ import valeditor.utils.file.FileReaderLoader;
 
 #if starling
 import starling.core.Starling;
+import starling.display.Image;
+import starling.display.Quad;
+import valedit.data.starling.display.StarlingDisplayData;
+import valedit.data.starling.texture.StarlingTextureData;
+import valeditor.utils.starling.TextureCreationParameters;
 #end
 
 /**
