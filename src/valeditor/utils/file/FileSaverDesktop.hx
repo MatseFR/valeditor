@@ -1,9 +1,10 @@
 package valeditor.utils.file;
+import haxe.io.Path;
 import openfl.events.Event;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;
-import openfl.utils.ByteArray;
+import openfl.utils.ByteArray.ByteArrayData;
 
 /**
  * ...
@@ -13,6 +14,7 @@ class FileSaverDesktop
 {
 	private var _file:File = new File();
 	private var _fileStream:FileStream = new FileStream();
+	//private var _filterList:Array<FileFilter>;
 	
 	private var _data:Dynamic;
 	
@@ -21,7 +23,7 @@ class FileSaverDesktop
 	
 	public function new() 
 	{
-		
+		//this._filterList = [new FileFilter(ValEditor.fileDescription, "*." + ValEditor.fileExtension)];
 	}
 	
 	public function clear():Void
@@ -37,17 +39,23 @@ class FileSaverDesktop
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
-		this._file.addEventListener(Event.SELECT, onFileSelected);
-		this._file.addEventListener(Event.CANCEL, onFileCancelled);
-		
 		if (path != null)
 		{
-			this._file.resolvePath(path);
+			if (Path.directory(path) == "")
+			{
+				path = Path.join([File.documentsDirectory.nativePath, path]);
+			}
+			
+			this._file = this._file.resolvePath(path);
 		}
+		
+		this._file.addEventListener(Event.SELECT, onFileSelected);
+		this._file.addEventListener(Event.CANCEL, onFileCancelled);
 		
 		if (browseForSave)
 		{
 			this._file.browseForSave(dialogTitle);
+			//this._file.browseForOpen(dialogTitle, this._filterList);
 		}
 		else
 		{

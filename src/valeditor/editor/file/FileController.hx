@@ -99,7 +99,7 @@ class FileController
 		var data:Dynamic = ValEditor.toZipSave();
 		
 		#if desktop
-		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fullPath, ValEditor.fileSettings.fullPath == null || forceBrowse);
+		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fullPath, ValEditor.fileSettings.filePath == null || forceBrowse);
 		#else
 		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fileName);
 		#end

@@ -72,6 +72,7 @@ class ValEditor
 	static public var currentContainer(get, set):ValEditorContainer;
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
+	static public var fileDescription:String = "ValEditor Source file (*.ves)";
 	static public var fileExtension:String = "ves";
 	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
