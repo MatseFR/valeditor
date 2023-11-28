@@ -21,6 +21,7 @@ import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import valedit.DisplayObjectType;
 import valedit.ValEdit;
+import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
 import valedit.data.feathers.themes.SimpleThemeData;
 import valedit.data.openfl.display.DisplayData;
@@ -81,6 +82,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 	public function new() 
 	{
 		super();
+	}
+	
+	override function initialize():Void 
+	{
+		ValEdit.assetLib = new AssetLib();
+		ValEdit.assetLib.excludePath("icon");
+		ValEdit.assetLib.init(true);
+		
+		super.initialize();
 	}
 	
 	override function editorSetup():Void 
