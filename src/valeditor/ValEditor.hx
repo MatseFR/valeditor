@@ -352,6 +352,7 @@ class ValEditor
 		{
 			v.addCategory(category);
 		}
+		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
 		v.usePivotScaling = settings.usePivotScaling;
