@@ -19,6 +19,7 @@ import openfl.text.Font;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
+import openfl.utils.Assets;
 import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
@@ -187,6 +188,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
 		settings.objectCollection = DisplayData.exposeBitmapInstance();
@@ -212,6 +214,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_TEXT);
+		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
 		settings.objectCollection = TextData.exposeTextField();
@@ -230,6 +233,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.STARLING;
 		settings.objectCollection = StarlingDisplayData.exposeQuadInstance();
@@ -244,6 +248,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.STARLING;
 		settings.objectCollection = StarlingDisplayData.exposeImageInstance();
