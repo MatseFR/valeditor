@@ -96,8 +96,8 @@ class TemplateLibrary extends LayoutGroup
 		this._idColumn = new GridViewColumn("id");
 		this._idColumn.cellRendererRecycler = recycler;
 		
-		this._classColumn = new GridViewColumn("class", (item)->item.clss.className);
-		this._numInstancesColumn = new GridViewColumn("#", (item)->Std.string(item.numInstances));
+		this._classColumn = new GridViewColumn("class", (item)->item.clss.className, 80.0);
+		this._numInstancesColumn = new GridViewColumn("#", (item)->Std.string(item.numInstances), 30.0);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			this._idColumn,
