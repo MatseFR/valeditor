@@ -13,6 +13,7 @@ import inputAction.Input;
 import inputAction.controllers.KeyboardController;
 import juggler.animation.Juggler;
 import openfl.Lib;
+import openfl.display.BitmapData;
 import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
 import openfl.events.Event;
@@ -435,7 +436,7 @@ class ValEditor
 	}
 	
 	static public function registerClassSimple(type:Class<Dynamic>, canBeCreated:Bool = true, objectCollection:ExposedCollection, templateCollection:ExposedCollection = null,
-											   constructorCollection:ExposedCollection = null, categories:Array<String> = null):ValEditorClass
+											   constructorCollection:ExposedCollection = null, categories:Array<String> = null, iconBitmapData:BitmapData = null):ValEditorClass
 	{
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		settings.canBeCreated = canBeCreated;

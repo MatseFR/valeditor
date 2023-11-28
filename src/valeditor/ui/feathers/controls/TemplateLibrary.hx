@@ -6,12 +6,15 @@ import feathers.controls.GridViewColumn;
 import feathers.controls.LayoutGroup;
 import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.data.ArrayCollection;
+import feathers.data.GridViewCellState;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
+import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
@@ -33,7 +36,10 @@ import valeditor.ui.feathers.variant.LayoutGroupVariant;
  */
 class TemplateLibrary extends LayoutGroup 
 {
-	public var _grid:GridView;
+	private var _grid:GridView;
+	private var _idColumn:GridViewColumn;
+	private var _classColumn:GridViewColumn;
+	private var _numInstancesColumn:GridViewColumn;
 	private var _footer:LayoutGroup;
 	
 	private var _templateAddButton:Button;
@@ -78,10 +84,25 @@ class TemplateLibrary extends LayoutGroup
 		this._templateRenameButton.enabled = false;
 		this._footer.addChild(this._templateRenameButton);
 		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.icon = new Bitmap();
+			return renderer;
+		});
+		recycler.update = (renderer:ItemRenderer, state:GridViewCellState) -> {
+			cast(renderer.icon, Bitmap).bitmapData = state.data.clss.iconBitmapData;
+			renderer.text = cast(state.data, ValEditorTemplate).id;
+		};
+		this._idColumn = new GridViewColumn("id");
+		this._idColumn.cellRendererRecycler = recycler;
+		
+		this._classColumn = new GridViewColumn("class", (item)->item.clss.className);
+		this._numInstancesColumn = new GridViewColumn("#", (item)->Std.string(item.numInstances));
+		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("id", (item)->cast(item, ValEditorTemplate).id),
-			new GridViewColumn("class", (item)->item.clss.className),
-			new GridViewColumn("#", (item)->Std.string(item.numInstances))
+			this._idColumn,
+			this._classColumn,
+			this._numInstancesColumn
 		]);
 		
 		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);

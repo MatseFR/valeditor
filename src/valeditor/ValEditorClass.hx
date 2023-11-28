@@ -1,4 +1,5 @@
 package valeditor;
+import openfl.display.BitmapData;
 import openfl.display.DisplayObjectContainer;
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
@@ -26,6 +27,7 @@ class ValEditorClass extends ValEditClass
 	public var hasTransformProperty:Bool;
 	public var hasVisibleProperty:Bool;	
 	public var hasRadianRotation:Bool;
+	public var iconBitmapData:BitmapData;
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 	public var usePivotScaling:Bool;
 
@@ -44,6 +46,7 @@ class ValEditorClass extends ValEditClass
 		this.hasTransformProperty = false;
 		this.hasVisibleProperty = false;
 		this.hasRadianRotation = false;
+		this.iconBitmapData = null;
 		this.interactiveFactory = null;
 		this.usePivotScaling = false;
 		
