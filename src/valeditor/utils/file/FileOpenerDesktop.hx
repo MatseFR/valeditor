@@ -9,8 +9,12 @@ import openfl.net.FileFilter;
  */
 class FileOpenerDesktop 
 {
-	private var _file:File = new File();
+	public var isRunning(get, never):Bool;
 	
+	private function get_isRunning():Bool { return this._isRunning; }
+	
+	private var _file:File = new File();
+	private var _isRunning:Bool = false;
 	private var _completeCallback:File->Void;
 	private var _cancelCallback:Void->Void;
 	
@@ -27,6 +31,13 @@ class FileOpenerDesktop
 	
 	public function start(completeCallback:File->Void, cancelCallback:Void->Void, filterList:Array<FileFilter> = null, path:String = null, dialogTitle:String = "Select file"):Void
 	{
+		if (this._isRunning)
+		{
+			trace("FileOpenerDesktop is already running");
+			return;
+		}
+		this._isRunning = true;
+		
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		
@@ -45,6 +56,7 @@ class FileOpenerDesktop
 		this._file.removeEventListener(Event.SELECT, onFileSelected);
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
 		
+		this._isRunning = false;
 		this._completeCallback(this._file);
 	}
 	
@@ -53,6 +65,7 @@ class FileOpenerDesktop
 		this._file.removeEventListener(Event.SELECT, onFileSelected);
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
 		
+		this._isRunning = false;
 		this._cancelCallback();
 	}
 	

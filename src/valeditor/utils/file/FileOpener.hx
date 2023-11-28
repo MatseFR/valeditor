@@ -10,10 +10,13 @@ import openfl.net.FileReference;
  */
 class FileOpener 
 {
+	public var isRunning(get, never):Bool;
 	public var loadFile:Bool;
 	
-	private var _fileReference:FileReference;
+	private function get_isRunning():Bool { return this._isRunning; }
 	
+	private var _fileReference:FileReference;
+	private var _isRunning:Bool = false;
 	private var _completeCallback:FileReference->Void;
 	private var _cancelCallback:Void->Void;
 	private var _errorCallback:IOErrorEvent->Void;
@@ -32,6 +35,13 @@ class FileOpener
 	
 	public function start(completeCallback:FileReference->Void, cancelCallback:Void->Void, ?errorCallback:IOErrorEvent->Void, ?filterList:Array<FileFilter>):Void
 	{
+		if (this._isRunning)
+		{
+			trace("FileOpener is already running");
+			return;
+		}
+		this._isRunning = true;
+		
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
 		this._errorCallback = errorCallback;
@@ -56,6 +66,7 @@ class FileOpener
 		}
 		else
 		{
+			this._isRunning = false;
 			this._completeCallback(this._fileReference);
 		}
 	}
@@ -65,6 +76,7 @@ class FileOpener
 		this._fileReference.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		this._fileReference.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
+		this._isRunning = false;
 		this._completeCallback(this._fileReference);
 	}
 	
@@ -73,6 +85,7 @@ class FileOpener
 		this._fileReference.removeEventListener(Event.COMPLETE, onFileLoadComplete);
 		this._fileReference.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
+		this._isRunning = false;
 		this._errorCallback(evt);
 	}
 	
@@ -81,6 +94,7 @@ class FileOpener
 		this._fileReference.removeEventListener(Event.SELECT, onFileSelected);
 		this._fileReference.removeEventListener(Event.CANCEL, onFileCancelled);
 		
+		this._isRunning = false;
 		this._cancelCallback();
 	}
 	
