@@ -347,6 +347,8 @@ class ValEditor
 		
 		_classMap.set(className, v);
 		
+		var index:Int = className.lastIndexOf(".");
+		v.classNameShort = className.substr(index+1);
 		v.canBeCreated = settings.canBeCreated;
 		for (category in settings.categories)
 		{
