@@ -21,6 +21,7 @@ class ValEditorClass extends ValEditClass
 	
 	public var canBeCreated:Bool;
 	public var categories(default, null):Array<String> = new Array<String>();
+	public var classNameShort:String;
 	public var hasPivotProperties:Bool;
 	public var hasScaleProperties:Bool;
 	public var hasTransformationMatrixProperty:Bool;
@@ -40,6 +41,7 @@ class ValEditorClass extends ValEditClass
 	{
 		this.canBeCreated = false;
 		this.categories.resize(0);
+		this.classNameShort = null;
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
 		this.hasTransformationMatrixProperty = false;
@@ -57,6 +59,19 @@ class ValEditorClass extends ValEditClass
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	public function makeTemplateIDPreview():String
+	{
+		var templateID:String = null;
+		var num:Int = this._templateIDIndex;
+		while (true)
+		{
+			num++;
+			templateID = this.classNameShort + num;
+			if (!this._IDToTemplate.exists(templateID)) break;
+		}
+		return templateID;
 	}
 	
 	public function reset():Void
@@ -109,6 +124,7 @@ class ValEditorClass extends ValEditClass
 		this._objectToValEditObject.clear();
 		
 		this._objectIDIndex = -1;
+		this._templateIDIndex = -1;
 		
 		for (collection in this._collectionsToPool)
 		{
