@@ -172,7 +172,7 @@ class TemplateCreationWindow extends Panel
 		this._classGroup.layout = vLayout;
 		addChild(this._classGroup);
 		
-		this._classLabel = new Label("Object Class");
+		this._classLabel = new Label("Template Class");
 		this._classGroup.addChild(this._classLabel);
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
@@ -189,7 +189,7 @@ class TemplateCreationWindow extends Panel
 		this._idGroup.layout = vLayout;
 		addChild(this._idGroup);
 		
-		this._idLabel = new Label("Object ID (optionnal)");
+		this._idLabel = new Label("Template ID (optionnal)");
 		this._idGroup.addChild(this._idLabel);
 		
 		this._idInput = new TextInput("", null, onIDInputChange);
@@ -282,12 +282,10 @@ class TemplateCreationWindow extends Panel
 	{
 		if (_categoryPicker.selectedItem != null)
 		{
-			
 			_categoryClearButton.enabled = true;
 		}
 		else
 		{
-			
 			_categoryClearButton.enabled = false;
 		}
 	}
@@ -303,12 +301,14 @@ class TemplateCreationWindow extends Panel
 		{
 			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem.value);
 			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
+			this._idInput.prompt = this._valEditClass.makeTemplateIDPreview();
 		}
 		else
 		{
 			ValEditor.editConstructor(null, this._constructorContainer);
 			this._constructorCollection = null;
 			this._valEditClass = null;
+			this._idInput.prompt = null;
 		}
 		checkValid();
 	}
