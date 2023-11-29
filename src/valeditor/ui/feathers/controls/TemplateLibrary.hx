@@ -28,7 +28,9 @@ import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.variant.ButtonVariant;
+import valeditor.ui.feathers.variant.ItemRendererVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.variant.SortOrderHeaderRendererVariant;
 
 /**
  * ...
@@ -86,6 +88,7 @@ class TemplateLibrary extends LayoutGroup
 		
 		var recycler = DisplayObjectRecycler.withFunction(()->{
 			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.variant = ItemRendererVariant.CRAMPED;
 			renderer.icon = new Bitmap();
 			return renderer;
 		});
@@ -96,8 +99,27 @@ class TemplateLibrary extends LayoutGroup
 		this._idColumn = new GridViewColumn("id");
 		this._idColumn.cellRendererRecycler = recycler;
 		
-		this._classColumn = new GridViewColumn("class", (item)->item.clss.className, 80.0);
-		this._numInstancesColumn = new GridViewColumn("#", (item)->Std.string(item.numInstances), 30.0);
+		recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.variant = ItemRendererVariant.CRAMPED;
+			return renderer;
+		});
+		recycler.update = (renderer:ItemRenderer, state:GridViewCellState) -> {
+			renderer.text = state.data.clss.className;
+		};
+		this._classColumn = new GridViewColumn("class", null, 80.0);
+		this._classColumn.cellRendererRecycler = recycler;
+		
+		recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.variant = ItemRendererVariant.CRAMPED;
+			return renderer;
+		});
+		recycler.update = (renderer:ItemRenderer, state:GridViewCellState) -> {
+			renderer.text = Std.string(state.data.numInstances);
+		};
+		this._numInstancesColumn = new GridViewColumn("#", null, 28.0);
+		this._numInstancesColumn.cellRendererRecycler = recycler;
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
 			this._idColumn,
@@ -106,6 +128,7 @@ class TemplateLibrary extends LayoutGroup
 		]);
 		
 		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);
+		this._grid.customHeaderRendererVariant = SortOrderHeaderRendererVariant.CRAMPED;
 		this._grid.addEventListener(KeyboardEvent.KEY_DOWN, onGridKeyDown);
 		this._grid.addEventListener(KeyboardEvent.KEY_UP, onGridKeyUp);
 		this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
