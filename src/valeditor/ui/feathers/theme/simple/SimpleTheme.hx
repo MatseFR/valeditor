@@ -5,7 +5,6 @@ import feathers.graphics.FillStyle;
 import feathers.graphics.LineStyle;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.style.IDarkModeTheme;
-import feathers.style.Theme;
 import feathers.text.TextFormat;
 import feathers.themes.ClassVariantTheme;
 import feathers.themes.steel.DefaultSteelTheme;
