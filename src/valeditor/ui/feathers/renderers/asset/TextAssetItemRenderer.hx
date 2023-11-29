@@ -13,6 +13,14 @@ import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
  */
 class TextAssetItemRenderer extends AssetItemRenderer
 {
+	static private var _POOL:Array<TextAssetItemRenderer> = new Array<TextAssetItemRenderer>();
+	
+	static public function fromPool():TextAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new TextAssetItemRenderer();
+	}
+	
 	public var asset(get, set):TextAsset;
 	private var _asset:TextAsset;
 	private function get_asset():TextAsset { return this._asset; }
@@ -40,6 +48,12 @@ class TextAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 
 	override function initialize():Void

@@ -77,6 +77,11 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 			itemRenderer.clear();
 		};
 		
+		recycler.destroy = (itemRenderer:StarlingAtlasAssetItemRenderer) -> {
+			itemRenderer.removeEventListener(MouseEvent.RIGHT_CLICK, onItemRightClick);
+			itemRenderer.pool();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{

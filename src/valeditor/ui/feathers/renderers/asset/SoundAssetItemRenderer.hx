@@ -19,6 +19,14 @@ import valedit.asset.SoundAsset;
  */
 class SoundAssetItemRenderer extends AssetItemRenderer 
 {
+	static private var _POOL:Array<SoundAssetItemRenderer> = new Array<SoundAssetItemRenderer>();
+	
+	static public function fromPool():SoundAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new SoundAssetItemRenderer();
+	}
+	
 	public var asset(get, set):SoundAsset;
 	private var _asset:SoundAsset;
 	private function get_asset():SoundAsset { return this._asset; }
@@ -57,6 +65,12 @@ class SoundAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

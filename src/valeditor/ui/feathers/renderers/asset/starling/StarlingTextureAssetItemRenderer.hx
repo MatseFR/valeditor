@@ -16,6 +16,14 @@ import valeditor.ui.feathers.variant.LayoutGroupVariant;
  */
 class StarlingTextureAssetItemRenderer extends AssetItemRenderer 
 {
+	static private var _POOL:Array<StarlingTextureAssetItemRenderer> = new Array<StarlingTextureAssetItemRenderer>();
+	
+	static public function fromPool():StarlingTextureAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new StarlingTextureAssetItemRenderer();
+	}
+	
 	public var asset(get, set):StarlingTextureAsset;
 	private var _asset:StarlingTextureAsset;
 	private function get_asset():StarlingTextureAsset { return this._asset; }
@@ -64,6 +72,12 @@ class StarlingTextureAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

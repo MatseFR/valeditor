@@ -8,7 +8,7 @@ import openfl.events.MouseEvent;
  * @author Matse
  */
 @:styleContext
-class AssetItemRenderer extends LayoutGroupItemRenderer 
+abstract class AssetItemRenderer extends LayoutGroupItemRenderer 
 {
 
 	public function new() 
@@ -16,6 +16,8 @@ class AssetItemRenderer extends LayoutGroupItemRenderer
 		super();
 		this.addEventListener(MouseEvent.CLICK, onMouseClick);
 	}
+	
+	abstract public function pool():Void;
 	
 	override public function dispose():Void 
 	{

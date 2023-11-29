@@ -13,6 +13,14 @@ import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
  */
 class BinaryAssetItemRenderer extends AssetItemRenderer 
 {
+	static private var _POOL:Array<BinaryAssetItemRenderer> = new Array<BinaryAssetItemRenderer>();
+	
+	static public function fromPool():BinaryAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new BinaryAssetItemRenderer();
+	}
+	
 	public var asset(get, set):BinaryAsset;
 	private var _asset:BinaryAsset;
 	private function get_asset():BinaryAsset { return this._asset; }
@@ -40,6 +48,12 @@ class BinaryAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

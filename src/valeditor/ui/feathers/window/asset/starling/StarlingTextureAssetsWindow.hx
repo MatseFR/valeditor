@@ -84,6 +84,11 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 			itemRenderer.clear();
 		};
 		
+		recycler.destroy = (itemRenderer:StarlingTextureAssetItemRenderer) -> {
+			itemRenderer.removeEventListener(MouseEvent.RIGHT_CLICK, onItemRightClick);
+			itemRenderer.pool();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{

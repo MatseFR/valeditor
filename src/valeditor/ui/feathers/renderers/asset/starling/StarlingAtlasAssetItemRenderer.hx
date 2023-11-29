@@ -16,6 +16,14 @@ import valedit.asset.starling.StarlingAtlasAsset;
  */
 class StarlingAtlasAssetItemRenderer extends AssetItemRenderer 
 {
+	static private var _POOL:Array<StarlingAtlasAssetItemRenderer> = new Array<StarlingAtlasAssetItemRenderer>();
+	
+	static public function fromPool():StarlingAtlasAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new StarlingAtlasAssetItemRenderer();
+	}
+	
 	public var asset(get, set):StarlingAtlasAsset;
 	private var _asset:StarlingAtlasAsset;
 	private function get_asset():StarlingAtlasAsset { return this._asset; }
@@ -53,6 +61,12 @@ class StarlingAtlasAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 

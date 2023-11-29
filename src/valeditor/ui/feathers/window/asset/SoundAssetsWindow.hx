@@ -94,6 +94,11 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 			itemRenderer.clear();
 		};
 		
+		recycler.destroy = (itemRenderer:SoundAssetItemRenderer) -> {
+			itemRenderer.removeEventListener(MouseEvent.RIGHT_CLICK, onItemRightClick);
+			itemRenderer.pool();
+		};
+		
 		this._assetList.itemRendererRecycler = recycler;
 		this._assetList.itemToText = function(item:Dynamic):String
 		{

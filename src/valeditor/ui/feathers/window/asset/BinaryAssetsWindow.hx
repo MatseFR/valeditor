@@ -74,7 +74,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		this._assetList.dataProvider = ValEdit.assetLib.binaryCollection;
 		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			var renderer:BinaryAssetItemRenderer = new BinaryAssetItemRenderer();
+			var renderer:BinaryAssetItemRenderer = BinaryAssetItemRenderer.fromPool();
 			renderer.addEventListener(MouseEvent.RIGHT_CLICK, onItemRightClick);
 			return renderer;
 		});
@@ -85,6 +85,11 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		
 		recycler.reset = (itemRenderer:BinaryAssetItemRenderer, state:ListViewItemState) -> {
 			itemRenderer.clear();
+		};
+		
+		recycler.destroy = (itemRenderer:BinaryAssetItemRenderer) -> {
+			itemRenderer.removeEventListener(MouseEvent.RIGHT_CLICK, onItemRightClick);
+			itemRenderer.pool();
 		};
 		
 		this._assetList.itemRendererRecycler = recycler;

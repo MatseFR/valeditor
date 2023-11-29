@@ -16,6 +16,14 @@ import valedit.asset.BitmapAsset;
  */
 class BitmapAssetItemRenderer extends AssetItemRenderer 
 {
+	static private var _POOL:Array<BitmapAssetItemRenderer> = new Array<BitmapAssetItemRenderer>();
+	
+	static public function fromPool():BitmapAssetItemRenderer
+	{
+		if (_POOL.length != 0) return _POOL.pop();
+		return new BitmapAssetItemRenderer();
+	}
+	
 	public var asset(get, set):BitmapAsset;
 	private var _asset:BitmapAsset;
 	private function get_asset():BitmapAsset { return this._asset; }
@@ -56,6 +64,12 @@ class BitmapAssetItemRenderer extends AssetItemRenderer
 	public function clear():Void
 	{
 		this.asset = null;
+	}
+	
+	public function pool():Void
+	{
+		clear();
+		_POOL[_POOL.length] = this;
 	}
 	
 	override function initialize():Void 
