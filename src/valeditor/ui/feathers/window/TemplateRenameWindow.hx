@@ -128,7 +128,7 @@ class TemplateRenameWindow extends Panel
 		}
 		else
 		{
-			if (this._nameInput.text == this._template.id || !this._template.clss.objectIDExists(this._nameInput.text))
+			if (this._nameInput.text == this._template.id || !this._template.clss.templateIDExists(this._nameInput.text))
 			{
 				this._nameInput.errorString = null;
 			}
