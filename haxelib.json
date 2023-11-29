@@ -9,7 +9,10 @@
 	"contributors": [ "matse" ],
 	"dependencies": {
 		"openfl":"",
-		"valedit":""
+		"valedit":"",
+		"feathersui":"",
+		"openfl-juggler":"",
+		"inputAction":""
 	},
 	"classPath": "src"
 }
