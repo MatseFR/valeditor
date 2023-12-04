@@ -1,4 +1,5 @@
 package valeditor.utils;
+import valeditor.ValEditorClass;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.ui.feathers.data.StringData;
@@ -86,6 +87,15 @@ class ArraySort
 		if (strA > strB) return 1;
 		strA = a.id.toLowerCase();
 		strB = b.id.toLowerCase();
+		if (strA < strB) return -1;
+		if (strA > strB) return 1;
+		return 0;
+	}
+	
+	inline static public function clss(a:ValEditorClass, b:ValEditorClass):Int
+	{
+		var strA:String = a.className.toLowerCase();
+		var strB:String = b.className.toLowerCase();
 		if (strA < strB) return -1;
 		if (strA > strB) return 1;
 		return 0;

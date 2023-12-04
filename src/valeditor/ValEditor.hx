@@ -92,7 +92,8 @@ class ValEditor
 	static public var viewPort(default, null):ViewPort = new ViewPort();
 	
 	static public var categoryCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
-	static public var classCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	static public var classCollection(default, null):ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
+	static public var classNameCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
 	
 	static public var isMouseOverUI:Bool;
@@ -199,7 +200,7 @@ class ValEditor
 		_rootContainer.adjustView();
 	}
 	
-	static private var _categoryToClassCollection:Map<String, ArrayCollection<StringData>> = new Map<String, ArrayCollection<StringData>>();
+	static private var _categoryToClassCollection:Map<String, ArrayCollection<ValEditorClass>> = new Map<String, ArrayCollection<ValEditorClass>>();
 	static private var _categoryToObjectCollection:Map<String, ArrayCollection<ValEditorObject>> = new Map<String, ArrayCollection<ValEditorObject>>();
 	static private var _categoryToTemplateCollection:Map<String, ArrayCollection<ValEditorTemplate>> = new Map<String, ArrayCollection<ValEditorTemplate>>();
 	static private var _classToObjectCollection:Map<String, ArrayCollection<ValEditorObject>> = new Map<String, ArrayCollection<ValEditorObject>>();
@@ -240,7 +241,7 @@ class ValEditor
 		libraryDragManager = new LibraryDragManager();
 		
 		categoryCollection.sortCompareFunction = ArraySort.stringData;
-		classCollection.sortCompareFunction = ArraySort.stringData;
+		classCollection.sortCompareFunction = ArraySort.clss;
 		templateCollection.sortCompareFunction = ArraySort.template;
 		
 		if (ValEdit.assetLib == null)
@@ -366,6 +367,7 @@ class ValEditor
 		v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
 		
 		var objCollection:ArrayCollection<ValEditorObject>;
+		var clssCollection:ArrayCollection<ValEditorClass>;
 		var strCollection:ArrayCollection<StringData>;
 		var templateCollection:ArrayCollection<ValEditorTemplate>;
 		var stringData:StringData;
@@ -378,9 +380,9 @@ class ValEditor
 				_categoryToStringData.set(category, stringData);
 				categoryCollection.add(stringData);
 				
-				strCollection = new ArrayCollection<StringData>();
-				strCollection.sortCompareFunction = ArraySort.stringData;
-				_categoryToClassCollection.set(category, strCollection);
+				clssCollection = new ArrayCollection<ValEditorClass>();
+				clssCollection.sortCompareFunction = ArraySort.clss;
+				_categoryToClassCollection.set(category, clssCollection);
 				
 				objCollection = new ArrayCollection<ValEditorObject>();
 				objCollection.sortCompareFunction = ArraySort.object;
@@ -390,8 +392,8 @@ class ValEditor
 				templateCollection.sortCompareFunction = ArraySort.template;
 				_categoryToTemplateCollection.set(category, templateCollection);
 			}
-			strCollection = _categoryToClassCollection.get(category);
-			strCollection.add(strClass);
+			clssCollection = _categoryToClassCollection.get(category);
+			clssCollection.add(v);
 		}
 		
 		if (!_classToObjectCollection.exists(className))
@@ -432,7 +434,7 @@ class ValEditor
 		
 		if (v.canBeCreated)
 		{
-			classCollection.add(strClass);
+			classCollection.add(v);
 		}
 		
 		return v;
@@ -477,12 +479,15 @@ class ValEditor
 		_classNameToStringData.remove(className);
 		
 		var strCategory:StringData;
-		var strCollection:ArrayCollection<StringData>;
+		//var strCollection:ArrayCollection<StringData>;
+		var clssCollection:ArrayCollection<ValEditorClass>;
 		for (category in valClass.categories)
 		{
-			strCollection = _categoryToClassCollection.get(category);
-			strCollection.remove(strClass);
-			if (strCollection.length == 0)
+			//strCollection = _categoryToClassCollection.get(category);
+			//strCollection.remove(strClass);
+			clssCollection = _categoryToClassCollection.get(category);
+			//if (strCollection.length == 0)
+			if (clssCollection.length == 0)
 			{
 				// no more class associated with this category : remove category
 				strCategory = _categoryToStringData.get(category);
@@ -505,7 +510,7 @@ class ValEditor
 				destroyObjectInternal(cast obj);
 			}
 			
-			classCollection.remove(strClass);
+			classCollection.remove(valClass);
 			_classToObjectCollection.remove(className);
 		}
 		else
@@ -940,7 +945,7 @@ class ValEditor
 		return _categoryToStringData.get(category);
 	}
 	
-	static public function getClassUICollectionForCategory(category:String):ArrayCollection<StringData>
+	static public function getClassUICollectionForCategory(category:String):ArrayCollection<ValEditorClass>
 	{
 		return _categoryToClassCollection.get(category);
 	}

@@ -8,8 +8,10 @@ import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
+import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -18,7 +20,10 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
+import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.events.Event;
+import valeditor.ValEditorClass;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -126,10 +131,22 @@ class ObjectSelectWindow extends Panel
 		this._classLabel = new Label("Object Class");
 		this._classGroup.addChild(this._classLabel);
 		
+		//var recycler = DisplayObjectRecycler.withFunction(()->{
+			//var renderer:ItemRenderer = new ItemRenderer();
+			//renderer.icon = new Bitmap();
+			//return renderer;
+		//});
+		//
+		//recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
+			//cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
+			//renderer.text = state.data.className;
+		//};
+		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
 		this._classPicker.itemToText = function(item:Dynamic):String {
 			return item.value;
 		};
+		//this._classPicker.itemRendererRecycler = recycler;
 		this._classGroup.addChild(this._classPicker);
 		
 		this._objectGroup = new LayoutGroup();
@@ -191,7 +208,7 @@ class ObjectSelectWindow extends Panel
 		else
 		{
 			// allow all classes
-			this._classCollection.addAll(ValEditor.classCollection);
+			this._classCollection.addAll(ValEditor.classNameCollection);
 		}
 		this._classList.sort(ArraySort.stringData);
 		this._classCollection.array = this._classList;

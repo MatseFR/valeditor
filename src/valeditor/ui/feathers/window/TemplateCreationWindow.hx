@@ -8,8 +8,10 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
+import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -17,9 +19,11 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
+import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.events.Event;
 import valedit.ExposedCollection;
-import valedit.ValEdit;
+import valeditor.ValEditorClass;
 import valeditor.ValEditorTemplate;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -78,7 +82,7 @@ class TemplateCreationWindow extends Panel
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
-	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	private var _classCollection:ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	
 	private var _idGroup:LayoutGroup;
 	private var _idLabel:Label;
@@ -175,10 +179,22 @@ class TemplateCreationWindow extends Panel
 		this._classLabel = new Label("Template Class");
 		this._classGroup.addChild(this._classLabel);
 		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.icon = new Bitmap();
+			return renderer;
+		});
+		
+		recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
+			cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
+			renderer.text = state.data.className;
+		};
+		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
 		this._classPicker.itemToText = function(item:Dynamic):String {
-			return item.value;
+			return item.className;
 		};
+		this._classPicker.itemRendererRecycler = recycler;
 		this._classGroup.addChild(this._classPicker);
 		
 		// ID
@@ -230,12 +246,12 @@ class TemplateCreationWindow extends Panel
 		this._constructorButtonGroup.addChild(this._constructorDefaultsButton);
 	}
 	
-	public function reset(?allowedClassNames:Array<StringData>, ?allowedCategories:Array<StringData>):Void
+	public function reset(?allowedClasses:Array<ValEditorClass>, ?allowedCategories:Array<StringData>):Void
 	{
-		var selectedItem:StringData = this._classPicker.selectedItem;
-		if (allowedClassNames != null && allowedClassNames.length != 0)
+		var selectedItem:ValEditorClass = this._classPicker.selectedItem;
+		if (allowedClasses != null && allowedClasses.length != 0)
 		{
-			this._classCollection.array = allowedClassNames;
+			this._classCollection.array = allowedClasses;
 		}
 		else
 		{
@@ -299,7 +315,7 @@ class TemplateCreationWindow extends Panel
 	{
 		if (this._classPicker.selectedItem != null)
 		{
-			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem.value);
+			this._valEditClass = this._classPicker.selectedItem;
 			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
 			this._idInput.prompt = this._valEditClass.makeTemplateIDPreview();
 		}
@@ -322,7 +338,14 @@ class TemplateCreationWindow extends Panel
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		var id:String = null;
-		if (this._idInput.text != "") id = this._idInput.text;
+		if (this._idInput.text != "") 
+		{
+			id = this._idInput.text;
+		}
+		if (id == null)
+		{
+			id = this._valEditClass.makeTemplateID();
+		}
 		
 		var constructorCollection:ExposedCollection;
 		if (this._constructorCollection != null)

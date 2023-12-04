@@ -7,7 +7,9 @@ import feathers.controls.GridViewColumn;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
+import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -15,7 +17,10 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
+import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.events.Event;
+import valeditor.ValEditorClass;
 import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -48,7 +53,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	private var _classControlsGroup:LayoutGroup;
 	private var _classPicker:ComboBox;
 	private var _classClearButton:Button;
-	private var _classCollection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	private var _classCollection:ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	
 	private var _templateGroup:LayoutGroup;
 	private var _templateLabel:Label;
@@ -133,12 +138,24 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		this._classControlsGroup.layout = hLayout;
 		this._classGroup.addChild(this._classControlsGroup);
 		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:ItemRenderer = new ItemRenderer();
+			renderer.icon = new Bitmap();
+			return renderer;
+		});
+		
+		recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
+			cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
+			renderer.text = state.data.className;
+		};
+		
 		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
+		//this._classPicker.itemToText = function(item:Dynamic):String {
+			//return item.value;
+		//};
+		this._classPicker.itemRendererRecycler = recycler;
 		this._classPicker.selectedIndex = -1;
-		this._classPicker.itemToText = function(item:Dynamic):String {
-			return item.value;
-		};
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
 		this._classPicker.layoutData = new HorizontalLayoutData(100);
 		this._classControlsGroup.addChild(this._classPicker);
@@ -244,7 +261,7 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 	
 	private function updateClassCollection():Void
 	{
-		var selectedItem:StringData = this._classPicker.selectedItem;
+		var selectedItem:ValEditorClass = this._classPicker.selectedItem;
 		this._classCollection.removeAll();
 		if (this._categoryPicker.selectedItem == null)
 		{

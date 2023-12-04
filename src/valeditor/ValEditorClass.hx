@@ -74,6 +74,18 @@ class ValEditorClass extends ValEditClass
 		return templateID;
 	}
 	
+	public function makeTemplateID():String
+	{
+		var templateID:String = null;
+		while (true)
+		{
+			this._templateIDIndex++;
+			templateID = this.classNameShort + this._templateIDIndex;
+			if (!this._IDToTemplate.exists(templateID)) break;
+		}
+		return templateID;
+	}
+	
 	public function reset():Void
 	{
 		var containers:Array<DisplayObjectContainer> = [];
