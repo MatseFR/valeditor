@@ -34,6 +34,7 @@ import valeditor.ui.feathers.theme.simple.components.SortOrderHeaderRendererStyl
 import valeditor.ui.feathers.theme.simple.components.TabBarStyles;
 import valeditor.ui.feathers.theme.simple.components.TextInputStyles;
 import valeditor.ui.feathers.theme.simple.components.ToggleButtonStyles;
+import valeditor.ui.feathers.theme.simple.components.ToolTipStyles;
 import valeditor.ui.feathers.theme.simple.components.TreeViewStyles;
 import valeditor.ui.feathers.theme.simple.components.VScrollBarStyles;
 import valeditor.ui.feathers.theme.simple.components.VSliderStyles;
@@ -621,6 +622,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		TabBarStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
+		ToolTipStyles.initialize(this, this.styleProvider);
 		TreeViewStyles.initialize(this, this.styleProvider);
 		VScrollBarStyles.initialize(this, this.styleProvider);
 		VSliderStyles.initialize(this, this.styleProvider);
