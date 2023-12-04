@@ -159,15 +159,18 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		this._layerAddButton = new Button(null, onLayerAddButton);
 		this._layerAddButton.variant = ButtonVariant.ADD;
+		this._layerAddButton.toolTip = "add new layer";
 		this._layerBottomGroup.addChild(this._layerAddButton);
 		
 		this._layerRemoveButton = new Button(null, onLayerRemoveButton);
 		this._layerRemoveButton.variant = ButtonVariant.REMOVE;
+		this._layerRemoveButton.toolTip = "remove selected layer(s)";
 		this._layerRemoveButton.enabled = false;
 		this._layerBottomGroup.addChild(this._layerRemoveButton);
 		
 		this._layerRenameButton = new Button(null, null);
 		this._layerRenameButton.variant = ButtonVariant.RENAME;
+		this._layerRenameButton.toolTip = "rename selected layer";
 		this._layerBottomGroup.addChild(this._layerRenameButton);
 		
 		// TIMELINES
@@ -261,22 +264,27 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		this._frameFirstButton = new Button(null, onFrameFirstButton);
 		this._frameFirstButton.variant = ButtonVariant.FRAME_FIRST;
+		this._frameFirstButton.toolTip = "first frame";
 		this._timeLineControlsGroup.addChild(this._frameFirstButton);
 		
 		this._framePreviousButton = new Button(null, onFramePreviousButton);
 		this._framePreviousButton.variant = ButtonVariant.FRAME_PREVIOUS;
+		this._framePreviousButton.toolTip = "previous frame";
 		this._timeLineControlsGroup.addChild(this._framePreviousButton);
 		
 		this._playStopButton = new ToggleButton(null, false, onPlayStopButton);
 		this._playStopButton.variant = ToggleButtonVariant.PLAY_STOP;
+		this._playStopButton.toolTip = "play/stop";
 		this._timeLineControlsGroup.addChild(this._playStopButton);
 		
 		this._frameNextButton = new Button(null, onFrameNextButton);
 		this._frameNextButton.variant = ButtonVariant.FRAME_NEXT;
+		this._frameNextButton.toolTip = "next frame";
 		this._timeLineControlsGroup.addChild(this._frameNextButton);
 		
 		this._frameLastButton = new Button(null, onFrameLastButton);
 		this._frameLastButton.variant = ButtonVariant.FRAME_LAST;
+		this._frameLastButton.toolTip = "last frame";
 		this._timeLineControlsGroup.addChild(this._frameLastButton);
 		
 		this._timeLineList.addEventListener(Event.RESIZE, onTimeLineResize);
