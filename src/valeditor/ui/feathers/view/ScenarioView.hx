@@ -275,7 +275,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._frameNextButton.variant = ButtonVariant.FRAME_NEXT;
 		this._timeLineControlsGroup.addChild(this._frameNextButton);
 		
-		this._frameLastButton = new Button(null, onFramePreviousButton);
+		this._frameLastButton = new Button(null, onFrameLastButton);
 		this._frameLastButton.variant = ButtonVariant.FRAME_LAST;
 		this._timeLineControlsGroup.addChild(this._frameLastButton);
 		
