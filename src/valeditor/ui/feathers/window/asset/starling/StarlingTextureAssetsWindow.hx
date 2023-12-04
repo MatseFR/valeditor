@@ -107,7 +107,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		
 		this._contextMenu.itemToText = function(item:Dynamic):String
 		{
-			return item.name;
+			return item.text;
 		};
 		
 		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool

@@ -7,13 +7,13 @@ package valeditor.ui.feathers.data;
 class AssetMenuItem 
 {
 	public var id:String;
-	public var name:String;
+	public var text:String;
 	public var enabled:Bool;
 	
-	public function new(id:String, name:String, enabled:Bool = true) 
+	public function new(id:String, text:String, enabled:Bool = true) 
 	{
 		this.id = id;
-		this.name = name;
+		this.text = text;
 		this.enabled = enabled;
 	}
 	
