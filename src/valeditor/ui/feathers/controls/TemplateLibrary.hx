@@ -74,15 +74,18 @@ class TemplateLibrary extends LayoutGroup
 		
 		this._templateAddButton = new Button(null, onTemplateAddButton);
 		this._templateAddButton.variant = ButtonVariant.ADD;
+		this._templateAddButton.toolTip = "add new template";
 		this._footer.addChild(this._templateAddButton);
 		
 		this._templateRemoveButton = new Button(null, onTemplateRemoveButton);
 		this._templateRemoveButton.variant = ButtonVariant.REMOVE;
+		this._templateRemoveButton.toolTip = "remove selected template(s)";
 		this._templateRemoveButton.enabled = false;
 		this._footer.addChild(this._templateRemoveButton);
 		
 		this._templateRenameButton = new Button(null, onTemplateRenameButton);
 		this._templateRenameButton.variant = ButtonVariant.RENAME;
+		this._templateRenameButton.toolTip = "rename selected template";
 		this._templateRenameButton.enabled = false;
 		this._footer.addChild(this._templateRenameButton);
 		
