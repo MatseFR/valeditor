@@ -151,9 +151,9 @@ class ObjectCreationFromTemplateView extends LayoutGroup
 		
 		this._classCollection.addAll(ValEditor.classCollection);
 		this._classPicker = new ComboBox(this._classCollection);
-		//this._classPicker.itemToText = function(item:Dynamic):String {
-			//return item.value;
-		//};
+		this._classPicker.itemToText = function(item:Dynamic):String {
+			return item.className;
+		};
 		this._classPicker.itemRendererRecycler = recycler;
 		this._classPicker.selectedIndex = -1;
 		this._classPicker.addEventListener(Event.CHANGE, onClassChange);
