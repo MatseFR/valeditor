@@ -7,7 +7,8 @@ package valeditor.ui.feathers.variant;
 class LabelVariant 
 {
 	
-	static public inline var GROUP_NAME:String = "group-name";
+	static public inline var MENU_ITEM_SHORTCUT:String = "menu-item-shortcut";
+	static public inline var MENU_ITEM_TEXT:String = "menu-item-text";
 	static public inline var NOTE:String = "note";
 	static public inline var OBJECT_NAME:String = "object-name";
 	static public inline var SUBVALUE_NAME:String = "subvalue-name";
