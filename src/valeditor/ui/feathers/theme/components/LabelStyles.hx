@@ -23,11 +23,25 @@ class LabelStyles
 	{
 		LabelStyles.theme = theme;
 		
+		styleProvider.setStyleFunction(Label, LabelVariant.MENU_ITEM_SHORTCUT, menuItem_shortcut);
+		styleProvider.setStyleFunction(Label, LabelVariant.MENU_ITEM_TEXT, menuItem_text);
 		styleProvider.setStyleFunction(Label, LabelVariant.NOTE, note);
 		styleProvider.setStyleFunction(Label, LabelVariant.OBJECT_NAME, object_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.SUBVALUE_NAME, subValue_name);
 		styleProvider.setStyleFunction(Label, LabelVariant.TIMELINE, timeline);
 		styleProvider.setStyleFunction(Label, LabelVariant.VALUE_NAME, value_name);
+	}
+	
+	static private function menuItem_shortcut(label:Label):Void
+	{
+		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
+		label.disabledTextFormat = theme.getTextFormat(TextFormatAlign.RIGHT, theme.contrastColorLighter);
+	}
+	
+	static private function menuItem_text(label:Label):Void
+	{
+		label.textFormat = theme.getTextFormat();
+		label.disabledTextFormat = theme.getTextFormat(theme.contrastColorLighter);
 	}
 	
 	static private function note(label:Label):Void
