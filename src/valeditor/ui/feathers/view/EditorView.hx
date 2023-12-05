@@ -67,7 +67,7 @@ class EditorView extends LayoutGroup
 	private var _editContainer:ScrollContainer;
 	
 	// menus
-	private var _menuCallbacks:Map<String, Dynamic->Void> = new Map<String, Dynamic->Void>();
+	private var _menuCallbacks:Map<String, MenuItem->Void> = new Map<String, MenuItem->Void>();
 	private var _menuCollections:Map<String, ArrayCollection<MenuItem>> = new Map<String, ArrayCollection<MenuItem>>();
 	private var _menuIDList:Array<String> = new Array<String>();
 	private var _menuIDToItemToEnabled:Map<String, Dynamic->Bool> = new Map<String, Dynamic->Bool>();
@@ -84,7 +84,7 @@ class EditorView extends LayoutGroup
 		initializeNow();
 	}
 	
-	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, ?items:Array<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
+	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, items:ArrayCollection<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
 	{
 		this._menuIDList.push(menuID);
 		this._menuIDToText.set(menuID, menuText);
@@ -98,8 +98,7 @@ class EditorView extends LayoutGroup
 			this._menuIDToItemToEnabled.set(menuID, itemToEnabled);
 		}
 		
-		var collection:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>(items);
-		this._menuCollections.set(menuID, collection);
+		this._menuCollections.set(menuID, items);
 		
 		if (this._initialized)
 		{
@@ -107,7 +106,7 @@ class EditorView extends LayoutGroup
 		}
 	}
 	
-	public function addMenuItem(menuID:String, item:Dynamic):Void
+	public function addMenuItem(menuID:String, item:MenuItem):Void
 	{
 		_menuCollections.get(menuID).add(item);
 	}
@@ -131,25 +130,26 @@ class EditorView extends LayoutGroup
 		menu.name = menuID;
 		menu.prompt = this._menuIDToText.get(menuID);
 		menu.selectedIndex = -1;
-		//if (this._menuIDToItemToEnabled.exists(menuID))
-		//{
-			//itemToEnabled = this._menuIDToItemToEnabled.get(menuID);
-		//}
-		//else
-		//{
-			//itemToEnabled = defaultItemToEnabled;
-		//}
-		//menu.itemToEnabled = itemToEnabled;
-		//if (this._menuIDToItemToText.exists(menuID))
-		//{
-			//itemToText = this._menuIDToItemToText.get(menuID);
-		//}
-		//else
-		//{
-			//itemToText = defaultItemToText;
-		//}
-		//menu.itemToText = itemToText;
-		menu.itemToEnabled = defaultItemToEnabled;
+		
+		if (this._menuIDToItemToEnabled.exists(menuID))
+		{
+			itemToEnabled = this._menuIDToItemToEnabled.get(menuID);
+		}
+		else
+		{
+			itemToEnabled = defaultItemToEnabled;
+		}
+		menu.itemToEnabled = itemToEnabled;
+		if (this._menuIDToItemToText.exists(menuID))
+		{
+			itemToText = this._menuIDToItemToText.get(menuID);
+		}
+		else
+		{
+			itemToText = defaultItemToText;
+		}
+		menu.itemToText = itemToText;
+		
 		var recycler = DisplayObjectRecycler.withFunction(()->{
 			return new MenuItemRenderer();
 		});
@@ -321,7 +321,7 @@ class EditorView extends LayoutGroup
 		var item:MenuItem = menu.selectedItem;
 		menu.selectedIndex = -1;
 		if (!item.enabled) return;
-		var callback:Dynamic->Void = this._menuCallbacks.get(menu.name);
+		var callback:MenuItem->Void = this._menuCallbacks.get(menu.name);
 		if (callback != null) callback(item);
 	}
 	

@@ -1,5 +1,6 @@
 package valeditor.editor.base;
 import feathers.controls.navigators.StackItem;
+import feathers.data.ArrayCollection;
 import haxe.io.Path;
 import inputAction.InputAction;
 import inputAction.controllers.KeyAction;
@@ -143,26 +144,26 @@ class ValEditorFull extends ValEditorBaseFeathers
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);
 		
-		var fileItems:Array<MenuItem> = [
+		var fileItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
 			new MenuItem("new", "New", true, "Ctrl+N"),
 			new MenuItem("open", "Open", true, "Ctrl+O"),
 			new MenuItem("save", "Save", true, "Ctrl+S"),
 			new MenuItem("save as", "Save As", true, "Ctrl+Shift+S"),
 			new MenuItem("file settings", "File Settings"),
 			new MenuItem("export settings", "Export Settings")
-		];
+		]);
 		this.editView.addMenu("file", "File", onFileMenuCallback, fileItems);
 		
-		var assetItems:Array<MenuItem> = [
+		var assetItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
 			new MenuItem("browser", "Browser", true, "Ctrl+B")
-		];
+		]);
 		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, assetItems);
 		
-		var themeItems:Array<MenuItem> = [
+		var themeItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
 			new MenuItem("light mode", "Light mode"),
 			new MenuItem("dark mode", "Dark mode"),
 			new MenuItem("edit", "Edit")
-		];
+		]);
 		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, themeItems);
 	}
 	
