@@ -40,6 +40,7 @@ import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
+import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.view.EditorView;
 
@@ -142,25 +143,25 @@ class ValEditorFull extends ValEditorBaseFeathers
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);
 		
-		var fileItems:Array<Dynamic> = [
-			{text:"New (Ctrl+N)", id:"new"},
-			{text:"Open (Ctrl+O)", id:"open"},
-			{text:"Save (Ctrl+S)", id:"save"},
-			{text:"Save As (Ctrl+Shift+S)", id:"save as"},
-			{text:"File Settings", id:"file settings"},
-			{text:"Export Settings", id:"export settings"}
+		var fileItems:Array<MenuItem> = [
+			new MenuItem("new", "New", true, "Ctrl+N"),
+			new MenuItem("open", "Open", true, "Ctrl+O"),
+			new MenuItem("save", "Save", true, "Ctrl+S"),
+			new MenuItem("save as", "Save As", true, "Ctrl+Shift+S"),
+			new MenuItem("file settings", "File Settings"),
+			new MenuItem("export settings", "Export Settings")
 		];
 		this.editView.addMenu("file", "File", onFileMenuCallback, fileItems);
 		
-		var assetItems:Array<Dynamic> = [
-			{text:"Browser (Ctrl+B)", id:"browser"}
+		var assetItems:Array<MenuItem> = [
+			new MenuItem("browser", "Browser", true, "Ctrl+B")
 		];
 		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, assetItems);
 		
-		var themeItems:Array<Dynamic> = [
-			{text:"Light mode", id:"light mode"},
-			{text:"Dark mode", id:"dark mode"},
-			{text:"Edit", id:"edit"}
+		var themeItems:Array<MenuItem> = [
+			new MenuItem("light mode", "Light mode"),
+			new MenuItem("dark mode", "Dark mode"),
+			new MenuItem("edit", "Edit")
 		];
 		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, themeItems);
 	}
@@ -373,7 +374,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		}
 	}
 	
-	private function onFileMenuCallback(item:Dynamic):Void
+	private function onFileMenuCallback(item:MenuItem):Void
 	{
 		switch (item.id)
 		{
@@ -399,7 +400,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		Lib.current.stage.focus = null;
 	}
 	
-	private function onAssetMenuCallback(item:Dynamic):Void
+	private function onAssetMenuCallback(item:MenuItem):Void
 	{
 		switch (item.id)
 		{
@@ -410,7 +411,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		Lib.current.stage.focus = null;
 	}
 	
-	private function onThemeMenuCallback(item:Dynamic):Void
+	private function onThemeMenuCallback(item:MenuItem):Void
 	{
 		switch (item.id)
 		{
