@@ -7,9 +7,8 @@ import feathers.controls.PopUpListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
 import feathers.controls.VDividedBox;
-import feathers.controls.navigators.TabItem;
-import feathers.controls.navigators.TabNavigator;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
@@ -17,19 +16,21 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalListLayout;
+import feathers.utils.DisplayObjectRecycler;
 import openfl.Lib;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
+import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.controls.SelectionInfo;
 import valeditor.ui.feathers.controls.ObjectLibrary;
+import valeditor.ui.feathers.controls.SelectionInfo;
 import valeditor.ui.feathers.controls.TemplateLibrary;
 import valeditor.ui.feathers.controls.ToggleLayoutGroup;
+import valeditor.ui.feathers.data.MenuItem;
+import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
-import valeditor.ui.UIConfig;
-import valeditor.ui.feathers.Padding;
 
 /**
  * ...
@@ -67,7 +68,7 @@ class EditorView extends LayoutGroup
 	
 	// menus
 	private var _menuCallbacks:Map<String, Dynamic->Void> = new Map<String, Dynamic->Void>();
-	private var _menuCollections:Map<String, ArrayCollection<Dynamic>> = new Map<String, ArrayCollection<Dynamic>>();
+	private var _menuCollections:Map<String, ArrayCollection<MenuItem>> = new Map<String, ArrayCollection<MenuItem>>();
 	private var _menuIDList:Array<String> = new Array<String>();
 	private var _menuIDToItemToEnabled:Map<String, Dynamic->Bool> = new Map<String, Dynamic->Bool>();
 	private var _menuIDToItemToText:Map<String, Dynamic->String> = new Map<String, Dynamic->String>();
@@ -83,7 +84,7 @@ class EditorView extends LayoutGroup
 		initializeNow();
 	}
 	
-	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, ?items:Array<Dynamic>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
+	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, ?items:Array<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
 	{
 		this._menuIDList.push(menuID);
 		this._menuIDToText.set(menuID, menuText);
@@ -97,7 +98,7 @@ class EditorView extends LayoutGroup
 			this._menuIDToItemToEnabled.set(menuID, itemToEnabled);
 		}
 		
-		var collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>(items);
+		var collection:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>(items);
 		this._menuCollections.set(menuID, collection);
 		
 		if (this._initialized)
@@ -130,24 +131,36 @@ class EditorView extends LayoutGroup
 		menu.name = menuID;
 		menu.prompt = this._menuIDToText.get(menuID);
 		menu.selectedIndex = -1;
-		if (this._menuIDToItemToEnabled.exists(menuID))
-		{
-			itemToEnabled = this._menuIDToItemToEnabled.get(menuID);
-		}
-		else
-		{
-			itemToEnabled = defaultItemToEnabled;
-		}
-		menu.itemToEnabled = itemToEnabled;
-		if (this._menuIDToItemToText.exists(menuID))
-		{
-			itemToText = this._menuIDToItemToText.get(menuID);
-		}
-		else
-		{
-			itemToText = defaultItemToText;
-		}
-		menu.itemToText = itemToText;
+		//if (this._menuIDToItemToEnabled.exists(menuID))
+		//{
+			//itemToEnabled = this._menuIDToItemToEnabled.get(menuID);
+		//}
+		//else
+		//{
+			//itemToEnabled = defaultItemToEnabled;
+		//}
+		//menu.itemToEnabled = itemToEnabled;
+		//if (this._menuIDToItemToText.exists(menuID))
+		//{
+			//itemToText = this._menuIDToItemToText.get(menuID);
+		//}
+		//else
+		//{
+			//itemToText = defaultItemToText;
+		//}
+		//menu.itemToText = itemToText;
+		menu.itemToEnabled = defaultItemToEnabled;
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			return new MenuItemRenderer();
+		});
+		
+		recycler.update = (renderer:MenuItemRenderer, state:ListViewItemState) -> {
+			renderer.text = state.data.text;
+			renderer.shortcutText = state.data.shortcutText;
+			renderer.iconBitmapData = state.data.iconBitmapData;
+			renderer.enabled = state.data.enabled;
+		};
+		menu.itemRendererRecycler = recycler;
 		this._menuBar.addChild(menu);
 	}
 	
@@ -285,7 +298,7 @@ class EditorView extends LayoutGroup
 	
 	private function defaultItemToEnabled(item:Dynamic):Bool
 	{
-		return true;
+		return item.enabled;
 	}
 	
 	private function defaultItemToText(item:Dynamic):String
@@ -305,8 +318,9 @@ class EditorView extends LayoutGroup
 	{
 		var menu:PopUpListView = cast evt.target;
 		if (menu.selectedIndex == -1) return;
-		var item:Dynamic = menu.selectedItem;
+		var item:MenuItem = menu.selectedItem;
 		menu.selectedIndex = -1;
+		if (!item.enabled) return;
 		var callback:Dynamic->Void = this._menuCallbacks.get(menu.name);
 		if (callback != null) callback(item);
 	}
