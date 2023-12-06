@@ -5,6 +5,7 @@ import openfl.display.BitmapData;
 import openfl.display.PixelSnapping;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
+import valeditor.ui.feathers.data.FrameData;
 
 /**
  * ...
@@ -20,6 +21,7 @@ class BitmapScrollRenderer extends Sprite
 		return new BitmapScrollRenderer(bitmapData, rectMap);
 	}
 	
+	public var frameData:FrameData;
 	public var rectMap:Map<FrameItemState, Rectangle>;
 	public var state(get, set):#if flash Dynamic #else FrameItemState #end;
 	
@@ -76,6 +78,7 @@ class BitmapScrollRenderer extends Sprite
 	
 	public function pool():Void
 	{
+		this.frameData = null;
 		_POOL[_POOL.length] = this;
 	}
 	
