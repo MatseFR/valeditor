@@ -11,7 +11,10 @@ import feathers.controls.ScrollPolicy;
 import feathers.controls.ToggleButton;
 import feathers.controls.ToggleButtonState;
 import feathers.controls.VScrollBar;
+import feathers.controls.popups.CalloutPopUpAdapter;
+import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
+import feathers.events.ListViewEvent;
 import feathers.events.ScrollEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
@@ -22,10 +25,12 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
+import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import juggler.animation.IAnimatable;
 import openfl.Lib;
 import openfl.display.Shape;
+import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
@@ -40,6 +45,10 @@ import valeditor.events.EditorEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.controls.item.LayerItem;
 import valeditor.ui.feathers.controls.item.TimeLineItem;
+import valeditor.ui.feathers.data.FrameData;
+import valeditor.ui.feathers.data.MenuItem;
+import valeditor.ui.feathers.renderers.BitmapScrollRenderer;
+import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ListViewVariant;
@@ -87,13 +96,22 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _container:ValEditorContainer;
 	private var _currentTimeLineItem:TimeLineItem;
 	
-	// TESTING
 	private var _cursor:LayoutGroup;
 	private var _indicatorContainer:ScrollContainer;
 	private var _indicator:LayoutGroup;
 	
 	private var _pt:Point = new Point();
-	//\TESTING
+	
+	private var _contextMenu:ListView;
+	private var _contextMenuCollection:ArrayCollection<MenuItem>;
+	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
+	private var _contextMenuSprite:Sprite;
+	private var _contextMenuPt:Point = new Point();
+	
+	private var _insertFrameItem:MenuItem;
+	private var _insertKeyFrameItem:MenuItem;
+	private var _removeFrameItem:MenuItem;
+	private var _removeKeyFrameItem:MenuItem;
 	
 	public function new() 
 	{
@@ -294,10 +312,81 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._indicator.layoutData = new AnchorLayoutData(0, null, 0);
 		this._indicatorContainer.addChild(this._indicator);
 		
+		this._insertFrameItem = new MenuItem("insert frame", "Insert frame", true, "F5");
+		this._insertKeyFrameItem = new MenuItem("insert keyframe", "Insert keyframe", true, "F6");
+		this._removeFrameItem = new MenuItem("remove frame", "Remove frame", true, "Shift+F5");
+		this._removeKeyFrameItem = new MenuItem("remove keyframe", "Remove keyframe", true, "Shift+F6");
+		
+		this._contextMenuCollection = new ArrayCollection<MenuItem>([
+			this._insertFrameItem,
+			this._insertKeyFrameItem,
+			this._removeFrameItem,
+			this._removeKeyFrameItem
+		]);
+		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			return new MenuItemRenderer();
+		});
+		
+		recycler.update = (renderer:MenuItemRenderer, state:ListViewItemState) -> {
+			renderer.text = state.data.text;
+			renderer.shortcutText = state.data.shortcutText;
+			renderer.iconBitmapData = state.data.iconBitmapData;
+			//renderer.enabled = state.data.enabled;
+		};
+		
+		this._contextMenu = new ListView(this._contextMenuCollection);
+		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
+		var listLayout:VerticalListLayout = new VerticalListLayout();
+		listLayout.requestedRowCount = this._contextMenuCollection.length;
+		this._contextMenu.layout = listLayout;
+		this._contextMenu.itemRendererRecycler = recycler;
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool {
+			return item.enabled;
+		}
+		this._contextMenu.itemToText = function(item:Dynamic):String {
+			return item.text;
+		}
+		
+		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
+		this._contextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onContextMenuItemTrigger);
+		
+		this._contextMenuSprite = new Sprite();
+		this._contextMenuSprite.mouseEnabled = false;
+		this._contextMenuSprite.graphics.beginFill(0xff0000, 0);
+		this._contextMenuSprite.graphics.drawRect(0, 0, 4, 4);
+		this._contextMenuSprite.graphics.endFill();
+		addChild(this._contextMenuSprite);
+		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
 		
 		listsChangeEnable();
+	}
+	
+	private function onContextMenuChange(evt:Event):Void
+	{
+		if (this._contextMenu.selectedItem == null) return;
+		
+		switch (this._contextMenu.selectedItem.id)
+		{
+			case "insert frame" :
+				ValEditor.insertFrame();
+			
+			case "insert keyframe" :
+				ValEditor.insertKeyFrame();
+			
+			case "remove frame" :
+				ValEditor.removeFrame();
+			
+			case "remove keyframe" :
+				ValEditor.removeKeyFrame();
+		}
+	}
+	
+	private function onContextMenuItemTrigger(evt:ListViewEvent):Void
+	{
+		closeContextMenu();
 	}
 	
 	private function onRulerMouseDown(evt:MouseEvent):Void
@@ -460,11 +549,19 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		updateVScrollBar();
 	}
 	
+	private function closeContextMenu():Void
+	{
+		this._popupAdapter.close();
+		this._contextMenu.selectedIndex = -1;
+		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+	}
+	
 	private function createTimeLineItem(timeLine:ValEditorTimeLine, index:Int):Void
 	{
 		var item:TimeLineItem = TimeLineItem.fromPool(timeLine);
 		item.addEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
+		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
 		this._timeLineItems.insert(index, item);
 		this._timeLineList.addChildAt(item, index);
 		
@@ -596,6 +693,43 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onTimeLineFrameIndexChange(evt:TimeLineEvent):Void
 	{
 		setPlayHeadIndex(this._container.frameIndex);
+	}
+	
+	private function onTimeLineFrameRightClick(evt:MouseEvent):Void
+	{
+		var timeLineItem:TimeLineItem = evt.currentTarget;
+		var renderer:BitmapScrollRenderer = evt.target;
+		var frameData:FrameData = renderer.frameData;
+		timeLineItem.setSelectedFrame(frameData);
+		
+		// context menu
+		this._contextMenuPt.x = evt.stageX;
+		this._contextMenuPt.y = evt.stageY;
+		this._contextMenuPt = globalToLocal(this._contextMenuPt);
+		this._contextMenuSprite.x = this._contextMenuPt.x;
+		this._contextMenuSprite.y = this._contextMenuPt.y;
+		
+		if (this._popupAdapter.active)
+		{
+			closeContextMenu();
+		}
+		this._removeFrameItem.enabled = frameData.frame != null;
+		this._removeKeyFrameItem.enabled = frameData.frame != null && frameData.frame.indexCurrent == frameData.frame.indexStart;
+		this._contextMenuCollection.updateAt(this._contextMenuCollection.indexOf(this._removeFrameItem));
+		this._contextMenuCollection.updateAt(this._contextMenuCollection.indexOf(this._removeKeyFrameItem));
+		this._contextMenu.selectedIndex = -1;
+		this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
+		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+	}
+	
+	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
+	{
+		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
+		{
+			return;
+		}
+		
+		closeContextMenu();
 	}
 	
 	private function onTimeLineItemScroll(evt:Event):Void
