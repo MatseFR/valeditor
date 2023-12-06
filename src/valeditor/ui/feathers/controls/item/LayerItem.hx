@@ -2,7 +2,6 @@ package valeditor.ui.feathers.controls.item;
 
 import feathers.controls.Check;
 import feathers.controls.Label;
-import feathers.controls.LayoutGroup;
 import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
