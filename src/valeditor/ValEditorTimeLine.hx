@@ -386,21 +386,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 			if (this._frameCurrent.indexStart == this._frameCurrent.indexEnd)
 			{
 				// remove key frame
-				keyFrame = getNextKeyFrame(this._frameCurrent);
-				while (keyFrame != null)
-				{
-					keyFrame.indexStart--;
-					this._frames[keyFrame.indexStart] = keyFrame;
-					this._frameDatas[keyFrame.indexStart].frame = cast keyFrame;
-					this._frames[keyFrame.indexEnd] = null;
-					this._frameDatas[keyFrame.indexEnd].frame = null;
-					keyFrame.indexEnd--;
-					keyFrame = getNextKeyFrame(keyFrame);
-				}
-				
-				unregisterKeyFrame(this._frameCurrent);
-				this._frameCurrent.pool();
-				setFrameCurrent(this._frames[this._frameIndex]);
+				removeKeyFrame();
+				return;
 			}
 			else
 			{
