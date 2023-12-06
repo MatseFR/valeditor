@@ -10,6 +10,7 @@ import openfl.events.MouseEvent;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.events.DefaultEvent;
+import valeditor.ui.feathers.data.FrameData;
 import valeditor.ui.feathers.variant.ListViewVariant;
 
 /**
@@ -132,6 +133,11 @@ class TimeLineItem extends LayoutGroup
 	public function clearSelection():Void
 	{
 		this._list.selectedIndex = -1;
+	}
+	
+	public function setSelectedFrame(frameData:FrameData):Void
+	{
+		this._list.selectedItem = frameData;
 	}
 	
 	private function setTo(timeLine:ValEditorTimeLine):TimeLineItem
