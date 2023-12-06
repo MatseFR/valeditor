@@ -3,8 +3,10 @@ import feathers.controls.ListView;
 import feathers.controls.ScrollPolicy;
 import feathers.data.ListViewItemState;
 import feathers.layout.HorizontalListLayout;
+import feathers.layout.VerticalListLayout;
 import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
+import feathers.utils.DeviceUtil;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.display.BitmapData;
 import openfl.display.Graphics;
@@ -43,6 +45,11 @@ class ListViewStyles
 		
 		colorUpdate(theme);
 		
+		if (styleProvider.getStyleFunction(ListView, ListViewVariant.CONTEXT_MENU) == null)
+		{
+			styleProvider.setStyleFunction(ListView, ListViewVariant.CONTEXT_MENU, contextMenu);
+		}
+		
 		if (styleProvider.getStyleFunction(ListView, ListViewVariant.TIMELINE) == null)
 		{
 			styleProvider.setStyleFunction(ListView, ListViewVariant.TIMELINE, timeLine);
@@ -57,6 +64,41 @@ class ListViewStyles
 		{
 			styleProvider.setStyleFunction(ListView, ListViewVariant.TIMELINE_RULER, timeLine_ruler);
 		}
+	}
+	
+	static private function contextMenu(listView:ListView):Void
+	{
+		var isDesktop = DeviceUtil.isDesktop();
+		
+		listView.autoHideScrollBars = !isDesktop;
+		listView.fixedScrollBars = isDesktop;
+		
+		if (listView.layout == null) {
+			var layout = new VerticalListLayout();
+			layout.requestedRowCount = 5.0;
+			listView.layout = layout;
+		}
+		
+		if (listView.backgroundSkin == null) {
+			var backgroundSkin = new RectangleSkin();
+			backgroundSkin.fill = theme.getLightFill();
+			backgroundSkin.border = theme.getContrastBorderLighter();
+			backgroundSkin.width = 10.0;
+			backgroundSkin.height = 10.0;
+			listView.backgroundSkin = backgroundSkin;
+		}
+		
+		if (listView.focusRectSkin == null) {
+			var focusRectSkin = new RectangleSkin();
+			focusRectSkin.fill = null;
+			focusRectSkin.border = theme.getFocusBorder();
+			listView.focusRectSkin = focusRectSkin;
+		}
+		
+		listView.paddingTop = 1.0;
+		listView.paddingRight = 1.0;
+		listView.paddingBottom = 1.0;
+		listView.paddingLeft = 1.0;
 	}
 	
 	static private function colorUpdate(theme:SimpleTheme):Void
@@ -584,6 +626,7 @@ class ListViewStyles
 	static private var _frame:ValEditKeyFrame;
 	static private function timeLine_itemUpdate(itemRenderer:BitmapScrollRenderer, state:ListViewItemState):Void
 	{
+		itemRenderer.frameData = state.data;
 		_frame = state.data.frame;
 		if (_frame != null)
 		{
