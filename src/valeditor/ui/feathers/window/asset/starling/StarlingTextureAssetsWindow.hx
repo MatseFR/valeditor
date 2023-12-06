@@ -21,6 +21,7 @@ import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingTextureAsset;
 import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.starling.StarlingTextureAssetItemRenderer;
+import valeditor.ui.feathers.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valeditor.utils.starling.AtlasLoader;
 import valeditor.utils.starling.TextureCreationParameters;
@@ -101,6 +102,7 @@ class StarlingTextureAssetsWindow extends AssetsWindow<StarlingTextureAsset>
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._sourceMenuItem, this._removeMenuItem]);
 		
 		this._contextMenu = new ListView(this._contextMenuData);
+		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
 		var listLayout:VerticalListLayout = new VerticalListLayout();
 		listLayout.requestedRowCount = this._contextMenuData.length;
 		this._contextMenu.layout = listLayout;

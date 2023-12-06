@@ -17,6 +17,7 @@ import valedit.ValEdit;
 import valedit.asset.TextAsset;
 import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.TextAssetItemRenderer;
+import valeditor.ui.feathers.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 #if desktop
 import openfl.filesystem.File;
@@ -110,6 +111,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
 		#end
 		this._contextMenu = new ListView(this._contextMenuData);
+		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
 		var listLayout:VerticalListLayout = new VerticalListLayout();
 		listLayout.requestedRowCount = this._contextMenuData.length;
 		this._contextMenu.layout = listLayout;
