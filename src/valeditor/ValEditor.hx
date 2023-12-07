@@ -284,7 +284,7 @@ class ValEditor
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
 	{
-		if (settings == null) settings = new ValEditorClassSettings();
+		if (settings == null) settings = ValEditorClassSettings.fromPool();
 		
 		ValEdit.getClassSettings(type, settings);
 		
@@ -707,7 +707,7 @@ class ValEditor
 	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(className);
-		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
+		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
 		ValEdit.createObjectWithClassName(className, id, params, valObject, collection);
 		
@@ -740,7 +740,7 @@ class ValEditor
 		
 		ValEdit.createTemplateWithClassName(className, id, constructorCollection, template);
 		
-		template.object = createObjectWithTemplate(template, template.collection, false);
+		template.object = createObjectWithTemplate(template, id, template.collection, false);
 		template.object.currentCollection.readValues();
 		
 		registerTemplateInternal(template);
@@ -751,7 +751,13 @@ class ValEditor
 	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, registerToTemplate:Bool = true):ValEditorObject
 	{
 		var valClass:ValEditorClass = cast template.clss;
-		var valObject:ValEditorObject = new ValEditorObject(valClass, id);
+		
+		if (id == null)
+		{
+			id = template.makeObjectID();
+		}
+		
+		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
 		valObject.hasScaleProperties = valClass.hasScaleProperties;
@@ -768,7 +774,10 @@ class ValEditor
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
 		}
 		
-		registerObjectInternal(valObject);
+		if (registerToTemplate)
+		{
+			registerObjectInternal(valObject);
+		}
 		
 		return valObject;
 	}
