@@ -30,7 +30,23 @@ class ValEditorTemplate extends ValEditTemplate
 	override function set_id(value:String):String 
 	{
 		if (this._id == value) return value;
+		var oldID:String = this._id;
 		super.set_id(value);
+		
+		if (oldID != null)
+		{
+			this._instanceMap.clear();
+			oldID += "-";
+			for (instance in this._instances)
+			{
+				if (instance.id.indexOf(oldID) == 0)
+				{
+					instance.id = this._id + "-" + instance.id.substr(oldID.length);
+				}
+				this._instanceMap.set(instance.id, instance);
+			}
+		}
+		
 		TemplateEvent.dispatch(this, TemplateEvent.RENAMED, this);
 		return this._id;
 	}
@@ -53,6 +69,8 @@ class ValEditorTemplate extends ValEditTemplate
 		
 		return super.set_object(value);
 	}
+	
+	private var _objectIDIndex:Int = -1;
 
 	public function new(clss:ValEditClass, ?id:String, ?collection:ExposedCollection, ?constructorCollection:ExposedCollection) 
 	{
@@ -64,6 +82,7 @@ class ValEditorTemplate extends ValEditTemplate
 		this.isInClipboard = false;
 		this.isInLibrary = false;
 		this.lockInstanceUpdates = false;
+		this._objectIDIndex = -1;
 		super.clear();
 	}
 	
@@ -88,6 +107,18 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		super.removeInstance(instance);
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
+	}
+	
+	public function makeObjectID():String
+	{
+		var objID:String = null;
+		while (true)
+		{
+			this._objectIDIndex++;
+			objID = this.id + "-" + this._objectIDIndex;
+			if (!this._instanceMap.exists(objID)) break;
+		}
+		return objID;
 	}
 	
 	@:access(valedit.value.base.ExposedValue)
