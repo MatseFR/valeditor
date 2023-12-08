@@ -7,8 +7,10 @@ import feathers.controls.PopUpListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
 import feathers.controls.VDividedBox;
+import feathers.controls.popups.CalloutPopUpAdapter;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
+import feathers.events.ListViewEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
@@ -18,9 +20,11 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.Lib;
+import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
+import openfl.geom.Rectangle;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ObjectLibrary;
@@ -30,6 +34,7 @@ import valeditor.ui.feathers.controls.ToggleLayoutGroup;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.variant.ListViewVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
 
 /**
@@ -58,6 +63,7 @@ class EditorView extends LayoutGroup
 	
 	// center content
 	private var _displayArea:LayoutGroup;
+	private var _displayRect:Rectangle = new Rectangle();
 	private var _scenario:ScenarioView;
 	
 	// right content
@@ -77,6 +83,19 @@ class EditorView extends LayoutGroup
 	private var _isFirstResize:Bool = true;
 	
 	private var _pt:Point = new Point();
+	
+	private var _contextMenu:ListView;
+	private var _contextMenuCollection:ArrayCollection<MenuItem>;
+	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
+	private var _contextMenuSprite:Sprite;
+	private var _contextMenuPt:Point = new Point();
+	
+	private var _copyMenuItem:MenuItem;
+	private var _cutMenuItem:MenuItem;
+	private var _pasteMenuItem:MenuItem;
+	private var _deleteMenuItem:MenuItem;
+	private var _selectAllMenuItem:MenuItem;
+	private var _unselectAllMenuItem:MenuItem;
 	
 	public function new() 
 	{
@@ -252,6 +271,7 @@ class EditorView extends LayoutGroup
 		
 		// center content
 		this._displayArea = new LayoutGroup();
+		//this._displayArea.variant = LayoutGroupVariant.VIEWPORT_DEBUG;
 		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
 		this._centerBox.addChild(this._displayArea);
 		
@@ -293,7 +313,66 @@ class EditorView extends LayoutGroup
 		this._editContainer.layout = vLayout;
 		this._propertiesGroup.addContent(this._editContainer);
 		
+		this._copyMenuItem = new MenuItem("copy", "Copy", true, "Ctrl+C");
+		this._cutMenuItem = new MenuItem("cut", "Cut", true, "Ctrl+X");
+		this._pasteMenuItem = new MenuItem("paste", "Paste", true, "Ctrl+V");
+		this._deleteMenuItem = new MenuItem("delete", "Delete", true, "Del");
+		this._selectAllMenuItem = new MenuItem("select all", "Select all", true, "Ctrl+A");
+		this._unselectAllMenuItem = new MenuItem("unselect all", "Unselect all", true, "Ctrl+Shift+A");
+		
+		this._contextMenuCollection = new ArrayCollection<MenuItem>([
+			this._copyMenuItem,
+			this._cutMenuItem,
+			this._pasteMenuItem,
+			this._deleteMenuItem,
+			this._selectAllMenuItem,
+			this._unselectAllMenuItem
+		]);
+		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			return new MenuItemRenderer();
+		});
+		
+		recycler.update = (renderer:MenuItemRenderer, state:ListViewItemState) -> {
+			renderer.text = state.data.text;
+			renderer.shortcutText = state.data.shortcutText;
+			renderer.iconBitmapData = state.data.iconBitmapData;
+			renderer.enabled = state.data.enabled;
+		};
+		
+		this._contextMenu = new ListView(this._contextMenuCollection);
+		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
+		var listLayout:VerticalListLayout = new VerticalListLayout();
+		listLayout.requestedRowCount = this._contextMenuCollection.length;
+		this._contextMenu.layout = listLayout;
+		this._contextMenu.itemRendererRecycler = recycler;
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool {
+			return item.enabled;
+		}
+		this._contextMenu.itemToText = function(item:Dynamic):String {
+			return item.text;
+		}
+		
+		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
+		this._contextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onContextMenuItemTrigger);
+		Lib.current.stage.addEventListener(MouseEvent.RIGHT_CLICK, onContextMenuStageRightClick);
+		
+		this._contextMenuSprite = new Sprite();
+		this._contextMenuSprite.mouseEnabled = false;
+		this._contextMenuSprite.graphics.beginFill(0xff0000, 0);
+		this._contextMenuSprite.graphics.drawRect(-2, -2, 2, 2);
+		this._contextMenuSprite.graphics.endFill();
+		addChild(this._contextMenuSprite);
+		
 		this.addEventListener(Event.RESIZE, onResize);
+	}
+	
+	private function closeContextMenu():Void
+	{
+		this._popupAdapter.close();
+		this._contextMenu.selectedIndex = -1;
+		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
 	}
 	
 	private function defaultItemToEnabled(item:Dynamic):Bool
@@ -306,11 +385,84 @@ class EditorView extends LayoutGroup
 		return item.text;
 	}
 	
+	private function onContextMenuChange(evt:Event):Void
+	{
+		if (this._contextMenu.selectedItem == null) return;
+		
+		switch (this._contextMenu.selectedItem.id)
+		{
+			case "copy" :
+				ValEditor.copy();
+			
+			case "cut" :
+				ValEditor.cut();
+			
+			case "paste" :
+				ValEditor.paste();
+			
+			case "delete" :
+				ValEditor.delete();
+			
+			case "select all" :
+				ValEditor.selectAll();
+			
+			case "unselect all" :
+				ValEditor.unselectAll();
+		}
+	}
+	
+	private function onContextMenuItemTrigger(evt:ListViewEvent):Void
+	{
+		closeContextMenu();
+	}
+	
+	private function onContextMenuStageRightClick(evt:MouseEvent):Void
+	{
+		if (this._displayRect.contains(evt.stageX, evt.stageY))
+		{
+			this._contextMenuPt.x = evt.stageX;
+			this._contextMenuPt.y = evt.stageY;
+			this._contextMenuSprite.x = this._contextMenuPt.x;
+			this._contextMenuSprite.y = this._contextMenuPt.y;
+			
+			if (this._popupAdapter.active)
+			{
+				closeContextMenu();
+			}
+			
+			var isObjectSelected:Bool = ValEditor.selection.numObjects != 0 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) || Std.isOfType(ValEditor.selection.object, ValEditorObjectGroup));
+			var isObjectInClipboard:Bool = ValEditor.clipboard.numObjects != 0 && (Std.isOfType(ValEditor.clipboard.object, ValEditorObject) || Std.isOfType(ValEditor.clipboard.object, ValEditorObjectGroup));
+			
+			this._copyMenuItem.enabled = isObjectSelected;
+			this._cutMenuItem.enabled = isObjectSelected;
+			this._pasteMenuItem.enabled = isObjectInClipboard;
+			this._deleteMenuItem.enabled = isObjectSelected;
+			this._selectAllMenuItem.enabled = true;//ValEditor.currentContainer;
+			this._unselectAllMenuItem.enabled = isObjectSelected;
+			this._contextMenuCollection.updateAll();
+			this._contextMenu.selectedIndex = -1;
+			this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
+			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+			this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
+		}
+	}
+	
+	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
+	{
+		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
+		{
+			return;
+		}
+		
+		closeContextMenu();
+	}
+	
 	private function onDisplayAreaResize(evt:Event):Void
 	{
 		this._pt.setTo(this._displayArea.x, this._displayArea.y);
 		var loc:Point = this._displayArea.localToGlobal(this._pt);
-		ValEditor.viewPort.update(loc.x, loc.y, this._displayArea.width, this._displayArea.height);
+		this._displayRect.setTo(loc.x, loc.y, this._displayArea.width, this._displayArea.height);
+		ValEditor.viewPort.update(loc.x, loc.y, this._displayRect.width, this._displayRect.height);
 		
 	}
 	
