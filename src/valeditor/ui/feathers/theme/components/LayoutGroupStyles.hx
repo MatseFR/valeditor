@@ -1,5 +1,6 @@
 package valeditor.ui.feathers.theme.components;
 import feathers.controls.LayoutGroup;
+import feathers.graphics.FillStyle;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.RelativePosition;
@@ -58,6 +59,8 @@ class LayoutGroupStyles
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT, toggleCustom_content);
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOOL_BAR, tool_bar);
+		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.VIEWPORT_DEBUG, viewport_debug);
 	}
 	
 	static private function arrow_down_group(group:LayoutGroup):Void
@@ -184,6 +187,13 @@ class LayoutGroupStyles
 	{
 		var backgroundSkin = new RectangleSkin();
 		backgroundSkin.fill = theme.getLightFillDark();
+		group.backgroundSkin = backgroundSkin;
+	}
+	
+	static private function viewport_debug(group:LayoutGroup):Void
+	{
+		var backgroundSkin = new RectangleSkin();
+		backgroundSkin.fill = FillStyle.SolidColor(0xff00ff, 0.25);
 		group.backgroundSkin = backgroundSkin;
 	}
 	
