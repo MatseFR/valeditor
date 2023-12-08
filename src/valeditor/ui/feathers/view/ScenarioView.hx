@@ -33,6 +33,7 @@ import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
+import openfl.filters.DropShadowFilter;
 import openfl.geom.Point;
 import valedit.ValEditLayer;
 import valedit.events.PlayEvent;
@@ -554,6 +555,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._popupAdapter.close();
 		this._contextMenu.selectedIndex = -1;
 		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
 	}
 	
 	private function createTimeLineItem(timeLine:ValEditorTimeLine, index:Int):Void
@@ -572,6 +574,16 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.pool();
+	}
+	
+	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
+	{
+		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
+		{
+			return;
+		}
+		
+		closeContextMenu();
 	}
 	
 	private function onFrameFirstButton(evt:TriggerEvent):Void
@@ -720,16 +732,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._contextMenu.selectedIndex = -1;
 		this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
 		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
-	}
-	
-	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
-	{
-		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
-		{
-			return;
-		}
-		
-		closeContextMenu();
+		this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
 	}
 	
 	private function onTimeLineItemScroll(evt:Event):Void
