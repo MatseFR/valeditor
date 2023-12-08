@@ -1061,6 +1061,39 @@ class ValEditor
 		return timeLine;
 	}
 	
+	static public function copy():Void
+	{
+		clipboard.clear();
+		selection.copyToClipboard(clipboard);
+	}
+	
+	static public function cut():Void
+	{
+		clipboard.clear();
+		selection.cutToClipboard(clipboard);
+		selection.clear();
+	}
+	
+	static public function delete():Void
+	{
+		selection.delete();
+	}
+	
+	static public function paste():Void
+	{
+		clipboard.paste();
+	}
+	
+	static public function selectAll():Void
+	{
+		currentContainer.selectAllVisible();
+	}
+	
+	static public function unselectAll():Void
+	{
+		selection.object = null;
+	}
+	
 	static public function insertFrame():Void
 	{
 		if (currentContainer == null) return;

@@ -441,25 +441,22 @@ class ValEditorFull extends ValEditorBaseFeathers
 				FeathersWindows.toggleAssetBrowser();
 			
 			case InputActionID.COPY :
-				ValEditor.clipboard.clear();
-				ValEditor.selection.copyToClipboard(ValEditor.clipboard);
+				ValEditor.copy();
 			
 			case InputActionID.CUT :
-				ValEditor.clipboard.clear();
-				ValEditor.selection.cutToClipboard(ValEditor.clipboard);
-				ValEditor.selection.clear();
+				ValEditor.cut();
 			
 			case InputActionID.PASTE :
-				ValEditor.clipboard.paste();
+				ValEditor.paste();
 			
 			case InputActionID.DELETE :
-				ValEditor.selection.delete();
+				ValEditor.delete();
 			
 			case InputActionID.SELECT_ALL :
-				ValEditor.currentContainer.selectAllVisible();
+				ValEditor.selectAll();
 			
 			case InputActionID.UNSELECT_ALL :
-				ValEditor.selection.object = null;
+				ValEditor.unselectAll();
 			
 			case InputActionID.PLAY_STOP :
 				ValEditor.playStop();
