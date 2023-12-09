@@ -43,10 +43,57 @@ class FileSaverDesktop
 		{
 			if (Path.directory(path) == "")
 			{
-				path = Path.join([File.documentsDirectory.nativePath, path]);
+				// we have a filename but no path to it
+				
+				var file:File = null;
+				// this can fail if you're like me right now : my work drive died and Windows documents directory isn't set to anything anymore ^^
+				try
+				{
+					file = File.documentsDirectory.resolvePath(path);
+				}
+				catch (e:Any)
+				{
+					// nothing
+				}
+				
+				if (file == null)
+				{
+					try
+					{
+						file = File.desktopDirectory.resolvePath(path);
+					}
+					catch (e:Any)
+					{
+						// nothing
+					}
+				}
+				
+				if (file == null)
+				{
+					try
+					{
+						file = File.applicationDirectory.resolvePath(path);
+					}
+					catch (e:Any)
+					{
+						// nothing
+					}
+				}
+				
+				if (file == null)
+				{
+					path = null;
+				}
+				else
+				{
+					path = file.nativePath;
+				}
 			}
 			
-			this._file = this._file.resolvePath(path);
+			if (path != null)
+			{
+				this._file = this._file.resolvePath(path);
+			}
 		}
 		
 		this._file.addEventListener(Event.SELECT, onFileSelected);
@@ -55,7 +102,6 @@ class FileSaverDesktop
 		if (browseForSave)
 		{
 			this._file.browseForSave(dialogTitle);
-			//this._file.browseForOpen(dialogTitle, this._filterList);
 		}
 		else
 		{
