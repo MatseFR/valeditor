@@ -29,6 +29,7 @@ import valeditor.ui.feathers.theme.simple.components.LayoutGroupStyles;
 import valeditor.ui.feathers.theme.simple.components.ListViewStyles;
 import valeditor.ui.feathers.theme.simple.components.PanelStyles;
 import valeditor.ui.feathers.theme.simple.components.PopUpListViewStyles;
+import valeditor.ui.feathers.theme.simple.components.RadioStyles;
 import valeditor.ui.feathers.theme.simple.components.ScrollContainerStyles;
 import valeditor.ui.feathers.theme.simple.components.SortOrderHeaderRendererStyles;
 import valeditor.ui.feathers.theme.simple.components.TabBarStyles;
@@ -617,6 +618,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 		ListViewStyles.initialize(this, this.styleProvider);
 		PanelStyles.initialize(this, this.styleProvider);
 		PopUpListViewStyles.initialize(this, this.styleProvider);
+		RadioStyles.initialize(this, this.styleProvider);
 		ScrollContainerStyles.initialize(this, this.styleProvider);
 		SortOrderHeaderRendererStyles.initialize(this, this.styleProvider);
 		TabBarStyles.initialize(this, this.styleProvider);
