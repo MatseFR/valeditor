@@ -418,6 +418,8 @@ class EditorView extends LayoutGroup
 	
 	private function onContextMenuStageRightClick(evt:MouseEvent):Void
 	{
+		if (FeathersWindows.isWindowOpen) return;
+		
 		if (this._displayRect.contains(evt.stageX, evt.stageY))
 		{
 			this._contextMenuPt.x = evt.stageX;

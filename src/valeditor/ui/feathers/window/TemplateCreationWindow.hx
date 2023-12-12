@@ -9,7 +9,6 @@ import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
 import feathers.controls.dataRenderers.ItemRenderer;
-import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
@@ -331,7 +330,7 @@ class TemplateCreationWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
@@ -359,7 +358,7 @@ class TemplateCreationWindow extends Panel
 		
 		var template:ValEditorTemplate = ValEditor.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
 		
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback(template);
 	}
 	

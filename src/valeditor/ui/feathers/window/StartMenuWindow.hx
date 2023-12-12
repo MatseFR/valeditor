@@ -3,7 +3,6 @@ package valeditor.ui.feathers.window;
 import feathers.controls.Button;
 import feathers.controls.Header;
 import feathers.controls.Panel;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalAlign;

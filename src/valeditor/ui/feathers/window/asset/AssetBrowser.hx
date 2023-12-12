@@ -6,7 +6,6 @@ import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.controls.navigators.StackItem;
 import feathers.controls.navigators.StackNavigator;
-import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayoutData;
@@ -149,7 +148,7 @@ class AssetBrowser extends Panel
 	
 	private function onCloseButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 	}
 	
 }

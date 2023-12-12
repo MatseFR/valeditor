@@ -5,7 +5,6 @@ import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -13,7 +12,6 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.value.ExposedString;
 import valeditor.ValEditor;
@@ -139,7 +137,7 @@ class ExportSettingsWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null)
 		{
 			this._cancelCallback();
@@ -148,7 +146,7 @@ class ExportSettingsWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		this._editSettings.clone(this._settings);
 		if (this._confirmCallback != null)
 		{

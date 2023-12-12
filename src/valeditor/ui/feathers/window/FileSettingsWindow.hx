@@ -5,7 +5,6 @@ import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -146,7 +145,7 @@ class FileSettingsWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null)
 		{
 			this._cancelCallback();
@@ -155,7 +154,7 @@ class FileSettingsWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		this._editSettings.clone(this._settings);
 		if (this._confirmCallback != null)
 		{

@@ -6,7 +6,6 @@ import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.TextInput;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -143,14 +142,14 @@ class ObjectRenameWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
 		this._object.id = this._nameInput.text;
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback();
 	}
 	

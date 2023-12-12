@@ -6,7 +6,6 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.controls.Radio;
-import feathers.core.PopUpManager;
 import feathers.core.ToggleGroup;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
@@ -205,13 +204,13 @@ class ObjectAddWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		
 		if (this._newObjectRadio.selected)
 		{

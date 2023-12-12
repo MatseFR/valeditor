@@ -5,7 +5,6 @@ import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -13,7 +12,6 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import valedit.ValEdit;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -130,13 +128,13 @@ class ObjectEditWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		this.editObject = null;
 		this._confirmCallback();
 	}

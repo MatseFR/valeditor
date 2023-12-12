@@ -8,10 +8,7 @@ import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
-import feathers.controls.dataRenderers.ItemRenderer;
-import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
-import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -20,16 +17,13 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
-import feathers.utils.DisplayObjectRecycler;
-import openfl.display.Bitmap;
 import openfl.events.Event;
-import valeditor.ValEditorClass;
+import valedit.ValEdit;
+import valedit.ValEditObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.utils.ArraySort;
-import valedit.ValEdit;
-import valedit.ValEditObject;
 
 /**
  * ...
@@ -239,13 +233,13 @@ class ObjectSelectWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		this._confirmCallback(this._objectGrid.selectedItem);
 	}
 	

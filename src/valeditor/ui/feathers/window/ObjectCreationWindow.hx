@@ -6,7 +6,6 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.navigators.TabItem;
 import feathers.controls.navigators.TabNavigator;
-import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
@@ -122,7 +121,7 @@ class ObjectCreationWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
@@ -137,7 +136,7 @@ class ObjectCreationWindow extends Panel
 		{
 			object = this._templateView.confirm();
 		}
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback(object);
 	}
 	

@@ -5,7 +5,6 @@ import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -95,7 +94,7 @@ class MessageConfirmWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null)
 		{
 			this._confirmCallback();

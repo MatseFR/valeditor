@@ -5,7 +5,6 @@ import feathers.controls.Header;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.Panel;
-import feathers.core.PopUpManager;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -287,7 +286,7 @@ class AssetsWindow<T> extends Panel
 		}
 		if (this._closeOnSelection)
 		{
-			PopUpManager.removePopUp(this);
+			FeathersWindows.closeWindow(this);
 		}
 		if (this._removeButton != null)
 		{
@@ -352,7 +351,7 @@ class AssetsWindow<T> extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
-		PopUpManager.removePopUp(this);
+		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	
