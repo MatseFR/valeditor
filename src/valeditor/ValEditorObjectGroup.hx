@@ -53,10 +53,6 @@ class ValEditorObjectGroup
 			{
 				ValEditor.destroyObject(object);
 			}
-			else
-			{
-				ValEditor.selection.removeObject(object);
-			}
 		}
 		this._objects.resize(0);
 		clear();

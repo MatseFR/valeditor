@@ -288,10 +288,12 @@ class Selection extends EventDispatcher
 		if (this._templateGroup.numTemplates != 0)
 		{
 			this._templateGroup.deleteTemplates();
+			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 		}
 		else if (this._objectGroup.numObjects != 0)
 		{
 			this._objectGroup.deleteObjects();
+			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 		}
 	}
 	
