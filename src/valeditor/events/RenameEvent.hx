@@ -25,7 +25,7 @@ class RenameEvent extends Event
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
-		return dispatcher.dispatchEvent(new ContainerEvent(type, previouseNameOrID, bubbles, cancelable));
+		return dispatcher.dispatchEvent(new RenameEvent(type, previouseNameOrID, bubbles, cancelable));
 		#else
 		var event:RenameEvent = fromPool(type, previouseNameOrID, bubbles, cancelable);
 		var result:Bool = dispatcher.dispatchEvent(event);
