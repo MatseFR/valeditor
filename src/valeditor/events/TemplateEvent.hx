@@ -3,6 +3,7 @@ package valeditor.events;
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
 import valedit.ValEditTemplate;
+import valeditor.ValEditorTemplate;
 
 /**
  * ...
@@ -12,19 +13,18 @@ class TemplateEvent extends Event
 {
 	inline static public var INSTANCE_ADDED:String = "instance_added";
 	inline static public var INSTANCE_REMOVED:String = "instance_removed";
-	inline static public var RENAMED:String = "renamed";
 	
 	#if !flash
 	static private var _POOL:Array<TemplateEvent> = new Array<TemplateEvent>();
 	
-	static private function fromPool(type:String, template:ValEditTemplate, bubbles:Bool, cancelable:Bool):TemplateEvent
+	static private function fromPool(type:String, template:ValEditorTemplate, bubbles:Bool, cancelable:Bool):TemplateEvent
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(type, template, bubbles, cancelable);
 		return new TemplateEvent(type, template, bubbles, cancelable);
 	}
 	#end
 	
-	static public function dispatch(dispatcher:IEventDispatcher, type:String, template:ValEditTemplate,
+	static public function dispatch(dispatcher:IEventDispatcher, type:String, template:ValEditorTemplate,
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
@@ -37,9 +37,9 @@ class TemplateEvent extends Event
 		#end
 	}
 	
-	public var template(default, null):ValEditTemplate;
+	public var template(default, null):ValEditorTemplate;
 
-	public function new(type:String, template:ValEditTemplate, bubbles:Bool=false, cancelable:Bool=false) 
+	public function new(type:String, template:ValEditorTemplate, bubbles:Bool=false, cancelable:Bool=false) 
 	{
 		super(type, bubbles, cancelable);
 		this.template = template;
@@ -66,7 +66,7 @@ class TemplateEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, template:ValEditTemplate, bubbles:Bool = false, cancelable:Bool = false):TemplateEvent
+	public function setTo(type:String, template:ValEditorTemplate, bubbles:Bool = false, cancelable:Bool = false):TemplateEvent
 	{
 		this.type = type;
 		this.template = template;
