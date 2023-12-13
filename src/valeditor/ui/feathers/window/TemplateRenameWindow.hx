@@ -43,7 +43,7 @@ class TemplateRenameWindow extends Panel
 	private function set_template(value:ValEditorTemplate):ValEditorTemplate
 	{
 		this._template = value;
-		if (this._template != null)
+		if (this._initialized && this._template != null)
 		{
 			this._nameInput.text = this._template.id;
 		}
@@ -63,7 +63,6 @@ class TemplateRenameWindow extends Panel
 	public function new() 
 	{
 		super();
-		initializeNow();
 	}
 	
 	override function initialize():Void 
@@ -112,6 +111,10 @@ class TemplateRenameWindow extends Panel
 		
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
+		if (this._template != null)
+		{
+			this._nameInput.text = this._template.id;
+		}
 		this._nameGroup.addChild(this._nameInput);
 	}
 	
@@ -123,7 +126,7 @@ class TemplateRenameWindow extends Panel
 		if (this._nameInput.text == "")
 		{
 			isValid = false;
-			this._nameInput.errorString = "template must have an ID";
+			this._nameInput.errorString = "Template must have an ID";
 		}
 		else
 		{
