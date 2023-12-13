@@ -3,6 +3,8 @@ import openfl.display.BitmapData;
 import openfl.display.DisplayObjectContainer;
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
+import valedit.ValEditTemplate;
+import valeditor.events.RenameEvent;
 import valeditor.ui.IInteractiveObject;
 
 /**
@@ -148,6 +150,27 @@ class ValEditorClass extends ValEditClass
 	public function addCategory(category:String):Void
 	{
 		this.categories.push(category);
+	}
+	
+	override public function addTemplate(template:ValEditTemplate):Void 
+	{
+		super.addTemplate(template);
+		
+		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
+	}
+	
+	override public function removeTemplate(template:ValEditTemplate):Void 
+	{
+		super.removeTemplate(template);
+		
+		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
+	}
+	
+	private function onTemplateRenamed(evt:RenameEvent):Void
+	{
+		var template:ValEditorTemplate = cast evt.target;
+		this._IDToTemplate.remove(evt.previousNameOrID);
+		this._IDToTemplate.set(template.id, template);
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void
