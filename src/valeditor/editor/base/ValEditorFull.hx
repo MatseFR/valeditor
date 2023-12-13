@@ -233,6 +233,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		// Starling Display
 		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
@@ -248,6 +249,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.clear();
 		
 		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
