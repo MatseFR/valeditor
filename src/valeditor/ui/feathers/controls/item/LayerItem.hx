@@ -32,7 +32,6 @@ class LayerItem extends LayoutGroupItemRenderer
 	private function get_layer():ValEditorLayer { return this._layer; }
 	private function set_layer(value:ValEditorLayer):ValEditorLayer
 	{
-		if (this._layer == value) return value;
 		if (value != null && this._initialized)
 		{
 			this._name.text = value.name;
