@@ -91,6 +91,7 @@ class FileController
 		{
 			_cancelCallback();
 		}
+		
 		_fileOpener.clear();
 	}
 	
