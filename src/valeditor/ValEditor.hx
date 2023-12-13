@@ -43,6 +43,7 @@ import valeditor.editor.file.ZipSaveLoader;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
 import valeditor.events.EditorEvent;
+import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
 import valeditor.ui.InteractiveFactories;
@@ -822,7 +823,7 @@ class ValEditor
 		
 		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
-		template.addEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
+		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
@@ -916,7 +917,7 @@ class ValEditor
 		
 		template.removeEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.removeEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
-		template.removeEventListener(TemplateEvent.RENAMED, onTemplateRenamed);
+		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
@@ -1191,17 +1192,59 @@ class ValEditor
 	
 	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		
+		var collection:ArrayCollection<ValEditorTemplate>;
+		for (className in evt.template.clss.superClassNames)
+		{
+			collection = _classToTemplateCollection.get(className);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+		
+		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		{
+			collection = _categoryToTemplateCollection.get(category);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
 	}
 	
 	static private function onTemplateInstanceRemoved(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		
+		var collection:ArrayCollection<ValEditorTemplate>;
+		for (className in evt.template.clss.superClassNames)
+		{
+			collection = _classToTemplateCollection.get(className);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+		
+		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		{
+			collection = _categoryToTemplateCollection.get(category);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
 	}
 	
-	static private function onTemplateRenamed(evt:TemplateEvent):Void
+	static private function onTemplateRenamed(evt:RenameEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(cast evt.template));
+		var template:ValEditorTemplate = evt.target;
+		ValEdit.renameTemplate(template, evt.previousNameOrID);
+		
+		templateCollection.updateAt(templateCollection.indexOf(template));
+		
+		var collection:ArrayCollection<ValEditorTemplate>;
+		for (className in template.clss.superClassNames)
+		{
+			collection = _classToTemplateCollection.get(className);
+			collection.updateAt(collection.indexOf(template));
+		}
+		
+		for (category in cast(template.clss, ValEditorClass).categories)
+		{
+			collection = _categoryToTemplateCollection.get(category);
+			collection.updateAt(collection.indexOf(template));
+		}
 	}
 	
 	static public function registerForChangeUpdate(object:IChangeUpdate):Void
