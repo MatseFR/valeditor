@@ -17,6 +17,7 @@ import valedit.ValEditLayer;
 import valedit.utils.RegularPropertyName;
 import valeditor.events.ContainerEvent;
 import valeditor.events.LayerEvent;
+import valeditor.events.RenameEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.UIConfig;
@@ -205,6 +206,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this.viewCenterY = this._viewCenterY;
 	}
 	
+	public function layerNameExists(name:String):Bool
+	{
+		return this._layerMap.exists(name);
+	}
+	
 	public function makeLayerName():String
 	{
 		var name:String = null;
@@ -349,6 +355,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			this._interactiveObjectToValEditObject.remove(editorObject.interactiveObject);
 		}
 		this.objectCollection.remove(editorObject);
+	}
+	
+	override function layer_renamed(evt:RenameEvent):Void 
+	{
+		super.layer_renamed(evt);
+		this.layerCollection.updateAt(this.layerCollection.indexOf(cast evt.target));
 	}
 	
 	public function open():Void
