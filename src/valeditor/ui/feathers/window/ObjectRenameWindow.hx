@@ -43,7 +43,7 @@ class ObjectRenameWindow extends Panel
 	private function set_object(value:ValEditorObject):ValEditorObject
 	{
 		this._object = value;
-		if (this._object != null)
+		if (this._initialized && this._object != null)
 		{
 			this._nameInput.text = this._object.id;
 		}
@@ -63,7 +63,6 @@ class ObjectRenameWindow extends Panel
 	public function new() 
 	{
 		super();
-		initializeNow();
 	}
 	
 	override function initialize():Void 
@@ -112,6 +111,10 @@ class ObjectRenameWindow extends Panel
 		
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
+		if (this._object != null)
+		{
+			this._nameInput.text = this._object.id;
+		}
 		this._nameGroup.addChild(this._nameInput);
 	}
 	
@@ -123,11 +126,12 @@ class ObjectRenameWindow extends Panel
 		if (this._nameInput.text == "")
 		{
 			isValid = false;
-			this._nameInput.errorString = "object must have an ID";
+			this._nameInput.errorString = "Object must have an ID";
 		}
 		else
 		{
-			if (this._nameInput.text == this._object.id || !this._object.clss.objectIDExists(this._nameInput.text))
+			if (this._nameInput.text == this._object.id || (this._object.template == null && !this._object.clss.objectIDExists(this._nameInput.text))
+				|| (this._object.template != null && !cast(this._object.template, ValEditorTemplate).objectIDExists(this._nameInput.text)))
 			{
 				this._nameInput.errorString = null;
 			}
