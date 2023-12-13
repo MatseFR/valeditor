@@ -4,12 +4,14 @@ import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.events.MouseEvent;
 import valedit.ValEditObject;
+import valeditor.ValEditorLayer;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.FileSettingsWindow;
+import valeditor.ui.feathers.window.LayerRenameWindow;
 import valeditor.ui.feathers.window.MessageConfirmWindow;
 import valeditor.ui.feathers.window.MessageWindow;
 import valeditor.ui.feathers.window.ObjectAddWindow;
@@ -61,6 +63,8 @@ class FeathersWindows
 	
 	static private var _exportSettings:ExportSettingsWindow;
 	static private var _fileSettings:FileSettingsWindow;
+	
+	static private var _layerRename:LayerRenameWindow;
 	
 	static private var _messageWindow:MessageWindow;
 	static private var _messageConfirmWindow:MessageConfirmWindow;
@@ -300,6 +304,22 @@ class FeathersWindows
 		_fileSettings.height = Lib.current.stage.stageHeight / 2;
 		
 		openWindow(_fileSettings);
+	}
+	
+	static public function showLayerRenameWindow(layer:ValEditorLayer, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void):Void
+	{
+		if (_layerRename == null)
+		{
+			_layerRename = new LayerRenameWindow();
+		}
+		
+		_layerRename.layer = layer;
+		_layerRename.confirmCallback = confirmCallback;
+		_layerRename.cancelCallback = cancelCallback;
+		
+		_layerRename.width = Lib.current.stage.stageWidth / 2;
+		
+		openWindow(_layerRename);
 	}
 	
 	static public function showMessageWindow(title:String, message:String):Void
