@@ -3,13 +3,11 @@ package valeditor.ui.feathers.view;
 import feathers.controls.Button;
 import feathers.controls.HDividedBox;
 import feathers.controls.HScrollBar;
-import feathers.controls.HSlider;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.ScrollPolicy;
 import feathers.controls.ToggleButton;
-import feathers.controls.ToggleButtonState;
 import feathers.controls.VScrollBar;
 import feathers.controls.popups.CalloutPopUpAdapter;
 import feathers.data.ArrayCollection;
@@ -29,11 +27,9 @@ import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import juggler.animation.IAnimatable;
 import openfl.Lib;
-import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
-import openfl.filters.DropShadowFilter;
 import openfl.geom.Point;
 import valedit.ValEditLayer;
 import valedit.events.PlayEvent;
@@ -187,7 +183,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._layerRemoveButton.enabled = false;
 		this._layerBottomGroup.addChild(this._layerRemoveButton);
 		
-		this._layerRenameButton = new Button(null, null);
+		this._layerRenameButton = new Button(null, onLayerRenameButton);
 		this._layerRenameButton.variant = ButtonVariant.RENAME;
 		this._layerRenameButton.toolTip = "rename selected layer";
 		this._layerBottomGroup.addChild(this._layerRenameButton);
@@ -661,6 +657,11 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onLayerRemoved(evt:ContainerEvent):Void
 	{
 		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+	}
+	
+	private function onLayerRenameButton(evt:TriggerEvent):Void
+	{
+		FeathersWindows.showLayerRenameWindow(cast this._container.currentLayer);
 	}
 	
 	private function onLayerSelected(evt:ContainerEvent):Void
