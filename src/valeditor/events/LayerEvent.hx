@@ -12,7 +12,6 @@ class LayerEvent extends Event
 {
 	inline static public var OBJECT_ADDED:String = "object_added";
 	inline static public var OBJECT_REMOVED:String = "object_removed";
-	inline static public var RENAMED:String = "renamed";
 	
 	#if !flash
 	static private var _POOL:Array<LayerEvent> = new Array<LayerEvent>();
