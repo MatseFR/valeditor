@@ -819,8 +819,6 @@ class ValEditor
 	
 	static private function registerTemplateInternal(template:ValEditorTemplate):Void
 	{
-		ValEdit.registerTemplateInternal(template);
-		
 		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
