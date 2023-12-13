@@ -8,6 +8,7 @@ import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.StringIndexedMap;
 import valeditor.events.LayerEvent;
+import valeditor.events.RenameEvent;
 
 /**
  * ...
@@ -28,8 +29,9 @@ class ValEditorLayer extends ValEditLayer
 	override function set_name(value:String):String 
 	{
 		if (value == this._name) return value;
+		var previousName:String = this._name;
 		super.set_name(value);
-		LayerEvent.dispatch(this, LayerEvent.RENAMED, this);
+		RenameEvent.dispatch(this, RenameEvent.RENAMED, previousName);
 		return this._name;
 	}
 	
