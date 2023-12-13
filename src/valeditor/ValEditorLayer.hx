@@ -87,11 +87,11 @@ class ValEditorLayer extends ValEditLayer
 			switch (object.displayObjectType)
 			{
 				case DisplayObjectType.OPENFL :
-					this._container.addChild(cast editorObject.interactiveObject);
+					this._displayContainer.addChild(cast editorObject.interactiveObject);
 				
 				#if starling
 				case DisplayObjectType.STARLING :
-					this._containerStarling.addChild(cast editorObject.interactiveObject);
+					this._displayContainerStarling.addChild(cast editorObject.interactiveObject);
 				#end
 				
 				default :
@@ -115,11 +115,11 @@ class ValEditorLayer extends ValEditLayer
 			switch (object.displayObjectType)
 			{
 				case DisplayObjectType.OPENFL :
-					this._container.removeChild(cast editorObject.interactiveObject);
+					this._displayContainer.removeChild(cast editorObject.interactiveObject);
 				
 				#if starling
 				case DisplayObjectType.STARLING :
-					this._containerStarling.removeChild(cast editorObject.interactiveObject);
+					this._displayContainerStarling.removeChild(cast editorObject.interactiveObject);
 				#end
 				
 				default :
