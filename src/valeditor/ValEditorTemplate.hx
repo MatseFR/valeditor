@@ -6,6 +6,7 @@ import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.value.base.ExposedValue;
 import valeditor.events.ObjectEvent;
+import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 
 /**
@@ -36,18 +37,18 @@ class ValEditorTemplate extends ValEditTemplate
 		if (oldID != null)
 		{
 			this._instanceMap.clear();
-			oldID += "-";
+			var objID:String = oldID + "-";
 			for (instance in this._instances)
 			{
-				if (instance.id.indexOf(oldID) == 0)
+				if (instance.id.indexOf(objID) == 0)
 				{
-					instance.id = this._id + "-" + instance.id.substr(oldID.length);
+					instance.id = this._id + "-" + instance.id.substr(objID.length);
 				}
 				this._instanceMap.set(instance.id, instance);
 			}
 		}
 		
-		TemplateEvent.dispatch(this, TemplateEvent.RENAMED, this);
+		RenameEvent.dispatch(this, RenameEvent.RENAMED, oldID);
 		return this._id;
 	}
 	
@@ -119,6 +120,11 @@ class ValEditorTemplate extends ValEditTemplate
 			if (!this._instanceMap.exists(objID)) break;
 		}
 		return objID;
+	}
+	
+	public function objectIDExists(id:String):Bool
+	{
+		return this._instanceMap.exists(id);
 	}
 	
 	@:access(valedit.value.base.ExposedValue)
