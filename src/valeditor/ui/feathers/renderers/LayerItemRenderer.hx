@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.controls.item;
+package valeditor.ui.feathers.renderers;
 
 import feathers.controls.Check;
 import feathers.controls.Label;
@@ -16,14 +16,14 @@ import valeditor.ui.feathers.variant.CheckVariant;
  * @author Matse
  */
 @:styleContext
-class LayerItem extends LayoutGroupItemRenderer 
+class LayerItemRenderer extends LayoutGroupItemRenderer 
 {
-	static private var _POOL:Array<LayerItem> = new Array<LayerItem>();
+	static private var _POOL:Array<LayerItemRenderer> = new Array<LayerItemRenderer>();
 	
-	static public function fromPool(layer:ValEditorLayer = null):LayerItem
+	static public function fromPool(layer:ValEditorLayer = null):LayerItemRenderer
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(layer);
-		return new LayerItem(layer);
+		return new LayerItemRenderer(layer);
 	}
 	
 	public var layer(get, set):ValEditorLayer;
@@ -42,6 +42,7 @@ class LayerItem extends LayoutGroupItemRenderer
 	
 	private var _name:Label;
 	private var _visibleToggle:Check;
+	private var _lockToggle:Check;
 	
 	public function new(layer:ValEditorLayer) 
 	{
@@ -52,6 +53,7 @@ class LayerItem extends LayoutGroupItemRenderer
 		{
 			this._name.text = layer.name;
 			this._visibleToggle.selected = layer.visible;
+			this._lockToggle.selected = layer.locked;
 		}
 	}
 	
@@ -73,6 +75,8 @@ class LayerItem extends LayoutGroupItemRenderer
 		var hLayout:HorizontalLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.gap = Spacing.MINIMAL;
+		hLayout.paddingRight = Padding.MINIMAL;
 		this.layout = hLayout;
 		
 		this._name = new Label();
@@ -83,12 +87,23 @@ class LayerItem extends LayoutGroupItemRenderer
 		this._visibleToggle.variant = CheckVariant.LAYER;
 		this._visibleToggle.addEventListener(Event.CHANGE, onVisibleToggle);
 		addChild(this._visibleToggle);
+		
+		this._lockToggle = new Check(null, false);
+		this._lockToggle.variant = CheckVariant.LAYER;
+		this._lockToggle.addEventListener(Event.CHANGE, onLockToggle);
+		addChild(this._lockToggle);
 	}
 	
-	private function setTo(layer:ValEditorLayer):LayerItem
+	private function setTo(layer:ValEditorLayer):LayerItemRenderer
 	{
 		this.layer = layer;
 		return this;
+	}
+	
+	private function onLockToggle(evt:Event):Void
+	{
+		if (this._layer == null) return;
+		this._layer.locked = this._lockToggle.selected;
 	}
 	
 	private function onVisibleToggle(evt:Event):Void
