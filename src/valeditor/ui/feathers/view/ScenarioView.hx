@@ -10,6 +10,7 @@ import feathers.controls.ScrollPolicy;
 import feathers.controls.ToggleButton;
 import feathers.controls.VScrollBar;
 import feathers.controls.popups.CalloutPopUpAdapter;
+import feathers.core.InvalidationFlag;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
 import feathers.events.ListViewEvent;
@@ -27,6 +28,9 @@ import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import juggler.animation.IAnimatable;
 import openfl.Lib;
+import openfl.display.Bitmap;
+import openfl.display.BitmapData;
+import openfl.display.PixelSnapping;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
@@ -40,11 +44,11 @@ import valeditor.ValEditorTimeLine;
 import valeditor.events.ContainerEvent;
 import valeditor.events.EditorEvent;
 import valeditor.events.TimeLineEvent;
-import valeditor.ui.feathers.controls.item.LayerItem;
 import valeditor.ui.feathers.controls.item.TimeLineItem;
 import valeditor.ui.feathers.data.FrameData;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.BitmapScrollRenderer;
+import valeditor.ui.feathers.renderers.LayerItemRenderer;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
@@ -56,12 +60,44 @@ import valeditor.ui.feathers.variant.ToggleButtonVariant;
  * ...
  * @author Matse
  */
+@:styleContext
 class ScenarioView extends LayoutGroup implements IAnimatable
 {
+	public var lockIconBitmapData(get, set):BitmapData;
+	public var visibleIconBitmapData(get, set):BitmapData;
+	
+	private var _lockIconBitmapData:BitmapData;
+	private function get_lockIconBitmapData():BitmapData { return this._lockIconBitmapData; }
+	private function set_lockIconBitmapData(value:BitmapData):BitmapData
+	{
+		if (this._initialized)
+		{
+			this._lockIcon.bitmapData = value;
+			this._lockIcon.smoothing = true;
+			this._layerTopGroup.setInvalid(InvalidationFlag.LAYOUT);
+		}
+		return this._lockIconBitmapData = value;
+	}
+	
+	private var _visibleIconBitmapData:BitmapData;
+	private function get_visibleIconBitmapData():BitmapData { return this._visibleIconBitmapData; }
+	private function set_visibleIconBitmapData(value:BitmapData):BitmapData
+	{
+		if (this._initialized)
+		{
+			this._visibleIcon.bitmapData = value;
+			this._visibleIcon.smoothing = true;
+			this._layerTopGroup.setInvalid(InvalidationFlag.LAYOUT);
+		}
+		return this._visibleIconBitmapData = value;
+	}
+	
 	private var _mainBox:HDividedBox;
 	
 	private var _layerGroup:LayoutGroup;
 	private var _layerTopGroup:LayoutGroup;
+	private var _lockIcon:Bitmap;
+	private var _visibleIcon:Bitmap;
 	private var _layerList:ListView;
 	private var _layerBottomGroup:LayoutGroup;
 	
@@ -144,13 +180,22 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._layerTopGroup.variant = LayoutGroupVariant.TOOL_BAR;
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.RIGHT;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
+		hLayout.paddingRight = Padding.MINIMAL;
+		hLayout.gap = Spacing.MINIMAL;
 		this._layerTopGroup.layout = hLayout;
 		this._layerGroup.addChild(this._layerTopGroup);
+		
+		this._visibleIcon = new Bitmap(this._visibleIconBitmapData, PixelSnapping.AUTO, true);
+		this._layerTopGroup.addChild(this._visibleIcon);
+		
+		this._lockIcon = new Bitmap(this._lockIconBitmapData, PixelSnapping.AUTO, true);
+		this._layerTopGroup.addChild(this._lockIcon);
 		
 		this._layerList = new ListView();
 		this._layerList.variant = ListView.VARIANT_BORDERLESS;
 		var layerRecycler = DisplayObjectRecycler.withFunction(() -> {
-			return LayerItem.fromPool();
+			return LayerItemRenderer.fromPool();
 		});
 		layerRecycler.destroy = layerItemDestroy;
 		layerRecycler.reset = layerItemReset;
@@ -452,17 +497,17 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._vScrollBar.page = this._timeLineList.height;
 	}
 	
-	private function layerItemDestroy(itemRenderer:LayerItem):Void
+	private function layerItemDestroy(itemRenderer:LayerItemRenderer):Void
 	{
 		itemRenderer.pool();
 	}
 	
-	private function layerItemReset(itemRenderer:LayerItem, state:ListViewItemState):Void
+	private function layerItemReset(itemRenderer:LayerItemRenderer, state:ListViewItemState):Void
 	{
 		
 	}
 	
-	private function layerItemUpdate(itemRenderer:LayerItem, state:ListViewItemState):Void
+	private function layerItemUpdate(itemRenderer:LayerItemRenderer, state:ListViewItemState):Void
 	{
 		itemRenderer.layer = state.data;
 	}
