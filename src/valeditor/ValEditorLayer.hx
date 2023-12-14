@@ -135,6 +135,7 @@ class ValEditorLayer extends ValEditLayer
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.name = json.name;
+		this.locked = json.locked;
 		this.visible = json.visible;
 		this.x = json.x;
 		this.y = json.y;
@@ -147,6 +148,7 @@ class ValEditorLayer extends ValEditLayer
 		if (json == null) json = {};
 		
 		json.name = this.name;
+		json.locked = this.locked;
 		json.visible = this.visible;
 		json.x = this.x;
 		json.y = this.y;
