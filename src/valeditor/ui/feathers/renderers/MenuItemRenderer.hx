@@ -71,6 +71,14 @@ class MenuItemRenderer extends LayoutGroupItemRenderer
 		if (this._initialized)
 		{
 			this._shortcutLabel.text = value;
+			if (value == null)
+			{
+				if (this._shortcutLabel.parent != null) removeChild(this._shortcutLabel);
+			}
+			else
+			{
+				if (this._shortcutLabel.parent == null) addChild(this._shortcutLabel);
+			}
 		}
 		return this._shortcutText = value;
 	}
@@ -92,7 +100,8 @@ class MenuItemRenderer extends LayoutGroupItemRenderer
 		var hLayout:HorizontalLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.setPadding(2.0);
+		hLayout.paddingTop = hLayout.paddingBottom = Padding.MINIMAL;
+		hLayout.paddingLeft = hLayout.paddingRight = Padding.SMALL;
 		hLayout.gap = Spacing.BIG;
 		this.layout = hLayout;
 		
@@ -109,7 +118,7 @@ class MenuItemRenderer extends LayoutGroupItemRenderer
 		this._shortcutLabel.enabled = this._enabled;
 		hData = new HorizontalLayoutData(100);
 		this._shortcutLabel.layoutData = hData;
-		addChild(this._shortcutLabel);
+		if (this._shortcutText != null) addChild(this._shortcutLabel);
 	}
 	
 }
