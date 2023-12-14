@@ -2,7 +2,7 @@ package valeditor.ui.feathers.theme.components;
 import feathers.controls.ToggleButtonState;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
-import valeditor.ui.feathers.controls.item.LayerItem;
+import valeditor.ui.feathers.renderers.LayerItemRenderer;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 
 /**
@@ -17,13 +17,13 @@ class LayerItemStyles
 	{
 		LayerItemStyles.theme = theme;
 		
-		if (styleProvider.getStyleFunction(LayerItem, null) == null)
+		if (styleProvider.getStyleFunction(LayerItemRenderer, null) == null)
 		{
-			styleProvider.setStyleFunction(LayerItem, null, default_style);
+			styleProvider.setStyleFunction(LayerItemRenderer, null, default_style);
 		}
 	}
 	
-	static private function default_style(item:LayerItem):Void
+	static private function default_style(item:LayerItemRenderer):Void
 	{
 		var size:Float = 18.0;
 		
