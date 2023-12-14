@@ -34,6 +34,7 @@ import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
+import valeditor.editor.UIAssets;
 import valeditor.editor.file.FileController;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
@@ -99,6 +100,11 @@ class ValEditorFull extends ValEditorBaseFeathers
 	override function editorSetup():Void 
 	{
 		super.editorSetup();
+		
+		UIAssets.lightMode.lockIcon = Assets.getBitmapData("ui/light/lock.png");
+		UIAssets.darkMode.lockIcon = Assets.getBitmapData("ui/dark/lock.png");
+		UIAssets.lightMode.visibleIcon = Assets.getBitmapData("ui/light/eye.png");
+		UIAssets.darkMode.visibleIcon = Assets.getBitmapData("ui/dark/eye.png");
 		
 		// register assets file extensions
 		ValEdit.assetLib.registerExtension("bmp", AssetType.BITMAP);
