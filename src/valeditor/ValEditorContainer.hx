@@ -44,6 +44,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		return new ValEditorContainer();
 	}
 	
+	public var ignoreRightClick(default, null):Bool;
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
@@ -166,6 +167,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	private var _objectsToDeselect:Array<ValEditorObject> = new Array<ValEditorObject>();
 	private var _pt:Point = new Point();
 	
+	private var _ignoreNextStageClick:Bool;
+	
 	public function new() 
 	{
 		this.timeLine = new ValEditorTimeLine(0);
@@ -175,6 +178,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	override public function clear():Void
 	{
+		this.ignoreRightClick = false;
 		this.layerCollection.removeAll();
 		this.objectCollection.removeAll();
 		this.viewCenterX = 0;
@@ -190,6 +194,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this.selection.clear();
 		
 		this._layerNameIndex = 0;
+		
+		this._ignoreNextStageClick = false;
 		
 		super.clear();
 	}
@@ -369,6 +375,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 		Lib.current.stage.addEventListener(MouseEvent.CLICK, onStageMouseClick);
+		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
 		Lib.current.stage.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMiddleMouseDown);
 		
 		Juggler.root.add(this);
@@ -382,6 +389,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
 		Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageMouseClick);
+		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
 		Lib.current.stage.removeEventListener(MouseEvent.MIDDLE_MOUSE_UP, onMiddleMouseUp);
 		
 		Juggler.root.remove(this);
@@ -508,6 +516,9 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
 		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
+		
+		this.ignoreRightClick = true;
+		this._ignoreNextStageClick = true;
 		
 		this._mouseObject.isMouseDown = false;
 		this.selection.isMouseDown = false;
@@ -812,10 +823,23 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	private function onStageMouseClick(evt:MouseEvent):Void
 	{
+		if (this._ignoreNextStageClick)
+		{
+			this._ignoreNextStageClick = false;
+			return;
+		}
 		if (evt.target != Lib.current.stage) return;
 		if (this._mouseObject != null) return;
 		
 		ValEditor.selection.object = null;
+	}
+	
+	private function onStageMouseUp(evt:MouseEvent):Void
+	{
+		if (this._ignoreNextStageClick && ValEditor.isMouseOverUI)
+		{
+			this._ignoreNextStageClick = false;
+		}
 	}
 	
 	private function onMiddleMouseDown(evt:MouseEvent):Void
@@ -859,6 +883,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	public function advanceTime(time:Float):Void
 	{
+		this.ignoreRightClick = false; // TESTING
 		this._mouseDownOnObject = false;
 	}
 	

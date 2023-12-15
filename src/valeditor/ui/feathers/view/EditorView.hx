@@ -420,6 +420,8 @@ class EditorView extends LayoutGroup
 	{
 		if (FeathersWindows.isWindowOpen) return;
 		
+		if (ValEditor.currentContainer.ignoreRightClick) return;
+		
 		if (this._displayRect.contains(evt.stageX, evt.stageY))
 		{
 			this._contextMenuPt.x = evt.stageX;
