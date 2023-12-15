@@ -88,6 +88,7 @@ class ItemRendererStyles
 			skin.selectedFill = theme.getThemeFill();
 			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
 			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+			skin.setFillForState(ToggleButtonState.DISABLED(true), theme.getLightFillLight());
 			if (isDesktop) {
 				skin.width = 32.0;
 				skin.height = 32.0;
@@ -101,27 +102,6 @@ class ItemRendererStyles
 			}
 			itemRenderer.backgroundSkin = skin;
 		}
-		
-		//if (itemRenderer.textFormat == null) {
-			//itemRenderer.textFormat = theme.getTextFormat();
-		//}
-		//if (itemRenderer.disabledTextFormat == null) {
-			//itemRenderer.disabledTextFormat = theme.getTextFormat_disabled();
-		//}
-		//if (itemRenderer.secondaryTextFormat == null) {
-			//itemRenderer.secondaryTextFormat = theme.getTextFormat_small();
-		//}
-		//if (itemRenderer.disabledSecondaryTextFormat == null) {
-			//itemRenderer.disabledSecondaryTextFormat = theme.getTextFormat_small_disabled();
-		//}
-		//
-		//itemRenderer.paddingTop = 4.0;
-		//itemRenderer.paddingRight = 10.0;
-		//itemRenderer.paddingBottom = 4.0;
-		//itemRenderer.paddingLeft = 10.0;
-		//itemRenderer.gap = 4.0;
-		//
-		//itemRenderer.horizontalAlign = LEFT;
 	}
 	
 }
