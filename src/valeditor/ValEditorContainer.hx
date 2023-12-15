@@ -883,7 +883,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	public function advanceTime(time:Float):Void
 	{
-		this.ignoreRightClick = false; // TESTING
+		this.ignoreRightClick = false;
 		this._mouseDownOnObject = false;
 	}
 	
