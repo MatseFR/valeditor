@@ -35,14 +35,22 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
+import openfl.geom.Rectangle;
 import valedit.ValEditLayer;
 import valedit.events.PlayEvent;
 import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
+import valeditor.editor.action.layer.LayerAddAction;
+import valeditor.editor.action.layer.LayerIndexDownAction;
+import valeditor.editor.action.layer.LayerIndexUpAction;
+import valeditor.editor.action.layer.LayerLockAction;
+import valeditor.editor.action.layer.LayerRemoveAction;
+import valeditor.editor.action.layer.LayerVisibleAction;
 import valeditor.events.ContainerEvent;
 import valeditor.events.EditorEvent;
+import valeditor.events.LayerEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.controls.item.TimeLineItem;
 import valeditor.ui.feathers.data.FrameData;
@@ -104,6 +112,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _layerAddButton:Button;
 	private var _layerRemoveButton:Button;
 	private var _layerRenameButton:Button;
+	private var _layerUpButton:Button;
+	private var _layerDownButton:Button;
 	
 	private var _timeLineMainGroup:LayoutGroup;
 	private var _timeLineTopGroup:LayoutGroup;
@@ -122,6 +132,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _frameLastButton:Button;
 	
 	private var _timeLineItems:Array<TimeLineItem> = new Array<TimeLineItem>();
+	private var _timeLineToItem:Map<ValEditorTimeLine, TimeLineItem> = new Map<ValEditorTimeLine, TimeLineItem>();
 	
 	private var _hScrollBar:HScrollBar;
 	private var _vScrollBar:VScrollBar;
@@ -133,18 +144,35 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _indicatorContainer:ScrollContainer;
 	private var _indicator:LayoutGroup;
 	
-	private var _pt:Point = new Point();
+	private var _rulerPt:Point = new Point();
 	
-	private var _contextMenu:ListView;
-	private var _contextMenuCollection:ArrayCollection<MenuItem>;
-	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
-	private var _contextMenuSprite:Sprite;
-	private var _contextMenuPt:Point = new Point();
+	private var _frameContextMenu:ListView;
+	private var _frameContextMenuCollection:ArrayCollection<MenuItem>;
+	private var _framePopupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
 	
 	private var _insertFrameItem:MenuItem;
 	private var _insertKeyFrameItem:MenuItem;
 	private var _removeFrameItem:MenuItem;
 	private var _removeKeyFrameItem:MenuItem;
+	
+	private var _layerContextMenu:ListView;
+	private var _layerContextMenuCollection:ArrayCollection<MenuItem>;
+	private var _layerPopupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
+	private var _contextSelectedLayers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+	private var _contextOtherLayers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+	
+	private var _insertLayerItem:MenuItem;
+	private var _removeLayerItem:MenuItem;
+	private var _showAllLayerItem:MenuItem;
+	private var _unlockAllLayerItem:MenuItem;
+	private var _lockOthersLayerItem:MenuItem;
+	private var _hideOthersLayerItem:MenuItem;
+	private var _moveDownLayerItem:MenuItem;
+	private var _moveUpLayerItem:MenuItem;
+	
+	private var _contextMenuSprite:Sprite;
+	private var _contextMenuPt:Point = new Point();
+	private var _contextMenuRect:Rectangle = new Rectangle();
 	
 	public function new() 
 	{
@@ -195,12 +223,15 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._layerList = new ListView();
 		this._layerList.variant = ListView.VARIANT_BORDERLESS;
 		var layerRecycler = DisplayObjectRecycler.withFunction(() -> {
-			return LayerItemRenderer.fromPool();
+			var renderer:LayerItemRenderer = LayerItemRenderer.fromPool();
+			renderer.addEventListener(MouseEvent.RIGHT_CLICK, onLayerItemRightClick);
+			return renderer;
 		});
 		layerRecycler.destroy = layerItemDestroy;
 		layerRecycler.reset = layerItemReset;
 		layerRecycler.update = layerItemUpdate;
 		this._layerList.itemRendererRecycler = layerRecycler;
+		this._layerList.allowMultipleSelection = true;
 		this._layerList.layoutData = new VerticalLayoutData(null, 100);
 		this._layerList.scrollPolicyX = ScrollPolicy.OFF;
 		this._layerList.scrollPolicyY = ScrollPolicy.OFF;
@@ -232,6 +263,16 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._layerRenameButton.variant = ButtonVariant.RENAME;
 		this._layerRenameButton.toolTip = "rename selected layer";
 		this._layerBottomGroup.addChild(this._layerRenameButton);
+		
+		this._layerUpButton = new Button(null, onLayerUpButton);
+		this._layerUpButton.variant = ButtonVariant.UP;
+		this._layerUpButton.toolTip = "move selected layer(s) up";
+		this._layerBottomGroup.addChild(this._layerUpButton);
+		
+		this._layerDownButton = new Button(null, onLayerDownButton);
+		this._layerDownButton.variant = ButtonVariant.DOWN;
+		this._layerDownButton.toolTip = "move selected layer(s) down";
+		this._layerBottomGroup.addChild(this._layerDownButton);
 		
 		// TIMELINES
 		this._timeLineMainGroup = new LayoutGroup();
@@ -359,7 +400,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._removeFrameItem = new MenuItem("remove frame", "Remove frame", true, "Shift+F5");
 		this._removeKeyFrameItem = new MenuItem("remove keyframe", "Remove keyframe", true, "Shift+F6");
 		
-		this._contextMenuCollection = new ArrayCollection<MenuItem>([
+		this._frameContextMenuCollection = new ArrayCollection<MenuItem>([
 			this._insertFrameItem,
 			this._insertKeyFrameItem,
 			this._removeFrameItem,
@@ -374,24 +415,71 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			renderer.text = state.data.text;
 			renderer.shortcutText = state.data.shortcutText;
 			renderer.iconBitmapData = state.data.iconBitmapData;
-			//renderer.enabled = state.data.enabled;
+			renderer.enabled = state.data.enabled;
 		};
 		
-		this._contextMenu = new ListView(this._contextMenuCollection);
-		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
+		this._frameContextMenu = new ListView(this._frameContextMenuCollection);
+		this._frameContextMenu.variant = ListViewVariant.CONTEXT_MENU;
 		var listLayout:VerticalListLayout = new VerticalListLayout();
-		listLayout.requestedRowCount = this._contextMenuCollection.length;
-		this._contextMenu.layout = listLayout;
-		this._contextMenu.itemRendererRecycler = recycler;
-		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool {
+		listLayout.requestedRowCount = this._frameContextMenuCollection.length;
+		this._frameContextMenu.layout = listLayout;
+		this._frameContextMenu.itemRendererRecycler = recycler;
+		this._frameContextMenu.itemToEnabled = function(item:Dynamic):Bool {
 			return item.enabled;
 		}
-		this._contextMenu.itemToText = function(item:Dynamic):String {
+		this._frameContextMenu.itemToText = function(item:Dynamic):String {
 			return item.text;
 		}
 		
-		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
-		this._contextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onContextMenuItemTrigger);
+		this._frameContextMenu.addEventListener(Event.CHANGE, onFrameContextMenuChange);
+		this._frameContextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onFrameContextMenuItemTrigger);
+		
+		this._insertLayerItem = new MenuItem("insert layer", "Insert layer");
+		this._removeLayerItem = new MenuItem("remove layer", "Remove layer(s)");
+		this._showAllLayerItem = new MenuItem("show all", "Show all");
+		this._unlockAllLayerItem = new MenuItem("unlock all", "Unlock all");
+		this._hideOthersLayerItem = new MenuItem("hide others", "Hide other(s)");
+		this._lockOthersLayerItem = new MenuItem("lock others", "Lock other(s)");
+		this._moveUpLayerItem = new MenuItem("move up", "Move up layer(s)");
+		this._moveDownLayerItem = new MenuItem("move down", "Move down layer(s)");
+		
+		this._layerContextMenuCollection = new ArrayCollection<MenuItem>([
+			this._insertLayerItem,
+			this._removeLayerItem,
+			this._showAllLayerItem,
+			this._unlockAllLayerItem,
+			this._hideOthersLayerItem,
+			this._lockOthersLayerItem,
+			this._moveUpLayerItem,
+			this._moveDownLayerItem
+		]);
+		
+		recycler = DisplayObjectRecycler.withFunction(()->{
+			return new MenuItemRenderer();
+		});
+		
+		recycler.update = (renderer:MenuItemRenderer, state:ListViewItemState) -> {
+			renderer.text = state.data.text;
+			renderer.shortcutText = state.data.shortcutText;
+			renderer.iconBitmapData = state.data.iconBitmapData;
+			renderer.enabled = state.data.enabled;
+		};
+		
+		this._layerContextMenu = new ListView(this._layerContextMenuCollection);
+		this._layerContextMenu.variant = ListViewVariant.CONTEXT_MENU;
+		var listLayout:VerticalListLayout = new VerticalListLayout();
+		listLayout.requestedRowCount = this._layerContextMenuCollection.length;
+		this._layerContextMenu.layout = listLayout;
+		this._layerContextMenu.itemRendererRecycler = recycler;
+		this._layerContextMenu.itemToEnabled = function(item:Dynamic):Bool {
+			return item.enabled;
+		}
+		this._layerContextMenu.itemToText = function(item:Dynamic):String {
+			return item.text;
+		}
+		
+		this._layerContextMenu.addEventListener(Event.CHANGE, onLayerContextMenuChange);
+		this._layerContextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onLayerContextMenuItemTrigger);
 		
 		this._contextMenuSprite = new Sprite();
 		this._contextMenuSprite.mouseEnabled = false;
@@ -403,14 +491,14 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
 		
-		listsChangeEnable();
+		this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
 	}
 	
-	private function onContextMenuChange(evt:Event):Void
+	private function onFrameContextMenuChange(evt:Event):Void
 	{
-		if (this._contextMenu.selectedItem == null) return;
+		if (this._frameContextMenu.selectedItem == null) return;
 		
-		switch (this._contextMenu.selectedItem.id)
+		switch (this._frameContextMenu.selectedItem.id)
 		{
 			case "insert frame" :
 				ValEditor.insertFrame();
@@ -426,14 +514,147 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		}
 	}
 	
-	private function onContextMenuItemTrigger(evt:ListViewEvent):Void
+	private function onFrameContextMenuItemTrigger(evt:ListViewEvent):Void
 	{
-		closeContextMenu();
+		if (!evt.state.enabled)
+		{
+			return;
+		}
+		closeFrameContextMenu();
+	}
+	
+	private function onLayerContextMenuChange(evt:Event):Void
+	{
+		if (this._layerContextMenu.selectedItem == null) return;
+		
+		switch (this._layerContextMenu.selectedItem.id)
+		{
+			case "insert layer" :
+				var layer:ValEditorLayer = ValEditor.createLayer();
+				
+				var layers:Array<ValEditorLayer> = [layer];
+				var action:LayerAddAction = LayerAddAction.fromPool();
+				action.setup(this._container, layers, this._layerList.selectedIndex);
+				ValEditor.actionStack.add(action);
+			
+			case "remove layer" :
+				this._currentTimeLineItem = null;
+				
+				var action:LayerRemoveAction = LayerRemoveAction.fromPool();
+				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				for (layer in this._layerList.selectedItems)
+				{
+					layers.push(layer);
+				}
+				action.setup(this._container, layers);
+				ValEditor.actionStack.add(action);
+			
+			case "show all" :
+				var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+				for (layer in this._container.layerCollection)
+				{
+					if (!layer.visible)
+					{
+						action.addLayer(layer, true);
+					}
+				}
+				ValEditor.actionStack.add(action);
+			
+			case "unlock all" :
+				var action:LayerLockAction = LayerLockAction.fromPool();
+				for (layer in this._container.layerCollection)
+				{
+					if (layer.locked)
+					{
+						action.addLayer(layer, false);
+					}
+				}
+				ValEditor.actionStack.add(action);
+			
+			case "hide others" :
+				for (layer in this._layerList.selectedItems)
+				{
+					this._contextSelectedLayers.push(layer);
+				}
+				this._container.getOtherLayers(this._contextSelectedLayers, this._contextOtherLayers);
+				var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+				for (layer in this._contextSelectedLayers)
+				{
+					if (!layer.visible)
+					{
+						action.addLayer(layer, true);
+					}
+				}
+				for (layer in this._contextOtherLayers)
+				{
+					if (layer.visible)
+					{
+						action.addLayer(layer, false);
+					}
+				}
+				this._contextSelectedLayers.resize(0);
+				this._contextOtherLayers.resize(0);
+				ValEditor.actionStack.add(action);
+			
+			case "lock others" :
+				for (layer in this._layerList.selectedItems)
+				{
+					this._contextSelectedLayers.push(layer);
+				}
+				this._container.getOtherLayers(this._contextSelectedLayers, this._contextOtherLayers);
+				var action:LayerLockAction = LayerLockAction.fromPool();
+				for (layer in this._contextSelectedLayers)
+				{
+					if (layer.locked)
+					{
+						action.addLayer(layer, false);
+					}
+				}
+				for (layer in this._contextOtherLayers)
+				{
+					if (!layer.locked)
+					{
+						action.addLayer(layer, true);
+					}
+				}
+				this._contextSelectedLayers.resize(0);
+				this._contextOtherLayers.resize(0);
+				ValEditor.actionStack.add(action);
+			
+			case "move up" :
+				var action:LayerIndexUpAction = LayerIndexUpAction.fromPool();
+				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				for (layer in this._layerList.selectedItems)
+				{
+					layers.push(layer);
+				}
+				action.setup(this._container, layers);
+				ValEditor.actionStack.add(action);
+			
+			case "move down" :
+				var action:LayerIndexDownAction = LayerIndexDownAction.fromPool();
+				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				for (layer in this._layerList.selectedItems)
+				{
+					layers.push(layer);
+				}
+				action.setup(this._container, layers);
+				ValEditor.actionStack.add(action);
+		}
+	}
+	
+	private function onLayerContextMenuItemTrigger(evt:ListViewEvent):Void
+	{
+		if (!evt.state.enabled)
+		{
+			return;
+		}
+		closeLayerContextMenu();
 	}
 	
 	private function onRulerMouseDown(evt:MouseEvent):Void
 	{
-		_pt.x = evt.stageX;
+		_rulerPt.x = evt.stageX;
 		
 		if (this._currentTimeLineItem != null)
 		{
@@ -447,14 +668,14 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onRulerMouseMove(evt:MouseEvent):Void
 	{
-		_pt.x = evt.stageX;
+		_rulerPt.x = evt.stageX;
 	}
 	
 	public function advanceTime(time:Float):Void
 	{
-		var loc:Point = this._timeLineTopControlsGroup.globalToLocal(_pt);
+		var loc:Point = this._timeLineTopControlsGroup.globalToLocal(_rulerPt);
 		var index:Int;
-		var indexMax:Int = this._timeLineRulerList.dataProvider.length - 1; // this._container.timeLine.lastFrameIndex;
+		var indexMax:Int = this._timeLineRulerList.dataProvider.length - 1;
 		
 		if (loc.x < 0.0)
 		{
@@ -499,6 +720,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function layerItemDestroy(itemRenderer:LayerItemRenderer):Void
 	{
+		itemRenderer.removeEventListener(MouseEvent.RIGHT_CLICK, onLayerItemRightClick);
 		itemRenderer.pool();
 	}
 	
@@ -512,15 +734,15 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		itemRenderer.layer = state.data;
 	}
 	
-	private function listsChangeDisable():Void
-	{
-		this._layerList.removeEventListener(Event.CHANGE, onLayerListChange);
-	}
+	//private function listsChangeDisable():Void
+	//{
+		//this._layerList.removeEventListener(Event.CHANGE, onLayerListChange);
+	//}
 	
-	private function listsChangeEnable():Void
-	{
-		this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
-	}
+	//private function listsChangeEnable():Void
+	//{
+		//this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
+	//}
 	
 	private function updateHScrollBar():Void
 	{
@@ -529,10 +751,72 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._hScrollBar.maximum = this._timeLineRulerList.maxScrollX;
 	}
 	
+	private function updateLayerControls():Void
+	{
+		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+		this._layerRenameButton.enabled = this._layerList.selectedIndices.length == 1;
+		this._layerUpButton.enabled = this._layerList.selectedIndices.indexOf(0) == -1;
+		this._layerDownButton.enabled = this._layerList.selectedIndices.indexOf(this._container.numLayers - 1) == -1;
+	}
+	
 	private function updateVScrollBar():Void
 	{
 		this._vScrollBar.minimum = this._timeLineList.minScrollY;
 		this._vScrollBar.maximum = this._timeLineList.maxScrollY;
+	}
+	
+	private function closeFrameContextMenu():Void
+	{
+		this._framePopupAdapter.close();
+		this._frameContextMenu.selectedIndex = -1;
+		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onFrameContextMenuStageMouseDown);
+		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onFrameContextMenuStageMouseDown);
+	}
+	
+	private function closeLayerContextMenu():Void
+	{
+		this._layerPopupAdapter.close();
+		this._layerContextMenu.selectedIndex = -1;
+		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onLayerContextMenuStageMouseDown);
+		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onLayerContextMenuStageMouseDown);
+	}
+	
+	private function createTimeLineItem(timeLine:ValEditorTimeLine, index:Int):Void
+	{
+		var item:TimeLineItem = TimeLineItem.fromPool(timeLine);
+		item.addEventListener(Event.SELECT, onTimeLineItemSelected);
+		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
+		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
+		this._timeLineItems.insert(index, item);
+		this._timeLineList.addChildAt(item, index);
+		this._timeLineToItem.set(timeLine, item);
+		
+		item.scrollX = this._hScrollBar.value;
+	}
+	
+	private function destroyTimeLineItem(item:TimeLineItem):Void
+	{
+		item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
+		item.removeEventListener(Event.SCROLL, onTimeLineItemScroll);
+		item.removeEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
+		this._timeLineItems.remove(item);
+		this._timeLineList.removeChild(item);
+		this._timeLineToItem.remove(item.timeLine);
+		item.pool();
+	}
+	
+	private function layerRegister(layer:ValEditorLayer):Void
+	{
+		layer.addEventListener(LayerEvent.LOCK_CHANGE, onLayerChange);
+		layer.addEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
+		
+		createTimeLineItem(cast layer.timeLine, this._container.getLayerIndex(layer));
+	}
+	
+	private function layerUnregister(layer:ValEditorLayer):Void
+	{
+		layer.removeEventListener(LayerEvent.LOCK_CHANGE, onLayerChange);
+		layer.removeEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
 	}
 	
 	private function onContainerClose(evt:EditorEvent):Void
@@ -552,8 +836,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		{
 			destroyTimeLineItem(item);
 		}
-		this._timeLineItems.resize(0);
-		this._timeLineList.removeChildren();
+		//this._timeLineItems.resize(0);
+		//this._timeLineList.removeChildren();
 		this._currentTimeLineItem = null;
 	}
 	
@@ -575,7 +859,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		for (layer in this._container.layerCollection)
 		{
-			createTimeLineItem(cast layer.timeLine, this._timeLineItems.length);
+			//createTimeLineItem(cast layer.timeLine, this._timeLineItems.length);
+			layerRegister(layer);
 		}
 		this._timeLineList.validateNow();
 		
@@ -591,40 +876,17 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		updateVScrollBar();
 	}
 	
-	private function closeContextMenu():Void
+	private function onFrameContextMenuStageMouseDown(evt:MouseEvent):Void
 	{
-		this._popupAdapter.close();
-		this._contextMenu.selectedIndex = -1;
-		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
-		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
-	}
-	
-	private function createTimeLineItem(timeLine:ValEditorTimeLine, index:Int):Void
-	{
-		var item:TimeLineItem = TimeLineItem.fromPool(timeLine);
-		item.addEventListener(Event.SELECT, onTimeLineItemSelected);
-		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
-		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
-		this._timeLineItems.insert(index, item);
-		this._timeLineList.addChildAt(item, index);
-		
-		item.scrollX = this._hScrollBar.value;
-	}
-	
-	private function destroyTimeLineItem(item:TimeLineItem):Void
-	{
-		item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
-		item.pool();
-	}
-	
-	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
-	{
-		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
+		this._contextMenuPt.setTo(this._frameContextMenu.x, this._frameContextMenu.y);
+		var pt:Point = this._frameContextMenu.localToGlobal(this._contextMenuPt);
+		this._contextMenuRect.setTo(pt.x, pt.y, this._frameContextMenu.width, this._frameContextMenu.height);
+		if (_contextMenuRect.contains(evt.stageX, evt.stageY))
 		{
 			return;
 		}
 		
-		closeContextMenu();
+		closeFrameContextMenu();
 	}
 	
 	private function onFrameFirstButton(evt:TriggerEvent):Void
@@ -651,22 +913,119 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		if (this._layerList.selectedIndex != -1)
 		{
-			listsChangeDisable();
-			
 			var layer:ValEditorLayer = ValEditor.createLayer();
-			createTimeLineItem(cast layer.timeLine, this._layerList.selectedIndex);
-			this._timeLineList.validateNow();
-			updateVScrollBar();
 			
-			this._container.addLayerAt(layer, this._layerList.selectedIndex);
-			
-			listsChangeEnable();
+			var layers:Array<ValEditorLayer> = [layer];
+			var action:LayerAddAction = LayerAddAction.fromPool();
+			action.setup(this._container, layers, this._layerList.selectedIndex);
+			ValEditor.actionStack.add(action);
 		}
 	}
 	
 	private function onLayerAdded(evt:ContainerEvent):Void
 	{
-		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+		trace("onLayerAdded");
+		
+		layerRegister(evt.object);
+		this._timeLineList.validateNow();
+		updateVScrollBar();
+		
+		updateLayerControls();
+	}
+	
+	private function onLayerChange(evt:LayerEvent):Void
+	{
+		
+	}
+	
+	private function onLayerDownButton(evt:TriggerEvent):Void
+	{
+		var action:LayerIndexDownAction = LayerIndexDownAction.fromPool();
+		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+		for (layer in this._layerList.selectedItems)
+		{
+			layers.push(layer);
+		}
+		action.setup(this._container, layers);
+		ValEditor.actionStack.add(action);
+	}
+	
+	private function onLayerContextMenuStageMouseDown(evt:MouseEvent):Void
+	{
+		this._contextMenuPt.setTo(this._layerContextMenu.x, this._layerContextMenu.y);
+		var pt:Point = this._layerContextMenu.localToGlobal(this._contextMenuPt);
+		this._contextMenuRect.setTo(pt.x, pt.y, this._layerContextMenu.width, this._layerContextMenu.height);
+		if (this._contextMenuRect.contains(evt.stageX, evt.stageY))
+		{
+			return;
+		}
+		
+		closeLayerContextMenu();
+	}
+	
+	private function onLayerItemRightClick(evt:MouseEvent):Void
+	{
+		var itemRenderer:LayerItemRenderer = evt.currentTarget;
+		var clickLayer:ValEditorLayer = itemRenderer.layer;
+		
+		if (this._layerList.selectedItems.indexOf(clickLayer) == -1)
+		{
+			this._layerList.selectedItem = clickLayer;
+		}
+		
+		for (layer in this._layerList.selectedItems)
+		{
+			this._contextSelectedLayers.push(layer);
+		}
+		this._container.getOtherLayers(this._contextSelectedLayers, this._contextOtherLayers);
+		
+		var otherLayerUnlocked:Bool = false;
+		var otherLayerVisible:Bool = false;
+		for (layer in this._contextOtherLayers)
+		{
+			if (!layer.locked)
+			{
+				otherLayerUnlocked = true;
+				break;
+			}
+		}
+		
+		for (layer in this._contextOtherLayers)
+		{
+			if (layer.visible)
+			{
+				otherLayerVisible = true;
+				break;
+			}
+		}
+		
+		// context menu
+		this._contextMenuPt.x = evt.stageX;
+		this._contextMenuPt.y = evt.stageY;
+		this._contextMenuPt = globalToLocal(this._contextMenuPt);
+		this._contextMenuSprite.x = this._contextMenuPt.x;
+		this._contextMenuSprite.y = this._contextMenuPt.y;
+		
+		if (this._layerPopupAdapter.active)
+		{
+			closeLayerContextMenu();
+		}
+		
+		this._removeLayerItem.enabled = this._layerList.selectedItems.length != this._container.numLayers;
+		this._showAllLayerItem.enabled = this._container.hasInvisibleLayer;
+		this._unlockAllLayerItem.enabled = this._container.hasLockedLayer;
+		this._lockOthersLayerItem.enabled = otherLayerUnlocked;
+		this._hideOthersLayerItem.enabled = otherLayerVisible;
+		this._moveUpLayerItem.enabled = this._layerList.selectedIndices.indexOf(0) == -1;
+		this._moveDownLayerItem.enabled = this._layerList.selectedIndices.indexOf(this._container.numLayers - 1) == -1;
+		
+		this._layerContextMenu.selectedIndex = -1;
+		this._layerPopupAdapter.open(this._layerContextMenu, this._contextMenuSprite);
+		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onLayerContextMenuStageMouseDown);
+		this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onLayerContextMenuStageMouseDown);
+		
+		this._contextSelectedLayers.resize(0);
+		this._contextOtherLayers.resize(0);
 	}
 	
 	private function onLayerListChange(evt:Event):Void
@@ -675,7 +1034,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		{
 			this._container.currentLayer = this._container.getLayerAt(this._layerList.selectedIndex);
 		}
-		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+		updateLayerControls();
 	}
 	
 	private function onLayerListScroll(evt:ScrollEvent):Void
@@ -687,21 +1046,27 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		if (this._layerList.selectedIndex != -1 && this._container.layerCollection.length > 1)
 		{
-			destroyTimeLineItem(this._currentTimeLineItem);
-			this._timeLineItems.remove(this._currentTimeLineItem);
-			this._timeLineList.removeChild(this._currentTimeLineItem);
-			this._timeLineList.validateNow();
 			this._currentTimeLineItem = null;
 			
-			this._container.removeLayerAt(this._layerList.selectedIndex);
-			
-			updateVScrollBar();
+			var action:LayerRemoveAction = LayerRemoveAction.fromPool();
+			var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+			for (layer in this._layerList.selectedItems)
+			{
+				layers.push(layer);
+			}
+			action.setup(this._container, layers);
+			ValEditor.actionStack.add(action);
 		}
 	}
 	
 	private function onLayerRemoved(evt:ContainerEvent):Void
 	{
-		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
+		var layer:ValEditorLayer = evt.object;
+		var timeLineItem:TimeLineItem = this._timeLineToItem.get(cast layer.timeLine);
+		destroyTimeLineItem(timeLineItem);
+		this._timeLineList.validateNow();
+		updateVScrollBar();
+		updateLayerControls();
 	}
 	
 	private function onLayerRenameButton(evt:TriggerEvent):Void
@@ -711,17 +1076,32 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerSelected(evt:ContainerEvent):Void
 	{
-		var layer:ValEditorLayer = cast evt.object;
-		var layerIndex:Int = this._container.getLayerIndex(layer);
-		this._layerList.selectedIndex = layerIndex;
-		
 		if (this._currentTimeLineItem != null)
 		{
 			this._currentTimeLineItem.isCurrent = false;
 		}
+		
+		var layer:ValEditorLayer = cast evt.object;
+		if (layer == null) return;
+		
+		var layerIndex:Int = this._container.getLayerIndex(layer);
+		this._layerList.selectedIndex = layerIndex;
+		
 		this._currentTimeLineItem = this._timeLineItems[layerIndex];
 		this._currentTimeLineItem.isCurrent = true;
 		this._currentTimeLineItem.selectedIndex = layer.timeLine.frameIndex;
+	}
+	
+	private function onLayerUpButton(evt:TriggerEvent):Void
+	{
+		var action:LayerIndexUpAction = LayerIndexUpAction.fromPool();
+		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+		for (layer in this._layerList.selectedItems)
+		{
+			layers.push(layer);
+		}
+		action.setup(this._container, layers);
+		ValEditor.actionStack.add(action);
 	}
 	
 	private function onNumFramesChange(evt:TimeLineEvent):Void
@@ -767,18 +1147,18 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._contextMenuSprite.x = this._contextMenuPt.x;
 		this._contextMenuSprite.y = this._contextMenuPt.y;
 		
-		if (this._popupAdapter.active)
+		if (this._framePopupAdapter.active)
 		{
-			closeContextMenu();
+			closeFrameContextMenu();
 		}
 		this._removeFrameItem.enabled = frameData.frame != null;
 		this._removeKeyFrameItem.enabled = frameData.frame != null && frameData.frame.indexCurrent == frameData.frame.indexStart;
-		this._contextMenuCollection.updateAt(this._contextMenuCollection.indexOf(this._removeFrameItem));
-		this._contextMenuCollection.updateAt(this._contextMenuCollection.indexOf(this._removeKeyFrameItem));
-		this._contextMenu.selectedIndex = -1;
-		this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
-		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
-		this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
+		this._frameContextMenuCollection.updateAt(this._frameContextMenuCollection.indexOf(this._removeFrameItem));
+		this._frameContextMenuCollection.updateAt(this._frameContextMenuCollection.indexOf(this._removeKeyFrameItem));
+		this._frameContextMenu.selectedIndex = -1;
+		this._framePopupAdapter.open(this._frameContextMenu, this._contextMenuSprite);
+		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onFrameContextMenuStageMouseDown);
+		this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onFrameContextMenuStageMouseDown);
 	}
 	
 	private function onTimeLineItemScroll(evt:Event):Void
