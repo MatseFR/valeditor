@@ -79,6 +79,7 @@ class EditorView extends LayoutGroup
 	private var _menuIDToItemToEnabled:Map<String, Dynamic->Bool> = new Map<String, Dynamic->Bool>();
 	private var _menuIDToItemToText:Map<String, Dynamic->String> = new Map<String, Dynamic->String>();
 	private var _menuIDToText:Map<String, String> = new Map<String, String>();
+	private var _menuOpenListeners:Map<String, Event->Void> = new Map<String, Event->Void>();
 	
 	private var _isFirstResize:Bool = true;
 	
@@ -103,11 +104,12 @@ class EditorView extends LayoutGroup
 		initializeNow();
 	}
 	
-	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, items:ArrayCollection<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
+	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, openListener:Event->Void, items:ArrayCollection<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
 	{
 		this._menuIDList.push(menuID);
 		this._menuIDToText.set(menuID, menuText);
 		this._menuCallbacks.set(menuID, callback);
+		this._menuOpenListeners.set(menuID, openListener);
 		if (itemToText != null)
 		{
 			this._menuIDToItemToText.set(menuID, itemToText);
@@ -136,6 +138,12 @@ class EditorView extends LayoutGroup
 		var itemToText:Dynamic->String;
 		var collection:ArrayCollection<Dynamic> = this._menuCollections.get(menuID);
 		var menu:PopUpListView = new PopUpListView(collection, onMenuChange);
+		var openListener:Event->Void = this._menuOpenListeners.get(menuID);
+		
+		if (openListener != null)
+		{
+			menu.addEventListener(Event.OPEN, openListener);
+		}
 		
 		menu.listViewFactory = function():ListView
 		{
