@@ -110,12 +110,14 @@ class FileController
 	static private function onSaveComplete(path:String):Void
 	{
 		ValEditor.fileSettings.fullPath = path;
+		ValEditor.fileSaved();
 		_fileSaver.clear();
 	}
 	#else
 	static private function onSaveComplete(fileName:String):Void
 	{
 		ValEditor.fileSettings.fileName = fileName;
+		ValEditor.fileSaved();
 		_fileSaver.clear();
 	}
 	#end
