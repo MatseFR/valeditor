@@ -80,6 +80,7 @@ class ValEditor
 	static public var fileExtension:String = "ves";
 	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
+	static public var isNewFile(default, null):Bool = false;
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
 	static public var openedContainers(default, null):Array<ValEditorContainer> = new Array<ValEditorContainer>();
@@ -259,7 +260,14 @@ class ValEditor
 	
 	static public function newFile():Void
 	{
+		isNewFile = true;
 		rootContainer = createContainer();
+	}
+	
+	static public function fileSaved():Void
+	{
+		isNewFile = false;
+		actionStack.fileSaved();
 	}
 	
 	/** Creates an empty "new file" but does not clear exposed data */
