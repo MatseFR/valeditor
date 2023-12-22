@@ -13,6 +13,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valeditor.ValEditorLayer;
+import valeditor.editor.action.layer.LayerRenameAction;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
@@ -152,7 +153,10 @@ class LayerRenameWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		this._layer.name = this._nameInput.text;
+		var action:LayerRenameAction = LayerRenameAction.fromPool();
+		action.setup(this._layer, this._nameInput.text);
+		ValEditor.actionStack.add(action);
+		
 		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback();
 	}
