@@ -4,6 +4,7 @@ import feathers.controls.ButtonState;
 import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
+import valeditor.ui.feathers.theme.IconGraphics;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.variant.ButtonVariant;
 
@@ -32,6 +33,16 @@ class ButtonStyles
 		if (styleProvider.getStyleFunction(Button, ButtonVariant.RENAME) == null)
 		{
 			styleProvider.setStyleFunction(Button, ButtonVariant.RENAME, rename);
+		}
+		
+		if (styleProvider.getStyleFunction(Button, ButtonVariant.UP) == null)
+		{
+			styleProvider.setStyleFunction(Button, ButtonVariant.UP, up);
+		}
+		
+		if (styleProvider.getStyleFunction(Button, ButtonVariant.DOWN) == null)
+		{
+			styleProvider.setStyleFunction(Button, ButtonVariant.DOWN, down);
 		}
 		
 		if (styleProvider.getStyleFunction(Button, ButtonVariant.FRAME_FIRST) == null)
@@ -98,11 +109,11 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawAddIcon(icon, theme.contrastColor);
+		IconGraphics.drawAddIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawAddIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawAddIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -111,11 +122,11 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawRemoveIcon(icon, theme.contrastColor);
+		IconGraphics.drawRemoveIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawRemoveIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawRemoveIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -124,11 +135,37 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawRenameIcon(icon, theme.contrastColor);
+		IconGraphics.drawRenameIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawRenameIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawRenameIcon(icon, theme.contrastColorLighter);
+		btn.setIconForState(DISABLED, icon);
+	}
+	
+	static private function up(btn:Button):Void
+	{
+		common(btn);
+		
+		var icon:Shape = new Shape();
+		IconGraphics.drawUpIcon(icon, theme.contrastColor);
+		btn.icon = icon;
+		
+		icon = new Shape();
+		IconGraphics.drawUpIcon(icon, theme.contrastColorLighter);
+		btn.setIconForState(DISABLED, icon);
+	}
+	
+	static private function down(btn:Button):Void
+	{
+		common(btn);
+		
+		var icon:Shape = new Shape();
+		IconGraphics.drawDownIcon(icon, theme.contrastColor);
+		btn.icon = icon;
+		
+		icon = new Shape();
+		IconGraphics.drawDownIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -137,11 +174,11 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawFrameFirstIcon(icon, theme.contrastColor);
+		IconGraphics.drawFrameFirstIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawFrameFirstIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawFrameFirstIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -150,11 +187,11 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawFrameLastIcon(icon, theme.contrastColor);
+		IconGraphics.drawFrameLastIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawFrameLastIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawFrameLastIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -163,11 +200,11 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawFrameNextIcon(icon, theme.contrastColor);
+		IconGraphics.drawFrameNextIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawFrameNextIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawFrameNextIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	
@@ -176,103 +213,12 @@ class ButtonStyles
 		common(btn);
 		
 		var icon:Shape = new Shape();
-		drawFramePreviousIcon(icon, theme.contrastColor);
+		IconGraphics.drawFramePreviousIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawFramePreviousIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawFramePreviousIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
-	}
-	
-	static private function drawAddIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.drawRect(4.0, 9.0, 12.0, 2.0);
-		//icon.graphics.drawRect(9.0, 4.0, 2.0, 12.0);
-		icon.graphics.drawRect(9.0, 4.0, 2.0, 5.0);
-		icon.graphics.drawRect(9.0, 11.0, 2.0, 5.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawRemoveIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.drawRect(4.0, 9.0, 12.0, 2.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawRenameIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.drawRect(7.0, 4.0, 6.0, 2.0);
-		icon.graphics.drawRect(7.0, 14.0, 6.0, 2.0);
-		icon.graphics.drawRect(9.0, 6.0, 2.0, 8.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawFrameFirstIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(16.0, 4.0);
-		icon.graphics.lineTo(8.0, 10.0);
-		icon.graphics.lineTo(16.0, 16.0);
-		icon.graphics.lineTo(16.0, 4.0);
-		icon.graphics.drawRect(4.0, 4.0, 2.0, 12.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawFrameLastIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(4.0, 4.0);
-		icon.graphics.lineTo(12.0, 10.0);
-		icon.graphics.lineTo(4.0, 16.0);
-		icon.graphics.lineTo(4.0, 4.0);
-		icon.graphics.drawRect(14.0, 4.0, 2.0, 12.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawFrameNextIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(8.0, 4.0);
-		icon.graphics.lineTo(16.0, 10.0);
-		icon.graphics.lineTo(8.0, 16.0);
-		icon.graphics.lineTo(8.0, 4.0);
-		icon.graphics.drawRect(4.0, 4.0, 2.0, 12.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawFramePreviousIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(12.0, 4.0);
-		icon.graphics.lineTo(4.0, 10.0);
-		icon.graphics.lineTo(12.0, 16.0);
-		icon.graphics.lineTo(12.0, 4.0);
-		icon.graphics.drawRect(14.0, 4.0, 2.0, 12.0);
-		icon.graphics.endFill();
 	}
 	
 }
