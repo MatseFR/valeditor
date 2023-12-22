@@ -51,7 +51,6 @@ class FileSettingsWindow extends Panel
 			
 			if (this._initialized)
 			{
-				//ValEditor.edit(null, null, this._editContainer);
 				this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
 			}
 		}
