@@ -6,6 +6,7 @@ import feathers.layout.RelativePosition;
 import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
+import valeditor.ui.feathers.theme.IconGraphics;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
 import valeditor.ui.feathers.Padding;
@@ -101,11 +102,11 @@ class ToggleButtonStyles
 		btn.textFormat.bold = true;
 		
 		var defaultIcon:Shape = new Shape();
-		drawDisclosureClosedIcon(defaultIcon, theme.contrastColor);
+		IconGraphics.drawDisclosureClosedIcon(defaultIcon, theme.contrastColor);
 		btn.icon = defaultIcon;
 		
 		var selectedIcon:Shape = new Shape();
-		drawDisclosureOpenIcon(selectedIcon, theme.contrastColor);
+		IconGraphics.drawDisclosureOpenIcon(selectedIcon, theme.contrastColor);
 		btn.selectedIcon = selectedIcon;
 		
 		if (btn.focusRectSkin == null)
@@ -140,19 +141,19 @@ class ToggleButtonStyles
 		}
 		
 		var icon:Shape = new Shape();
-		drawPlayIcon(icon, theme.contrastColor);
+		IconGraphics.drawPlayIcon(icon, theme.contrastColor);
 		btn.icon = icon;
 		
 		icon = new Shape();
-		drawPlayIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawPlayIcon(icon, theme.contrastColorLighter);
 		btn.disabledIcon = icon;
 		
 		icon = new Shape();
-		drawStopIcon(icon, theme.contrastColor);
+		IconGraphics.drawStopIcon(icon, theme.contrastColor);
 		btn.selectedIcon = icon;
 		
 		icon = new Shape();
-		drawStopIcon(icon, theme.contrastColorLighter);
+		IconGraphics.drawStopIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED(true), icon);
 		
 		if (btn.focusRectSkin == null) {
@@ -175,53 +176,6 @@ class ToggleButtonStyles
 		//btn.paddingBottom = 4.0;
 		//btn.paddingLeft = 10.0;
 		//btn.gap = 4.0;
-	}
-	
-	static private function drawDisclosureClosedIcon(icon:Shape, color:Int):Void {
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(4.0, 4.0);
-		icon.graphics.lineTo(16.0, 10.0);
-		icon.graphics.lineTo(4.0, 16.0);
-		icon.graphics.lineTo(4.0, 4.0);
-		icon.graphics.endFill();
-	}
-
-	static private function drawDisclosureOpenIcon(icon:Shape, color:Int):Void {
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(4.0, 4.0);
-		icon.graphics.lineTo(16.0, 4.0);
-		icon.graphics.lineTo(10.0, 16.0);
-		icon.graphics.lineTo(4.0, 4.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawPlayIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.moveTo(4.0, 4.0);
-		icon.graphics.lineTo(16.0, 10.0);
-		icon.graphics.lineTo(4.0, 16.0);
-		icon.graphics.lineTo(4.0, 4.0);
-		icon.graphics.endFill();
-	}
-	
-	static private function drawStopIcon(icon:Shape, color:Int):Void
-	{
-		icon.graphics.beginFill(0xff00ff, 0.0);
-		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
-		icon.graphics.endFill();
-		icon.graphics.beginFill(color);
-		icon.graphics.drawRect(4.0, 4.0, 12.0, 12.0);
-		icon.graphics.endFill();
 	}
 	
 }
