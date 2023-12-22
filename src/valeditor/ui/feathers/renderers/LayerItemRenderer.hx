@@ -3,12 +3,16 @@ package valeditor.ui.feathers.renderers;
 import feathers.controls.Check;
 import feathers.controls.Label;
 import feathers.controls.dataRenderers.LayoutGroupItemRenderer;
+import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import valeditor.ValEditorLayer;
+import valeditor.editor.action.layer.LayerLockAction;
+import valeditor.editor.action.layer.LayerVisibleAction;
+import valeditor.events.LayerEvent;
 import valeditor.ui.feathers.variant.CheckVariant;
 
 /**
@@ -32,9 +36,24 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 	private function get_layer():ValEditorLayer { return this._layer; }
 	private function set_layer(value:ValEditorLayer):ValEditorLayer
 	{
+		if (this._layer != value)
+		{
+			if (this._layer != null)
+			{
+				this._layer.removeEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
+				this._layer.removeEventListener(LayerEvent.VISIBLE_CHANGE, onLayerVisibilityChange);
+			}
+			if (value != null)
+			{
+				value.addEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
+				value.addEventListener(LayerEvent.VISIBLE_CHANGE, onLayerVisibilityChange);
+			}
+		}
+		
 		if (value != null && this._initialized)
 		{
 			this._name.text = value.name;
+			this._lockToggle.selected = value.locked;
 			this._visibleToggle.selected = value.visible;
 		}
 		return this._layer = value;
@@ -85,12 +104,12 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 		
 		this._visibleToggle = new Check(null, true);
 		this._visibleToggle.variant = CheckVariant.LAYER;
-		this._visibleToggle.addEventListener(Event.CHANGE, onVisibleToggle);
+		this._visibleToggle.addEventListener(TriggerEvent.TRIGGER, onVisibleToggle);
 		addChild(this._visibleToggle);
 		
 		this._lockToggle = new Check(null, false);
 		this._lockToggle.variant = CheckVariant.LAYER;
-		this._lockToggle.addEventListener(Event.CHANGE, onLockToggle);
+		this._lockToggle.addEventListener(TriggerEvent.TRIGGER, onLockToggle);
 		addChild(this._lockToggle);
 	}
 	
@@ -100,16 +119,32 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 		return this;
 	}
 	
+	private function onLayerLockChange(evt:LayerEvent):Void
+	{
+		this._lockToggle.selected = this._layer.locked;
+	}
+	
+	private function onLayerVisibilityChange(evt:LayerEvent):Void
+	{
+		this._visibleToggle.selected = this._layer.visible;
+	}
+	
 	private function onLockToggle(evt:Event):Void
 	{
 		if (this._layer == null) return;
-		this._layer.locked = this._lockToggle.selected;
+		
+		var action:LayerLockAction = LayerLockAction.fromPool();
+		action.addLayer(this._layer, this._lockToggle.selected);
+		ValEditor.actionStack.add(action);
 	}
 	
 	private function onVisibleToggle(evt:Event):Void
 	{
 		if (this._layer == null) return;
-		this._layer.visible = this._visibleToggle.selected;
+		
+		var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+		action.addLayer(this._layer, this._visibleToggle.selected);
+		ValEditor.actionStack.add(action);
 	}
 	
 }

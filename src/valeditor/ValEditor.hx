@@ -35,6 +35,7 @@ import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
+import valeditor.editor.action.ValEditorActionStack;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
@@ -65,6 +66,7 @@ class ValEditor
 {
 	static public var VERSION:String = Compiler.getDefine("valeditor");
 	
+	static public var actionStack:ValEditorActionStack;
 	#if desktop
 	static public var assetFileLoader:AssetFilesLoaderDesktop;
 	#else
@@ -220,6 +222,7 @@ class ValEditor
 	
 	static public function init(completeCallback:Void->Void):Void
 	{
+		actionStack = new ValEditorActionStack();
 		if (assetFileLoader == null)
 		{
 			#if desktop
