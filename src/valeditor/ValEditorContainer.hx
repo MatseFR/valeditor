@@ -44,6 +44,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		return new ValEditorContainer();
 	}
 	
+	public var hasInvisibleLayer(get, never):Bool;
+	public var hasLockedLayer(get, never):Bool;
 	public var ignoreRightClick(default, null):Bool;
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
@@ -53,6 +55,24 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
 	public var viewWidth(get, set):Float;
+	
+	private function get_hasInvisibleLayer():Bool
+	{
+		for (layer in this._layers)
+		{
+			if (!layer.visible) return true;
+		}
+		return false;
+	}
+	
+	private function get_hasLockedLayer():Bool
+	{
+		for (layer in this._layers)
+		{
+			if (layer.locked) return true;
+		}
+		return false;
+	}
 	
 	private var _isOpen:Bool;
 	private function get_isOpen():Bool { return this._isOpen; }
@@ -261,6 +281,21 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public function getLayerIndex(layer:ValEditLayer):Int
 	{
 		return this._layers.indexOf(layer);
+	}
+	
+	public function getOtherLayers(layersToIgnore:Array<ValEditorLayer>, ?otherLayers:Array<ValEditorLayer>):Array<ValEditorLayer>
+	{
+		if (otherLayers == null) otherLayers = new Array<ValEditorLayer>();
+		
+		for (layer in this._layers)
+		{
+			if (layersToIgnore.indexOf(cast layer) == -1)
+			{
+				otherLayers.push(cast layer);
+			}
+		}
+		
+		return otherLayers;
 	}
 	
 	override public function removeLayer(layer:ValEditLayer):Void 
