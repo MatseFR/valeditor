@@ -47,7 +47,7 @@ class DefaultEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.target = null;
 		this.currentTarget = null;
@@ -57,7 +57,7 @@ class DefaultEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, bubbles:Bool = false, cancelable:Bool = false):DefaultEvent
+	private function setTo(type:String, bubbles:Bool, cancelable:Bool):DefaultEvent
 	{
 		this.type = type;
 		this.bubbles = bubbles;

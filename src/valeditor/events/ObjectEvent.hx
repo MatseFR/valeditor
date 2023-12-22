@@ -59,7 +59,7 @@ class ObjectEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.object = null;
 		this.parameters = null;
@@ -72,7 +72,7 @@ class ObjectEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, object:ValEditObject, propertyName:String = null, parameters:Array<Dynamic> = null, bubbles:Bool = false, cancelable:Bool = false):ObjectEvent
+	private function setTo(type:String, object:ValEditObject, propertyName:String, parameters:Array<Dynamic>, bubbles:Bool, cancelable:Bool):ObjectEvent
 	{
 		this.type = type;
 		this.object = object;

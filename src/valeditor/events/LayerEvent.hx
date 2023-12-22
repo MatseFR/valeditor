@@ -10,8 +10,10 @@ import valedit.ValEditObject;
  */
 class LayerEvent extends Event
 {
+	inline static public var LOCK_CHANGE:String = "lock_change";
 	inline static public var OBJECT_ADDED:String = "object_added";
 	inline static public var OBJECT_REMOVED:String = "object_removed";
+	inline static public var VISIBLE_CHANGE:String = "visible_change";
 	
 	#if !flash
 	static private var _POOL:Array<LayerEvent> = new Array<LayerEvent>();
@@ -56,7 +58,7 @@ class LayerEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.layer = null;
 		this.object = null;
@@ -68,7 +70,7 @@ class LayerEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool = false, cancelable:Bool = false):LayerEvent
+	private function setTo(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool, cancelable:Bool):LayerEvent
 	{
 		this.type = type;
 		this.layer = layer;

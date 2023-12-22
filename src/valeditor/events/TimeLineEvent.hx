@@ -50,7 +50,7 @@ class TimeLineEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.target = null;
 		this.currentTarget = null;
@@ -60,7 +60,7 @@ class TimeLineEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, bubbles:Bool = false, cancelable:Bool = false):TimeLineEvent
+	private function setTo(type:String, bubbles:Bool, cancelable:Bool):TimeLineEvent
 	{
 		this.type = type;
 		this.bubbles = bubbles;

@@ -55,7 +55,7 @@ class TemplateEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.template = null;
 		this.target = null;
@@ -66,7 +66,7 @@ class TemplateEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, template:ValEditorTemplate, bubbles:Bool = false, cancelable:Bool = false):TemplateEvent
+	private function setTo(type:String, template:ValEditorTemplate, bubbles:Bool, cancelable:Bool):TemplateEvent
 	{
 		this.type = type;
 		this.template = template;

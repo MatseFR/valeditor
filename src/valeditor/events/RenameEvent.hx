@@ -52,7 +52,7 @@ class RenameEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.previousNameOrID = null;
 		this.target = null;
@@ -63,7 +63,7 @@ class RenameEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, previousNameOrID:String, bubbles:Bool = false, cancelable:Bool = false):RenameEvent
+	private function setTo(type:String, previousNameOrID:String, bubbles:Bool, cancelable:Bool):RenameEvent
 	{
 		this.type = type;
 		this.previousNameOrID = previousNameOrID;

@@ -52,7 +52,7 @@ class SelectionEvent extends Event
 	}
 	
 	#if !flash
-	public function pool():Void
+	private function pool():Void
 	{
 		this.object = null;
 		this.target = null;
@@ -63,7 +63,7 @@ class SelectionEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setTo(type:String, object:Dynamic, bubbles:Bool = false, cancelable:Bool = false):SelectionEvent
+	private function setTo(type:String, object:Dynamic, bubbles:Bool, cancelable:Bool):SelectionEvent
 	{
 		this.type = type;
 		this.object = object;
