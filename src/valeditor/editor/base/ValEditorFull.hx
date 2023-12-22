@@ -8,6 +8,7 @@ import inputAction.events.InputActionEvent;
 import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
+import openfl.events.Event;
 import openfl.filters.BlurFilter;
 import openfl.filters.DropShadowFilter;
 import openfl.filters.GlowFilter;
@@ -82,6 +83,30 @@ class ValEditorFull extends ValEditorBaseFeathers
 	#if html5
 	private var _fileReaderLoader:FileReaderLoader = new FileReaderLoader();
 	#end
+	
+	// file menu
+	private var _fileMenuCollection:ArrayCollection<MenuItem>;
+	private var _newFileItem:MenuItem;
+	private var _openFileItem:MenuItem;
+	private var _saveFileItem:MenuItem;
+	private var _saveFileAsItem:MenuItem;
+	private var _fileSettingsItem:MenuItem;
+	private var _exportSettingsItem:MenuItem;
+	
+	// edit menu
+	private var _editMenuCollection:ArrayCollection<MenuItem>;
+	private var _undoItem:MenuItem;
+	private var _redoItem:MenuItem;
+	
+	// asset menu
+	private var _assetMenuCollection:ArrayCollection<MenuItem>;
+	private var _assetBrowserItem:MenuItem;
+	
+	// theme menu
+	private var _themeMenuCollection:ArrayCollection<MenuItem>;
+	private var _lightModeItem:MenuItem;
+	private var _darkModeItem:MenuItem;
+	private var _editThemeItem:MenuItem;
 
 	public function new() 
 	{
@@ -150,27 +175,53 @@ class ValEditorFull extends ValEditorBaseFeathers
 		item = StackItem.withDisplayObject(EditorView.ID, this.editView);
 		this.screenNavigator.addItem(item);
 		
-		var fileItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
-			new MenuItem("new", "New", true, "Ctrl+N"),
-			new MenuItem("open", "Open", true, "Ctrl+O"),
-			new MenuItem("save", "Save", true, "Ctrl+S"),
-			new MenuItem("save as", "Save As", true, "Ctrl+Shift+S"),
-			new MenuItem("file settings", "File Settings"),
-			new MenuItem("export settings", "Export Settings")
-		]);
-		this.editView.addMenu("file", "File", onFileMenuCallback, fileItems);
+		// File menu
+		this._newFileItem = new MenuItem("new", "New", true, "Ctrl+N");
+		this._openFileItem = new MenuItem("open", "Open", true, "Ctrl+O");
+		this._saveFileItem = new MenuItem("save", "Save", true, "Ctrl+S");
+		this._saveFileAsItem = new MenuItem("save as", "Save As", true, "Ctrl+Shift+S");
+		this._fileSettingsItem = new MenuItem("file settings", "File Settings");
+		this._exportSettingsItem = new MenuItem("export settings", "Export Settings");
 		
-		var assetItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
-			new MenuItem("browser", "Browser", true, "Ctrl+B")
+		this._fileMenuCollection = new ArrayCollection<MenuItem>([
+			this._newFileItem,
+			this._openFileItem,
+			this._saveFileItem,
+			this._saveFileAsItem,
+			this._fileSettingsItem,
+			this._exportSettingsItem
 		]);
-		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, assetItems);
+		this.editView.addMenu("file", "File", onFileMenuCallback, onFileMenuOpen, this._fileMenuCollection);
 		
-		var themeItems:ArrayCollection<MenuItem> = new ArrayCollection<MenuItem>([
-			new MenuItem("light mode", "Light mode"),
-			new MenuItem("dark mode", "Dark mode"),
-			new MenuItem("edit", "Edit")
+		// Edit menu
+		this._undoItem = new MenuItem("undo", "Undo", true, "Ctrl+Z");
+		this._redoItem = new MenuItem("redo", "Redo", true, "Ctrl+Y");
+		
+		this._editMenuCollection = new ArrayCollection<MenuItem>([
+			this._undoItem,
+			this._redoItem
 		]);
-		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, themeItems);
+		this.editView.addMenu("edit", "Edit", onEditMenuCallback, onEditMenuOpen, this._editMenuCollection);
+		
+		// Asset menu
+		this._assetBrowserItem = new MenuItem("browser", "Browser", true, "Ctrl+B");
+		
+		this._assetMenuCollection = new ArrayCollection<MenuItem>([
+			this._assetBrowserItem
+		]);
+		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, onAssetMenuOpen, this._assetMenuCollection);
+		
+		// Theme menu
+		this._lightModeItem = new MenuItem("light mode", "Light mode");
+		this._darkModeItem = new MenuItem("dark mode", "Dark mode");
+		this._editThemeItem = new MenuItem("edit", "Edit");
+		
+		this._themeMenuCollection = new ArrayCollection<MenuItem>([
+			this._lightModeItem,
+			this._darkModeItem,
+			this._editThemeItem
+		]);
+		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, onThemeMenuOpen, this._themeMenuCollection);
 	}
 	
 	override function exposeData():Void 
@@ -312,10 +363,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 		{
 			FeathersWindows.closeStartMenuWindow();
 		}
-		FeathersWindows.showFileSettingsWindow(this._fileSettings, "New File", onFileSettingsConfirm, onFileSettingsCancel);
+		FeathersWindows.showFileSettingsWindow(this._fileSettings, "New File", onNewFileSettingsConfirm, onNewFileSettingsCancel);
 	}
 	
-	private function onFileSettingsConfirm():Void
+	private function onNewFileSettingsConfirm():Void
 	{
 		ValEditor.reset();
 		this._fileSettings.clone(ValEditor.fileSettings);
@@ -323,7 +374,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		this._isStartUp = false;
 	}
 	
-	private function onFileSettingsCancel():Void
+	private function onNewFileSettingsCancel():Void
 	{
 		if (this._isStartUp)
 		{
@@ -350,10 +401,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onLoadFileCancel():Void
 	{
-		//if (this._isStartUp)
-		//{
-			//FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);
-		//}
+		
 	}
 	
 	private function onSelectionChange(evt:SelectionEvent):Void
@@ -383,6 +431,12 @@ class ValEditorFull extends ValEditorBaseFeathers
 		}
 	}
 	
+	private function onFileMenuOpen(evt:Event):Void
+	{
+		this._saveFileItem.enabled = ValEditor.actionStack.hasChanges;
+		this._fileMenuCollection.updateAt(this._fileMenuCollection.indexOf(this._saveFileItem));
+	}
+	
 	private function onFileMenuCallback(item:MenuItem):Void
 	{
 		switch (item.id)
@@ -409,6 +463,32 @@ class ValEditorFull extends ValEditorBaseFeathers
 		Lib.current.stage.focus = null;
 	}
 	
+	private function onEditMenuOpen(evt:Event):Void
+	{
+		this._undoItem.enabled = ValEditor.actionStack.canUndo;
+		this._redoItem.enabled = ValEditor.actionStack.canRedo;
+		this._editMenuCollection.updateAll();
+	}
+	
+	private function onEditMenuCallback(item:MenuItem):Void
+	{
+		switch (item.id)
+		{
+			case "undo" :
+				ValEditor.actionStack.undo();
+			
+			case "redo" :
+				ValEditor.actionStack.redo();
+		}
+		
+		Lib.current.stage.focus = null;
+	}
+	
+	private function onAssetMenuOpen(evt:Event):Void
+	{
+		
+	}
+	
 	private function onAssetMenuCallback(item:MenuItem):Void
 	{
 		switch (item.id)
@@ -418,6 +498,13 @@ class ValEditorFull extends ValEditorBaseFeathers
 		}
 		
 		Lib.current.stage.focus = null;
+	}
+	
+	private function onThemeMenuOpen(evt:Event):Void
+	{
+		this._lightModeItem.enabled = this.theme.darkMode;
+		this._darkModeItem.enabled = !this.theme.darkMode;
+		this._themeMenuCollection.updateAll();
 	}
 	
 	private function onThemeMenuCallback(item:MenuItem):Void
@@ -468,6 +555,12 @@ class ValEditorFull extends ValEditorBaseFeathers
 			
 			case InputActionID.PLAY_STOP :
 				ValEditor.playStop();
+			
+			case InputActionID.UNDO :
+				ValEditor.actionStack.undo();
+			
+			case InputActionID.REDO :
+				ValEditor.actionStack.redo();
 			
 			// file
 			case InputActionID.NEW_FILE :
@@ -561,6 +654,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 		keyAction = new KeyAction(InputActionID.DELETE);
 		ValEditor.keyboardController.addKeyAction(Keyboard.DELETE, keyAction);
 		ValEditor.keyboardController.addKeyAction(Keyboard.BACKSPACE, keyAction);
+		
+		// undo
+		keyAction = new KeyAction(InputActionID.UNDO, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.Z, keyAction);
+		
+		// redo
+		keyAction = new KeyAction(InputActionID.REDO, false, true);
+		ValEditor.keyboardController.addKeyAction(Keyboard.Y, keyAction);
 		
 		// save
 		keyAction = new KeyAction(InputActionID.SAVE, false, true);
