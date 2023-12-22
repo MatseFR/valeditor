@@ -26,13 +26,29 @@ class ValEditorLayer extends ValEditLayer
 	
 	public var objectCollection(default, null):ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	
+	override function set_locked(value:Bool):Bool 
+	{
+		if (this._locked == value) return value;
+		super.set_locked(value);
+		LayerEvent.dispatch(this, LayerEvent.LOCK_CHANGE, this);
+		return this._locked;
+	}
+	
 	override function set_name(value:String):String 
 	{
-		if (value == this._name) return value;
+		if (this._name == value) return value;
 		var previousName:String = this._name;
 		super.set_name(value);
 		RenameEvent.dispatch(this, RenameEvent.RENAMED, previousName);
 		return this._name;
+	}
+	
+	override function set_visible(value:Bool):Bool 
+	{
+		if (this._visible == value) return value;
+		super.set_visible(value);
+		LayerEvent.dispatch(this, LayerEvent.VISIBLE_CHANGE, this);
+		return this._visible;
 	}
 	
 	private var _displayObjects:StringIndexedMap<ValEditorObject> = new StringIndexedMap<ValEditorObject>();
