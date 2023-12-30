@@ -13,6 +13,8 @@ class LayerEvent extends Event
 	inline static public var LOCK_CHANGE:String = "lock_change";
 	inline static public var OBJECT_ADDED:String = "object_added";
 	inline static public var OBJECT_REMOVED:String = "object_removed";
+	inline static public var SELECTED:String = "selected";
+	inline static public var UNSELECTED:String = "unselected";
 	inline static public var VISIBLE_CHANGE:String = "visible_change";
 	
 	#if !flash
