@@ -25,6 +25,7 @@ class ValEditorLayer extends ValEditLayer
 	}
 	
 	public var objectCollection(default, null):ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
+	public var selected(get, set):Bool;
 	
 	override function set_locked(value:Bool):Bool 
 	{
@@ -41,6 +42,23 @@ class ValEditorLayer extends ValEditLayer
 		super.set_name(value);
 		RenameEvent.dispatch(this, RenameEvent.RENAMED, previousName);
 		return this._name;
+	}
+	
+	private var _selected:Bool = false;
+	private function get_selected():Bool { return this._selected; }
+	private function set_selected(value:Bool):Bool
+	{
+		if (this._selected == value) return value;
+		this._selected = value;
+		if (this._selected)
+		{
+			LayerEvent.dispatch(this, LayerEvent.SELECTED, this);
+		}
+		else
+		{
+			LayerEvent.dispatch(this, LayerEvent.UNSELECTED, this);
+		}
+		return this._selected;
 	}
 	
 	override function set_visible(value:Bool):Bool 
@@ -63,6 +81,7 @@ class ValEditorLayer extends ValEditLayer
 	{
 		this.objectCollection.removeAll();
 		this._displayObjects.clear();
+		this._selected = false;
 		super.clear();
 	}
 	
