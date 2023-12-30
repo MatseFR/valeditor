@@ -6,6 +6,7 @@ package valeditor.editor.action;
  */
 abstract class ValEditorAction
 {
+	public var name:String;
 	public var status:ValEditorActionStatus = ValEditorActionStatus.UNDONE;
 	
 	public function clear():Void
