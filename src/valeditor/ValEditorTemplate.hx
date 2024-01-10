@@ -28,6 +28,8 @@ class ValEditorTemplate extends ValEditTemplate
 	public var isInLibrary:Bool = false;
 	public var lockInstanceUpdates:Bool = false;
 	
+	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
+	
 	override function set_id(value:String):String 
 	{
 		if (this._id == value) return value;
@@ -51,6 +53,8 @@ class ValEditorTemplate extends ValEditTemplate
 		RenameEvent.dispatch(this, RenameEvent.RENAMED, oldID);
 		return this._id;
 	}
+	
+	override function get_numInstances():Int { return this._instances.length - this._suspendedInstances.length; }
 	
 	override function set_object(value:ValEditObject):ValEditObject 
 	{
@@ -84,6 +88,13 @@ class ValEditorTemplate extends ValEditTemplate
 		this.isInLibrary = false;
 		this.lockInstanceUpdates = false;
 		this._objectIDIndex = -1;
+		
+		//for (object in this._suspendedInstances)
+		//{
+			//ValEditor.destroyObject(object);
+		//}
+		this._suspendedInstances.resize(0);
+		
 		super.clear();
 	}
 	
@@ -108,6 +119,18 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		super.removeInstance(instance);
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
+	}
+	
+	public function suspendInstance(instance:ValEditorObject):Void
+	{
+		this._suspendedInstances.push(instance);
+		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_SUSPENDED, this);
+	}
+	
+	public function unsuspendInstance(instance:ValEditorObject):Void
+	{
+		this._suspendedInstances.remove(instance);
+		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_UNSUSPENDED, this);
 	}
 	
 	public function makeObjectID():String
