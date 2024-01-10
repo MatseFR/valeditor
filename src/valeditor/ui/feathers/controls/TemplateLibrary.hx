@@ -119,7 +119,8 @@ class TemplateLibrary extends LayoutGroup
 			return renderer;
 		});
 		recycler.update = (renderer:ItemRenderer, state:GridViewCellState) -> {
-			renderer.text = Std.string(state.data.numInstances);
+			//renderer.text = Std.string(state.data.numInstances);
+			renderer.text = Std.string(cast(state.data, ValEditorTemplate).numInstances);
 		};
 		this._numInstancesColumn = new GridViewColumn("#", null, 28.0);
 		this._numInstancesColumn.cellRendererRecycler = recycler;
