@@ -2,7 +2,6 @@ package valeditor.events;
 
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
-import valedit.ValEditTemplate;
 import valeditor.ValEditorTemplate;
 
 /**
@@ -13,6 +12,8 @@ class TemplateEvent extends Event
 {
 	inline static public var INSTANCE_ADDED:String = "instance_added";
 	inline static public var INSTANCE_REMOVED:String = "instance_removed";
+	inline static public var INSTANCE_SUSPENDED:String = "instance_suspended";
+	inline static public var INSTANCE_UNSUSPENDED:String = "instance_unsuspended";
 	
 	#if !flash
 	static private var _POOL:Array<TemplateEvent> = new Array<TemplateEvent>();
