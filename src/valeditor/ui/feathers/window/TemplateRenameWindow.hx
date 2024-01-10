@@ -13,7 +13,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valeditor.ValEditorTemplate;
-import valeditor.editor.action.template.TemplateRenameAction;
+import valeditor.editor.action.template.TemplateRename;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
@@ -152,7 +152,7 @@ class TemplateRenameWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		var action:TemplateRenameAction = TemplateRenameAction.fromPool();
+		var action:TemplateRename = TemplateRename.fromPool();
 		action.setup(this._template, this._nameInput.text);
 		ValEditor.actionStack.add(action);
 		

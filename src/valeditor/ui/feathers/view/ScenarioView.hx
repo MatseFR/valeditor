@@ -42,12 +42,12 @@ import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
-import valeditor.editor.action.layer.LayerAddAction;
-import valeditor.editor.action.layer.LayerIndexDownAction;
-import valeditor.editor.action.layer.LayerIndexUpAction;
-import valeditor.editor.action.layer.LayerLockAction;
-import valeditor.editor.action.layer.LayerRemoveAction;
-import valeditor.editor.action.layer.LayerVisibleAction;
+import valeditor.editor.action.layer.LayerAdd;
+import valeditor.editor.action.layer.LayerIndexDown;
+import valeditor.editor.action.layer.LayerIndexUp;
+import valeditor.editor.action.layer.LayerLock;
+import valeditor.editor.action.layer.LayerRemove;
+import valeditor.editor.action.layer.LayerVisible;
 import valeditor.events.ContainerEvent;
 import valeditor.events.EditorEvent;
 import valeditor.events.LayerEvent;
@@ -533,14 +533,14 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				var layer:ValEditorLayer = ValEditor.createLayer();
 				
 				var layers:Array<ValEditorLayer> = [layer];
-				var action:LayerAddAction = LayerAddAction.fromPool();
+				var action:LayerAdd = LayerAdd.fromPool();
 				action.setup(this._container, layers, this._layerList.selectedIndex);
 				ValEditor.actionStack.add(action);
 			
 			case "remove layer" :
 				this._currentTimeLineItem = null;
 				
-				var action:LayerRemoveAction = LayerRemoveAction.fromPool();
+				var action:LayerRemove = LayerRemove.fromPool();
 				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 				for (layer in this._layerList.selectedItems)
 				{
@@ -550,7 +550,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				ValEditor.actionStack.add(action);
 			
 			case "show all" :
-				var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+				var action:LayerVisible = LayerVisible.fromPool();
 				for (layer in this._container.layerCollection)
 				{
 					if (!layer.visible)
@@ -561,7 +561,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				ValEditor.actionStack.add(action);
 			
 			case "unlock all" :
-				var action:LayerLockAction = LayerLockAction.fromPool();
+				var action:LayerLock = LayerLock.fromPool();
 				for (layer in this._container.layerCollection)
 				{
 					if (layer.locked)
@@ -577,7 +577,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 					this._contextSelectedLayers.push(layer);
 				}
 				this._container.getOtherLayers(this._contextSelectedLayers, this._contextOtherLayers);
-				var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+				var action:LayerVisible = LayerVisible.fromPool();
 				for (layer in this._contextSelectedLayers)
 				{
 					if (!layer.visible)
@@ -602,7 +602,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 					this._contextSelectedLayers.push(layer);
 				}
 				this._container.getOtherLayers(this._contextSelectedLayers, this._contextOtherLayers);
-				var action:LayerLockAction = LayerLockAction.fromPool();
+				var action:LayerLock = LayerLock.fromPool();
 				for (layer in this._contextSelectedLayers)
 				{
 					if (layer.locked)
@@ -622,7 +622,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				ValEditor.actionStack.add(action);
 			
 			case "move up" :
-				var action:LayerIndexUpAction = LayerIndexUpAction.fromPool();
+				var action:LayerIndexUp = LayerIndexUp.fromPool();
 				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 				for (layer in this._layerList.selectedItems)
 				{
@@ -632,7 +632,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				ValEditor.actionStack.add(action);
 			
 			case "move down" :
-				var action:LayerIndexDownAction = LayerIndexDownAction.fromPool();
+				var action:LayerIndexDown = LayerIndexDown.fromPool();
 				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 				for (layer in this._layerList.selectedItems)
 				{
@@ -916,7 +916,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			var layer:ValEditorLayer = ValEditor.createLayer();
 			
 			var layers:Array<ValEditorLayer> = [layer];
-			var action:LayerAddAction = LayerAddAction.fromPool();
+			var action:LayerAdd = LayerAdd.fromPool();
 			action.setup(this._container, layers, this._layerList.selectedIndex);
 			ValEditor.actionStack.add(action);
 		}
@@ -940,7 +940,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerDownButton(evt:TriggerEvent):Void
 	{
-		var action:LayerIndexDownAction = LayerIndexDownAction.fromPool();
+		var action:LayerIndexDown = LayerIndexDown.fromPool();
 		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 		for (layer in this._layerList.selectedItems)
 		{
@@ -1048,7 +1048,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		{
 			this._currentTimeLineItem = null;
 			
-			var action:LayerRemoveAction = LayerRemoveAction.fromPool();
+			var action:LayerRemove = LayerRemove.fromPool();
 			var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 			for (layer in this._layerList.selectedItems)
 			{
@@ -1094,7 +1094,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerUpButton(evt:TriggerEvent):Void
 	{
-		var action:LayerIndexUpAction = LayerIndexUpAction.fromPool();
+		var action:LayerIndexUp = LayerIndexUp.fromPool();
 		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
 		for (layer in this._layerList.selectedItems)
 		{
