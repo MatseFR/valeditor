@@ -1,6 +1,7 @@
 package valeditor;
 
 import haxe.Constraints.Function;
+import openfl.errors.Error;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
 import valedit.ValEditKeyFrame;
@@ -42,6 +43,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var isInClipboard:Bool;
 	public var isMouseDown:Bool;
 	public var isSelectable(get, set):Bool;
+	public var isSuspended:Bool;
 	public var mouseRestoreX:Float;
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
@@ -192,6 +194,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.isInClipboard = false;
 		this.isMouseDown = false;
 		this.isSelectable = true;
+		this.isSuspended = false;
 		this.usePivotScaling = false;
 	}
 	
@@ -216,6 +219,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	{
 		super.addKeyFrame(keyFrame, collection);
 		this._keyFrameToCollection.get(keyFrame).valEditorObject = this;
+		if (this.isSuspended && this.template != null)
+		{
+			cast(this.template, ValEditorTemplate).unsuspendInstance(this);
+		}
 	}
 	
 	override public function removeKeyFrame(keyFrame:ValEditKeyFrame, poolCollection:Bool = true):Void 
@@ -225,6 +232,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			this._keyFrameToCollection.get(keyFrame).valEditorObject = null;
 		}
 		super.removeKeyFrame(keyFrame, poolCollection);
+		if (this.numKeyFrames == 0 && this.template != null)
+		{
+			cast(this.template, ValEditorTemplate).suspendInstance(this);
+		}
 	}
 	
 	override public function setKeyFrame(keyFrame:ValEditKeyFrame):Void 
