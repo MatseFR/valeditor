@@ -10,8 +10,8 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
 import valeditor.ValEditorLayer;
-import valeditor.editor.action.layer.LayerLockAction;
-import valeditor.editor.action.layer.LayerVisibleAction;
+import valeditor.editor.action.layer.LayerLock;
+import valeditor.editor.action.layer.LayerVisible;
 import valeditor.events.LayerEvent;
 import valeditor.ui.feathers.variant.CheckVariant;
 
@@ -133,7 +133,7 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 	{
 		if (this._layer == null) return;
 		
-		var action:LayerLockAction = LayerLockAction.fromPool();
+		var action:LayerLock = LayerLock.fromPool();
 		action.addLayer(this._layer, this._lockToggle.selected);
 		ValEditor.actionStack.add(action);
 	}
@@ -142,7 +142,7 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 	{
 		if (this._layer == null) return;
 		
-		var action:LayerVisibleAction = LayerVisibleAction.fromPool();
+		var action:LayerVisible = LayerVisible.fromPool();
 		action.addLayer(this._layer, this._visibleToggle.selected);
 		ValEditor.actionStack.add(action);
 	}
