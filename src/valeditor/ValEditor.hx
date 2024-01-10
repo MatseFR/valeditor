@@ -35,6 +35,7 @@ import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithChildren;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
+import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.ValEditorActionStack;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
@@ -1067,7 +1068,10 @@ class ValEditor
 		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
 		timeLine.frameIndex = 0;
 		timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
-		timeLine.insertKeyFrame();
+		var action:MultiAction = MultiAction.fromPool();
+		timeLine.insertKeyFrame(action);
+		action.apply();
+		action.pool();
 		return timeLine;
 	}
 	
