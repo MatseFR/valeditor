@@ -7,14 +7,14 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class ValueChangeAction extends ValEditorAction
+class ValueChange extends ValEditorAction
 {
-	static private var _POOL:Array<ValueChangeAction> = new Array<ValueChangeAction>();
+	static private var _POOL:Array<ValueChange> = new Array<ValueChange>();
 	
-	static public function fromPool():ValueChangeAction
+	static public function fromPool():ValueChange
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new ValueChangeAction();
+		return new ValueChange();
 	}
 	
 	public var exposedValue:ExposedValue;
@@ -52,7 +52,7 @@ class ValueChangeAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("ValueChangeAction already applied");
+			throw new Error("ValueChange already applied");
 		}
 		this.exposedValue.value = this.newValue;
 		this.status = ValEditorActionStatus.DONE;
@@ -62,7 +62,7 @@ class ValueChangeAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("ValueChangeAction already cancelled");
+			throw new Error("ValueChange already cancelled");
 		}
 		this.exposedValue.value = this.previousValue;
 		this.status = ValEditorActionStatus.UNDONE;

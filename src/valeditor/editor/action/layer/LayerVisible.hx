@@ -8,18 +8,18 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class LayerLockAction extends ValEditorAction 
+class LayerVisible extends ValEditorAction 
 {
-	static private var _POOL:Array<LayerLockAction> = new Array<LayerLockAction>();
+	static private var _POOL:Array<LayerVisible> = new Array<LayerVisible>();
 	
-	static public function fromPool():LayerLockAction
+	static public function fromPool():LayerVisible
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new LayerLockAction();
+		return new LayerVisible();
 	}
 	
 	public var layers:Array<ValEditorLayer>;
-	public var lockValues:Array<Bool>;
+	public var visibilities:Array<Bool>;
 	
 	public function new() 
 	{
@@ -29,7 +29,7 @@ class LayerLockAction extends ValEditorAction
 	override public function clear():Void 
 	{
 		this.layers = null;
-		this.lockValues = null;
+		this.visibilities = null;
 		
 		super.clear();
 	}
@@ -40,32 +40,32 @@ class LayerLockAction extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(layers:Array<ValEditorLayer>, lockValues:Array<Bool>):Void
+	public function setup(layers:Array<ValEditorLayer>, visibilities:Array<Bool>):Void
 	{
 		this.layers = layers;
-		this.lockValues = lockValues;
+		this.visibilities = visibilities;
 	}
 	
-	public function addLayer(layer:ValEditorLayer, lock:Bool):Void
+	public function addLayer(layer:ValEditorLayer, visible:Bool):Void
 	{
 		if (this.layers == null) this.layers = new Array<ValEditorLayer>();
-		if (this.lockValues == null) this.lockValues = new Array<Bool>();
+		if (this.visibilities == null) this.visibilities = new Array<Bool>();
 		
 		this.layers.push(layer);
-		this.lockValues.push(lock);
+		this.visibilities.push(visible);
 	}
 	
 	public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("LayerLockAction already applied");
+			throw new Error("LayerVisible already applied");
 		}
 		
 		var count:Int = this.layers.length;
 		for (i in 0...count)
 		{
-			this.layers[i].locked = this.lockValues[i];
+			this.layers[i].visible = this.visibilities[i];
 		}
 		this.status = ValEditorActionStatus.DONE;
 	}
@@ -74,13 +74,13 @@ class LayerLockAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("LayerLockAction already cancelled");
+			throw new Error("LayerVisible already cancelled");
 		}
 		
 		var count:Int = this.layers.length;
 		for (i in 0...count)
 		{
-			this.layers[i].locked = !this.lockValues[i];
+			this.layers[i].visible = !this.visibilities[i];
 		}
 		this.status = ValEditorActionStatus.UNDONE;
 	}

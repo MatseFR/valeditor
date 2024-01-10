@@ -9,14 +9,14 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class LayerIndexUpAction extends ValEditorAction 
+class LayerIndexDown extends ValEditorAction 
 {
-	static private var _POOL:Array<LayerIndexUpAction> = new Array<LayerIndexUpAction>();
+	static private var _POOL:Array<LayerIndexDown> = new Array<LayerIndexDown>();
 	
-	static public function fromPool():LayerIndexUpAction
+	static public function fromPool():LayerIndexDown
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new LayerIndexUpAction();
+		return new LayerIndexDown();
 	}
 	
 	public var container:ValEditorContainer;
@@ -51,24 +51,7 @@ class LayerIndexUpAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("LayerIndexUpAction already applied");
-		}
-		
-		var index:Int;
-		for (layer in this.layers)
-		{
-			index = this.container.getLayerIndex(layer);
-			this.container.removeLayerAt(index);
-			this.container.addLayerAt(layer, index - 1);
-		}
-		this.status = ValEditorActionStatus.DONE;
-	}
-	
-	public function cancel():Void
-	{
-		if (this.status == ValEditorActionStatus.UNDONE)
-		{
-			throw new Error("LayerIndexUpAction already cancelled");
+			throw new Error("LayerIndexDown already applied");
 		}
 		
 		var index:Int;
@@ -77,6 +60,23 @@ class LayerIndexUpAction extends ValEditorAction
 			index = this.container.getLayerIndex(layer);
 			this.container.removeLayerAt(index);
 			this.container.addLayerAt(layer, index + 1);
+		}
+		this.status = ValEditorActionStatus.DONE;
+	}
+	
+	public function cancel():Void
+	{
+		if (this.status == ValEditorActionStatus.UNDONE)
+		{
+			throw new Error("LayerIndexDown already cancelled");
+		}
+		
+		var index:Int;
+		for (layer in this.layers)
+		{
+			index = this.container.getLayerIndex(layer);
+			this.container.removeLayerAt(index);
+			this.container.addLayerAt(layer, index - 1);
 		}
 		this.status = ValEditorActionStatus.UNDONE;
 	}

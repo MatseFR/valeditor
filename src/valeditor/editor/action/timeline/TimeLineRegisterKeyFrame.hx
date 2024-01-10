@@ -1,6 +1,7 @@
 package valeditor.editor.action.timeline;
 
 import openfl.errors.Error;
+import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.editor.action.ValEditorAction;
 
@@ -8,18 +9,18 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class TimeLineNumFramesAction extends ValEditorAction 
+class TimeLineRegisterKeyFrame extends ValEditorAction 
 {
-	static private var _POOL:Array<TimeLineNumFramesAction> = new Array<TimeLineNumFramesAction>();
+	static private var _POOL:Array<TimeLineRegisterKeyFrame> = new Array<TimeLineRegisterKeyFrame>();
 	
-	static public function fromPool():TimeLineNumFramesAction
+	static public function fromPool():TimeLineRegisterKeyFrame
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new TimeLineNumFramesAction();
+		return new TimeLineRegisterKeyFrame();
 	}
 	
 	public var timeLine:ValEditorTimeLine;
-	public var valueChange:Int;
+	public var keyFrame:ValEditorKeyFrame;
 	
 	public function new() 
 	{
@@ -29,6 +30,11 @@ class TimeLineNumFramesAction extends ValEditorAction
 	override public function clear():Void 
 	{
 		this.timeLine = null;
+		//if (this.status == ValEditorActionStatus.UNDONE)
+		//{
+			//this.keyFrame.pool();
+		//}
+		this.keyFrame = null;
 		
 		super.clear();
 	}
@@ -39,20 +45,19 @@ class TimeLineNumFramesAction extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(timeLine:ValEditorTimeLine, valueChange:Int):Void
+	public function setup(timeLine:ValEditorTimeLine, keyFrame:ValEditorKeyFrame):Void
 	{
 		this.timeLine = timeLine;
-		this.valueChange = valueChange;
+		this.keyFrame = keyFrame;
 	}
 	
 	public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("TimeLineNumFramesAction already applied");
+			throw new Error("TimeLineRegisterKeyFrame already applied");
 		}
-		
-		this.timeLine.numFrames += this.valueChange;
+		this.timeLine.registerKeyFrame(this.keyFrame);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -60,10 +65,9 @@ class TimeLineNumFramesAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("TimeLineNumFramesAction already cancelled");
+			throw new Error("TimeLineRegisterKeyFrame already cancelled");
 		}
-		
-		this.timeLine.numFrames -= this.valueChange;
+		this.timeLine.unregisterKeyFrame(this.keyFrame);
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	

@@ -8,14 +8,14 @@ import valeditor.utils.ArraySort;
  * ...
  * @author Matse
  */
-class LayerRemoveAction extends ValEditorAction 
+class LayerRemove extends ValEditorAction 
 {
-	static private var _POOL:Array<LayerRemoveAction> = new Array<LayerRemoveAction>();
+	static private var _POOL:Array<LayerRemove> = new Array<LayerRemove>();
 	
-	static public function fromPool():LayerRemoveAction
+	static public function fromPool():LayerRemove
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new LayerRemoveAction();
+		return new LayerRemove();
 	}
 	
 	public var container:ValEditorContainer;
@@ -59,7 +59,7 @@ class LayerRemoveAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("LayerRemoveAction already applied");
+			throw new Error("LayerRemove already applied");
 		}
 		
 		if (this.layerIndices.length == 0)
@@ -86,7 +86,7 @@ class LayerRemoveAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("LayerRemoveAction already cancelled");
+			throw new Error("LayerRemove already cancelled");
 		}
 		var count:Int = this.layers.length;
 		for (i in 0...count)

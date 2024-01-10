@@ -1,5 +1,6 @@
 package valeditor.editor.action.template;
 
+import openfl.errors.Error;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.action.ValEditorAction;
 
@@ -7,14 +8,14 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class TemplateAddAction extends ValEditorAction 
+class TemplateAdd extends ValEditorAction 
 {
-	static private var _POOL:Array<TemplateAddAction> = new Array<TemplateAddAction>();
+	static private var _POOL:Array<TemplateAdd> = new Array<TemplateAdd>();
 	
-	static public function fromPool():TemplateAddAction
+	static public function fromPool():TemplateAdd
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new TemplateAddAction();
+		return new TemplateAdd();
 	}
 	
 	public var template:ValEditorTemplate;
@@ -46,6 +47,24 @@ class TemplateAddAction extends ValEditorAction
 		this.template = template;
 	}
 	
+	public function apply():Void
+	{
+		if (this.status == ValEditorActionStatus.DONE)
+		{
+			throw new Error("TemplateAdd already applied");
+		}
+		
+		this.status = ValEditorActionStatus.DONE;
+	}
 	
+	public function cancel():Void
+	{
+		if (this.status == ValEditorActionStatus.UNDONE)
+		{
+			throw new Error("TemplateAdd already cancelled");
+		}
+		
+		this.status = ValEditorActionStatus.UNDONE;
+	}
 	
 }

@@ -8,14 +8,14 @@ import valeditor.editor.action.ValEditorAction;
  * ...
  * @author Matse
  */
-class LayerRenameAction extends ValEditorAction 
+class LayerRename extends ValEditorAction 
 {
-	static private var _POOL:Array<LayerRenameAction> = new Array<LayerRenameAction>();
+	static private var _POOL:Array<LayerRename> = new Array<LayerRename>();
 	
-	static public function fromPool():LayerRenameAction
+	static public function fromPool():LayerRename
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new LayerRenameAction();
+		return new LayerRename();
 	}
 	
 	public var layer:ValEditorLayer;
@@ -53,7 +53,7 @@ class LayerRenameAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("LayerRenameAction already applied");
+			throw new Error("LayerRename already applied");
 		}
 		
 		this.layer.name = this.newName;
@@ -64,7 +64,7 @@ class LayerRenameAction extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("LayerRenameAction already cancelled");
+			throw new Error("LayerRename already cancelled");
 		}
 		
 		this.layer.name = this.previousName;
