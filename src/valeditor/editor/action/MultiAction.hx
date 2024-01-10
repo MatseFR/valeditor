@@ -1,5 +1,6 @@
 package valeditor.editor.action;
 import openfl.errors.Error;
+import valedit.utils.ReverseIterator;
 
 /**
  * ...
@@ -16,6 +17,8 @@ class MultiAction extends ValEditorAction
 	}
 	
 	public var actions:Array<ValEditorAction> = new Array<ValEditorAction>();
+	public var postActions:Array<ValEditorAction> = new Array<ValEditorAction>();
+	public var reversePostActionsOnCancel:Bool = true;
 
 	public function new() 
 	{
@@ -28,6 +31,15 @@ class MultiAction extends ValEditorAction
 		{
 			action.pool();
 		}
+		this.actions.resize(0);
+		
+		for (action in this.postActions)
+		{
+			action.pool();
+		}
+		this.postActions.resize(0);
+		
+		this.reversePostActionsOnCancel = true;
 		
 		super.clear();
 	}
@@ -43,6 +55,11 @@ class MultiAction extends ValEditorAction
 		this.actions.push(action);
 	}
 	
+	public function addPost(action:ValEditorAction):Void
+	{
+		this.postActions.push(action);
+	}
+	
 	public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
@@ -51,6 +68,11 @@ class MultiAction extends ValEditorAction
 		}
 		
 		for (action in this.actions)
+		{
+			action.apply();
+		}
+		
+		for (action in this.postActions)
 		{
 			action.apply();
 		}
@@ -67,6 +89,21 @@ class MultiAction extends ValEditorAction
 		for (action in this.actions)
 		{
 			action.cancel();
+		}
+		
+		if (this.reversePostActionsOnCancel)
+		{
+			for (i in new ReverseIterator(this.postActions.length - 1, 0))
+			{
+				this.postActions[i].cancel();
+			}
+		}
+		else
+		{
+			for (action in this.postActions)
+			{
+				action.cancel();
+			}
 		}
 		this.status = ValEditorActionStatus.UNDONE;
 	}
