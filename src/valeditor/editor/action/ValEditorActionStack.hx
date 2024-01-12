@@ -60,7 +60,10 @@ class ValEditorActionStack extends EventDispatcher
 	**/
 	public function add(action:ValEditorAction):Void
 	{
-		action.apply();
+		if (action.status == ValEditorActionStatus.UNDONE)
+		{
+			action.apply();
+		}
 		this._doneActions.unshift(action);
 		clearUndoneActions();
 		this._lastAction = action;
