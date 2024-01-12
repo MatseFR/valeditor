@@ -4,6 +4,7 @@ import inputAction.Input;
 import inputAction.InputAction;
 import juggler.animation.IAnimatable;
 import valedit.utils.RegularPropertyName;
+import valeditor.editor.action.MultiAction;
 
 /**
  * ...
@@ -11,7 +12,7 @@ import valedit.utils.RegularPropertyName;
  */
 class LiveInputActionManager implements IAnimatable 
 {
-
+	
 	public function new() 
 	{
 		
@@ -19,7 +20,8 @@ class LiveInputActionManager implements IAnimatable
 	
 	public function advanceTime(time:Float):Void 
 	{
-		var action:InputAction;
+		var action:MultiAction;
+		var inputAction:InputAction;
 		var input:Input = ValEditor.input;
 		
 		if (ValEditor.currentContainer != null)
@@ -27,56 +29,128 @@ class LiveInputActionManager implements IAnimatable
 			// insert frame
 			if (input.justDid(InputActionID.INSERT_FRAME) != null)
 			{
-				ValEditor.insertFrame();
+				action = MultiAction.fromPool();
+				ValEditor.insertFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.INSERT_FRAME);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.INSERT_FRAME);
+				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.insertFrame();
+					action = MultiAction.fromPool();
+					ValEditor.insertFrame(action);
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
 				}
 			}
 			
 			// insert keyframe
 			if (input.justDid(InputActionID.INSERT_KEYFRAME) != null)
 			{
-				ValEditor.insertKeyFrame();
+				action = MultiAction.fromPool();
+				ValEditor.insertKeyFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.INSERT_KEYFRAME);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.INSERT_KEYFRAME);
+				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.insertKeyFrame();
+					action = MultiAction.fromPool();
+					ValEditor.insertKeyFrame(action);
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
 				}
 			}
 			
 			// remove frame
 			if (input.justDid(InputActionID.REMOVE_FRAME) != null)
 			{
-				ValEditor.removeFrame();
+				action = MultiAction.fromPool();
+				ValEditor.removeFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.REMOVE_FRAME);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.REMOVE_FRAME);
+				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.removeFrame();
+					action = MultiAction.fromPool();
+					ValEditor.removeFrame(action);
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
 				}
 			}
 			
 			// remove keyframe
 			if (input.justDid(InputActionID.REMOVE_KEYFRAME) != null)
 			{
-				ValEditor.removeKeyFrame();
+				action = MultiAction.fromPool();
+				ValEditor.removeKeyFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.REMOVE_KEYFRAME);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.REMOVE_KEYFRAME);
+				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.removeKeyFrame();
+					action = MultiAction.fromPool();
+					ValEditor.removeKeyFrame(action);
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
 				}
 			}
 			
@@ -87,8 +161,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_DOWN_1);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_DOWN_1);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 				}
@@ -100,8 +174,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_DOWN_10);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_DOWN_10);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 				}
@@ -114,8 +188,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_LEFT_1);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_LEFT_1);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 				}
@@ -127,8 +201,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_LEFT_10);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_LEFT_10);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 				}
@@ -141,8 +215,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_RIGHT_1);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_RIGHT_1);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 				}
@@ -154,8 +228,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_RIGHT_10);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_RIGHT_10);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 				}
@@ -168,8 +242,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_UP_1);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_UP_1);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 				}
@@ -181,8 +255,8 @@ class LiveInputActionManager implements IAnimatable
 			}
 			else
 			{
-				action = input.isDoing(InputActionID.MOVE_UP_10);
-				if (action != null && action.canRepeat())
+				inputAction = input.isDoing(InputActionID.MOVE_UP_10);
+				if (inputAction != null && inputAction.canRepeat())
 				{
 					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 				}
