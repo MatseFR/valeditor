@@ -17,8 +17,12 @@ class MultiAction extends ValEditorAction
 	}
 	
 	public var actions:Array<ValEditorAction> = new Array<ValEditorAction>();
+	public var autoApply:Bool = true;
+	public var numActions(get, never):Int;
 	public var postActions:Array<ValEditorAction> = new Array<ValEditorAction>();
 	public var reversePostActionsOnCancel:Bool = true;
+	
+	private function get_numActions():Int { return this.actions.length + this.postActions.length; }
 
 	public function new() 
 	{
@@ -39,6 +43,7 @@ class MultiAction extends ValEditorAction
 		}
 		this.postActions.resize(0);
 		
+		this.autoApply = true;
 		this.reversePostActionsOnCancel = true;
 		
 		super.clear();
@@ -52,11 +57,21 @@ class MultiAction extends ValEditorAction
 	
 	public function add(action:ValEditorAction):Void
 	{
+		if (this.autoApply && action.status == ValEditorActionStatus.UNDONE)
+		{
+			action.apply();
+			this.status = ValEditorActionStatus.DONE;
+		}
 		this.actions.push(action);
 	}
 	
 	public function addPost(action:ValEditorAction):Void
 	{
+		if (this.autoApply && action.status == ValEditorActionStatus.UNDONE)
+		{
+			action.apply();
+			this.status = ValEditorActionStatus.DONE;
+		}
 		this.postActions.push(action);
 	}
 	
@@ -86,9 +101,9 @@ class MultiAction extends ValEditorAction
 			throw new Error("MultiAction already cancelled");
 		}
 		
-		for (action in this.actions)
+		for (i in new ReverseIterator(this.actions.length - 1, 0))
 		{
-			action.cancel();
+			this.actions[i].cancel();
 		}
 		
 		if (this.reversePostActionsOnCancel)
