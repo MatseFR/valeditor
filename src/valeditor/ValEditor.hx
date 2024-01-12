@@ -1068,10 +1068,10 @@ class ValEditor
 		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
 		timeLine.frameIndex = 0;
 		timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
-		var action:MultiAction = MultiAction.fromPool();
-		timeLine.insertKeyFrame(action);
-		action.apply();
-		action.pool();
+		//var action:MultiAction = MultiAction.fromPool();
+		timeLine.insertKeyFrame();
+		//action.apply();
+		//action.pool();
 		return timeLine;
 	}
 	
@@ -1108,40 +1108,40 @@ class ValEditor
 		selection.object = null;
 	}
 	
-	static public function insertFrame():Void
+	static public function insertFrame(?action:MultiAction):Void
 	{
 		if (currentContainer == null) return;
 		if (currentContainer.isPlaying) return;
 		if (currentContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame();
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame(action);
 	}
 	
-	static public function insertKeyFrame():Void
+	static public function insertKeyFrame(?action:MultiAction):Void
 	{
 		if (currentContainer == null) return;
 		if (currentContainer.isPlaying) return;
 		if (currentContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame();
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame(action);
 	}
 	
-	static public function removeFrame():Void
+	static public function removeFrame(?action:MultiAction):Void
 	{
 		if (currentContainer == null) return;
 		if (currentContainer.isPlaying) return;
 		if (currentContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame();
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame(action);
 	}
 	
-	static public function removeKeyFrame():Void
+	static public function removeKeyFrame(?action:MultiAction):Void
 	{
 		if (currentContainer == null) return;
 		if (currentContainer.isPlaying) return;
 		if (currentContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame();
+		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame(action);
 	}
 	
 	static public function firstFrame():Void
