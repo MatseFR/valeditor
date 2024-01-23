@@ -45,6 +45,7 @@ class TemplateAdd extends ValEditorAction
 	public function setup(template:ValEditorTemplate):Void
 	{
 		this.template = template;
+		this.status = ValEditorActionStatus.DONE;
 	}
 	
 	public function apply():Void
@@ -54,6 +55,8 @@ class TemplateAdd extends ValEditorAction
 			throw new Error("TemplateAdd already applied");
 		}
 		
+		ValEditor.registerTemplate(this.template);
+		this.template.registerInstances();
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -64,6 +67,8 @@ class TemplateAdd extends ValEditorAction
 			throw new Error("TemplateAdd already cancelled");
 		}
 		
+		ValEditor.unregisterTemplate(this.template);
+		this.template.unregisterInstances();
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
