@@ -7,11 +7,13 @@ import haxe.iterators.ArrayIterator;
  */
 class ValEditorObjectCopyGroup 
 {
+	public var isRealClipboard:Bool = false;
 	public var numCopies(get, never):Int;
 	
 	private function get_numCopies():Int { return this._copies.length; }
 	
 	private var _copies:Array<ValEditorObjectCopy> = new Array<ValEditorObjectCopy>();
+	private var _objectToCopy:Map<ValEditorObject, ValEditorObjectCopy> = new Map<ValEditorObject, ValEditorObjectCopy>();
 	
 	public function new() 
 	{
@@ -27,21 +29,34 @@ class ValEditorObjectCopyGroup
 	{
 		for (copy in this._copies)
 		{
-			copy.object.isInClipboard = false;
-			if (copy.object.canBeDestroyed())
+			if (this.isRealClipboard)
 			{
-				ValEditor.destroyObject(copy.object);
+				copy.object.isInClipboard = false;
+				if (copy.object.canBeDestroyed())
+				{
+					ValEditor.destroyObject(copy.object);
+				}
 			}
 			copy.pool();
 		}
 		this._copies.resize(0);
+		this._objectToCopy.clear();
+	}
+	
+	public function copyFrom(group:ValEditorObjectCopyGroup):Void
+	{
+		for (copy in group._copies)
+		{
+			addCopy(copy.clone());
+		}
 	}
 	
 	public function addCopy(copy:ValEditorObjectCopy):Void
 	{
 		if (this._copies.indexOf(copy) != -1) return;
-		copy.object.isInClipboard = true;
+		if (this.isRealClipboard) copy.object.isInClipboard = true;
 		this._copies.push(copy);
+		this._objectToCopy.set(copy.object, copy);
 	}
 	
 	public function getCopyAt(index:Int):ValEditorObjectCopy
@@ -49,9 +64,19 @@ class ValEditorObjectCopyGroup
 		return this._copies[index];
 	}
 	
+	public function getCopyForObject(object:ValEditorObject):ValEditorObjectCopy
+	{
+		return this._objectToCopy.get(object);
+	}
+	
 	public function hasCopy(copy:ValEditorObjectCopy):Bool
 	{
 		return this._copies.indexOf(copy) != -1;
+	}
+	
+	public function hasCopyForObject(object:ValEditorObject):Bool
+	{
+		return this._objectToCopy.exists(object);
 	}
 	
 	public function removeCopy(copy:ValEditorObjectCopy):Bool
@@ -59,14 +84,25 @@ class ValEditorObjectCopyGroup
 		var result:Bool = this._copies.remove(copy);
 		if (result)
 		{
-			copy.object.isInClipboard = false;
-			if (copy.object.canBeDestroyed())
+			this._objectToCopy.remove(copy.object);
+			if (this.isRealClipboard)
 			{
-				ValEditor.destroyObject(copy.object);
+				copy.object.isInClipboard = false;
+				if (copy.object.canBeDestroyed())
+				{
+					ValEditor.destroyObject(copy.object);
+				}
 			}
 			copy.pool();
 		}
 		return result;
+	}
+	
+	public function removeCopyForObject(object:ValEditorObject):Bool
+	{
+		var copy:ValEditorObjectCopy = getCopyForObject(object);
+		if (copy == null) return false;
+		return removeCopy(copy);
 	}
 	
 }
