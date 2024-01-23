@@ -8,6 +8,7 @@ import valeditor.ValEditorKeyFrame;
  */
 class ValEditorFrameCopyGroup 
 {
+	public var isRealClipboard:Bool = false;
 	public var numFrames(get, never):Int;
 	
 	private function get_numFrames():Int { return this._frames.length; }
@@ -26,21 +27,32 @@ class ValEditorFrameCopyGroup
 	
 	public function clear():Void
 	{
-		for (frame in this._frames)
+		if (this.isRealClipboard)
 		{
-			frame.isInClipboard = false;
-			if (frame.canBeDestroyed())
+			for (frame in this._frames)
 			{
-				frame.pool();
+				frame.isInClipboard = false;
+				if (frame.canBeDestroyed())
+				{
+					frame.pool();
+				}
 			}
 		}
 		this._frames.resize(0);
 	}
 	
+	public function copyFrom(group:ValEditorFrameCopyGroup):Void
+	{
+		for (frame in group._frames)
+		{
+			addFrame(frame);
+		}
+	}
+	
 	public function addFrame(frame:ValEditorKeyFrame):Void
 	{
 		if (this._frames.indexOf(frame) != -1) return;
-		frame.isInClipboard = true;
+		if (this.isRealClipboard) frame.isInClipboard = true;
 		this._frames.push(frame);
 	}
 	
@@ -57,7 +69,7 @@ class ValEditorFrameCopyGroup
 	public function removeFrame(frame:ValEditorKeyFrame):Bool
 	{
 		var result:Bool = this._frames.remove(frame);
-		if (result)
+		if (result && this.isRealClipboard)
 		{
 			frame.isInClipboard = false;
 			if (frame.canBeDestroyed())
