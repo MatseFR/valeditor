@@ -44,6 +44,7 @@ class MultiAction extends ValEditorAction
 		this.postActions.resize(0);
 		
 		this.autoApply = true;
+		this.isStepAction = true;
 		this.reversePostActionsOnCancel = true;
 		
 		super.clear();
