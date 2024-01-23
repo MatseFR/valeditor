@@ -25,6 +25,7 @@ import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
+import valeditor.editor.action.MultiAction;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ObjectLibrary;
@@ -397,25 +398,82 @@ class EditorView extends LayoutGroup
 	{
 		if (this._contextMenu.selectedItem == null) return;
 		
+		var action:MultiAction;
+		
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "copy" :
-				ValEditor.copy();
+				action = MultiAction.fromPool();
+				action.isStepAction = false;
+				ValEditor.copy(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "cut" :
-				ValEditor.cut();
+				action = MultiAction.fromPool();
+				ValEditor.cut(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "paste" :
-				ValEditor.paste();
+				action = MultiAction.fromPool();
+				ValEditor.paste(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "delete" :
-				ValEditor.delete();
+				action = MultiAction.fromPool();
+				ValEditor.delete(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "select all" :
-				ValEditor.selectAll();
+				action = MultiAction.fromPool();
+				ValEditor.selectAll(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "unselect all" :
-				ValEditor.unselectAll();
+				action = MultiAction.fromPool();
+				ValEditor.unselectAll(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 		}
 	}
 	
