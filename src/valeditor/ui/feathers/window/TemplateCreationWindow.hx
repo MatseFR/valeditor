@@ -24,6 +24,7 @@ import openfl.events.Event;
 import valedit.ExposedCollection;
 import valeditor.ValEditorClass;
 import valeditor.ValEditorTemplate;
+import valeditor.editor.action.template.TemplateAdd;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.data.StringData;
@@ -357,6 +358,9 @@ class TemplateCreationWindow extends Panel
 		}
 		
 		var template:ValEditorTemplate = ValEditor.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
+		var action:TemplateAdd = TemplateAdd.fromPool();
+		action.setup(template);
+		ValEditor.actionStack.add(action);
 		
 		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback(template);
