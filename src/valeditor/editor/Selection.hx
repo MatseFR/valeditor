@@ -2,6 +2,11 @@ package valeditor.editor;
 import openfl.events.EventDispatcher;
 import valedit.ValEditKeyFrame;
 import valeditor.ValEditorFrameGroup;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.clipboard.ClipboardAddFrame;
+import valeditor.editor.action.clipboard.ClipboardAddObject;
+import valeditor.editor.action.clipboard.ClipboardAddTemplate;
+import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.events.SelectionEvent;
 
@@ -74,6 +79,20 @@ class Selection extends EventDispatcher
 		this._objectGroup.clear();
 		this._templateGroup.clear();
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, null);
+	}
+	
+	public function copyFrom(selection:Selection, clear:Bool = true):Void
+	{
+		if (clear)
+		{
+			this._frameGroup.clear();
+			this._objectGroup.clear();
+			this._templateGroup.clear();
+		}
+		this._frameGroup.copyFrom(selection._frameGroup);
+		this._objectGroup.copyFrom(selection._objectGroup);
+		this._templateGroup.copyFrom(selection._templateGroup);
+		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
 	public function addFrame(frame:ValEditorKeyFrame):Void
@@ -160,36 +179,136 @@ class Selection extends EventDispatcher
 		SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 	}
 	
-	public function copyToClipboard(clipboard:ValEditorClipboard):Void
+	public function copyToClipboard(clipboard:ValEditorClipboard, ?action:MultiAction):Void
 	{
-		for (frame in this._frameGroup)
+		if (action != null)
 		{
-			clipboard.addFrame(frame);
+			var frameAdd:ClipboardAddFrame = ClipboardAddFrame.fromPool();
+			var objectAdd:ClipboardAddObject = ClipboardAddObject.fromPool();
+			var templateAdd:ClipboardAddTemplate = ClipboardAddTemplate.fromPool();
+			
+			frameAdd.setup(clipboard);
+			for (frame in this._frameGroup)
+			{
+				frameAdd.addFrame(frame);
+			}
+			if (frameAdd.numFrames == 0)
+			{
+				frameAdd.pool();
+			}
+			else
+			{
+				action.add(frameAdd);
+			}
+			
+			objectAdd.setup(clipboard);
+			for (object in this._objectGroup)
+			{
+				objectAdd.addObject(object);
+			}
+			if (objectAdd.numObjects == 0)
+			{
+				objectAdd.pool();
+			}
+			else
+			{
+				action.add(objectAdd);
+			}
+			
+			templateAdd.setup(clipboard);
+			for (template in this._templateGroup)
+			{
+				templateAdd.addTemplate(template);
+			}
+			if (templateAdd.numTemplates == 0)
+			{
+				templateAdd.pool();
+			}
+			else
+			{
+				action.add(templateAdd);
+			}
 		}
-		for (object in this._objectGroup)
+		else
 		{
-			clipboard.addObject(object);
-		}
-		for (template in this._templateGroup)
-		{
-			clipboard.addTemplate(template);
+			for (frame in this._frameGroup)
+			{
+				clipboard.addFrame(frame);
+			}
+			for (object in this._objectGroup)
+			{
+				clipboard.addObject(object);
+			}
+			for (template in this._templateGroup)
+			{
+				clipboard.addTemplate(template);
+			}
 		}
 	}
 	
-	public function cutToClipboard(clipboard:ValEditorClipboard):Void
+	public function cutToClipboard(clipboard:ValEditorClipboard, ?action:MultiAction):Void
 	{
-		for (frame in this._frameGroup)
+		if (action != null)
 		{
-			clipboard.addFrame(frame);
+			var frameAdd:ClipboardAddFrame = ClipboardAddFrame.fromPool();
+			var objectAdd:ClipboardAddObject;
+			var objectRemoveKeyFrame:ObjectRemoveKeyFrame;
+			var templateAdd:ClipboardAddTemplate = ClipboardAddTemplate.fromPool();
+			
+			frameAdd.setup(clipboard);
+			for (frame in this._frameGroup)
+			{
+				frameAdd.addFrame(frame);
+			}
+			if (frameAdd.numFrames == 0)
+			{
+				frameAdd.pool();
+			}
+			else
+			{
+				action.add(frameAdd);
+			}
+			
+			for (object in this._objectGroup)
+			{
+				objectAdd = ClipboardAddObject.fromPool();
+				objectAdd.setup(clipboard);
+				objectAdd.addObject(object);
+				action.add(objectAdd);
+				objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
+				objectRemoveKeyFrame.setup(object, cast object.currentKeyFrame);
+				action.add(objectRemoveKeyFrame);
+			}
+			
+			templateAdd.setup(clipboard);
+			for (template in this._templateGroup)
+			{
+				templateAdd.addTemplate(template);
+			}
+			if (templateAdd.numTemplates == 0)
+			{
+				templateAdd.pool();
+			}
+			else
+			{
+				action.add(templateAdd);
+			}
 		}
-		for (object in this._objectGroup)
+		else
 		{
-			clipboard.addObject(object);
-			object.currentKeyFrame.remove(object);
-		}
-		for (template in this._templateGroup)
-		{
-			clipboard.addTemplate(template);
+			for (frame in this._frameGroup)
+			{
+				clipboard.addFrame(frame);
+			}
+			for (object in this._objectGroup)
+			{
+				clipboard.addObject(object);
+				object.currentKeyFrame.remove(object);
+			}
+			for (template in this._templateGroup)
+			{
+				clipboard.addTemplate(template);
+			}
 		}
 	}
 	
@@ -283,16 +402,16 @@ class Selection extends EventDispatcher
 		}
 	}
 	
-	public function delete():Void
+	public function delete(action:MultiAction):Void
 	{
 		if (this._templateGroup.numTemplates != 0)
 		{
-			this._templateGroup.deleteTemplates();
+			this._templateGroup.deleteTemplates(action);
 			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 		}
 		else if (this._objectGroup.numObjects != 0)
 		{
-			this._objectGroup.deleteObjects();
+			this._objectGroup.deleteObjects(action);
 			SelectionEvent.dispatch(this, SelectionEvent.CHANGE, this.object);
 		}
 	}
