@@ -25,19 +25,33 @@ class ValEditorObjectCopy
 		this.collection = collection;
 	}
 	
-	public function clear():Void
+	public function clear(poolCollection:Bool = true):Void
 	{
 		this.object = null;
-		if (this.collection != null)
+		if (poolCollection && this.collection != null)
 		{
 			this.collection.pool();
 			this.collection = null;
 		}
 	}
 	
-	public function pool():Void
+	public function clone(?copy:ValEditorObjectCopy):ValEditorObjectCopy
 	{
-		clear();
+		if (copy == null)
+		{
+			return fromPool(this.object, this.collection);
+		}
+		else
+		{
+			copy.object = this.object;
+			copy.collection = this.collection;
+			return copy;
+		}
+	}
+	
+	public function pool(poolCollection:Bool = true):Void
+	{
+		clear(poolCollection);
 		_POOL[_POOL.length] = this;
 	}
 	
