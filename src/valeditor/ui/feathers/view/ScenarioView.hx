@@ -42,6 +42,7 @@ import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
+import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.layer.LayerAdd;
 import valeditor.editor.action.layer.LayerIndexDown;
 import valeditor.editor.action.layer.LayerIndexUp;
@@ -498,19 +499,57 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		if (this._frameContextMenu.selectedItem == null) return;
 		
+		var action:MultiAction;
+		
 		switch (this._frameContextMenu.selectedItem.id)
 		{
 			case "insert frame" :
-				ValEditor.insertFrame();
+				action = MultiAction.fromPool();
+				ValEditor.insertFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "insert keyframe" :
-				ValEditor.insertKeyFrame();
+				action = MultiAction.fromPool();
+				ValEditor.insertKeyFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "remove frame" :
-				ValEditor.removeFrame();
+				action = MultiAction.fromPool();
+				ValEditor.removeFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case "remove keyframe" :
-				ValEditor.removeKeyFrame();
+				action = MultiAction.fromPool();
+				ValEditor.removeKeyFrame(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 		}
 	}
 	
