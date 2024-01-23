@@ -1,5 +1,7 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.template.TemplateRemove;
 
 /**
  * ...
@@ -28,12 +30,30 @@ class ValEditorTemplateGroup
 		this._templates.resize(0);
 	}
 	
-	public function deleteTemplates():Void
+	public function copyFrom(group:ValEditorTemplateGroup):Void
+	{
+		addTemplates(group._templates);
+	}
+	
+	public function deleteTemplates(?action:MultiAction):Void
 	{
 		var templatesToDelete:Array<ValEditorTemplate> = this._templates.copy();
-		for (template in templatesToDelete)
+		if (action == null)
 		{
-			ValEditor.destroyTemplate(template);
+			for (template in templatesToDelete)
+			{
+				ValEditor.destroyTemplate(template);
+			}
+		}
+		else
+		{
+			var templateRemove:TemplateRemove;
+			for (template in templatesToDelete)
+			{
+				templateRemove = TemplateRemove.fromPool();
+				templateRemove.setup(template);
+				action.add(templateRemove);
+			}
 		}
 		clear();
 	}
@@ -42,6 +62,14 @@ class ValEditorTemplateGroup
 	{
 		if (this._templates.indexOf(template) != -1) return;
 		this._templates.push(template);
+	}
+	
+	public function addTemplates(templates:Array<ValEditorTemplate>):Void
+	{
+		for (template in templates)
+		{
+			addTemplate(template);
+		}
 	}
 	
 	public function getTemplateAt(index:Int):ValEditorTemplate
