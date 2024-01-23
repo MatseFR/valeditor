@@ -1,12 +1,14 @@
 package valeditor.editor.clipboard;
 import valedit.ExposedCollection;
 import valedit.ValEditObject;
-import valeditor.ValEditorFrameGroup;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
-import valeditor.ValEditorObjectGroup;
 import valeditor.ValEditorTemplate;
-import valeditor.ValEditorTemplateGroup;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectAddKeyFrame;
+import valeditor.editor.action.object.ObjectCreate;
+import valeditor.editor.action.object.ObjectSelect;
+import valeditor.editor.action.selection.SelectionClear;
 import valeditor.ui.feathers.FeathersWindows;
 
 /**
@@ -15,8 +17,19 @@ import valeditor.ui.feathers.FeathersWindows;
  */
 class ValEditorClipboard 
 {
+	public var isRealClipboard(get, set):Bool;
 	public var numObjects(get, never):Int;
 	public var object(get, set):Dynamic;
+	
+	private var _isRealClipboard:Bool = false;
+	private function get_isRealClipboard():Bool { return this._isRealClipboard; }
+	private function set_isRealClipboard(value:Bool):Bool
+	{
+		this._frameGroup.isRealClipboard = value;
+		this._objectGroup.isRealClipboard = value;
+		this._templateGroup.isRealClipboard = value;
+		return this._isRealClipboard = value;
+	}
 	
 	private function get_numObjects():Int
 	{
@@ -79,6 +92,7 @@ class ValEditorClipboard
 	
 	private var _pasteCount:Int;
 	private var _pasteIndex:Int;
+	private var _pasteAction:MultiAction;
 
 	public function new() 
 	{
@@ -90,6 +104,13 @@ class ValEditorClipboard
 		this._frameGroup.clear();
 		this._objectGroup.clear();
 		this._templateGroup.clear();
+	}
+	
+	public function copyFrom(clipboard:ValEditorClipboard):Void
+	{
+		this._frameGroup.copyFrom(clipboard._frameGroup);
+		this._objectGroup.copyFrom(clipboard._objectGroup);
+		this._templateGroup.copyFrom(clipboard._templateGroup);
 	}
 	
 	public function addFrame(frame:ValEditorKeyFrame):Void
@@ -108,6 +129,19 @@ class ValEditorClipboard
 		for (frame in frames)
 		{
 			this._frameGroup.addFrame(frame);
+		}
+	}
+	
+	public function removeFrame(frame:ValEditorKeyFrame):Void
+	{
+		this._frameGroup.removeFrame(frame);
+	}
+	
+	public function removeFrames(frames:Array<ValEditorKeyFrame>):Void
+	{
+		for (frame in frames)
+		{
+			this._frameGroup.removeFrame(frame);
 		}
 	}
 	
@@ -135,6 +169,19 @@ class ValEditorClipboard
 		}
 	}
 	
+	public function removeObject(object:ValEditorObject):Void
+	{
+		this._objectGroup.removeCopyForObject(object);
+	}
+	
+	public function removeObjects(objects:Array<ValEditorObject>):Void
+	{
+		for (object in objects)
+		{
+			this._objectGroup.removeCopyForObject(object);
+		}
+	}
+	
 	public function addTemplate(template:ValEditorTemplate):Void
 	{
 		if (template == null) return;
@@ -154,35 +201,61 @@ class ValEditorClipboard
 		}
 	}
 	
-	public function paste():Void
+	public function removeTemplate(template:ValEditorTemplate):Void
+	{
+		this._templateGroup.removeTemplate(template);
+	}
+	
+	public function removeTemplates(templates:Array<ValEditorTemplate>):Void
+	{
+		for (template in templates)
+		{
+			this._templateGroup.removeTemplate(template);
+		}
+	}
+	
+	public function paste(action:MultiAction):Void
 	{
 		if (this._frameGroup.numFrames != 0)
 		{
-			pasteFrames();
+			pasteFrames(action);
 		}
 		else if (this._objectGroup.numCopies != 0)
 		{
-			pasteObjects();
+			pasteObjects(action);
 		}
 		else if (this._templateGroup.numTemplates != 0)
 		{
-			pasteTemplates();
+			pasteTemplates(action);
 		}
 	}
 	
-	private function pasteFrames():Void
+	private function pasteFrames(action:MultiAction):Void
 	{
-		
+		// TODO : paste frames
 	}
 	
-	private function pasteObjects():Void
+	private function pasteObjects(action:MultiAction):Void
 	{
+		this._pasteAction = action;
 		this._pasteCount = this._objectGroup.numCopies;
 		this._pasteIndex = -1;
 		
 		if (this._pasteCount != 0)
 		{
-			ValEditor.selection.clear();
+			if (this._pasteAction != null)
+			{
+				if (ValEditor.selection.numObjects != 0)
+				{
+					var selectionClear:SelectionClear = SelectionClear.fromPool();
+					selectionClear.setup(ValEditor.selection);
+					this._pasteAction.add(selectionClear);
+				}
+			}
+			else
+			{
+				ValEditor.selection.clear();
+			}
 			pasteNextObject();
 		}
 	}
@@ -190,7 +263,15 @@ class ValEditorClipboard
 	private function pasteNextObject():Void
 	{
 		this._pasteIndex++;
-		if (this._pasteIndex >= this._pasteCount) return;
+		if (this._pasteIndex >= this._pasteCount)
+		{
+			if (this._pasteAction != null)
+			{
+				//ValEditor.actionStack.add(this._pasteAction);
+				this._pasteAction = null;
+			}
+			return;
+		}
 		
 		var copy:ValEditorObjectCopy = this._objectGroup.getCopyAt(this._pasteIndex);
 		// look for reusable objects
@@ -215,8 +296,26 @@ class ValEditorClipboard
 		var copy:ValEditorObjectCopy = this._objectGroup.getCopyAt(this._pasteIndex);
 		var object:ValEditorObject = ValEditor.createObjectWithTemplate(cast copy.object.template, null, copy.collection.clone(true));
 		
-		ValEditor.currentContainer.add(object);
-		ValEditor.selection.addObject(object);
+		if (this._pasteAction != null)
+		{
+			var objectCreate:ObjectCreate = ObjectCreate.fromPool();
+			objectCreate.setup(object);
+			this._pasteAction.add(objectCreate);
+			
+			var objectAdd:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
+			objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			this._pasteAction.add(objectAdd);
+			
+			var objectSelect:ObjectSelect = ObjectSelect.fromPool();
+			objectSelect.setup();
+			objectSelect.addObject(object);
+			this._pasteAction.add(objectSelect);
+		}
+		else
+		{
+			ValEditor.currentContainer.add(object);
+			ValEditor.selection.addObject(object);
+		}
 		
 		pasteNextObject();
 	}
@@ -224,19 +323,38 @@ class ValEditorClipboard
 	private function onReuseObject(object:ValEditorObject):Void
 	{
 		var copy:ValEditorObjectCopy = this._objectGroup.getCopyAt(this._pasteIndex);
+		var collection:ExposedCollection;
 		
-		ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
-		var collection:ExposedCollection = object.getCollectionForKeyFrame(ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-		collection.copyValuesFrom(copy.collection);
-		
-		ValEditor.selection.addObject(object);
+		if (this._pasteAction != null)
+		{
+			collection = object.createCollectionForKeyFrame(ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			
+			var objectAdd:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
+			objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent, collection);
+			this._pasteAction.add(objectAdd);
+			
+			collection.copyValuesFrom(copy.collection, this._pasteAction);
+			
+			var objectSelect:ObjectSelect = ObjectSelect.fromPool();
+			objectSelect.setup();
+			objectSelect.addObject(object);
+			this._pasteAction.add(objectSelect);
+		}
+		else
+		{
+			ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
+			collection = object.getCollectionForKeyFrame(ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			collection.copyValuesFrom(copy.collection);
+			
+			ValEditor.selection.addObject(object);
+		}
 		
 		pasteNextObject();
 	}
 	
-	private function pasteTemplates():Void
+	private function pasteTemplates(action:MultiAction):Void
 	{
-		
+		// TODO : paste templates
 	}
 	
 }
