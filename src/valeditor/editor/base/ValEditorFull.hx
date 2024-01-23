@@ -36,6 +36,7 @@ import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
 import valeditor.editor.UIAssets;
+import valeditor.editor.action.MultiAction;
 import valeditor.editor.file.FileController;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
@@ -528,30 +529,86 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		if (this._isStartUp) return;
 		
-		var action:InputAction = evt.action;
+		var action:MultiAction;
+		var inputAction:InputAction = evt.action;
 		
-		switch (action.actionID)
+		switch (inputAction.actionID)
 		{
 			case InputActionID.ASSET_BROWSER :
 				FeathersWindows.toggleAssetBrowser();
 			
 			case InputActionID.COPY :
-				ValEditor.copy();
+				action = MultiAction.fromPool();
+				action.isStepAction = false;
+				ValEditor.copy(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.CUT :
-				ValEditor.cut();
+				action = MultiAction.fromPool();
+				ValEditor.cut(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.PASTE :
-				ValEditor.paste();
+				action = MultiAction.fromPool();
+				ValEditor.paste(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.DELETE :
-				ValEditor.delete();
+				action = MultiAction.fromPool();
+				ValEditor.delete(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.SELECT_ALL :
-				ValEditor.selectAll();
+				action = MultiAction.fromPool();
+				ValEditor.selectAll(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.UNSELECT_ALL :
-				ValEditor.unselectAll();
+				action = MultiAction.fromPool();
+				ValEditor.unselectAll(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
 			
 			case InputActionID.PLAY_STOP :
 				ValEditor.playStop();
