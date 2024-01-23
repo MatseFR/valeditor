@@ -28,10 +28,23 @@ class ValEditorFrameGroup
 		this._frames.resize(0);
 	}
 	
+	public function copyFrom(group:ValEditorFrameGroup):Void
+	{
+		addFrames(group._frames);
+	}
+	
 	public function addFrame(frame:ValEditorKeyFrame):Void
 	{
 		if (this._frames.indexOf(frame) != -1) return;
 		this._frames.push(frame);
+	}
+	
+	public function addFrames(frames:Array<ValEditorKeyFrame>):Void
+	{
+		for (frame in frames)
+		{
+			addFrame(frame);
+		}
 	}
 	
 	public function getFrameAt(index:Int):ValEditorKeyFrame
