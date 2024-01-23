@@ -4,6 +4,7 @@ import valedit.ExposedCollection;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
+import valedit.utils.ReverseIterator;
 import valedit.value.base.ExposedValue;
 import valeditor.events.ObjectEvent;
 import valeditor.events.RenameEvent;
@@ -89,6 +90,17 @@ class ValEditorTemplate extends ValEditTemplate
 		this.lockInstanceUpdates = false;
 		this._objectIDIndex = -1;
 		
+		if (this.object != null)
+		{
+			ValEditor.destroyObject(cast this.object);
+			this.object = null;
+		}
+		
+		for (i in new ReverseIterator(this._instances.length - 1, 0))
+		{
+			ValEditor.destroyObject(cast this._instances[i]);
+		}
+		
 		//for (object in this._suspendedInstances)
 		//{
 			//ValEditor.destroyObject(object);
@@ -121,15 +133,35 @@ class ValEditorTemplate extends ValEditTemplate
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
 	}
 	
+	public function registerInstances():Void
+	{
+		for (instance in this._instances)
+		{
+			ValEditor.registerObject(cast instance);
+			cast(instance, ValEditorObject).restoreKeyFrames();
+		}
+	}
+	
+	public function unregisterInstances():Void
+	{
+		for (instance in this._instances)
+		{
+			cast(instance, ValEditorObject).backupKeyFrames();
+			ValEditor.unregisterObject(cast instance);
+		}
+	}
+	
 	public function suspendInstance(instance:ValEditorObject):Void
 	{
 		this._suspendedInstances.push(instance);
+		instance.isSuspended = true;
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_SUSPENDED, this);
 	}
 	
 	public function unsuspendInstance(instance:ValEditorObject):Void
 	{
 		this._suspendedInstances.remove(instance);
+		instance.isSuspended = false;
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_UNSUSPENDED, this);
 	}
 	
