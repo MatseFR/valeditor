@@ -37,6 +37,8 @@ import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.ValEditorActionStack;
+import valeditor.editor.action.clipboard.ClipboardClear;
+import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
@@ -233,6 +235,7 @@ class ValEditor
 			assetFileLoader = new AssetFilesLoader();
 			#end
 		}
+		clipboard.isRealClipboard = true;
 		keyboardController = new KeyboardController(Lib.current.stage);
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
@@ -809,6 +812,11 @@ class ValEditor
 		return newObject;
 	}
 	
+	static public function registerObject(valObject:ValEditorObject):Void
+	{
+		registerObjectInternal(valObject);
+	}
+	
 	static private function registerObjectInternal(valObject:ValEditorObject):Void
 	{
 		ValEdit.registerObjectInternal(valObject);
@@ -827,6 +835,11 @@ class ValEditor
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.add(valObject);
 		}
+	}
+	
+	static public function registerTemplate(template:ValEditorTemplate):Void
+	{
+		registerTemplateInternal(template);
 	}
 	
 	static private function registerTemplateInternal(template:ValEditorTemplate):Void
@@ -881,14 +894,24 @@ class ValEditor
 		valObject.pool();
 	}
 	
+	static public function unregisterObject(valObject:ValEditorObject):Void
+	{
+		unregisterObjectInternal(valObject);
+	}
+	
 	static private function unregisterObjectInternal(valObject:ValEditorObject):Void
 	{
 		ValEdit.unregisterObjectInternal(valObject);
 		
-		if (valObject.container != null)
-		{
-			valObject.container.remove(valObject);
-		}
+		//if (valObject.container != null)
+		//{
+			//valObject.container.remove(valObject);
+		//}
+		
+		//if (selection.hasObject(valObject))
+		//{
+			//selection.removeObject(valObject);
+		//}
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.remove(valObject);
@@ -919,6 +942,11 @@ class ValEditor
 		unregisterTemplateInternal(template);
 		
 		template.pool();
+	}
+	
+	static public function unregisterTemplate(template:ValEditorTemplate):Void
+	{
+		unregisterTemplateInternal(template);
 	}
 	
 	static private function unregisterTemplateInternal(template:ValEditorTemplate):Void
@@ -1075,37 +1103,78 @@ class ValEditor
 		return timeLine;
 	}
 	
-	static public function copy():Void
+	static public function copy(?action:MultiAction):Void
 	{
-		clipboard.clear();
-		selection.copyToClipboard(clipboard);
+		if (action != null)
+		{
+			var clipboardClear:ClipboardClear = ClipboardClear.fromPool();
+			clipboardClear.setup(clipboard);
+			action.add(clipboardClear);
+			
+			selection.copyToClipboard(clipboard, action);
+		}
+		else
+		{
+			clipboard.clear();
+			selection.copyToClipboard(clipboard);
+		}
 	}
 	
-	static public function cut():Void
+	static public function cut(?action:MultiAction):Void
 	{
-		clipboard.clear();
-		selection.cutToClipboard(clipboard);
-		selection.clear();
+		if (action != null)
+		{
+			if (selection.numObjects != 0)
+			{
+				var clipboardClear:ClipboardClear = ClipboardClear.fromPool();
+				clipboardClear.setup(clipboard);
+				action.add(clipboardClear);
+				
+				selection.cutToClipboard(clipboard, action);
+				
+				var selectionClear:SelectionClear = SelectionClear.fromPool();
+				selectionClear.setup(selection);
+				action.add(selectionClear);
+			}
+		}
+		else
+		{
+			clipboard.clear();
+			selection.cutToClipboard(clipboard);
+			selection.clear();
+		}
 	}
 	
-	static public function delete():Void
+	static public function delete(action:MultiAction):Void
 	{
-		selection.delete();
+		selection.delete(action);
 	}
 	
-	static public function paste():Void
+	static public function paste(action:MultiAction):Void
 	{
-		clipboard.paste();
+		clipboard.paste(action);
 	}
 	
-	static public function selectAll():Void
+	static public function selectAll(action:MultiAction):Void
 	{
-		currentContainer.selectAllVisible();
+		currentContainer.selectAllVisible(action);
 	}
 	
-	static public function unselectAll():Void
+	static public function unselectAll(action:MultiAction):Void
 	{
-		selection.object = null;
+		if (action != null)
+		{
+			if (selection.numObjects != 0)
+			{
+				var selectionClear:SelectionClear = SelectionClear.fromPool();
+				selectionClear.setup(selection);
+				action.add(selectionClear);
+			}
+		}
+		else
+		{
+			selection.object = null;
+		}
 	}
 	
 	static public function insertFrame(?action:MultiAction):Void
