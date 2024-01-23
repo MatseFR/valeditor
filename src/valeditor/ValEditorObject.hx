@@ -157,6 +157,8 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	}
 	
 	private var _boundsFunction:Function;
+	private var _restoreKeyFrames:Array<ValEditorKeyFrame> = new Array<ValEditorKeyFrame>();
+	private var _restoreKeyFramesCollections:Array<ExposedCollection> = new Array<ExposedCollection>();
 	
 	public function new(clss:ValEditClass, ?id:String) 
 	{
@@ -196,6 +198,13 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.isSelectable = true;
 		this.isSuspended = false;
 		this.usePivotScaling = false;
+		
+		this._restoreKeyFrames.resize(0);
+		for (collection in this._restoreKeyFramesCollections)
+		{
+			collection.pool();
+		}
+		this._restoreKeyFramesCollections.resize(0);
 	}
 	
 	override public function pool():Void 
@@ -206,13 +215,34 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	
 	override public function canBeDestroyed():Bool 
 	{
-		return this.numKeyFrames == 0 && !this.isInClipboard;
+		return this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended;
 	}
 	
 	override public function ready():Void 
 	{
 		super.ready();
 		this._boundsFunction = Reflect.field(this.object, this.getBoundsFunctionName);
+	}
+	
+	public function backupKeyFrames():Void
+	{
+		for (keyFrame in this._keyFrames)
+		{
+			this._restoreKeyFrames.push(cast keyFrame);
+			this._restoreKeyFramesCollections.push(this._keyFrameToCollection.get(keyFrame));
+			keyFrame.remove(this, false);
+		}
+	}
+	
+	public function restoreKeyFrames():Void
+	{
+		var count:Int = this._restoreKeyFrames.length;
+		for (i in 0...count)
+		{
+			this._restoreKeyFrames[i].add(this, this._restoreKeyFramesCollections[i]);
+		}
+		this._restoreKeyFrames.resize(0);
+		this._restoreKeyFramesCollections.resize(0);
 	}
 	
 	override public function addKeyFrame(keyFrame:ValEditKeyFrame, collection:ExposedCollection = null):Void 
