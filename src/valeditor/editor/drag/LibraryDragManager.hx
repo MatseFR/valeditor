@@ -7,6 +7,10 @@ import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTimeLine;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectAddKeyFrame;
+import valeditor.editor.action.object.ObjectCreate;
+import valeditor.editor.action.selection.SelectionSetObject;
 import valeditor.ui.InteractiveObjectVisible;
 import valeditor.ui.feathers.FeathersWindows;
 
@@ -118,28 +122,62 @@ class LibraryDragManager
 	
 	private function onNewObject():Void
 	{
+		var action:MultiAction = MultiAction.fromPool();
+		var objectCreate:ObjectCreate;
+		var objectAdd:ObjectAddKeyFrame;
+		var selectionSetObject:SelectionSetObject;
+		
 		this.object = ValEditor.createObjectWithTemplate(this.template);
+		objectCreate = ObjectCreate.fromPool();
+		objectCreate.setup(this.object);
+		action.add(objectCreate);
+		
 		if (this.object.isDisplayObject)
 		{
 			this.object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
 			this.object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
 		}
 		
-		ValEditor.currentContainer.add(this.object);
-		ValEditor.selection.object = this.object;
+		//ValEditor.currentContainer.add(this.object);
+		objectAdd = ObjectAddKeyFrame.fromPool();
+		objectAdd.setup(this.object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+		action.add(objectAdd);
+		
+		//ValEditor.selection.object = this.object;
+		selectionSetObject = SelectionSetObject.fromPool();
+		selectionSetObject.setup(this.object);
+		action.add(selectionSetObject);
+		
 		this.object = null;
 		Lib.current.stage.focus = null;
+		
+		ValEditor.actionStack.add(action);
 	}
 	
 	private function onReuseObject(object:ValEditorObject):Void
 	{
-		ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
+		var action:MultiAction = MultiAction.fromPool();
+		var objectAdd:ObjectAddKeyFrame;
+		var selectionSetObject:SelectionSetObject;
+		
+		//ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
+		objectAdd = ObjectAddKeyFrame.fromPool();
+		objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+		action.add(objectAdd);
 		
 		if (object.isDisplayObject)
 		{
 			object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
 			object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
 		}
+		
+		selectionSetObject = SelectionSetObject.fromPool();
+		selectionSetObject.setup(object);
+		action.add(selectionSetObject);
+		
+		Lib.current.stage.focus = null;
+		
+		ValEditor.actionStack.add(action);
 	}
 	
 	private function onCancelObject():Void
