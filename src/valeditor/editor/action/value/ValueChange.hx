@@ -41,11 +41,18 @@ class ValueChange extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(exposedValue:ExposedValue, newValue:Dynamic):Void
+	public function setup(exposedValue:ExposedValue, newValue:Dynamic, ?previousValue:Dynamic):Void
 	{
 		this.exposedValue = exposedValue;
 		this.newValue = newValue;
-		this.previousValue = this.exposedValue.value;
+		if (previousValue == null)
+		{
+			this.previousValue = this.exposedValue.value;
+		}
+		else
+		{
+			this.previousValue = previousValue;
+		}
 	}
 	
 	public function apply():Void
