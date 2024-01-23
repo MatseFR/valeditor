@@ -23,6 +23,8 @@ import openfl.events.MouseEvent;
 import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.template.TemplateRemove;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -156,7 +158,17 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateRemoveButton(evt:TriggerEvent):Void
 	{
-		ValEditor.destroyTemplate(this._grid.selectedItem);
+		//ValEditor.destroyTemplate(this._grid.selectedItem);
+		var action:MultiAction = MultiAction.fromPool();
+		var templateRemove:TemplateRemove;
+		
+		for (template in this._grid.selectedItems)
+		{
+			templateRemove = TemplateRemove.fromPool();
+			templateRemove.setup(template);
+			action.add(templateRemove);
+		}
+		ValEditor.actionStack.add(action);
 	}
 	
 	private function onTemplateRenameButton(evt:TriggerEvent):Void
@@ -252,10 +264,24 @@ class TemplateLibrary extends LayoutGroup
 				}
 			
 			case Keyboard.DELETE, Keyboard.BACKSPACE :
-				var templatesToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
-				for (template in templatesToRemove)
+				//var templatesToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
+				//for (template in templatesToRemove)
+				//{
+					//ValEditor.destroyTemplate(template);
+				//}
+				if (this._grid.selectedItems.length != 0)
 				{
-					ValEditor.destroyTemplate(template);
+					var action:MultiAction = MultiAction.fromPool();
+					var templateRemove:TemplateRemove;
+					
+					for (template in this._grid.selectedItems)
+					{
+						templateRemove = TemplateRemove.fromPool();
+						templateRemove.setup(template);
+						action.add(templateRemove);
+					}
+					
+					ValEditor.actionStack.add(action);
 				}
 		}
 		
