@@ -1,5 +1,7 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 
 /**
  * ...
@@ -40,21 +42,38 @@ class ValEditorObjectGroup
 		this._objects.resize(0);
 	}
 	
-	public function deleteObjects():Void
+	public function copyFrom(group:ValEditorObjectGroup):Void
+	{
+		addObjects(group._objects);
+	}
+	
+	public function deleteObjects(?action:MultiAction):Void
 	{
 		var objectsToDelete:Array<ValEditorObject> = this._objects.copy();
-		for (object in objectsToDelete)
+		if (action == null)
 		{
-			if (object.currentKeyFrame != null)
+			for (object in objectsToDelete)
 			{
-				object.currentKeyFrame.remove(object);
-			}
-			if (object.canBeDestroyed())
-			{
-				ValEditor.destroyObject(object);
+				if (object.currentKeyFrame != null)
+				{
+					object.currentKeyFrame.remove(object);
+				}
+				if (object.canBeDestroyed())
+				{
+					ValEditor.destroyObject(object);
+				}
 			}
 		}
-		this._objects.resize(0);
+		else
+		{
+			var objectRemove:ObjectRemoveKeyFrame;
+			for (object in objectsToDelete)
+			{
+				objectRemove = ObjectRemoveKeyFrame.fromPool();
+				objectRemove.setup(object, cast object.currentKeyFrame);
+				action.add(objectRemove);
+			}
+		}
 		clear();
 	}
 	
@@ -62,6 +81,14 @@ class ValEditorObjectGroup
 	{
 		if (this._objects.indexOf(object) != -1) return;
 		this._objects.push(object);
+	}
+	
+	public function addObjects(objects:Array<ValEditorObject>):Void
+	{
+		for (object in objects)
+		{
+			addObject(object);
+		}
 	}
 	
 	public function getObjectAt(index:Int):ValEditorObject
