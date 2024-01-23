@@ -151,9 +151,9 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		return this.objects.indexOf(object) != -1;
 	}
 	
-	override public function remove(object:ValEditObject):Void 
+	override public function remove(object:ValEditObject, poolCollection:Bool = true):Void 
 	{
-		super.remove(object);
+		super.remove(object, poolCollection);
 		rebuildTweens();
 		
 		if (this.timeLine != null)
