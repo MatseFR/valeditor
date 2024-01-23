@@ -15,6 +15,11 @@ import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.utils.RegularPropertyName;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectSelect;
+import valeditor.editor.action.object.ObjectUnselect;
+import valeditor.editor.action.selection.SelectionClear;
+import valeditor.editor.action.selection.SelectionSetObject;
 import valeditor.events.ContainerEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.RenameEvent;
@@ -50,6 +55,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
 	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	public var selectedLayers(default, null):Array<ValEditorLayer> = new Array<ValEditorLayer>();
 	public var selection(default, null):ValEditorObjectGroup = new ValEditorObjectGroup();
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
@@ -189,6 +195,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	private var _ignoreNextStageClick:Bool;
 	
+	private var _actionCurrent:MultiAction;
+	
 	public function new() 
 	{
 		this.timeLine = new ValEditorTimeLine(0);
@@ -210,6 +218,8 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._interactiveObjectToValEditObject.clear();
 		
 		this._mouseObject = null;
+		
+		this.selectedLayers.resize(0);
 		
 		this.selection.clear();
 		
@@ -435,6 +445,16 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	private function onObjectMouseDown(evt:MouseEvent):Void
 	{
 		if (this._mouseDownOnObject) return;
+		var selectionClear:SelectionClear;
+		
+		// DEBUG
+		if (this._actionCurrent != null)
+		{
+			throw new Error("ValEditorContainer : this._actionCurrent should be null");
+		}
+		this._actionCurrent = MultiAction.fromPool();
+		//\DEBUG
+		
 		this._mouseDownOnObject = true;
 		
 		this._mouseDownWithCtrl = evt.ctrlKey;
@@ -444,7 +464,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (!object.isSelectable) return;
 		if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 		{
-			ValEditor.selection.object = null;
+			//ValEditor.selection.object = null;
+			if (ValEditor.selection.numObjects != 0)
+			{
+				selectionClear = SelectionClear.fromPool();
+				selectionClear.setup(ValEditor.selection);
+				this._actionCurrent.add(selectionClear);
+			}
 		}
 		this._mouseObject = object;
 		this._mouseObject.isMouseDown = true;
@@ -493,6 +519,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	private function onObjectMouseUp(evt:MouseEvent):Void
 	{
+		var objectSelect:ObjectSelect;
+		var objectUnselect:ObjectUnselect;
+		var selectionSetObject:SelectionSetObject;
+		
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
 		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
@@ -501,16 +531,27 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			if (this.selection.hasObject(this._mouseObject))
 			{
-				ValEditor.selection.removeObject(this._mouseObject);
+				//ValEditor.selection.removeObject(this._mouseObject);
+				objectUnselect = ObjectUnselect.fromPool();
+				objectUnselect.setup();
+				objectUnselect.addObject(this._mouseObject);
+				this._actionCurrent.add(objectUnselect);
 			}
 			else
 			{
-				ValEditor.selection.addObject(this._mouseObject);
+				//ValEditor.selection.addObject(this._mouseObject);
+				objectSelect = ObjectSelect.fromPool();
+				objectSelect.setup();
+				objectSelect.addObject(this._mouseObject);
+				this._actionCurrent.add(objectSelect);
 			}
 		}
 		else if (!this.selection.hasObject(this._mouseObject))
 		{
-			ValEditor.selection.object = this._mouseObject;
+			//ValEditor.selection.object = this._mouseObject;
+			selectionSetObject = SelectionSetObject.fromPool();
+			selectionSetObject.setup(this._mouseObject);
+			this._actionCurrent.add(selectionSetObject);
 		}
 		
 		this._mouseObject.isMouseDown = false;
@@ -544,10 +585,24 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			obj.selectionBox.objectUpdate(obj);
 			obj.pivotIndicator.objectUpdate(obj);
 		}
+		
+		if (this._actionCurrent.numActions != 0)
+		{
+			ValEditor.actionStack.add(this._actionCurrent);
+		}
+		else
+		{
+			this._actionCurrent.pool();
+		}
+		this._actionCurrent = null;
 	}
 	
 	private function onObjectRightMouseUp(evt:MouseEvent):Void
 	{
+		this._actionCurrent.cancel();
+		this._actionCurrent.pool();
+		this._actionCurrent = null;
+		
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
 		Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onObjectMouseUp);
 		Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
@@ -618,6 +673,16 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (touch.phase == TouchPhase.BEGAN)
 		{
 			if (this._mouseDownOnObject) return;
+			var selectionClear:SelectionClear;
+			
+			// DEBUG
+			if (this._actionCurrent != null)
+			{
+				throw new Error("ValEditorContainer : this._actionCurrent should be null");
+			}
+			this._actionCurrent = MultiAction.fromPool();
+			//\DEBUG
+			
 			this._mouseDownOnObject = true;
 			
 			this._mouseDownWithCtrl = evt.ctrlKey;
@@ -625,7 +690,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			
 			if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 			{
-				ValEditor.selection.object = null;
+				//ValEditor.selection.object = null;
+				if (ValEditor.selection.numObjects != 0)
+				{
+					selectionClear = SelectionClear.fromPool();
+					selectionClear.setup(ValEditor.selection);
+					this._actionCurrent.add(selectionClear);
+				}
 			}
 			this._mouseObject = object;
 			this._mouseObject.isMouseDown = true;
@@ -673,6 +744,9 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		else if (touch.phase == TouchPhase.ENDED)
 		{
 			if (this._mouseObject == null) return;
+			var objectSelect:ObjectSelect;
+			var objectUnselect:ObjectUnselect;
+			var selectionSetObject:SelectionSetObject;
 			
 			Lib.current.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onObjectMouseMove);
 			Lib.current.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_UP, onObjectRightMouseUp);
@@ -681,16 +755,27 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			{
 				if (this.selection.hasObject(this._mouseObject))
 				{
-					ValEditor.selection.removeObject(this._mouseObject);
+					//ValEditor.selection.removeObject(this._mouseObject);
+					objectUnselect = ObjectUnselect.fromPool();
+					objectUnselect.setup();
+					objectUnselect.addObject(this._mouseObject);
+					this._actionCurrent.add(objectUnselect);
 				}
 				else
 				{
-					ValEditor.selection.addObject(this._mouseObject);
+					//ValEditor.selection.addObject(this._mouseObject);
+					objectSelect = ObjectSelect.fromPool();
+					objectSelect.setup();
+					objectSelect.addObject(this._mouseObject);
+					this._actionCurrent.add(objectSelect);
 				}
 			}
 			else if (!this.selection.hasObject(this._mouseObject))
 			{
-				ValEditor.selection.object = this._mouseObject;
+				//ValEditor.selection.object = this._mouseObject;
+				selectionSetObject = SelectionSetObject.fromPool();
+				selectionSetObject.setup(this._mouseObject);
+				this._actionCurrent.add(selectionSetObject);
 			}
 			
 			this._mouseObject.isMouseDown = false;
@@ -724,22 +809,53 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				obj.selectionBox.objectUpdate(obj);
 				obj.pivotIndicator.objectUpdate(obj);
 			}
+			
+			if (this._actionCurrent.numActions != 0)
+			{
+				ValEditor.actionStack.add(this._actionCurrent);
+			}
+			else
+			{
+				this._actionCurrent.pool();
+			}
+			this._actionCurrent = null;
 		}
 	}
 	#end
 	
-	public function selectAllVisible():Void
+	public function selectAllVisible(?action:MultiAction):Void
 	{
-		clearSelection();
-		
 		var visibleObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
-		for (layer in this.layerCollection)
+		
+		if (action != null)
 		{
-			layer.getAllVisibleObjects(visibleObjects);
+			var selectionClear:SelectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
+			var objectSelect:ObjectSelect;
+			
+			for (layer in this.layerCollection)
+			{
+				layer.getAllVisibleObjects(visibleObjects);
+			}
+			
+			objectSelect = ObjectSelect.fromPool();
+			objectSelect.setup(visibleObjects);
+			action.add(objectSelect);
 		}
-		for (object in visibleObjects)
+		else
 		{
-			ValEditor.selection.addObject(object);
+			clearSelection();
+			
+			for (layer in this.layerCollection)
+			{
+				layer.getAllVisibleObjects(visibleObjects);
+			}
+			for (object in visibleObjects)
+			{
+				ValEditor.selection.addObject(object);
+			}
 		}
 	}
 	
@@ -866,7 +982,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (evt.target != Lib.current.stage) return;
 		if (this._mouseObject != null) return;
 		
-		ValEditor.selection.object = null;
+		//ValEditor.selection.object = null;
+		if (ValEditor.selection.numObjects != 0)
+		{
+			var selectionClear:SelectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			ValEditor.actionStack.add(selectionClear);
+		}
 	}
 	
 	private function onStageMouseUp(evt:MouseEvent):Void

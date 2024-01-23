@@ -1,6 +1,7 @@
 package valeditor;
 import feathers.data.ArrayCollection;
 import valedit.IValEditContainer;
+import valeditor.editor.action.MultiAction;
 
 /**
  * @author Matse
@@ -11,5 +12,5 @@ interface IValEditorContainer extends IValEditContainer
 	function layerNameExists(name:String):Bool;
 	function open():Void;
 	function close():Void;
-	function selectAllVisible():Void;
+	function selectAllVisible(?action:MultiAction):Void;
 }
