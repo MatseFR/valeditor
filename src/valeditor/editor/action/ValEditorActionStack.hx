@@ -1,4 +1,5 @@
 package valeditor.editor.action;
+import openfl.errors.Error;
 import openfl.events.EventDispatcher;
 import valeditor.events.ActionStackEvent;
 
@@ -64,6 +65,12 @@ class ValEditorActionStack extends EventDispatcher
 		{
 			action.apply();
 		}
+		// DEBUG
+		if (Std.isOfType(action, MultiAction) && cast(action, MultiAction).numActions == 0)
+		{
+			throw new Error("ValEditorActionStack : trying to add MultiAction with no actions");
+		}
+		//\DEBUG
 		this._doneActions.unshift(action);
 		clearUndoneActions();
 		this._lastAction = action;
@@ -73,26 +80,38 @@ class ValEditorActionStack extends EventDispatcher
 	public function redo():Void
 	{
 		if (this._undoneActions.length == 0) return;
-		var action:ValEditorAction = this._undoneActions.shift();
-		action.apply();
-		this._doneActions.unshift(action);
-		this._lastAction = action;
+		var action:ValEditorAction;
+		while (true)
+		{
+			action = this._undoneActions.shift();
+			action.apply();
+			this._doneActions.unshift(action);
+			this._lastAction = action;
+			if (action.isStepAction) break;
+			if (this._undoneActions.length == 0) break;
+		}
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
 	}
 	
 	public function undo():Void
 	{
 		if (this._doneActions.length == 0) return;
-		var action:ValEditorAction = this._doneActions.shift();
-		action.cancel();
-		this._undoneActions.unshift(action);
-		if (this._doneActions.length != 0)
+		var action:ValEditorAction;
+		while (true)
 		{
-			this._lastAction = this._doneActions[0];
-		}
-		else
-		{
-			this._lastAction = null;
+			action = this._doneActions.shift();
+			action.cancel();
+			this._undoneActions.unshift(action);
+			if (this._doneActions.length != 0)
+			{
+				this._lastAction = this._doneActions[0];
+			}
+			else
+			{
+				this._lastAction = null;
+				break;
+			}
+			if (action.isStepAction) break;
 		}
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
 	}
