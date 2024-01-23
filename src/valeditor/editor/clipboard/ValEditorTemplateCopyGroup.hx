@@ -8,6 +8,7 @@ import valeditor.ValEditorTemplate;
  */
 class ValEditorTemplateCopyGroup 
 {
+	public var isRealClipboard:Bool = false;
 	public var numTemplates(get, never):Int;
 	
 	private function get_numTemplates():Int { return this._templates.length; }
@@ -26,21 +27,32 @@ class ValEditorTemplateCopyGroup
 	
 	public function clear():Void
 	{
-		for (template in this._templates)
+		if (this.isRealClipboard)
 		{
-			template.isInClipboard = false;
-			if (template.canBeDestroyed())
+			for (template in this._templates)
 			{
-				ValEditor.destroyTemplate(template);
+				template.isInClipboard = false;
+				if (template.canBeDestroyed())
+				{
+					ValEditor.destroyTemplate(template);
+				}
 			}
 		}
 		this._templates.resize(0);
 	}
 	
+	public function copyFrom(group:ValEditorTemplateCopyGroup):Void
+	{
+		for (template in group._templates)
+		{
+			addTemplate(template);
+		}
+	}
+	
 	public function addTemplate(template:ValEditorTemplate):Void
 	{
 		if (this._templates.indexOf(template) != -1) return;
-		template.isInClipboard = true;
+		if (this.isRealClipboard) template.isInClipboard = true;
 		this._templates.push(template);
 	}
 	
@@ -57,7 +69,7 @@ class ValEditorTemplateCopyGroup
 	public function removeTemplate(template:ValEditorTemplate):Bool
 	{
 		var result:Bool = this._templates.remove(template);
-		if (result)
+		if (result && this.isRealClipboard)
 		{
 			template.isInClipboard = false;
 			if (template.canBeDestroyed())
