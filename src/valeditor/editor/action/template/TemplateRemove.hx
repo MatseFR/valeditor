@@ -2,7 +2,9 @@ package valeditor.editor.action.template;
 
 import openfl.errors.Error;
 import valeditor.ValEditorTemplate;
+import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.ValEditorAction;
+import valeditor.editor.action.object.ObjectUnselect;
 
 /**
  * ...
@@ -19,6 +21,7 @@ class TemplateRemove extends ValEditorAction
 	}
 	
 	public var template:ValEditorTemplate;
+	public var action:MultiAction = new MultiAction();
 	
 	public function new() 
 	{
@@ -33,6 +36,8 @@ class TemplateRemove extends ValEditorAction
 		}
 		this.template = null;
 		
+		this.action.clear();
+		
 		super.clear();
 	}
 	
@@ -45,6 +50,17 @@ class TemplateRemove extends ValEditorAction
 	public function setup(template:ValEditorTemplate):Void
 	{
 		this.template = template;
+		var unselect:ObjectUnselect;
+		for (instance in this.template.instances)
+		{
+			if (ValEditor.selection.hasObject(cast instance))
+			{
+				unselect = ObjectUnselect.fromPool();
+				unselect.setup();
+				unselect.addObject(cast instance);
+				this.action.add(unselect);
+			}
+		}
 	}
 	
 	public function apply():Void
@@ -54,6 +70,9 @@ class TemplateRemove extends ValEditorAction
 			throw new Error("TemplateRemove already applied");
 		}
 		
+		ValEditor.unregisterTemplate(this.template);
+		this.template.unregisterInstances();
+		this.action.apply();
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -64,6 +83,9 @@ class TemplateRemove extends ValEditorAction
 			throw new Error("TemplateRemove already cancelled");
 		}
 		
+		ValEditor.registerTemplate(this.template);
+		this.template.registerInstances();
+		this.action.cancel();
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
