@@ -8,6 +8,9 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -181,8 +184,28 @@ class TextAssetUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		assetUpdate(null);
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			assetUpdate(null);
+		}
 	}
 	
 	private function onLoadButton(evt:TriggerEvent):Void
@@ -192,8 +215,28 @@ class TextAssetUI extends ValueUI
 	
 	private function assetSelected(asset:TextAsset):Void
 	{
-		this._exposedValue.value = asset;
-		assetUpdate(asset);
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != asset)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, asset);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = asset;
+			assetUpdate(asset);
+		}
 	}
 	
 	private function assetUpdate(asset:TextAsset):Void

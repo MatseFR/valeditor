@@ -14,6 +14,9 @@ import valedit.ValEdit;
 import valedit.asset.BitmapAsset;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -216,8 +219,37 @@ class BitmapUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		assetUpdate(null);
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				var previousValue:Dynamic = this._exposedValue.value;
+				if (Std.isOfType(previousValue, Bitmap))
+				{
+					previousValue = ValEdit.assetLib.getBitmapFromBitmapData(cast(previousValue, Bitmap).bitmapData);
+				}
+				else if (Std.isOfType(previousValue, BitmapData))
+				{
+					previousValue = ValEdit.assetLib.getBitmapFromBitmapData(cast previousValue);
+				}
+				valueChange.setup(this._exposedValue, null, previousValue);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			assetUpdate(null);
+		}
 	}
 	
 	private function onLoadButton(evt:TriggerEvent):Void
@@ -227,8 +259,34 @@ class BitmapUI extends ValueUI
 	
 	private function assetSelected(asset:BitmapAsset):Void
 	{
-		this._exposedValue.value = asset;
-		assetUpdate(asset);
+		if (!this._exposedValue.isConstructor)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var valueChange:ValueChange = ValueChange.fromPool();
+			var previousValue:Dynamic = this._exposedValue.value;
+			if (Std.isOfType(previousValue, Bitmap))
+			{
+				previousValue = ValEdit.assetLib.getBitmapFromBitmapData(cast(previousValue, Bitmap).bitmapData);
+			}
+			else if (Std.isOfType(previousValue, BitmapData))
+			{
+				previousValue = ValEdit.assetLib.getBitmapFromBitmapData(cast previousValue);
+			}
+			valueChange.setup(this._exposedValue, asset, previousValue);
+			action.add(valueChange);
+			
+			var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+			valueUIUpdate.setup(this._exposedValue);
+			action.addPost(valueUIUpdate);
+			
+			ValEditor.actionStack.add(action);
+		}
+		else
+		{
+			this._exposedValue.value = asset;
+			assetUpdate(asset);
+		}
 	}
 	
 	private function assetUpdate(asset:BitmapAsset):Void

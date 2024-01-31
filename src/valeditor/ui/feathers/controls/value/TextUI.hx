@@ -9,8 +9,14 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
+import valeditor.events.ValueUIEvent;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
@@ -55,6 +61,9 @@ class TextUI extends ValueUI
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
 	
+	private var _action:MultiAction;
+	private var _valueChangeAction:ValueChange;
+	
 	/**
 	   
 	**/
@@ -66,6 +75,13 @@ class TextUI extends ValueUI
 	
 	override public function clear():Void 
 	{
+		if (this._action != null)
+		{
+			this._action.pool();
+			this._action = null;
+			this._valueChangeAction = null;
+		}
+		
 		super.clear();
 		this._textValue = null;
 	}
@@ -172,6 +188,9 @@ class TextUI extends ValueUI
 		this._textArea.removeEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
 		this._textArea.removeEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._textArea.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._textArea.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	override function controlsEnable():Void
@@ -183,6 +202,9 @@ class TextUI extends ValueUI
 		this._textArea.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
 		this._textArea.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._textArea.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._textArea.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	private function onInputChange(evt:Event):Void
@@ -202,8 +224,80 @@ class TextUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		this._textArea.text = "";
-		this._exposedValue.value = null;
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.add(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._textArea.text = "";
+			this._exposedValue.value = null;
+		}
+	}
+	
+	private function onValueChangeBegin(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action != null)
+		{
+			throw new Error("FloatDraggerUI ::: action should be null");
+		}
+		
+		this._action = MultiAction.fromPool();
+		
+		this._valueChangeAction = ValueChange.fromPool();
+		this._valueChangeAction.setup(this._exposedValue, this._exposedValue.value, this._exposedValue.value);
+		this._action.add(this._valueChangeAction);
+		
+		var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+		valueUIUpdate.setup(this._exposedValue);
+		this._action.addPost(valueUIUpdate);
+	}
+	
+	private function onValueChangeEnd(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action == null)
+		{
+			throw new Error("FloatDraggerUI ::: action should not be null");
+		}
+		
+		this._valueChangeAction.newValue = this._exposedValue.value;
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		{
+			this._action.pool();
+		}
+		else
+		{
+			ValEditor.actionStack.add(this._action);
+		}
+		this._action = null;
+		this._valueChangeAction = null;
+	}
+	
+	private function input_focusInHandler(evt:FocusEvent):Void
+	{
+		onValueChangeBegin(null);
+	}
+	
+	private function input_focusOutHandler(evt:FocusEvent):Void
+	{
+		onValueChangeEnd(null);
 	}
 	
 }

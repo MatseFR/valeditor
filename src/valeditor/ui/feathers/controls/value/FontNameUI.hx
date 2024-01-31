@@ -12,6 +12,9 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import openfl.text.Font;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
@@ -210,13 +213,54 @@ class FontNameUI extends ValueUI
 	private function onListChange(evt:Event):Void
 	{
 		if (this._list.selectedItem == null) return;
-		this._exposedValue.value = this._list.selectedItem;
+		
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != this._list.selectedItem)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, this._list.selectedItem);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = this._list.selectedItem;
+		}
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		this._list.selectedIndex = -1;
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			this._list.selectedIndex = -1;
+		}
 	}
 	
 }

@@ -1,8 +1,14 @@
 package valeditor.ui.feathers.controls.value;
 import feathers.controls.TextInput;
+import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
 import valedit.value.base.ExposedValue;
 import valedit.value.ExposedPath;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
+import valeditor.events.ValueUIEvent;
 import valeditor.utils.file.FolderSelectorDesktop;
 #if desktop
 import feathers.controls.Button;
@@ -64,6 +70,9 @@ class PathUI extends ValueUI
 	private var _clearButton:Button;
 	
 	private var _folderSelector:FolderSelectorDesktop = new FolderSelectorDesktop();
+	
+	private var _action:MultiAction;
+	private var _valueChangeAction:ValueChange;
 
 	public function new() 
 	{
@@ -73,6 +82,13 @@ class PathUI extends ValueUI
 	
 	override public function clear():Void 
 	{
+		if (this._action != null)
+		{
+			this._action.pool();
+			this._action = null;
+			this._valueChangeAction = null;
+		}
+		
 		super.clear();
 		this._pathValue = null;
 	}
@@ -197,6 +213,9 @@ class PathUI extends ValueUI
 		this._pathInput.removeEventListener(Event.CHANGE, onPathInputChange);
 		this._setButton.removeEventListener(TriggerEvent.TRIGGER, onSetButton);
 		this._clearButton.removeEventListener(TriggerEvent.TRIGGER, onClearButton);
+		
+		this._pathInput.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._pathInput.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	override function controlsEnable():Void 
@@ -207,11 +226,35 @@ class PathUI extends ValueUI
 		this._pathInput.addEventListener(Event.CHANGE, onPathInputChange);
 		this._setButton.addEventListener(TriggerEvent.TRIGGER, onSetButton);
 		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);
+		
+		this._pathInput.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._pathInput.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			this._pathInput.text = "";
+		}
 	}
 	
 	private function onSetButton(evt:TriggerEvent):Void
@@ -221,8 +264,25 @@ class PathUI extends ValueUI
 	
 	private function onFolderSelected(path:String):Void
 	{
-		this._exposedValue.value = path;
-		this._pathInput.text = path;
+		if (!this._exposedValue.isConstructor)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var valueChange:ValueChange = ValueChange.fromPool();
+			valueChange.setup(this._exposedValue, path);
+			action.add(valueChange);
+			
+			var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+			valueUIUpdate.setup(this._exposedValue);
+			action.addPost(valueUIUpdate);
+			
+			ValEditor.actionStack.add(action);
+		}
+		else
+		{
+			this._exposedValue.value = path;
+			this._pathInput.text = path;
+		}
 	}
 	
 	private function onFolderCancelled():Void
@@ -233,6 +293,58 @@ class PathUI extends ValueUI
 	private function onPathInputChange(evt:Event):Void
 	{
 		this._exposedValue.value = this._pathInput.text;
+	}
+	
+	private function onValueChangeBegin(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action != null)
+		{
+			throw new Error("FloatDraggerUI ::: action should be null");
+		}
+		
+		this._action = MultiAction.fromPool();
+		
+		this._valueChangeAction = ValueChange.fromPool();
+		this._valueChangeAction.setup(this._exposedValue, this._exposedValue.value, this._exposedValue.value);
+		this._action.add(this._valueChangeAction);
+		
+		var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+		valueUIUpdate.setup(this._exposedValue);
+		this._action.addPost(valueUIUpdate);
+	}
+	
+	private function onValueChangeEnd(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action == null)
+		{
+			throw new Error("FloatDraggerUI ::: action should not be null");
+		}
+		
+		this._valueChangeAction.newValue = this._exposedValue.value;
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		{
+			this._action.pool();
+		}
+		else
+		{
+			ValEditor.actionStack.add(this._action);
+		}
+		this._action = null;
+		this._valueChangeAction = null;
+	}
+	
+	private function input_focusInHandler(evt:FocusEvent):Void
+	{
+		onValueChangeBegin(null);
+	}
+	
+	private function input_focusOutHandler(evt:FocusEvent):Void
+	{
+		onValueChangeEnd(null);
 	}
 	
 }

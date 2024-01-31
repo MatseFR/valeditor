@@ -8,6 +8,9 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import valedit.ExposedCollection;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.CollectionClone;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.variant.LabelVariant;
@@ -212,7 +215,31 @@ class FunctionUI extends ValueUI
 	
 	private function onButton(evt:TriggerEvent):Void
 	{
-		this._func.execute();
+		if (!this._exposedValue.isConstructor)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			var collection:ExposedCollection = this._exposedValue.collection.clone(true);
+			var collectionClone:CollectionClone = CollectionClone.fromPool();
+			collectionClone.setup(collection);
+			action.add(collectionClone);
+			
+			this._func.execute();
+			
+			collection.getActionChanges(this._exposedValue.collection, action);
+			
+			if (action.numActions == 1)
+			{
+				action.pool();
+			}
+			else
+			{
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._func.execute();
+		}
 	}
 	
 	private function onParameterGroupChange(evt:Event):Void

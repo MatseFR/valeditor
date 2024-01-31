@@ -14,6 +14,9 @@ import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObjectReference;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.variant.LabelVariant;
@@ -204,8 +207,28 @@ class ObjectReferenceUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		this._idLabel.text = "";
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			this._idLabel.text = "";
+		}
 	}
 	
 	private function onLoadButton(evt:TriggerEvent):Void
@@ -224,14 +247,31 @@ class ObjectReferenceUI extends ValueUI
 	
 	private function objectSelected(object:Dynamic):Void
 	{
-		this._exposedValue.value = object;
-		if (Std.isOfType(object, ValEditObject))
+		if (!this._exposedValue.isConstructor)
 		{
-			this._idLabel.text = cast(object, ValEditObject).id;
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var valueChange:ValueChange = ValueChange.fromPool();
+			valueChange.setup(this._exposedValue, object);
+			action.add(valueChange);
+			
+			var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+			valueUIUpdate.setup(this._exposedValue);
+			action.addPost(valueUIUpdate);
+			
+			ValEditor.actionStack.add(action);
 		}
 		else
 		{
-			throw new Error("missing ValEditObject");
+			this._exposedValue.value = object;
+			if (Std.isOfType(object, ValEditObject))
+			{
+				this._idLabel.text = cast(object, ValEditObject).id;
+			}
+			else
+			{
+				throw new Error("missing ValEditObject");
+			}
 		}
 	}
 	

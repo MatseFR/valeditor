@@ -10,7 +10,13 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
+import valeditor.events.ValueUIEvent;
 import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.TextInputVariant;
@@ -65,6 +71,9 @@ class IntUI extends ValueUI
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
 	
+	private var _action:MultiAction;
+	private var _valueChangeAction:ValueChange;
+	
 	/**
 	   
 	**/
@@ -76,6 +85,13 @@ class IntUI extends ValueUI
 	
 	override public function clear():Void 
 	{
+		if (this._action != null)
+		{
+			this._action.pool();
+			this._action = null;
+			this._valueChangeAction = null;
+		}
+		
 		super.clear();
 		this._intValue = null;
 	}
@@ -199,6 +215,9 @@ class IntUI extends ValueUI
 		super.controlsDisable();
 		this._input.removeEventListener(Event.CHANGE, onInputChange);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._input.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._input.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	override function controlsEnable():Void
@@ -208,6 +227,9 @@ class IntUI extends ValueUI
 		super.controlsEnable();
 		this._input.addEventListener(Event.CHANGE, onInputChange);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._input.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
+		this._input.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
 	}
 	
 	private function onInputChange(evt:Event):Void
@@ -218,8 +240,80 @@ class IntUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		this._input.text = "";
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			this._input.text = "";
+		}
+	}
+	
+	private function onValueChangeBegin(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action != null)
+		{
+			throw new Error("FloatDraggerUI ::: action should be null");
+		}
+		
+		this._action = MultiAction.fromPool();
+		
+		this._valueChangeAction = ValueChange.fromPool();
+		this._valueChangeAction.setup(this._exposedValue, this._exposedValue.value, this._exposedValue.value);
+		this._action.add(this._valueChangeAction);
+		
+		var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+		valueUIUpdate.setup(this._exposedValue);
+		this._action.addPost(valueUIUpdate);
+	}
+	
+	private function onValueChangeEnd(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action == null)
+		{
+			throw new Error("FloatDraggerUI ::: action should not be null");
+		}
+		
+		this._valueChangeAction.newValue = this._exposedValue.value;
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		{
+			this._action.pool();
+		}
+		else
+		{
+			ValEditor.actionStack.add(this._action);
+		}
+		this._action = null;
+		this._valueChangeAction = null;
+	}
+	
+	private function input_focusInHandler(evt:FocusEvent):Void
+	{
+		onValueChangeBegin(null);
+	}
+	
+	private function input_focusOutHandler(evt:FocusEvent):Void
+	{
+		onValueChangeEnd(null);
 	}
 	
 }

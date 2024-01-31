@@ -11,6 +11,9 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.controls.value.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.events.ValueEvent;
@@ -181,14 +184,51 @@ class BoolUI extends ValueUI
 	
 	private function onCheckChange(evt:Event):Void
 	{
-		this._check.text = "";
-		this._exposedValue.value = this._check.selected;
+		if (!this._exposedValue.isConstructor)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var valueChange:ValueChange = ValueChange.fromPool();
+			valueChange.setup(this._exposedValue, this._check.selected);
+			action.add(valueChange);
+			
+			var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+			valueUIUpdate.setup(this._exposedValue);
+			action.addPost(valueUIUpdate);
+			
+			ValEditor.actionStack.add(action);
+		}
+		else
+		{
+			this._check.text = "";
+			this._exposedValue.value = this._check.selected;
+		}
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
-		this._check.text = "(null)";
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+			this._check.text = "(null)";
+		}
 	}
 	
 }

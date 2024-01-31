@@ -9,12 +9,17 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.utils.MathUtil;
+import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloatDrag;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
+import valeditor.events.ValueUIEvent;
 import valeditor.ui.feathers.controls.NumericDragger;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.variant.LabelVariant;
@@ -61,6 +66,9 @@ class FloatDraggerUI extends ValueUI
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
 	
+	private var _action:MultiAction;
+	private var _valueChangeAction:ValueChange;
+	
 	/**
 	   
 	**/
@@ -72,6 +80,13 @@ class FloatDraggerUI extends ValueUI
 	
 	override public function clear():Void 
 	{
+		if (this._action != null)
+		{
+			this._action.pool();
+			this._action = null;
+			this._valueChangeAction = null;
+		}
+		
 		super.clear();
 		this._floatValue = null;
 	}
@@ -194,6 +209,9 @@ class FloatDraggerUI extends ValueUI
 		this._dragger.removeEventListener(KeyboardEvent.KEY_DOWN, onDraggerKeyDown);
 		this._dragger.removeEventListener(KeyboardEvent.KEY_UP, onDraggerKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._dragger.removeEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
+		this._dragger.removeEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 	}
 	
 	override function controlsEnable():Void 
@@ -205,6 +223,9 @@ class FloatDraggerUI extends ValueUI
 		this._dragger.addEventListener(KeyboardEvent.KEY_DOWN, onDraggerKeyDown);
 		this._dragger.addEventListener(KeyboardEvent.KEY_UP, onDraggerKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+		
+		this._dragger.addEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
+		this._dragger.addEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 	}
 	
 	private function onDraggerChange(evt:Event):Void
@@ -224,7 +245,69 @@ class FloatDraggerUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		this._exposedValue.value = null;
+		if (!this._exposedValue.isConstructor)
+		{
+			if (this._exposedValue.value != null)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, null);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = null;
+		}
+	}
+	
+	private function onValueChangeBegin(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action != null)
+		{
+			throw new Error("FloatDraggerUI ::: action should be null");
+		}
+		
+		this._action = MultiAction.fromPool();
+		
+		this._valueChangeAction = ValueChange.fromPool();
+		this._valueChangeAction.setup(this._exposedValue, this._exposedValue.value, this._exposedValue.value);
+		this._action.add(this._valueChangeAction);
+		
+		var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+		valueUIUpdate.setup(this._exposedValue);
+		this._action.addPost(valueUIUpdate);
+	}
+	
+	private function onValueChangeEnd(evt:ValueUIEvent):Void
+	{
+		if (this._exposedValue.isConstructor) return;
+		
+		if (this._action == null)
+		{
+			throw new Error("FloatDraggerUI ::: action should not be null");
+		}
+		
+		this._valueChangeAction.newValue = this._exposedValue.value;
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		{
+			this._action.pool();
+		}
+		else
+		{
+			ValEditor.actionStack.add(this._action);
+		}
+		this._action = null;
+		this._valueChangeAction = null;
 	}
 	
 }
