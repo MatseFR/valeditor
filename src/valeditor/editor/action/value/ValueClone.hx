@@ -20,7 +20,8 @@ class ValueClone extends ValEditorAction
 	
 	public var fromValue:ExposedValue;
 	public var toValue:ExposedValue;
-	public var backupValue:ExposedValue;
+	public var restoreValue:ExposedValue;
+	private var _isRestoreValueProvided:Bool;
 	
 	public function new() 
 	{
@@ -31,8 +32,12 @@ class ValueClone extends ValEditorAction
 	{
 		this.fromValue = null;
 		this.toValue = null;
-		this.backupValue.pool();
-		this.backupValue = null;
+		if (!this._isRestoreValueProvided)
+		{
+			this.restoreValue.pool();
+		}
+		this.restoreValue = null;
+		
 		
 		super.clear();
 	}
@@ -43,11 +48,20 @@ class ValueClone extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(fromValue:ExposedValue, toValue:ExposedValue):Void
+	public function setup(fromValue:ExposedValue, toValue:ExposedValue, ?restoreValue:ExposedValue):Void
 	{
 		this.fromValue = fromValue;
 		this.toValue = toValue;
-		this.backupValue = this.toValue.clone(true);
+		if (restoreValue != null)
+		{
+			this._isRestoreValueProvided = true;
+			this.restoreValue = restoreValue;
+		}
+		else
+		{
+			this._isRestoreValueProvided = false;
+			this.restoreValue = this.toValue.clone(true);
+		}
 	}
 	
 	public function apply():Void
@@ -68,7 +82,7 @@ class ValueClone extends ValEditorAction
 			throw new Error("ValueClone already cancelled");
 		}
 		
-		this.backupValue.cloneValue(this.toValue);
+		this.restoreValue.cloneValue(this.toValue);
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
