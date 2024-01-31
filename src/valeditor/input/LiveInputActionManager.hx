@@ -4,7 +4,10 @@ import inputAction.Input;
 import inputAction.InputAction;
 import juggler.animation.IAnimatable;
 import valedit.utils.RegularPropertyName;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 
 /**
  * ...
@@ -23,6 +26,9 @@ class LiveInputActionManager implements IAnimatable
 		var action:MultiAction;
 		var inputAction:InputAction;
 		var input:Input = ValEditor.input;
+		var value:ExposedValue;
+		var valueChange:ValueChange;
+		var valueUIUpdate:ValueUIUpdate;
 		
 		if (ValEditor.currentContainer != null)
 		{
@@ -157,108 +163,492 @@ class LiveInputActionManager implements IAnimatable
 			// Move down
 			if (input.justDid(InputActionID.MOVE_DOWN_1) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.Y);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value + 1);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_DOWN_1);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.Y);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value + 1);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 				}
 			}
 			
 			if (input.justDid(InputActionID.MOVE_DOWN_10) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.Y);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value + 10);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_DOWN_10);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.Y);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value + 10);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 				}
 			}
 			
 			// Move left
 			if (input.justDid(InputActionID.MOVE_LEFT_1) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.X);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value - 1);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_LEFT_1);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.X);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value - 1);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 				}
 			}
 			
 			if (input.justDid(InputActionID.MOVE_LEFT_10) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.X);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value - 10);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_LEFT_10);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.X);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value - 10);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 				}
 			}
 			
 			// Move right
 			if (input.justDid(InputActionID.MOVE_RIGHT_1) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.X);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value + 1);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_RIGHT_1);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.X);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value + 1);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 				}
 			}
 			
 			if (input.justDid(InputActionID.MOVE_RIGHT_10) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.X);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value + 10);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_RIGHT_10);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.X);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value + 10);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 				}
 			}
 			
 			// Move up
 			if (input.justDid(InputActionID.MOVE_UP_1) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.Y);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value - 1);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_UP_1);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.Y);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value - 1);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 				}
 			}
 			
 			if (input.justDid(InputActionID.MOVE_UP_10) != null)
 			{
-				ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
+				action = MultiAction.fromPool();
+				for (obj in ValEditor.currentContainer.selection)
+				{
+					value = obj.getValue(RegularPropertyName.Y);
+					if (value == null) continue;
+					
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value - 10);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+				
+				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 			}
 			else
 			{
 				inputAction = input.isDoing(InputActionID.MOVE_UP_10);
 				if (inputAction != null && inputAction.canRepeat())
 				{
-					ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
+					action = MultiAction.fromPool();
+					for (obj in ValEditor.currentContainer.selection)
+					{
+						value = obj.getValue(RegularPropertyName.Y);
+						if (value == null) continue;
+						
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value - 10);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+					
+					if (action.numActions != 0)
+					{
+						ValEditor.actionStack.add(action);
+					}
+					else
+					{
+						action.pool();
+					}
+					
+					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 				}
 			}
 		}
