@@ -15,11 +15,14 @@ import valedit.DisplayObjectType;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.utils.RegularPropertyName;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectSelect;
 import valeditor.editor.action.object.ObjectUnselect;
 import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.action.selection.SelectionSetObject;
+import valeditor.editor.action.value.ValueChange;
+import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.events.ContainerEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.RenameEvent;
@@ -226,6 +229,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._layerNameIndex = 0;
 		
 		this._ignoreNextStageClick = false;
+		
+		if (this._actionCurrent != null)
+		{
+			this._actionCurrent.pool();
+			this._actionCurrent = null;
+		}
 		
 		super.clear();
 	}
@@ -577,6 +586,63 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObject.mouseRestoreY);
 			}
 		}
+		else if (this._mouseObject.getProperty(RegularPropertyName.X) != this._mouseObject.mouseRestoreX || this._mouseObject.getProperty(RegularPropertyName.Y) != this._mouseObject.mouseRestoreY)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			var value:ExposedValue;
+			var valueChange:ValueChange;
+			var valueUIUpdate:ValueUIUpdate;
+			
+			if (this.selection.hasObject(this._mouseObject))
+			{
+				for (obj in this.selection)
+				{
+					// X
+					value = obj.getValue(RegularPropertyName.X);
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, obj.mouseRestoreX);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+					
+					// Y
+					value = obj.getValue(RegularPropertyName.Y);
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, obj.mouseRestoreY);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+			}
+			else
+			{
+				// X
+				value = this._mouseObject.getValue(RegularPropertyName.X);
+				valueChange = ValueChange.fromPool();
+				valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
+				action.add(valueChange);
+				
+				valueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(value);
+				action.addPost(valueUIUpdate);
+				
+				// Y
+				value = this._mouseObject.getValue(RegularPropertyName.Y);
+				valueChange = ValueChange.fromPool();
+				valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
+				action.add(valueChange);
+				
+				valueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(value);
+				action.addPost(valueUIUpdate);
+			}
+			
+			ValEditor.actionStack.add(action);
+		}
 		
 		this._mouseObject = null;
 		
@@ -800,6 +866,63 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					this._mouseObject.setProperty(RegularPropertyName.X, this._mouseObject.mouseRestoreX);
 					this._mouseObject.setProperty(RegularPropertyName.Y, this._mouseObject.mouseRestoreY);
 				}
+			}
+			else
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				var value:ExposedValue;
+				var valueChange:ValueChange;
+				var valueUIUpdate:ValueUIUpdate;
+				
+				if (this.selection.hasObject(this._mouseObject))
+				{
+					for (obj in this.selection)
+					{
+						// X
+						value = obj.getValue(RegularPropertyName.X);
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, obj.mouseRestoreX);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+						
+						// Y
+						value = obj.getValue(RegularPropertyName.Y);
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, obj.mouseRestoreY);
+						action.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						action.addPost(valueUIUpdate);
+					}
+				}
+				else
+				{
+					// X
+					value = this._mouseObject.getValue(RegularPropertyName.X);
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+					
+					// Y
+					value = this._mouseObject.getValue(RegularPropertyName.Y);
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
+					action.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					action.addPost(valueUIUpdate);
+				}
+				
+				ValEditor.actionStack.add(action);
 			}
 			
 			this._mouseObject = null;
