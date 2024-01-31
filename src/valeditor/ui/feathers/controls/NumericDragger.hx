@@ -21,6 +21,7 @@ import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
 import openfl.ui.Keyboard;
+import valeditor.events.ValueUIEvent;
 
 /**
  * ...
@@ -660,7 +661,11 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function dragLabel_stage_mouseMoveHandler(evt:MouseEvent):Void
 	{
-		this._hasMoved = true;
+		if (!this._hasMoved)
+		{
+			this._hasMoved = true;
+			ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_BEGIN);
+		}
 		
 		var moveX:Float = this.mouseX - this._pointerStartX;
 		var moveY:Float = -(this.mouseY - this._pointerStartY);
@@ -709,6 +714,20 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		{
 			FeathersEvent.dispatch(this, Event.CHANGE);
 		}
+		
+		if (this._hasMoved)
+		{
+			ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_END);
+		}
+		
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
+		}
 	}
 	
 	private function dragLabel_stage_rightClickHandler(evt:MouseEvent):Void
@@ -718,6 +737,17 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		stopDragging();
 		
 		this.value = this._valueBeforeDrag;
+		
+		ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_END);
+		
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
+		}
 	}
 	
 	private function focusInHandler(evt:FocusEvent):Void
@@ -759,6 +789,8 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		if (this._debug) trace("input_focusInHandler");
 		
 		this._inputHasFocus = true;
+		
+		ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_BEGIN);
 	}
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
@@ -769,6 +801,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		if (this._debug) trace("input_focusOutHandler");
 		
 		//changeState(UP);
+		ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_END);
 	}
 	
 	private function input_keyUpHandler(evt:KeyboardEvent):Void
