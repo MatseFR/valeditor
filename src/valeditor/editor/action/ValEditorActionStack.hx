@@ -77,6 +77,27 @@ class ValEditorActionStack extends EventDispatcher
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
 	}
 	
+	public function remove(action:ValEditorAction):Void
+	{
+		var removed:Bool = this._doneActions.remove(action);
+		if (!removed) this._undoneActions.remove(action);
+		if (this._lastAction == action)
+		{
+			if (this._doneActions.length != 0)
+			{
+				this._lastAction = this._doneActions[this._doneActions.length - 1];
+			}
+			else
+			{
+				this._lastAction = null;
+			}
+		}
+		if (this._lastSavedAction == action)
+		{
+			this._lastSavedAction = null;
+		}
+	}
+	
 	public function redo():Void
 	{
 		if (this._undoneActions.length == 0) return;
