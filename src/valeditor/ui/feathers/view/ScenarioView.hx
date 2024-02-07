@@ -49,6 +49,7 @@ import valeditor.editor.action.layer.LayerIndexUp;
 import valeditor.editor.action.layer.LayerLock;
 import valeditor.editor.action.layer.LayerRemove;
 import valeditor.editor.action.layer.LayerVisible;
+import valeditor.editor.action.timeline.TimeLineSetFrameIndex;
 import valeditor.events.ContainerEvent;
 import valeditor.events.EditorEvent;
 import valeditor.events.LayerEvent;
@@ -174,6 +175,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _contextMenuSprite:Sprite;
 	private var _contextMenuPt:Point = new Point();
 	private var _contextMenuRect:Rectangle = new Rectangle();
+	
+	private var _lastFrameIndex:Int;
 	
 	public function new() 
 	{
@@ -693,7 +696,9 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onRulerMouseDown(evt:MouseEvent):Void
 	{
-		_rulerPt.x = evt.stageX;
+		this._lastFrameIndex = this._container.frameIndex;
+		
+		this._rulerPt.x = evt.stageX;
 		
 		if (this._currentTimeLineItem != null)
 		{
@@ -707,12 +712,12 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onRulerMouseMove(evt:MouseEvent):Void
 	{
-		_rulerPt.x = evt.stageX;
+		this._rulerPt.x = evt.stageX;
 	}
 	
 	public function advanceTime(time:Float):Void
 	{
-		var loc:Point = this._timeLineTopControlsGroup.globalToLocal(_rulerPt);
+		var loc:Point = this._timeLineTopControlsGroup.globalToLocal(this._rulerPt);
 		var index:Int;
 		var indexMax:Int = this._timeLineRulerList.dataProvider.length - 1;
 		
@@ -736,6 +741,13 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onRulerMouseMove);
 		this.stage.removeEventListener(MouseEvent.MOUSE_UP, onRulerMouseUp);
 		ValEditor.juggler.remove(this);
+		
+		if (this._container.frameIndex != this._lastFrameIndex)
+		{
+			var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
+			setFrameIndex.setup(cast this._container.timeLine, this._container.frameIndex, this._lastFrameIndex);
+			ValEditor.actionStack.add(setFrameIndex);
+		}
 	}
 	
 	private function setPlayHeadIndex(index:Int):Void
@@ -820,10 +832,11 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onLayerContextMenuStageMouseDown);
 	}
 	
-	private function createTimeLineItem(timeLine:ValEditorTimeLine, index:Int):Void
+	private function createTimeLineItem(layer:ValEditorLayer, index:Int):Void
 	{
-		var item:TimeLineItem = TimeLineItem.fromPool(timeLine);
-		item.addEventListener(Event.SELECT, onTimeLineItemSelected);
+		var timeLine:ValEditorTimeLine = cast layer.timeLine;
+		var item:TimeLineItem = TimeLineItem.fromPool(layer);
+		//item.addEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
 		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
 		this._timeLineItems.insert(index, item);
@@ -835,7 +848,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function destroyTimeLineItem(item:TimeLineItem):Void
 	{
-		item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
+		//item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.removeEventListener(Event.SCROLL, onTimeLineItemScroll);
 		item.removeEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
 		this._timeLineItems.remove(item);
@@ -849,7 +862,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		layer.addEventListener(LayerEvent.LOCK_CHANGE, onLayerChange);
 		layer.addEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
 		
-		createTimeLineItem(cast layer.timeLine, this._container.getLayerIndex(layer));
+		createTimeLineItem(cast layer, this._container.getLayerIndex(layer));
 	}
 	
 	private function layerUnregister(layer:ValEditorLayer):Void
@@ -1206,11 +1219,11 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._hScrollBar.value = timeLineItem.scrollX;
 	}
 	
-	private function onTimeLineItemSelected(evt:Event):Void
-	{
-		var layer:ValEditLayer = this._container.getLayerAt(this._timeLineItems.indexOf(cast evt.target));
-		this._container.currentLayer = layer;
-	}
+	//private function onTimeLineItemSelected(evt:Event):Void
+	//{
+		//var layer:ValEditLayer = this._container.getLayerAt(this._timeLineItems.indexOf(cast evt.target));
+		//this._container.currentLayer = layer;
+	//}
 	
 	private function onTimeLineListScroll(evt:ScrollEvent):Void
 	{
