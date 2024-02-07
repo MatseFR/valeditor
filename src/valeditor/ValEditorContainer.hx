@@ -588,7 +588,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		else if (this._mouseObject.getProperty(RegularPropertyName.X) != this._mouseObject.mouseRestoreX || this._mouseObject.getProperty(RegularPropertyName.Y) != this._mouseObject.mouseRestoreY)
 		{
-			var action:MultiAction = MultiAction.fromPool();
+			//var action:MultiAction = MultiAction.fromPool();
 			var value:ExposedValue;
 			var valueChange:ValueChange;
 			var valueUIUpdate:ValueUIUpdate;
@@ -599,49 +599,69 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				{
 					// X
 					value = obj.getValue(RegularPropertyName.X);
-					valueChange = ValueChange.fromPool();
-					valueChange.setup(value, value.value, obj.mouseRestoreX);
-					action.add(valueChange);
-					
-					valueUIUpdate = ValueUIUpdate.fromPool();
-					valueUIUpdate.setup(value);
-					action.addPost(valueUIUpdate);
+					if (value.value != obj.mouseRestoreX)
+					{
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, obj.mouseRestoreX);
+						//action.add(valueChange);
+						this._actionCurrent.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						//action.addPost(valueUIUpdate);
+						this._actionCurrent.addPost(valueUIUpdate);
+					}
 					
 					// Y
 					value = obj.getValue(RegularPropertyName.Y);
-					valueChange = ValueChange.fromPool();
-					valueChange.setup(value, value.value, obj.mouseRestoreY);
-					action.add(valueChange);
-					
-					valueUIUpdate = ValueUIUpdate.fromPool();
-					valueUIUpdate.setup(value);
-					action.addPost(valueUIUpdate);
+					if (value.value != obj.mouseRestoreY)
+					{
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, obj.mouseRestoreY);
+						//action.add(valueChange);
+						this._actionCurrent.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						//action.addPost(valueUIUpdate);
+						this._actionCurrent.addPost(valueUIUpdate);
+					}
 				}
 			}
 			else
 			{
 				// X
 				value = this._mouseObject.getValue(RegularPropertyName.X);
-				valueChange = ValueChange.fromPool();
-				valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
-				action.add(valueChange);
-				
-				valueUIUpdate = ValueUIUpdate.fromPool();
-				valueUIUpdate.setup(value);
-				action.addPost(valueUIUpdate);
+				if (value.value != this._mouseObject.mouseRestoreX)
+				{
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
+					//action.add(valueChange);
+					this._actionCurrent.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					//action.addPost(valueUIUpdate);
+					this._actionCurrent.addPost(valueUIUpdate);
+				}
 				
 				// Y
 				value = this._mouseObject.getValue(RegularPropertyName.Y);
-				valueChange = ValueChange.fromPool();
-				valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
-				action.add(valueChange);
-				
-				valueUIUpdate = ValueUIUpdate.fromPool();
-				valueUIUpdate.setup(value);
-				action.addPost(valueUIUpdate);
+				if (value.value != this._mouseObject.mouseRestoreY)
+				{
+					valueChange = ValueChange.fromPool();
+					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
+					//action.add(valueChange);
+					this._actionCurrent.add(valueChange);
+					
+					valueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(value);
+					//action.addPost(valueUIUpdate);
+					this._actionCurrent.addPost(valueUIUpdate);
+				}
 			}
 			
-			ValEditor.actionStack.add(action);
+			//ValEditor.actionStack.add(action);
 		}
 		
 		this._mouseObject = null;
@@ -869,7 +889,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 			else
 			{
-				var action:MultiAction = MultiAction.fromPool();
+				//var action:MultiAction = MultiAction.fromPool();
 				var value:ExposedValue;
 				var valueChange:ValueChange;
 				var valueUIUpdate:ValueUIUpdate;
@@ -880,49 +900,76 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					{
 						// X
 						value = obj.getValue(RegularPropertyName.X);
-						valueChange = ValueChange.fromPool();
-						valueChange.setup(value, value.value, obj.mouseRestoreX);
-						action.add(valueChange);
-						
-						valueUIUpdate = ValueUIUpdate.fromPool();
-						valueUIUpdate.setup(value);
-						action.addPost(valueUIUpdate);
+						if (value.value != obj.mouseRestoreX)
+						{
+							valueChange = ValueChange.fromPool();
+							valueChange.setup(value, value.value, obj.mouseRestoreX);
+							//action.add(valueChange);
+							this._actionCurrent.add(valueChange);
+							
+							valueUIUpdate = ValueUIUpdate.fromPool();
+							valueUIUpdate.setup(value);
+							//action.addPost(valueUIUpdate);
+							this._actionCurrent.addPost(valueUIUpdate);
+						}
 						
 						// Y
 						value = obj.getValue(RegularPropertyName.Y);
-						valueChange = ValueChange.fromPool();
-						valueChange.setup(value, value.value, obj.mouseRestoreY);
-						action.add(valueChange);
-						
-						valueUIUpdate = ValueUIUpdate.fromPool();
-						valueUIUpdate.setup(value);
-						action.addPost(valueUIUpdate);
+						if (value.value != obj.mouseRestoreY)
+						{
+							valueChange = ValueChange.fromPool();
+							valueChange.setup(value, value.value, obj.mouseRestoreY);
+							//action.add(valueChange);
+							this._actionCurrent.add(valueChange);
+							
+							valueUIUpdate = ValueUIUpdate.fromPool();
+							valueUIUpdate.setup(value);
+							//action.addPost(valueUIUpdate);
+							this._actionCurrent.addPost(valueUIUpdate);
+						}
 					}
 				}
 				else
 				{
 					// X
 					value = this._mouseObject.getValue(RegularPropertyName.X);
-					valueChange = ValueChange.fromPool();
-					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
-					action.add(valueChange);
-					
-					valueUIUpdate = ValueUIUpdate.fromPool();
-					valueUIUpdate.setup(value);
-					action.addPost(valueUIUpdate);
+					if (value.value != this._mouseObject.mouseRestoreX)
+					{
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
+						//action.add(valueChange);
+						this._actionCurrent.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						//action.addPost(valueUIUpdate);
+						this._actionCurrent.addPost(valueUIUpdate);
+					}
 					
 					// Y
 					value = this._mouseObject.getValue(RegularPropertyName.Y);
-					valueChange = ValueChange.fromPool();
-					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
-					action.add(valueChange);
-					
-					valueUIUpdate = ValueUIUpdate.fromPool();
-					valueUIUpdate.setup(value);
-					action.addPost(valueUIUpdate);
+					if (value.value != this._mouseObject.mouseRestoreY)
+					{
+						valueChange = ValueChange.fromPool();
+						valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
+						//action.add(valueChange);
+						this._actionCurrent.add(valueChange);
+						
+						valueUIUpdate = ValueUIUpdate.fromPool();
+						valueUIUpdate.setup(value);
+						//action.addPost(valueUIUpdate);
+						this._actionCurrent.addPost(valueUIUpdate);
+					}
 				}
 				
-				ValEditor.actionStack.add(action);
+				//if (action.numActions != 0)
+				//{
+					//ValEditor.actionStack.add(action);
+				//}
+				//else
+				//{
+					//action.pool();
+				//}
 			}
 			
 			this._mouseObject = null;
