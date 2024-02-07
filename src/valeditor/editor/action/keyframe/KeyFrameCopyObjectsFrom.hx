@@ -2,13 +2,14 @@ package valeditor.editor.action.keyframe;
 
 import openfl.errors.Error;
 import valeditor.ValEditorKeyFrame;
+import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.ValEditorAction;
 
 /**
  * ...
  * @author Matse
  */
-class KeyFrameCopyObjectsFrom extends ValEditorAction 
+class KeyFrameCopyObjectsFrom extends MultiAction 
 {
 	static private var _POOL:Array<KeyFrameCopyObjectsFrom> = new Array<KeyFrameCopyObjectsFrom>();
 	
@@ -20,37 +21,27 @@ class KeyFrameCopyObjectsFrom extends ValEditorAction
 	
 	public var keyFrame:ValEditorKeyFrame;
 	public var fromKeyFrame:ValEditorKeyFrame;
-	public var objects:Array<ValEditorObject> = new Array<ValEditorObject>();
+	
+	override function get_numActions():Int  { return super.get_numActions() + 1; }
 	
 	private var _isFirstApply:Bool = true;
 
 	public function new() 
 	{
-		
+		super();
 	}
 	
 	override public function clear():Void 
 	{
 		this.keyFrame = null;
 		this.fromKeyFrame = null;
-		if (this.status == ValEditorActionStatus.UNDONE)
-		{
-			for (object in objects)
-			{
-				if (object.canBeDestroyed())
-				{
-					ValEditor.destroyObject(object);
-				}
-			}
-		}
-		this.objects.resize(0);
 		
 		this._isFirstApply = true;
 		
 		super.clear();
 	}
 	
-	public function pool():Void
+	override public function pool():Void
 	{
 		clear();
 		_POOL[_POOL.length] = this;
@@ -62,7 +53,7 @@ class KeyFrameCopyObjectsFrom extends ValEditorAction
 		this.fromKeyFrame = fromKeyFrame;
 	}
 	
-	public function apply():Void
+	override public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
@@ -72,36 +63,24 @@ class KeyFrameCopyObjectsFrom extends ValEditorAction
 		if (this._isFirstApply)
 		{
 			this._isFirstApply = false;
-			var previousObjectCount:Int = this.keyFrame.objects.length;
-			this.keyFrame.copyObjectsFrom(this.fromKeyFrame);
-			var objectCount:Int = this.keyFrame.objects.length;
-			for (i in previousObjectCount...objectCount)
-			{
-				this.objects.push(cast this.keyFrame.objects[i]);
-			}
+			this.keyFrame.copyObjectsFrom(this.fromKeyFrame, this);
+			
+			this.status = ValEditorActionStatus.DONE;
 		}
 		else
 		{
-			for (object in this.objects)
-			{
-				this.keyFrame.add(object);
-			}
+			super.apply();
 		}
-		this.status = ValEditorActionStatus.DONE;
 	}
 	
-	public function cancel():Void
+	override public function cancel():Void
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
 			throw new Error("KeyFrameCopyObjectsFrom already cancelled");
 		}
 		
-		for (object in this.objects)
-		{
-			this.keyFrame.remove(object);
-		}
-		this.status = ValEditorActionStatus.UNDONE;
+		super.cancel();
 	}
 	
 }
