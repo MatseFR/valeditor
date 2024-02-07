@@ -7,6 +7,8 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.data.ArrayCollection;
 import feathers.data.GridViewCellState;
+import feathers.events.GridViewEvent;
+import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
@@ -24,7 +26,10 @@ import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.action.template.TemplateRemove;
+import valeditor.editor.action.template.TemplateSelect;
+import valeditor.editor.action.template.TemplateUnselect;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -135,7 +140,7 @@ class TemplateLibrary extends LayoutGroup
 		
 		this._grid = new GridView(ValEditor.templateCollection, columns, onGridChange);
 		this._grid.customHeaderRendererVariant = SortOrderHeaderRendererVariant.CRAMPED;
-		this._grid.addEventListener(KeyboardEvent.KEY_DOWN, onGridKeyDown);
+		this._grid.addEventListener(KeyboardEvent.KEY_DOWN, onGridKeyDown, false, 500);
 		this._grid.addEventListener(KeyboardEvent.KEY_UP, onGridKeyUp);
 		this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
 		this._grid.addEventListener(FocusEvent.FOCUS_OUT, onGridFocusOut);
@@ -146,9 +151,10 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._footer), 0);
 		addChild(this._grid);
 		
+		this._grid.addEventListener(MouseEvent.CLICK, onGridMouseClick);
 		this._grid.addEventListener(MouseEvent.MOUSE_DOWN, onGridMouseDown);
 		
-		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 	}
 	
 	private function onTemplateAddButton(evt:TriggerEvent):Void
@@ -158,7 +164,6 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateRemoveButton(evt:TriggerEvent):Void
 	{
-		//ValEditor.destroyTemplate(this._grid.selectedItem);
 		var action:MultiAction = MultiAction.fromPool();
 		var templateRemove:TemplateRemove;
 		
@@ -181,52 +186,52 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (this._grid.selectedItems.length != 0)
 		{
-			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+			//ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			
-			var selection:Dynamic = ValEditor.selection.object;
-			if (Std.isOfType(selection, ValEditorTemplate))
-			{
-				if (this._grid.selectedItems.indexOf(selection) == -1)
-				{
-					ValEditor.selection.removeTemplate(selection);
-				}
-			}
-			else if (Std.isOfType(selection, ValEditorTemplateGroup))
-			{
-				var group:ValEditorTemplateGroup = cast selection;
-				for (template in group)
-				{
-					if (this._grid.selectedItems.indexOf(template) == -1)
-					{
-						this._templatesToRemove.push(template);
-					}
-				}
-				
-				if (this._templatesToRemove.length != 0)
-				{
-					ValEditor.selection.removeTemplates(this._templatesToRemove);
-					this._templatesToRemove.resize(0);
-				}
-			}
-			
-			for (template in this._grid.selectedItems)
-			{
-				if (!ValEditor.selection.hasTemplate(template))
-				{
-					ValEditor.selection.addTemplate(template);
-				}
-			}
+			//var selection:Dynamic = ValEditor.selection.object;
+			//if (Std.isOfType(selection, ValEditorTemplate))
+			//{
+				//if (this._grid.selectedItems.indexOf(selection) == -1)
+				//{
+					//ValEditor.selection.removeTemplate(selection);
+				//}
+			//}
+			//else if (Std.isOfType(selection, ValEditorTemplateGroup))
+			//{
+				//var group:ValEditorTemplateGroup = cast selection;
+				//for (template in group)
+				//{
+					//if (this._grid.selectedItems.indexOf(template) == -1)
+					//{
+						//this._templatesToRemove.push(template);
+					//}
+				//}
+				//
+				//if (this._templatesToRemove.length != 0)
+				//{
+					//ValEditor.selection.removeTemplates(this._templatesToRemove);
+					//this._templatesToRemove.resize(0);
+				//}
+			//}
+			//
+			//for (template in this._grid.selectedItems)
+			//{
+				//if (!ValEditor.selection.hasTemplate(template))
+				//{
+					//ValEditor.selection.addTemplate(template);
+				//}
+			//}
 			this._templateRemoveButton.enabled = true;
 			this._templateRenameButton.enabled = this._grid.selectedItems.length == 1;
 			
-			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
+			//ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 		}
 		else
 		{
-			if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate) || Std.isOfType(ValEditor.selection.object, ValEditorTemplateGroup))
-			{
-				ValEditor.selection.object = null;
-			}
+			//if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate) || Std.isOfType(ValEditor.selection.object, ValEditorTemplateGroup))
+			//{
+				//ValEditor.selection.object = null;
+			//}
 			this._templateRemoveButton.enabled = false;
 			this._templateRenameButton.enabled = false;
 		}
@@ -244,6 +249,9 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onGridKeyDown(evt:KeyboardEvent):Void
 	{
+		var result:Int = this._grid.selectedIndex;
+		var selectionChanged:Bool = false;
+		
 		switch (evt.keyCode)
 		{
 			case Keyboard.A :
@@ -283,14 +291,150 @@ class TemplateLibrary extends LayoutGroup
 					
 					ValEditor.actionStack.add(action);
 				}
+			
+			case Keyboard.UP:
+				result = result - 1;
+				selectionChanged = true;
+			
+			case Keyboard.DOWN:
+				result = result + 1;
+				selectionChanged = true;
+			
+			case Keyboard.LEFT:
+				result = result - 1;
+				selectionChanged = true;
+			
+			case Keyboard.RIGHT:
+				result = result + 1;
+				selectionChanged = true;
+			
+			case Keyboard.PAGE_UP:
+				result = result - 1;
+				selectionChanged = true;
+			
+			case Keyboard.PAGE_DOWN:
+				result = result + 1;
+				selectionChanged = true;
+			
+			case Keyboard.HOME:
+				result = 0;
+				selectionChanged = true;
+			
+			case Keyboard.END:
+				result = this._grid.dataProvider.length - 1;
+				selectionChanged = true;
+			
+			default:
+				// no keyboard navigation
 		}
 		
-		evt.stopPropagation();
+		if (selectionChanged)
+		{
+			if (result < 0)
+			{
+				result = 0;
+			}
+			else if (result >= this._grid.dataProvider.length)
+			{
+				result = this._grid.dataProvider.length - 1;
+			}
+			
+			if (result != this._grid.selectedIndex)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var selectionClear:SelectionClear = SelectionClear.fromPool();
+				selectionClear.setup(ValEditor.selection);
+				action.add(selectionClear);
+				
+				var templateSelect:TemplateSelect = TemplateSelect.fromPool();
+				templateSelect.setup();
+				templateSelect.addTemplate(this._grid.dataProvider.get(result));
+				action.add(templateSelect);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		
+		if (!evt.ctrlKey || (evt.keyCode != Keyboard.Z && evt.keyCode != Keyboard.Y))
+		{
+			evt.stopPropagation();
+		}
+		
+		evt.preventDefault(); // prevent GridView from reacting
 	}
 	
 	private function onGridKeyUp(evt:KeyboardEvent):Void
 	{
-		evt.stopPropagation();
+		if (!evt.ctrlKey || (evt.keyCode != Keyboard.Z && evt.keyCode != Keyboard.Y))
+		{
+			evt.stopPropagation();
+		}
+	}
+	
+	private function onGridMouseClick(evt:MouseEvent):Void
+	{
+		var object:DisplayObject = evt.target;
+		var template:ValEditorTemplate = null;
+		while (true)
+		{
+			if (object == null) break;
+			if (object is ItemRenderer)
+			{
+				template = cast(object, ItemRenderer).data;
+				break;
+			}
+			object = object.parent;
+		}
+		if (template != null)
+		{
+			if (evt.ctrlKey || evt.shiftKey)
+			{
+				if (ValEditor.selection.hasTemplate(template))
+				{
+					var templateUnselect:TemplateUnselect = TemplateUnselect.fromPool();
+					templateUnselect.setup();
+					templateUnselect.addTemplate(template);
+					ValEditor.actionStack.add(templateUnselect);
+				}
+				else
+				{
+					var action:MultiAction = MultiAction.fromPool();
+					
+					if (!Std.isOfType(ValEditor.selection.object, ValEditorTemplate) && !Std.isOfType(ValEditor.selection.object, ValEditorTemplateGroup))
+					{
+						var selectionClear:SelectionClear = SelectionClear.fromPool();
+						selectionClear.setup(ValEditor.selection);
+						action.add(selectionClear);
+					}
+					
+					var templateSelect:TemplateSelect = TemplateSelect.fromPool();
+					templateSelect.setup();
+					templateSelect.addTemplate(template);
+					action.add(templateSelect);
+					
+					ValEditor.actionStack.add(action);
+				}
+			}
+			else
+			{
+				if (ValEditor.selection.object != template)
+				{
+					var action:MultiAction = MultiAction.fromPool();
+					
+					var selectionClear:SelectionClear = SelectionClear.fromPool();
+					selectionClear.setup(ValEditor.selection);
+					action.add(selectionClear);
+					
+					var templateSelect:TemplateSelect = TemplateSelect.fromPool();
+					templateSelect.setup();
+					templateSelect.addTemplate(template);
+					action.add(templateSelect);
+					
+					ValEditor.actionStack.add(action);
+				}
+			}
+		}
 	}
 	
 	private function onGridMouseDown(evt:MouseEvent):Void
@@ -313,7 +457,7 @@ class TemplateLibrary extends LayoutGroup
 		}
 	}
 	
-	private function onObjectSelectionChange(evt:SelectionEvent):Void
+	private function onSelectionChange(evt:SelectionEvent):Void
 	{
 		if (evt.object != null)
 		{
