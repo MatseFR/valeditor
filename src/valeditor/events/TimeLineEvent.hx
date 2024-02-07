@@ -11,6 +11,7 @@ class TimeLineEvent extends Event
 {
 	inline static public var FRAME_INDEX_CHANGE:String = "frame_index_change";
 	inline static public var NUM_FRAMES_CHANGE:String = "num_frames_change";
+	inline static public var SELECTED_FRAME_INDEX_CHANGE:String = "selected_frame_index_change";
 	
 	#if !flash
 	static private var _POOL:Array<TimeLineEvent> = new Array<TimeLineEvent>();
