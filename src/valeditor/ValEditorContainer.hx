@@ -473,7 +473,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (!object.isSelectable) return;
 		if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 		{
-			//ValEditor.selection.object = null;
 			if (ValEditor.selection.numObjects != 0)
 			{
 				selectionClear = SelectionClear.fromPool();
@@ -540,7 +539,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			if (this.selection.hasObject(this._mouseObject))
 			{
-				//ValEditor.selection.removeObject(this._mouseObject);
 				objectUnselect = ObjectUnselect.fromPool();
 				objectUnselect.setup();
 				objectUnselect.addObject(this._mouseObject);
@@ -548,7 +546,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 			else
 			{
-				//ValEditor.selection.addObject(this._mouseObject);
 				objectSelect = ObjectSelect.fromPool();
 				objectSelect.setup();
 				objectSelect.addObject(this._mouseObject);
@@ -557,7 +554,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		else if (!this.selection.hasObject(this._mouseObject))
 		{
-			//ValEditor.selection.object = this._mouseObject;
 			selectionSetObject = SelectionSetObject.fromPool();
 			selectionSetObject.setup(this._mouseObject);
 			this._actionCurrent.add(selectionSetObject);
@@ -588,7 +584,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		else if (this._mouseObject.getProperty(RegularPropertyName.X) != this._mouseObject.mouseRestoreX || this._mouseObject.getProperty(RegularPropertyName.Y) != this._mouseObject.mouseRestoreY)
 		{
-			//var action:MultiAction = MultiAction.fromPool();
 			var value:ExposedValue;
 			var valueChange:ValueChange;
 			var valueUIUpdate:ValueUIUpdate;
@@ -603,12 +598,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					{
 						valueChange = ValueChange.fromPool();
 						valueChange.setup(value, value.value, obj.mouseRestoreX);
-						//action.add(valueChange);
 						this._actionCurrent.add(valueChange);
 						
 						valueUIUpdate = ValueUIUpdate.fromPool();
 						valueUIUpdate.setup(value);
-						//action.addPost(valueUIUpdate);
 						this._actionCurrent.addPost(valueUIUpdate);
 					}
 					
@@ -618,12 +611,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					{
 						valueChange = ValueChange.fromPool();
 						valueChange.setup(value, value.value, obj.mouseRestoreY);
-						//action.add(valueChange);
 						this._actionCurrent.add(valueChange);
 						
 						valueUIUpdate = ValueUIUpdate.fromPool();
 						valueUIUpdate.setup(value);
-						//action.addPost(valueUIUpdate);
 						this._actionCurrent.addPost(valueUIUpdate);
 					}
 				}
@@ -636,12 +627,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				{
 					valueChange = ValueChange.fromPool();
 					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
-					//action.add(valueChange);
 					this._actionCurrent.add(valueChange);
 					
 					valueUIUpdate = ValueUIUpdate.fromPool();
 					valueUIUpdate.setup(value);
-					//action.addPost(valueUIUpdate);
 					this._actionCurrent.addPost(valueUIUpdate);
 				}
 				
@@ -651,17 +640,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				{
 					valueChange = ValueChange.fromPool();
 					valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
-					//action.add(valueChange);
 					this._actionCurrent.add(valueChange);
 					
 					valueUIUpdate = ValueUIUpdate.fromPool();
 					valueUIUpdate.setup(value);
-					//action.addPost(valueUIUpdate);
 					this._actionCurrent.addPost(valueUIUpdate);
 				}
 			}
-			
-			//ValEditor.actionStack.add(action);
 		}
 		
 		this._mouseObject = null;
@@ -776,7 +761,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			
 			if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 			{
-				//ValEditor.selection.object = null;
 				if (ValEditor.selection.numObjects != 0)
 				{
 					selectionClear = SelectionClear.fromPool();
@@ -841,7 +825,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			{
 				if (this.selection.hasObject(this._mouseObject))
 				{
-					//ValEditor.selection.removeObject(this._mouseObject);
 					objectUnselect = ObjectUnselect.fromPool();
 					objectUnselect.setup();
 					objectUnselect.addObject(this._mouseObject);
@@ -849,7 +832,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 				}
 				else
 				{
-					//ValEditor.selection.addObject(this._mouseObject);
 					objectSelect = ObjectSelect.fromPool();
 					objectSelect.setup();
 					objectSelect.addObject(this._mouseObject);
@@ -858,7 +840,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 			else if (!this.selection.hasObject(this._mouseObject))
 			{
-				//ValEditor.selection.object = this._mouseObject;
 				selectionSetObject = SelectionSetObject.fromPool();
 				selectionSetObject.setup(this._mouseObject);
 				this._actionCurrent.add(selectionSetObject);
@@ -889,7 +870,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			}
 			else
 			{
-				//var action:MultiAction = MultiAction.fromPool();
 				var value:ExposedValue;
 				var valueChange:ValueChange;
 				var valueUIUpdate:ValueUIUpdate;
@@ -904,12 +884,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 						{
 							valueChange = ValueChange.fromPool();
 							valueChange.setup(value, value.value, obj.mouseRestoreX);
-							//action.add(valueChange);
 							this._actionCurrent.add(valueChange);
 							
 							valueUIUpdate = ValueUIUpdate.fromPool();
 							valueUIUpdate.setup(value);
-							//action.addPost(valueUIUpdate);
 							this._actionCurrent.addPost(valueUIUpdate);
 						}
 						
@@ -919,12 +897,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 						{
 							valueChange = ValueChange.fromPool();
 							valueChange.setup(value, value.value, obj.mouseRestoreY);
-							//action.add(valueChange);
 							this._actionCurrent.add(valueChange);
 							
 							valueUIUpdate = ValueUIUpdate.fromPool();
 							valueUIUpdate.setup(value);
-							//action.addPost(valueUIUpdate);
 							this._actionCurrent.addPost(valueUIUpdate);
 						}
 					}
@@ -937,12 +913,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					{
 						valueChange = ValueChange.fromPool();
 						valueChange.setup(value, value.value, this._mouseObject.mouseRestoreX);
-						//action.add(valueChange);
 						this._actionCurrent.add(valueChange);
 						
 						valueUIUpdate = ValueUIUpdate.fromPool();
 						valueUIUpdate.setup(value);
-						//action.addPost(valueUIUpdate);
 						this._actionCurrent.addPost(valueUIUpdate);
 					}
 					
@@ -952,24 +926,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 					{
 						valueChange = ValueChange.fromPool();
 						valueChange.setup(value, value.value, this._mouseObject.mouseRestoreY);
-						//action.add(valueChange);
 						this._actionCurrent.add(valueChange);
 						
 						valueUIUpdate = ValueUIUpdate.fromPool();
 						valueUIUpdate.setup(value);
-						//action.addPost(valueUIUpdate);
 						this._actionCurrent.addPost(valueUIUpdate);
 					}
 				}
-				
-				//if (action.numActions != 0)
-				//{
-					//ValEditor.actionStack.add(action);
-				//}
-				//else
-				//{
-					//action.pool();
-				//}
 			}
 			
 			this._mouseObject = null;
@@ -1152,7 +1115,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		if (evt.target != Lib.current.stage) return;
 		if (this._mouseObject != null) return;
 		
-		//ValEditor.selection.object = null;
 		if (ValEditor.selection.numObjects != 0)
 		{
 			var selectionClear:SelectionClear = SelectionClear.fromPool();
