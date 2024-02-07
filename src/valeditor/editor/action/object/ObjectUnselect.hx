@@ -18,7 +18,10 @@ class ObjectUnselect extends ValEditorAction
 		return new ObjectUnselect();
 	}
 	
+	public var numObjects(get, never):Int;
 	public var objects:Array<ValEditorObject> = new Array<ValEditorObject>();
+	
+	private function get_numObjects():Int { return this.objects.length; }
 	
 	public function new() 
 	{
