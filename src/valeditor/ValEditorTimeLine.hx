@@ -41,6 +41,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 	public var lastKeyFrame(get, never):ValEditorKeyFrame;
 	public var nextKeyFrame(get, never):ValEditorKeyFrame;
 	public var previousKeyFrame(get, never):ValEditorKeyFrame;
+	public var selectedFrameIndex(get, set):Int;
 	
 	override function set_frameIndex(value:Int):Int 
 	{
@@ -129,6 +130,17 @@ class ValEditorTimeLine extends ValEditTimeLine
 		return null;
 	}
 	
+	private var _selectedFrameIndex:Int = -1;
+	private function get_selectedFrameIndex():Int { return this._selectedFrameIndex; }
+	private function set_selectedFrameIndex(value:Int):Int
+	{
+		if (this._selectedFrameIndex == value) return value;
+		
+		this._selectedFrameIndex = value;
+		TimeLineEvent.dispatch(this, TimeLineEvent.SELECTED_FRAME_INDEX_CHANGE);
+		return this._selectedFrameIndex;
+	}
+	
 	private var _frameDatas:Array<FrameData> = new Array<FrameData>();
 	
 	private var _tempObjectMap:Map<ValEditObject, ValEditObject> = new Map<ValEditObject, ValEditObject>();
@@ -138,6 +150,7 @@ class ValEditorTimeLine extends ValEditTimeLine
 		super();
 		this.numFrames = numFrames;
 		this.frameCollection = new ArrayCollection(this._frameDatas);
+		this._selectedFrameIndex = -1;
 	}
 	
 	override public function clear():Void 
