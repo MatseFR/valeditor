@@ -53,6 +53,13 @@ class ValueChange extends ValEditorAction
 		{
 			this.previousValue = previousValue;
 		}
+		
+		//// DEBUG
+		//if (this.newValue == this.previousValue)
+		//{
+			//throw new Error("ValueChange ::: new value is the same as previous value");
+		//}
+		////\DEBUG
 	}
 	
 	public function apply():Void
@@ -61,6 +68,7 @@ class ValueChange extends ValEditorAction
 		{
 			throw new Error("ValueChange already applied");
 		}
+		
 		this.exposedValue.value = this.newValue;
 		this.status = ValEditorActionStatus.DONE;
 	}
@@ -71,6 +79,7 @@ class ValueChange extends ValEditorAction
 		{
 			throw new Error("ValueChange already cancelled");
 		}
+		
 		this.exposedValue.value = this.previousValue;
 		this.status = ValEditorActionStatus.UNDONE;
 	}
