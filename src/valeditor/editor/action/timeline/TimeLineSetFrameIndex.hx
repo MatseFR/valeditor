@@ -1,14 +1,16 @@
 package valeditor.editor.action.timeline;
 
 import openfl.errors.Error;
+import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorTimeLine;
-import valeditor.editor.action.ValEditorAction;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectUnselect;
 
 /**
  * ...
  * @author Matse
  */
-class TimeLineSetFrameIndex extends ValEditorAction 
+class TimeLineSetFrameIndex extends MultiAction 
 {
 	static private var _POOL:Array<TimeLineSetFrameIndex> = new Array<TimeLineSetFrameIndex>();
 	
@@ -22,9 +24,12 @@ class TimeLineSetFrameIndex extends ValEditorAction
 	public var frameIndex:Int;
 	public var previousFrameIndex:Int;
 	
+	override function get_numActions():Int { return super.get_numActions() + 1; }
+	
 	public function new() 
 	{
-		
+		super();
+		this.autoApply = false;
 	}
 	
 	override public function clear():Void 
@@ -32,22 +37,70 @@ class TimeLineSetFrameIndex extends ValEditorAction
 		this.timeLine = null;
 		
 		super.clear();
+		
+		this.autoApply = false;
 	}
 	
-	public function pool():Void
+	override public function pool():Void
 	{
 		clear();
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(timeLine:ValEditorTimeLine, frameIndex:Int):Void
+	public function setup(timeLine:ValEditorTimeLine, frameIndex:Int, ?previousFrameIndex:Int):Void
 	{
 		this.timeLine = timeLine;
 		this.frameIndex = frameIndex;
-		this.previousFrameIndex = this.timeLine.frameIndex;
+		if (previousFrameIndex != null)
+		{
+			this.previousFrameIndex = previousFrameIndex;
+		}
+		else
+		{
+			this.previousFrameIndex = this.timeLine.frameIndex;
+		}
+		
+		getActionsForTimeLine(this.timeLine);
+		for (line in this.timeLine.children)
+		{
+			getActionsForTimeLine(cast line);
+		}
 	}
 	
-	public function apply():Void
+	private function getActionsForTimeLine(timeLine:ValEditorTimeLine):Void
+	{
+		var prevKeyFrame:ValEditorKeyFrame;
+		var newKeyFrame:ValEditorKeyFrame;
+		var objectUnselect:ObjectUnselect;
+		
+		prevKeyFrame = cast timeLine.getKeyFrameAt(this.previousFrameIndex);
+		newKeyFrame = cast timeLine.getKeyFrameAt(this.frameIndex);
+		
+		if (newKeyFrame != prevKeyFrame && prevKeyFrame != null)
+		{
+			objectUnselect = ObjectUnselect.fromPool();
+			objectUnselect.setup();
+			
+			for (object in prevKeyFrame.objects)
+			{
+				if (ValEditor.selection.hasObject(cast object))
+				{
+					objectUnselect.addObject(cast object);
+				}
+			}
+			
+			if (objectUnselect.numObjects == 0)
+			{
+				objectUnselect.pool();
+			}
+			else
+			{
+				add(objectUnselect);
+			}
+		}
+	}
+	
+	override public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
@@ -55,10 +108,12 @@ class TimeLineSetFrameIndex extends ValEditorAction
 		}
 		
 		this.timeLine.frameIndex = this.frameIndex;
-		this.status = ValEditorActionStatus.DONE;
+		//this.status = ValEditorActionStatus.DONE;
+		
+		super.apply();
 	}
 	
-	public function cancel():Void
+	override public function cancel():Void
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
@@ -66,7 +121,9 @@ class TimeLineSetFrameIndex extends ValEditorAction
 		}
 		
 		this.timeLine.frameIndex = this.previousFrameIndex;
-		this.status = ValEditorActionStatus.UNDONE;
+		//this.status = ValEditorActionStatus.UNDONE;
+		
+		super.cancel();
 	}
 	
 }
