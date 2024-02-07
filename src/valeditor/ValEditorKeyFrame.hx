@@ -6,6 +6,9 @@ import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
+import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
+import valeditor.editor.action.object.ObjectAddKeyFrame;
+import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.DefaultEvent;
 import valeditor.events.ObjectEvent;
@@ -106,20 +109,52 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		return keyFrame;
 	}
 	
-	public function copyObjectsFrom(keyFrame:ValEditKeyFrame):Void
+	public function copyObjectsFrom(keyFrame:ValEditKeyFrame, ?action:KeyFrameCopyObjectsFrom):Void
 	{
-		if (keyFrame.timeLine == this.timeLine)
+		if (action != null)
 		{
-			for (object in keyFrame.objects)
+			var objectAdd:ObjectAddKeyFrame;
+			if (keyFrame.timeLine == this.timeLine)
 			{
-				add(object);
+				for (object in keyFrame.objects)
+				{
+					objectAdd = ObjectAddKeyFrame.fromPool();
+					objectAdd.setup(cast object, this);
+					action.add(objectAdd);
+				}
+			}
+			else
+			{
+				var objectCreate:ObjectCreate;
+				var newObject:ValEditorObject;
+				for (object in keyFrame.objects)
+				{
+					newObject = cast ValEditor.cloneObject(object);
+					objectCreate = ObjectCreate.fromPool();
+					objectCreate.setup(newObject);
+					action.add(objectCreate);
+					
+					objectAdd = ObjectAddKeyFrame.fromPool();
+					objectAdd.setup(cast object, this);
+					action.add(objectAdd);
+				}
 			}
 		}
 		else
 		{
-			for (object in keyFrame.objects)
+			if (keyFrame.timeLine == this.timeLine)
 			{
-				add(ValEditor.cloneObject(object));
+				for (object in keyFrame.objects)
+				{
+					add(object);
+				}
+			}
+			else
+			{
+				for (object in keyFrame.objects)
+				{
+					add(ValEditor.cloneObject(object));
+				}
 			}
 		}
 	}
