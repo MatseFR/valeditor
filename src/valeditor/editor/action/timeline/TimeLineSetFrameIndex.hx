@@ -108,7 +108,6 @@ class TimeLineSetFrameIndex extends MultiAction
 		}
 		
 		this.timeLine.frameIndex = this.frameIndex;
-		//this.status = ValEditorActionStatus.DONE;
 		
 		super.apply();
 	}
@@ -121,7 +120,6 @@ class TimeLineSetFrameIndex extends MultiAction
 		}
 		
 		this.timeLine.frameIndex = this.previousFrameIndex;
-		//this.status = ValEditorActionStatus.UNDONE;
 		
 		super.cancel();
 	}
