@@ -229,6 +229,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		for (keyFrame in this._keyFrames)
 		{
 			this._restoreKeyFrames.push(cast keyFrame);
+		}
+		
+		for (keyFrame in this._restoreKeyFrames)
+		{
 			this._restoreKeyFramesCollections.push(this._keyFrameToCollection.get(keyFrame));
 			keyFrame.remove(this, false);
 		}
