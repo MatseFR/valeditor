@@ -99,21 +99,6 @@ class TimeLineItem extends LayoutGroup
 	
 	private var _timeLine:ValEditorTimeLine;
 	private function get_timeLine():ValEditorTimeLine { return this._timeLine; }
-	//private function set_timeLine(value:ValEditorTimeLine):ValEditorTimeLine
-	//{
-		//if (this._timeLine == value) return value;
-		//
-		//if (value != null)
-		//{
-			//this._list.dataProvider = value.frameCollection;
-			//this._list.validateNow();
-		//}
-		//else
-		//{
-			//this._list.dataProvider = null;
-		//}
-		//return this._timeLine = value;
-	//}
 	
 	private var _dispatchScrollEvents:Bool = true;
 	private var _list:ListView;
@@ -156,12 +141,9 @@ class TimeLineItem extends LayoutGroup
 		
 		this._list = new ListView();
 		this._list.variant = ListViewVariant.TIMELINE;
-		//this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._list.addEventListener(ScrollEvent.SCROLL, onListScroll);
 		addChild(this._list);
-		
-		//addEventListener(MouseEvent.CLICK, onMouseClick);
 	}
 	
 	public function clearSelection():Void
@@ -179,11 +161,6 @@ class TimeLineItem extends LayoutGroup
 		this.layer = layer;
 		return this;
 	}
-	
-	//private function onListChange(evt:Event):Void
-	//{
-		//handleListSelection();
-	//}
 	
 	private function onListItemTrigger(evt:ListViewEvent):Void
 	{
@@ -235,39 +212,9 @@ class TimeLineItem extends LayoutGroup
 		}
 	}
 	
-	//private function onMouseClick(evt:MouseEvent):Void
-	//{
-		//handleListSelection();
-	//}
-	
 	private function onTimeLineSelectedFrameIndexChange(evt:TimeLineEvent):Void
 	{
 		this._list.selectedIndex = this._timeLine.selectedFrameIndex;
 	}
-	
-	//private function handleListSelection():Void
-	//{
-		//if (this._list.selectedIndex != -1)
-		//{
-			//this._timeLine.parent.frameIndex = this._list.selectedIndex;
-			//if (this.stage.focus == this._list)
-			//{
-				//if (this._list.selectedItem.frame != null)
-				//{
-					//ValEditor.selection.object = this._list.selectedItem.frame;
-				//}
-				//else
-				//{
-					//ValEditor.selection.object = null;
-				//}
-			//}
-			//
-			//if (!this._isCurrent)
-			//{
-				//this._isCurrent = true;
-				//DefaultEvent.dispatch(this, Event.SELECT);
-			//}
-		//}
-	//}
 	
 }
