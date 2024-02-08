@@ -846,6 +846,8 @@ class ValEditor
 	{
 		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
+		template.addEventListener(TemplateEvent.INSTANCE_SUSPENDED, onTemplateInstanceAdded);
+		template.addEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
 		
@@ -955,6 +957,8 @@ class ValEditor
 		
 		template.removeEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.removeEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
+		template.removeEventListener(TemplateEvent.INSTANCE_SUSPENDED, onTemplateInstanceSuspended);
+		template.removeEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
 		
@@ -1147,7 +1151,12 @@ class ValEditor
 	
 	static public function delete(action:MultiAction):Void
 	{
+		var selectionClear:SelectionClear = SelectionClear.fromPool();
+		selectionClear.setup(selection);
+		
 		selection.delete(action);
+		
+		action.addPost(selectionClear);
 	}
 	
 	static public function paste(action:MultiAction):Void
@@ -1291,6 +1300,42 @@ class ValEditor
 	}
 	
 	static private function onTemplateInstanceRemoved(evt:TemplateEvent):Void
+	{
+		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		
+		var collection:ArrayCollection<ValEditorTemplate>;
+		for (className in evt.template.clss.superClassNames)
+		{
+			collection = _classToTemplateCollection.get(className);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+		
+		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		{
+			collection = _categoryToTemplateCollection.get(category);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+	}
+	
+	static private function onTemplateInstanceSuspended(evt:TemplateEvent):Void
+	{
+		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		
+		var collection:ArrayCollection<ValEditorTemplate>;
+		for (className in evt.template.clss.superClassNames)
+		{
+			collection = _classToTemplateCollection.get(className);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+		
+		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		{
+			collection = _categoryToTemplateCollection.get(category);
+			collection.updateAt(collection.indexOf(evt.template));
+		}
+	}
+	
+	static private function onTemplateInstanceUnsuspended(evt:TemplateEvent):Void
 	{
 		templateCollection.updateAt(templateCollection.indexOf(evt.template));
 		
