@@ -126,7 +126,6 @@ class TemplateLibrary extends LayoutGroup
 			return renderer;
 		});
 		recycler.update = (renderer:ItemRenderer, state:GridViewCellState) -> {
-			//renderer.text = Std.string(state.data.numInstances);
 			renderer.text = Std.string(cast(state.data, ValEditorTemplate).numInstances);
 		};
 		this._numInstancesColumn = new GridViewColumn("#", null, 28.0);
@@ -186,52 +185,11 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (this._grid.selectedItems.length != 0)
 		{
-			//ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
-			
-			//var selection:Dynamic = ValEditor.selection.object;
-			//if (Std.isOfType(selection, ValEditorTemplate))
-			//{
-				//if (this._grid.selectedItems.indexOf(selection) == -1)
-				//{
-					//ValEditor.selection.removeTemplate(selection);
-				//}
-			//}
-			//else if (Std.isOfType(selection, ValEditorTemplateGroup))
-			//{
-				//var group:ValEditorTemplateGroup = cast selection;
-				//for (template in group)
-				//{
-					//if (this._grid.selectedItems.indexOf(template) == -1)
-					//{
-						//this._templatesToRemove.push(template);
-					//}
-				//}
-				//
-				//if (this._templatesToRemove.length != 0)
-				//{
-					//ValEditor.selection.removeTemplates(this._templatesToRemove);
-					//this._templatesToRemove.resize(0);
-				//}
-			//}
-			//
-			//for (template in this._grid.selectedItems)
-			//{
-				//if (!ValEditor.selection.hasTemplate(template))
-				//{
-					//ValEditor.selection.addTemplate(template);
-				//}
-			//}
 			this._templateRemoveButton.enabled = true;
 			this._templateRenameButton.enabled = this._grid.selectedItems.length == 1;
-			
-			//ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 		}
 		else
 		{
-			//if (Std.isOfType(ValEditor.selection.object, ValEditorTemplate) || Std.isOfType(ValEditor.selection.object, ValEditorTemplateGroup))
-			//{
-				//ValEditor.selection.object = null;
-			//}
 			this._templateRemoveButton.enabled = false;
 			this._templateRenameButton.enabled = false;
 		}
@@ -258,25 +216,43 @@ class TemplateLibrary extends LayoutGroup
 				if (evt.ctrlKey && evt.shiftKey)
 				{
 					// unselect all
-					this._grid.selectedIndex = -1;
+					var templateUnselect:TemplateUnselect = TemplateUnselect.fromPool();
+					for (template in this._grid.selectedItems)
+					{
+						templateUnselect.addTemplate(template);
+					}
+					
+					if (templateUnselect.numTemplates != 0)
+					{
+						ValEditor.actionStack.add(templateUnselect);
+					}
+					else
+					{
+						templateUnselect.pool();
+					}
 				}
 				else if (evt.ctrlKey)
 				{
-					var selectedIndices:Array<Int> = [];
-					var count:Int = this._grid.dataProvider.length;
-					for (i in 0...count)
+					var templateSelect:TemplateSelect = TemplateSelect.fromPool();
+					for (template in this._grid.dataProvider)
 					{
-						selectedIndices[i] = i;
+						if (!ValEditor.selection.hasTemplate(template))
+						{
+							templateSelect.addTemplate(template);
+						}
 					}
-					this._grid.selectedIndices = selectedIndices;
+					
+					if (templateSelect.numTemplates != 0)
+					{
+						ValEditor.actionStack.add(templateSelect);
+					}
+					else
+					{
+						templateSelect.pool();
+					}
 				}
 			
 			case Keyboard.DELETE, Keyboard.BACKSPACE :
-				//var templatesToRemove:Array<Dynamic> = this._grid.selectedItems.copy();
-				//for (template in templatesToRemove)
-				//{
-					//ValEditor.destroyTemplate(template);
-				//}
 				if (this._grid.selectedItems.length != 0)
 				{
 					var action:MultiAction = MultiAction.fromPool();
