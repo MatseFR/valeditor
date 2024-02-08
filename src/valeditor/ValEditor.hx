@@ -846,7 +846,7 @@ class ValEditor
 	{
 		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
-		template.addEventListener(TemplateEvent.INSTANCE_SUSPENDED, onTemplateInstanceAdded);
+		template.addEventListener(TemplateEvent.INSTANCE_SUSPENDED, onTemplateInstanceSuspended);
 		template.addEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
@@ -1283,73 +1283,85 @@ class ValEditor
 	
 	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		var index:Int = templateCollection.indexOf(evt.template);
+		if (index != -1) templateCollection.updateAt(index);
 		
 		var collection:ArrayCollection<ValEditorTemplate>;
 		for (className in evt.template.clss.superClassNames)
 		{
 			collection = _classToTemplateCollection.get(className);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 		
 		for (category in cast(evt.template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 	}
 	
 	static private function onTemplateInstanceRemoved(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		var index:Int = templateCollection.indexOf(evt.template);
+		if (index != -1) templateCollection.updateAt(index);
 		
 		var collection:ArrayCollection<ValEditorTemplate>;
 		for (className in evt.template.clss.superClassNames)
 		{
 			collection = _classToTemplateCollection.get(className);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 		
 		for (category in cast(evt.template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 	}
 	
 	static private function onTemplateInstanceSuspended(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		var index:Int = templateCollection.indexOf(evt.template);
+		if (index != -1) templateCollection.updateAt(index);
 		
 		var collection:ArrayCollection<ValEditorTemplate>;
 		for (className in evt.template.clss.superClassNames)
 		{
 			collection = _classToTemplateCollection.get(className);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 		
 		for (category in cast(evt.template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 	}
 	
 	static private function onTemplateInstanceUnsuspended(evt:TemplateEvent):Void
 	{
-		templateCollection.updateAt(templateCollection.indexOf(evt.template));
+		var index:Int = templateCollection.indexOf(evt.template);
+		if (index != -1) templateCollection.updateAt(index);
 		
 		var collection:ArrayCollection<ValEditorTemplate>;
 		for (className in evt.template.clss.superClassNames)
 		{
 			collection = _classToTemplateCollection.get(className);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 		
 		for (category in cast(evt.template.clss, ValEditorClass).categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
-			collection.updateAt(collection.indexOf(evt.template));
+			index = collection.indexOf(evt.template);
+			if (index != -1) collection.updateAt(index);
 		}
 	}
 	
