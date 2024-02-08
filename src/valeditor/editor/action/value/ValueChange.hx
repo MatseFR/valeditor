@@ -53,13 +53,6 @@ class ValueChange extends ValEditorAction
 		{
 			this.previousValue = previousValue;
 		}
-		
-		//// DEBUG
-		//if (this.newValue == this.previousValue)
-		//{
-			//throw new Error("ValueChange ::: new value is the same as previous value");
-		//}
-		////\DEBUG
 	}
 	
 	public function apply():Void
