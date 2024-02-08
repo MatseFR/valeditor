@@ -18,7 +18,10 @@ class TemplateSelect extends ValEditorAction
 		return new TemplateSelect();
 	}
 	
+	public var numTemplates(get, never):Int;
 	public var templates:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
+	
+	private function get_numTemplates():Int { return this.templates.length; }
 	
 	public function new() 
 	{
