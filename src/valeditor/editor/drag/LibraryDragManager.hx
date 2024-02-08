@@ -138,12 +138,10 @@ class LibraryDragManager
 			this.object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
 		}
 		
-		//ValEditor.currentContainer.add(this.object);
 		objectAdd = ObjectAddKeyFrame.fromPool();
 		objectAdd.setup(this.object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
 		action.add(objectAdd);
 		
-		//ValEditor.selection.object = this.object;
 		selectionSetObject = SelectionSetObject.fromPool();
 		selectionSetObject.setup(this.object);
 		action.add(selectionSetObject);
@@ -160,7 +158,6 @@ class LibraryDragManager
 		var objectAdd:ObjectAddKeyFrame;
 		var selectionSetObject:SelectionSetObject;
 		
-		//ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
 		objectAdd = ObjectAddKeyFrame.fromPool();
 		objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
 		action.add(objectAdd);
