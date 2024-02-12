@@ -3,6 +3,7 @@ package valeditor.editor.action.timeline;
 import openfl.errors.Error;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorTimeLine;
+import valeditor.editor.Selection;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectUnselect;
 
@@ -47,7 +48,7 @@ class TimeLineSetFrameIndex extends MultiAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(timeLine:ValEditorTimeLine, frameIndex:Int, ?previousFrameIndex:Int):Void
+	public function setup(timeLine:ValEditorTimeLine, frameIndex:Int, ?previousFrameIndex:Int, ?selection:Selection):Void
 	{
 		this.timeLine = timeLine;
 		this.frameIndex = frameIndex;
@@ -60,14 +61,19 @@ class TimeLineSetFrameIndex extends MultiAction
 			this.previousFrameIndex = this.timeLine.frameIndex;
 		}
 		
-		getActionsForTimeLine(this.timeLine);
+		if (selection == null)
+		{
+			selection = ValEditor.selection;
+		}
+		
+		getActionsForTimeLine(this.timeLine, selection);
 		for (line in this.timeLine.children)
 		{
-			getActionsForTimeLine(cast line);
+			getActionsForTimeLine(cast line, selection);
 		}
 	}
 	
-	private function getActionsForTimeLine(timeLine:ValEditorTimeLine):Void
+	private function getActionsForTimeLine(timeLine:ValEditorTimeLine, selection:Selection):Void
 	{
 		var prevKeyFrame:ValEditorKeyFrame;
 		var newKeyFrame:ValEditorKeyFrame;
@@ -83,7 +89,7 @@ class TimeLineSetFrameIndex extends MultiAction
 			
 			for (object in prevKeyFrame.objects)
 			{
-				if (ValEditor.selection.hasObject(cast object))
+				if (selection.hasObject(cast object))
 				{
 					objectUnselect.addObject(cast object);
 				}
