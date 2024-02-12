@@ -42,6 +42,7 @@ import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
+import valeditor.editor.Selection;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.layer.LayerAdd;
 import valeditor.editor.action.layer.LayerIndexDown;
@@ -177,6 +178,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _contextMenuRect:Rectangle = new Rectangle();
 	
 	private var _lastFrameIndex:Int;
+	private var _selection:Selection = new Selection();
 	
 	public function new() 
 	{
@@ -708,6 +710,9 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, onRulerMouseMove);
 		this.stage.addEventListener(MouseEvent.MOUSE_UP, onRulerMouseUp);
 		ValEditor.juggler.add(this);
+		
+		// copy current selection
+		this._selection.copyFrom(ValEditor.selection);
 	}
 	
 	private function onRulerMouseMove(evt:MouseEvent):Void
@@ -745,8 +750,10 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		if (this._container.frameIndex != this._lastFrameIndex)
 		{
 			var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
-			setFrameIndex.setup(cast this._container.timeLine, this._container.frameIndex, this._lastFrameIndex);
+			// use copied selection
+			setFrameIndex.setup(cast this._container.timeLine, this._container.frameIndex, this._lastFrameIndex, this._selection);
 			ValEditor.actionStack.add(setFrameIndex);
+			this._selection.clear();
 		}
 	}
 	
