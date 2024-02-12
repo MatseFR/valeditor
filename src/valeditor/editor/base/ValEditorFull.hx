@@ -118,6 +118,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		ValEdit.assetLib = new AssetLib();
 		ValEdit.assetLib.excludePath("icon");
+		ValEdit.assetLib.excludePath("ui/dark");
+		ValEdit.assetLib.excludePath("ui/light");
 		ValEdit.assetLib.init(true);
 		
 		super.initialize();
