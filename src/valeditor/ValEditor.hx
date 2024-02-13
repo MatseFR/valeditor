@@ -278,6 +278,7 @@ class ValEditor
 	static public function reset():Void
 	{
 		FeathersWindows.closeAll();
+		actionStack.clear();
 		assetFileLoader.clear();
 		selection.clear();
 		
