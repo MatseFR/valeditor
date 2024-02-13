@@ -279,7 +279,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = TextData.exposeTextField();
+		settings.objectCollection = TextData.exposeTextFieldInstance();
+		settings.templateCollection = TextData.exposeTextFieldTemplate();
 		settings.interactiveFactory = InteractiveFactories.openFL_visible;
 		ValEditor.registerClass(TextField, settings);
 		settings.clear();
