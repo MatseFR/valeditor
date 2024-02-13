@@ -2,6 +2,9 @@ package valeditor.editor.action.layer;
 import openfl.errors.Error;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
+import valeditor.ValEditorTimeLine;
+import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectUnselect;
 import valeditor.utils.ArraySort;
 
 /**
@@ -22,6 +25,8 @@ class LayerRemove extends ValEditorAction
 	public var layers:Array<ValEditorLayer>;
 	public var layerIndices:Array<Int> = new Array<Int>();
 	
+	private var _objectUnselect:ObjectUnselect = new ObjectUnselect();
+	
 	public function new() 
 	{
 		
@@ -40,6 +45,8 @@ class LayerRemove extends ValEditorAction
 		this.layers = null;
 		this.layerIndices.resize(0);
 		
+		this._objectUnselect.clear();
+		
 		super.clear();
 	}
 	
@@ -53,6 +60,18 @@ class LayerRemove extends ValEditorAction
 	{
 		this.container = container;
 		this.layers = layers;
+		
+		this._objectUnselect.setup();
+		for (layer in this.layers)
+		{
+			for (object in layer.timeLine.frameCurrent.objects)
+			{
+				if (ValEditor.selection.hasObject(cast object))
+				{
+					this._objectUnselect.addObject(cast object);
+				}
+			}
+		}
 	}
 	
 	public function apply():Void
@@ -79,6 +98,9 @@ class LayerRemove extends ValEditorAction
 		{
 			this.container.removeLayerAt(index);
 		}
+		
+		this._objectUnselect.apply();
+		
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -88,11 +110,15 @@ class LayerRemove extends ValEditorAction
 		{
 			throw new Error("LayerRemove already cancelled");
 		}
+		
 		var count:Int = this.layers.length;
 		for (i in 0...count)
 		{
 			this.container.addLayerAt(this.layers[i], this.layerIndices[i]);
 		}
+		
+		this._objectUnselect.cancel();
+		
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
