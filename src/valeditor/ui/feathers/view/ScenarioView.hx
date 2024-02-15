@@ -36,7 +36,6 @@ import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-import valedit.ValEditLayer;
 import valedit.events.PlayEvent;
 import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
