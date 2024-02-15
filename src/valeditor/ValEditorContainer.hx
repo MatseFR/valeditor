@@ -670,7 +670,6 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	private function onObjectRightMouseUp(evt:MouseEvent):Void
 	{
-		this._actionCurrent.cancel();
 		this._actionCurrent.pool();
 		this._actionCurrent = null;
 		
