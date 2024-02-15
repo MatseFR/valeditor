@@ -1,16 +1,40 @@
 package valeditor.ui;
 
-import starling.display.Canvas;
+import openfl.display.BitmapData;
+import openfl.geom.Rectangle;
+import starling.display.Image;
+import starling.display.Quad;
+import starling.display.Sprite;
+import starling.textures.Texture;
+import starling.utils.MathUtil;
 import valedit.utils.RegularPropertyName;
-import valeditor.utils.MathUtil;
 
 /**
  * ...
  * @author Matse
  */
-class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObject
+class InteractiveObjectStarlingVisible extends Sprite implements IInteractiveObject
 {
+	static public var LINE_BMD:BitmapData;
+	static public var LINE_TEX:Texture;
+	
+	static private var _IS_SETUP:Bool = false;
 	static private var _POOL:Array<InteractiveObjectStarlingVisible> = new Array<InteractiveObjectStarlingVisible>();
+	
+	static public function setup():Void
+	{
+		if (_IS_SETUP) return;
+		
+		LINE_BMD = new BitmapData(4, 1, true, 0x00ffffff);
+		LINE_BMD.setPixel32(0, 0, 0xff000000);
+		LINE_BMD.setPixel32(1, 0, 0xff000000);
+		LINE_BMD.setPixel32(2, 0, 0xffffffff);
+		LINE_BMD.setPixel32(3, 0, 0xffffffff);
+		
+		LINE_TEX = Texture.fromBitmapData(LINE_BMD, false);
+		
+		_IS_SETUP = true;
+	}
 	
 	static public function fromPool(?minWidth:Float, ?minHeight:Float):InteractiveObjectStarlingVisible
 	{
@@ -63,10 +87,23 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	}
 	
 	private var _interestMap:Map<String, Bool>;
+	private var _leftImg:Image;
+	private var _rightImg:Image;
+	private var _topImg:Image;
+	private var _bottomImg:Image;
+	private var _quad:Quad;
+	
+	private var _baseSize:Float;
 	
 	public function new(?minWidth:Float, ?minHeight:Float) 
 	{
 		super();
+		
+		this.touchGroup = true;
+		
+		if (!_IS_SETUP) setup();
+		
+		this._baseSize = LINE_BMD.width;
 		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);
@@ -79,6 +116,30 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 		this._interestMap.set(RegularPropertyName.WIDTH, true);
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
 		this._interestMap.set(RegularPropertyName.VISIBLE, true);
+		
+		this._leftImg = new Image(LINE_TEX);
+		this._leftImg.tileGrid = new Rectangle();
+		this._leftImg.rotation = MathUtil.deg2rad(90);
+		addChild(this._leftImg);
+		
+		this._rightImg = new Image(LINE_TEX);
+		this._rightImg.tileGrid = new Rectangle();
+		this._rightImg.rotation = MathUtil.deg2rad(90);
+		addChild(this._rightImg);
+		
+		this._topImg = new Image(LINE_TEX);
+		this._topImg.tileGrid = new Rectangle();
+		//this._topImg.rotation = MathUtil.deg2rad(90);
+		addChild(this._topImg);
+		
+		this._bottomImg = new Image(LINE_TEX);
+		this._bottomImg.tileGrid = new Rectangle();
+		//this._bottomImg.rotation = MathUtil.deg2rad(90);
+		addChild(this._bottomImg);
+		
+		this._quad = new Quad(10, 10, 0xff0000);
+		this._quad.alpha = 0.0;
+		addChild(this._quad);
 		
 		setTo(minWidth, minHeight);
 	}
@@ -178,21 +239,19 @@ class InteractiveObjectStarlingVisible extends Canvas implements IInteractiveObj
 	
 	private function refresh(width:Float, height:Float):Void
 	{
-		this.clear();
-		this.beginFill(0xffffff, 0);
-		this.drawRectangle(0, 0, width, height);
+		this._quad.width = width;
+		this._quad.height = height;
 		
-		this.beginFill(0xffffff, 1);
-		this.drawRectangle(0, 0, width, 1);
-		this.drawRectangle(width, 0, 1, height);
-		this.drawRectangle(0, height, width, 1);
-		this.drawRectangle(0, 0, 1, height);
+		var widthScale:Float = width / this._baseSize;
+		var heightScale:Float = height / this._baseSize;
 		
-		this.beginFill(0x000000, 1);
-		this.drawRectangle(1, 1, width - 2, 1);
-		this.drawRectangle(width - 1, 1, 1, height - 2);
-		this.drawRectangle(1, height - 1, width - 2, 1);
-		this.drawRectangle(1, 1, 1, height - 2);
+		this._leftImg.scaleX = heightScale;
+		this._rightImg.scaleX = heightScale;
+		this._topImg.scaleX = widthScale;
+		this._bottomImg.scaleX = widthScale;
+		
+		this._rightImg.x = width;
+		this._bottomImg.y = height;
 	}
 	
 }
