@@ -31,6 +31,7 @@ import valedit.data.openfl.display.DisplayData;
 import valedit.data.openfl.filters.FiltersData;
 import valedit.data.openfl.geom.GeomData;
 import valedit.data.openfl.text.TextData;
+import valedit.data.starling.text.StarlingTextData;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valeditor.ValEditorContainer;
@@ -323,10 +324,26 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.hasRadianRotation = true;
 		settings.usePivotScaling = true;
 		ValEditor.registerClass(Image, settings);
+		settings.clear();
 		
 		// Starling Filters
 		
 		// Starling Text
+		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_TEXT);
+		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.objectCollection = StarlingTextData.exposeTextFieldInstance();
+		settings.templateCollection = StarlingTextData.exposeTextFieldTemplate();
+		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_visible;
+		settings.hasRadianRotation = true;
+		settings.usePivotScaling = true;
+		ValEditor.registerClass(starling.text.TextField, settings);
+		settings.clear();
 		#end
 		
 		#if massive_starling
