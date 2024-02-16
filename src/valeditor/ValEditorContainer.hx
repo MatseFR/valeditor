@@ -961,20 +961,22 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		
 		if (action != null)
 		{
-			var selectionClear:SelectionClear = SelectionClear.fromPool();
-			selectionClear.setup(ValEditor.selection);
-			action.add(selectionClear);
-			
-			var objectSelect:ObjectSelect;
-			
 			for (layer in this.layerCollection)
 			{
 				layer.getAllVisibleObjects(visibleObjects);
 			}
 			
-			objectSelect = ObjectSelect.fromPool();
-			objectSelect.setup(visibleObjects);
-			action.add(objectSelect);
+			if (visibleObjects.length != 0)
+			{
+				var selectionClear:SelectionClear = SelectionClear.fromPool();
+				selectionClear.setup(ValEditor.selection);
+				action.add(selectionClear);
+				
+				var objectSelect:ObjectSelect;
+				objectSelect = ObjectSelect.fromPool();
+				objectSelect.setup(visibleObjects);
+				action.add(objectSelect);
+			}
 		}
 		else
 		{
