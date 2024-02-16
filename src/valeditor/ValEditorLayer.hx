@@ -106,6 +106,18 @@ class ValEditorLayer extends ValEditLayer
 		return visibleObjects;
 	}
 	
+	public function hasVisibleObject():Bool
+	{
+		for (object in this._displayObjects)
+		{
+			if (object.getProperty(RegularPropertyName.VISIBLE) == true)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public function canAddObject():Bool
 	{
 		return this.timeLine.frameCurrent != null && (!this.timeLine.frameCurrent.tween || this.timeLine.frameCurrent.indexCurrent == this.timeLine.frameCurrent.indexStart);
