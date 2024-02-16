@@ -395,6 +395,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 		var timeLineFrameUpdateAll:TimeLineFrameUpdateAll;
 		var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
 		
+		var indexEnd:Int;
+		
 		if (this._frameCurrent != null)
 		{
 			if (this._frameCurrent.indexStart == this._frameIndex)
@@ -495,12 +497,14 @@ class ValEditorTimeLine extends ValEditTimeLine
 						keyFrameCopyObjectsFrom.setup(keyFrame, cast this._frameCurrent);
 						action.add(keyFrameCopyObjectsFrom);
 						
+						indexEnd = this._frameCurrent.indexEnd;
+						
 						timeLineSetFrame = TimeLineSetFrame.fromPool();
 						timeLineSetFrame.setup(this, cast this._frameCurrent, this._frameCurrent.indexStart, this._frameIndex);
 						action.add(timeLineSetFrame);
 						
 						timeLineSetFrame = TimeLineSetFrame.fromPool();
-						timeLineSetFrame.setup(this, keyFrame, this._frameIndex + 1, this._frameCurrent.indexEnd);
+						timeLineSetFrame.setup(this, keyFrame, this._frameIndex + 1, indexEnd);
 						action.add(timeLineSetFrame);
 						
 						timeLineRegisterKeyFrame = TimeLineRegisterKeyFrame.fromPool();
@@ -550,12 +554,14 @@ class ValEditorTimeLine extends ValEditTimeLine
 					keyFrameCopyObjectsFrom.setup(keyFrame, cast this._frameCurrent);
 					action.add(keyFrameCopyObjectsFrom);
 					
+					indexEnd = this._frameCurrent.indexEnd;
+					
 					timeLineSetFrame = TimeLineSetFrame.fromPool();
 					timeLineSetFrame.setup(this, cast this._frameCurrent, this._frameCurrent.indexStart, this._frameIndex - 1);
 					action.add(timeLineSetFrame);
 					
 					timeLineSetFrame = TimeLineSetFrame.fromPool();
-					timeLineSetFrame.setup(this, keyFrame, this._frameIndex, this._frameCurrent.indexEnd);
+					timeLineSetFrame.setup(this, keyFrame, this._frameIndex, indexEnd);
 					action.add(timeLineSetFrame);
 					
 					timeLineRegisterKeyFrame = TimeLineRegisterKeyFrame.fromPool();
@@ -744,17 +750,20 @@ class ValEditorTimeLine extends ValEditTimeLine
 						timeLineSetFrame = TimeLineSetFrame.fromPool();
 						timeLineSetFrame.setup(this, cast keyFrame, keyFrame.indexStart - 1, keyFrame.indexEnd - 1);
 						action.add(timeLineSetFrame);
+						
+						keyFrame = getNextKeyFrame(keyFrame);
 					}
 					
 					timeLineSetFrameCurrent = TimeLineSetFrameCurrent.fromPool();
-					if (this._frameCurrent.indexEnd > this._frameIndex)
-					{
-						timeLineSetFrameCurrent.setup(this, cast this._frameCurrent);
-					}
-					else
-					{
-						timeLineSetFrameCurrent.setup(this, cast getNextKeyFrame(this._frameCurrent));
-					}
+					//if (this._frameCurrent.indexEnd > this._frameIndex)
+					//{
+						//timeLineSetFrameCurrent.setup(this, cast this._frameCurrent);
+					//}
+					//else
+					//{
+						//timeLineSetFrameCurrent.setup(this, cast getNextKeyFrame(this._frameCurrent));
+					//}
+					timeLineSetFrameCurrent.setup(this, cast this._frames[this._frameIndex]);
 					action.add(timeLineSetFrameCurrent);
 					
 					timeLineFrameUpdateAll = TimeLineFrameUpdateAll.fromPool();
