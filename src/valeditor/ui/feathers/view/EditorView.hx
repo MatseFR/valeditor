@@ -398,6 +398,8 @@ class EditorView extends LayoutGroup
 	{
 		if (this._contextMenu.selectedItem == null) return;
 		
+		if (!this._contextMenu.selectedItem.enabled) return;
+		
 		var action:MultiAction;
 		
 		switch (this._contextMenu.selectedItem.id)
@@ -479,6 +481,10 @@ class EditorView extends LayoutGroup
 	
 	private function onContextMenuItemTrigger(evt:ListViewEvent):Void
 	{
+		if (!evt.state.enabled)
+		{
+			return;
+		}
 		closeContextMenu();
 	}
 	
@@ -510,6 +516,7 @@ class EditorView extends LayoutGroup
 			this._selectAllMenuItem.enabled = ValEditor.currentContainer.hasVisibleObject();
 			this._unselectAllMenuItem.enabled = isObjectSelected;
 			this._contextMenuCollection.updateAll();
+			
 			this._contextMenu.selectedIndex = -1;
 			this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
 			this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
@@ -519,7 +526,7 @@ class EditorView extends LayoutGroup
 	
 	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
 	{
-		if (this._contextMenu.hitTestPoint(evt.stageX, evt.stageY))
+		if (this._contextMenu.parent.hitTestPoint(evt.stageX, evt.stageY))
 		{
 			return;
 		}
