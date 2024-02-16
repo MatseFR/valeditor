@@ -1101,10 +1101,7 @@ class ValEditor
 		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
 		timeLine.frameIndex = 0;
 		timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
-		//var action:MultiAction = MultiAction.fromPool();
 		timeLine.insertKeyFrame();
-		//action.apply();
-		//action.pool();
 		return timeLine;
 	}
 	
