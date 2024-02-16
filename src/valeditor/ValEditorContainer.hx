@@ -273,6 +273,18 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		return cast(this._currentLayer, ValEditorLayer).canAddObject();
 	}
 	
+	public function hasVisibleObject():Bool
+	{
+		for (layer in this.layerCollection)
+		{
+			if (layer.visible && layer.hasVisibleObject())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	override public function addLayer(layer:ValEditLayer):Void 
 	{
 		if (layer.name == null || layer.name == "")
@@ -963,7 +975,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		{
 			for (layer in this.layerCollection)
 			{
-				layer.getAllVisibleObjects(visibleObjects);
+				if (layer.visible)
+				{
+					layer.getAllVisibleObjects(visibleObjects);
+				}
 			}
 			
 			if (visibleObjects.length != 0)
