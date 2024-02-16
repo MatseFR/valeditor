@@ -181,6 +181,8 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 	{
 		if (this._contextMenu.selectedItem == null) return;
 		
+		if (!this._contextMenu.selectedItem.enabled) return;
+		
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :

@@ -174,6 +174,8 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	{
 		if (this._contextMenu.selectedItem == null) return;
 		
+		if (!this._contextMenu.selectedItem.enabled) return;
+		
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :
