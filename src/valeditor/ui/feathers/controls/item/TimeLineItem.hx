@@ -153,7 +153,49 @@ class TimeLineItem extends LayoutGroup
 	
 	public function setSelectedFrame(frameData:FrameData):Void
 	{
-		this._list.selectedItem = frameData;
+		if (this._list.selectedItem != frameData)
+		{
+			this._list.selectedItem = frameData;
+			
+			var action:MultiAction = MultiAction.fromPool();
+			
+			if (this.layer.container.currentLayer != this.layer)
+			{
+				var setCurrentLayer:ContainerSetCurrentLayer = ContainerSetCurrentLayer.fromPool();
+				setCurrentLayer.setup(cast this.layer.container, this.layer);
+				action.add(setCurrentLayer);
+			}
+			
+			if (this._timeLine.selectedFrameIndex != this._list.selectedIndex)
+			{
+				var setSelectedFrameIndex:TimeLineSetSelectedFrameIndex = TimeLineSetSelectedFrameIndex.fromPool();
+				setSelectedFrameIndex.setup(this._timeLine, this._list.selectedIndex);
+				action.add(setSelectedFrameIndex);
+			}
+			
+			if (this._timeLine.parent.frameIndex != this._list.selectedIndex)
+			{
+				var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
+				setFrameIndex.setup(cast this._timeLine.parent, this._list.selectedIndex);
+				action.add(setFrameIndex);
+			}
+			
+			if (ValEditor.selection.object != frameData.frame)
+			{
+				var selectionSetObject:SelectionSetObject = SelectionSetObject.fromPool();
+				selectionSetObject.setup(frameData.frame);
+				action.add(selectionSetObject);
+			}
+			
+			if (action.numActions != 0)
+			{
+				ValEditor.actionStack.add(action);
+			}
+			else
+			{
+				action.pool();
+			}
+		}
 	}
 	
 	private function setTo(layer:ValEditorLayer):TimeLineItem
