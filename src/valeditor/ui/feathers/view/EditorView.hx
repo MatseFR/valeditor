@@ -507,7 +507,7 @@ class EditorView extends LayoutGroup
 			this._cutMenuItem.enabled = isObjectSelected;
 			this._pasteMenuItem.enabled = isObjectInClipboard;
 			this._deleteMenuItem.enabled = isObjectSelected;
-			this._selectAllMenuItem.enabled = true;//ValEditor.currentContainer;
+			this._selectAllMenuItem.enabled = ValEditor.currentContainer.hasVisibleObject();
 			this._unselectAllMenuItem.enabled = isObjectSelected;
 			this._contextMenuCollection.updateAll();
 			this._contextMenu.selectedIndex = -1;
