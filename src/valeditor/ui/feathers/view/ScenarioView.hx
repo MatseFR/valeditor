@@ -503,6 +503,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		if (this._frameContextMenu.selectedItem == null) return;
 		
+		if (!this._frameContextMenu.selectedItem.enabled) return;
+		
 		var action:MultiAction;
 		
 		switch (this._frameContextMenu.selectedItem.id)
@@ -569,6 +571,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onLayerContextMenuChange(evt:Event):Void
 	{
 		if (this._layerContextMenu.selectedItem == null) return;
+		
+		if (!this._layerContextMenu.selectedItem.enabled) return;
 		
 		switch (this._layerContextMenu.selectedItem.id)
 		{
