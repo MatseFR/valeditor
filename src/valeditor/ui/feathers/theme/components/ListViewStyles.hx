@@ -108,6 +108,7 @@ class ListViewStyles
 		var spacing:Int = 1;
 		var shape:Shape = new Shape();
 		var graphics:Graphics = shape.graphics;
+		var smoothing:Bool = true;
 		
 		if (BMD_RULER == null)
 		{
@@ -139,7 +140,7 @@ class ListViewStyles
 		
 		// FRAME
 		drawCell(graphics, theme.lightColor, theme.contrastColorLighter);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.FRAME(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -147,7 +148,7 @@ class ListViewStyles
 		
 		// FRAME selected
 		drawCell(graphics, theme.alternColor, theme.contrastColorLighter);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.FRAME(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -155,7 +156,7 @@ class ListViewStyles
 		
 		// FRAME_5
 		drawCell(graphics, theme.lightColorDark, theme.contrastColorLighter);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.FRAME_5(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -163,7 +164,7 @@ class ListViewStyles
 		
 		// FRAME_5 selected
 		drawCell(graphics, theme.alternColor, theme.contrastColorLighter);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.FRAME_5(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -172,7 +173,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE
 		drawCell(graphics, theme.lightColorDarker, theme.contrastColor);
 		drawIcon_start(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -181,7 +182,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_start(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -190,7 +191,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_EMPTY
 		drawCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_startEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -199,7 +200,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_EMPTY selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -208,7 +209,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_TWEEN
 		drawCell(graphics, theme.themeColorLight, theme.contrastColor);
 		drawIcon_startTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_TWEEN(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -217,7 +218,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_TWEEN selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_TWEEN(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -226,7 +227,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_TWEEN_EMPTY
 		drawCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_startTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_TWEEN_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -235,7 +236,7 @@ class ListViewStyles
 		// KEYFRAME_SINGLE_TWEEN_EMPTY selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_SINGLE_TWEEN_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -244,7 +245,7 @@ class ListViewStyles
 		// KEYFRAME_START
 		drawFreeCell(graphics, theme.lightColorDarker, theme.contrastColor);
 		drawIcon_start(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -253,7 +254,7 @@ class ListViewStyles
 		// KEYFRAME_START selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_start(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -262,7 +263,7 @@ class ListViewStyles
 		// KEYFRAME_START_EMPTY
 		drawFreeCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_startEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -271,7 +272,7 @@ class ListViewStyles
 		// KEYFRAME_START_EMPTY selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -280,7 +281,7 @@ class ListViewStyles
 		// KEYFRAME_START_TWEEN
 		drawFreeCell(graphics, theme.themeColorLight, theme.contrastColor);
 		drawIcon_startTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_TWEEN(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -289,7 +290,7 @@ class ListViewStyles
 		// KEYFRAME_START_TWEEN selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_TWEEN(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -298,7 +299,7 @@ class ListViewStyles
 		// KEYFRAME_START_TWEEN_EMPTY
 		drawFreeCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_startTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_TWEEN_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -307,7 +308,7 @@ class ListViewStyles
 		// KEYFRAME_START_TWEEN_EMPTY selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_startTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_START_TWEEN_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -315,7 +316,7 @@ class ListViewStyles
 		
 		// KEYFRAME
 		drawFreeCell(graphics, theme.lightColorDarker, theme.contrastColor);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -323,7 +324,7 @@ class ListViewStyles
 		
 		// KEYFRAME selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -331,7 +332,7 @@ class ListViewStyles
 		
 		// KEYFRAME_EMPTY
 		drawFreeCell(graphics, theme.lightColor, theme.contrastColor);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -339,7 +340,7 @@ class ListViewStyles
 		
 		// KEYFRAME_EMPTY selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -348,7 +349,7 @@ class ListViewStyles
 		// KEYFRAME_TWEEN
 		drawFreeCell(graphics, theme.themeColorLight, theme.contrastColor);
 		drawIcon_tween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_TWEEN(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -357,7 +358,7 @@ class ListViewStyles
 		// KEYFRAME_TWEEN selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_tween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_TWEEN(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -366,7 +367,7 @@ class ListViewStyles
 		// KEYFRAME_TWEEN_EMPTY
 		drawFreeCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_tweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_TWEEN_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -375,7 +376,7 @@ class ListViewStyles
 		// KEYFRAME_TWEEN_EMPTY selected
 		drawFreeCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_tweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_TWEEN_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -384,7 +385,7 @@ class ListViewStyles
 		// KEYFRAME_END
 		drawCell(graphics, theme.lightColorDarker, theme.contrastColor);
 		drawIcon_end(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -393,7 +394,7 @@ class ListViewStyles
 		// KEYFRAME_END selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_end(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -402,7 +403,7 @@ class ListViewStyles
 		// KEYFRAME_END_EMPTY
 		drawCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_endEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -411,7 +412,7 @@ class ListViewStyles
 		// KEYFRAME_END_EMPTY selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_endEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -420,7 +421,7 @@ class ListViewStyles
 		// KEYFRAME_END_TWEEN
 		drawCell(graphics, theme.themeColorLight, theme.contrastColor);
 		drawIcon_endTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_TWEEN(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -429,7 +430,7 @@ class ListViewStyles
 		// KEYFRAME_END_TWEEN selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_endTween(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_TWEEN(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -438,7 +439,7 @@ class ListViewStyles
 		// KEYFRAME_END_TWEEN_EMPTY
 		drawCell(graphics, theme.lightColor, theme.contrastColor);
 		drawIcon_endTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_TWEEN_EMPTY(false), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -447,7 +448,7 @@ class ListViewStyles
 		// KEYFRAME_END_TWEEN_EMPTY selected
 		drawCell(graphics, theme.alternColor, theme.contrastColor);
 		drawIcon_endTweenEmpty(graphics);
-		BMD_FRAMES.draw(shape, matrix, null, null, null, true);
+		BMD_FRAMES.draw(shape, matrix, null, null, null, smoothing);
 		frameRectMap.set(FrameItemState.KEYFRAME_END_TWEEN_EMPTY(true), rect.clone());
 		graphics.clear();
 		matrix.translate(itemWidth + spacing, 0);
@@ -474,13 +475,11 @@ class ListViewStyles
 		graphics.drawRect(0, 0, itemWidth, itemHeight);
 		graphics.endFill();
 		
-		graphics.lineStyle(1, lineColor);
-		graphics.moveTo(0, 0);
-		graphics.lineTo(itemWidth - 1, 0);
-		graphics.moveTo(itemWidth - 1, 0);
-		graphics.lineTo(itemWidth - 1, itemHeight - 1);
-		graphics.lineTo(0, itemHeight - 1);
-		graphics.lineStyle();
+		graphics.beginFill(lineColor);
+		graphics.drawRect(0, 0, itemWidth, 1);
+		graphics.drawRect(itemWidth - 1, 1, 1, itemHeight-2);
+		graphics.drawRect(0, itemHeight - 1, itemWidth, 1);
+		graphics.endFill();
 	}
 	
 	static private function drawFreeCell(graphics:Graphics, fillColor:Int, lineColor:Int):Void
@@ -489,24 +488,15 @@ class ListViewStyles
 		graphics.drawRect(0, 0, itemWidth, itemHeight);
 		graphics.endFill();
 		
-		graphics.lineStyle(1, lineColor);
-		graphics.moveTo(0, 0);
-		graphics.lineTo(itemWidth, 0);
-		graphics.moveTo(0, itemHeight - 1);
-		graphics.lineTo(itemWidth, itemHeight - 1);
-		graphics.lineStyle();
+		graphics.beginFill(lineColor);
+		graphics.drawRect(0, 0, itemWidth, 1);
+		graphics.drawRect(0, itemHeight - 1, itemWidth, 1);
+		graphics.endFill();
 		
 		graphics.beginFill(theme.contrastColorLighter);
 		graphics.drawRect(itemWidth - 1, 1, 1, 1);
 		graphics.drawRect(itemWidth - 1, itemHeight - 2, 1, 1);
 		graphics.endFill();
-		
-		//graphics.lineStyle(1, theme.contrastColorLighter);
-		//graphics.moveTo(itemWidth - 1, 0);
-		//graphics.lineTo(itemWidth - 1, 2);
-		//graphics.moveTo(itemWidth - 1, itemHeight);
-		//graphics.lineTo(itemWidth - 1, itemHeight - 2);
-		//graphics.lineStyle();
 	}
 	
 	static private function drawIcon_start(graphics:Graphics):Void
