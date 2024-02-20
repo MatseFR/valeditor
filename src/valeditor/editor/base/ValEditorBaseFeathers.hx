@@ -70,6 +70,8 @@ class ValEditorBaseFeathers extends Application
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.stageFocusRect = false;
 		
+		stage.showDefaultContextMenu = false;
+		
 		theme = new ValEditorTheme();
 		Theme.setTheme(theme);
 		
