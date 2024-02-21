@@ -23,11 +23,11 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 	{
 		if (_IS_SETUP) return;
 		
-		LINE_BMD = new BitmapData(4, 1, true, 0x00ffffff);
-		LINE_BMD.setPixel32(0, 0, 0xff000000);
-		LINE_BMD.setPixel32(1, 0, 0xff000000);
-		LINE_BMD.setPixel32(2, 0, 0xffffffff);
-		LINE_BMD.setPixel32(3, 0, 0xffffffff);
+		LINE_BMD = new BitmapData(4, 1);
+		LINE_BMD.setPixel(0, 0, 0x000000);
+		LINE_BMD.setPixel(1, 0, 0x000000);
+		LINE_BMD.setPixel(2, 0, 0xffffff);
+		LINE_BMD.setPixel(3, 0, 0xffffff);
 		
 		_LINE_MATRIX = new Matrix();
 		_LINE_MATRIX.rotate(0.5 * Math.PI);
@@ -228,17 +228,16 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 		this._shape.graphics.clear();
 		this._shape.graphics.beginFill(0xff0000, 0);
 		this._shape.graphics.drawRect(0, 0, width, height);
-		this._shape.graphics.lineStyle(1);
-		this._shape.graphics.lineBitmapStyle(LINE_BMD);
-		this._shape.graphics.moveTo(0, 0);
-		this._shape.graphics.lineTo(width, 0);
-		this._shape.graphics.moveTo(0, height);
-		this._shape.graphics.lineTo(width, height);
-		this._shape.graphics.lineBitmapStyle(LINE_BMD, _LINE_MATRIX);
-		this._shape.graphics.moveTo(width, 0);
-		this._shape.graphics.lineTo(width, height);
-		this._shape.graphics.moveTo(0, 0);
-		this._shape.graphics.lineTo(0, height);
+		this._shape.graphics.endFill();
+		
+		this._shape.graphics.beginBitmapFill(LINE_BMD);
+		this._shape.graphics.drawRect(0, 0, width, 1);
+		this._shape.graphics.drawRect(0, height - 1, width, 1);
+		this._shape.graphics.endFill();
+		
+		this._shape.graphics.beginBitmapFill(LINE_BMD, _LINE_MATRIX);
+		this._shape.graphics.drawRect(0, 1, 1, height-2);
+		this._shape.graphics.drawRect(width -1, 1, 1, height-2);
 		this._shape.graphics.endFill();
 	}
 	
