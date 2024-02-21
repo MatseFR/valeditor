@@ -296,8 +296,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	
 	public function templateFunctionCall(propertyName:String, parameters:Array<Dynamic>):Void
 	{
+		this._defaultCollection.applyAndSetObject(this.object);
 		var func:ExposedFunction = cast this._defaultCollection.getValue(propertyName);
 		func.executeWithParameters(parameters);
+		this._defaultCollection.object = null;
 		
 		if (this.currentCollection != null)
 		{
