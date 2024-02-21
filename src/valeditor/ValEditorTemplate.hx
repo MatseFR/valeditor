@@ -101,10 +101,6 @@ class ValEditorTemplate extends ValEditTemplate
 			ValEditor.destroyObject(cast this._instances[i]);
 		}
 		
-		//for (object in this._suspendedInstances)
-		//{
-			//ValEditor.destroyObject(object);
-		//}
 		this._suspendedInstances.resize(0);
 		
 		super.clear();
