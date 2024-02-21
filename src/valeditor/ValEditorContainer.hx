@@ -209,6 +209,11 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 	
 	override public function clear():Void
 	{
+		for (layer in this._layers)
+		{
+			layerUnregister(layer);
+		}
+		
 		this.ignoreRightClick = false;
 		this.layerCollection.removeAll();
 		this.objectCollection.removeAll();
@@ -361,9 +366,28 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 	}
 	
-	override function layer_objectAdded(evt:LayerEvent):Void 
+	override function layerRegister(layer:ValEditLayer, index:Int):Void 
 	{
-		super.layer_objectAdded(evt);
+		super.layerRegister(layer, index);
+		
+		layer.addEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
+		layer.addEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
+		layer.addEventListener(RenameEvent.RENAMED, layer_renamed);
+	}
+	
+	override function layerUnregister(layer:ValEditLayer):Void 
+	{
+		super.layerUnregister(layer);
+		
+		layer.removeEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
+		layer.removeEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
+		layer.removeEventListener(RenameEvent.RENAMED, layer_renamed);
+	}
+	
+	private function layer_objectAdded(evt:LayerEvent):Void 
+	{
+		this._objects.set(evt.object.id, evt.object);
+		this._objectToLayer.set(evt.object, evt.layer);
 		
 		var editorObject:ValEditorObject = cast evt.object;
 		
@@ -395,9 +419,10 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this.objectCollection.add(editorObject);
 	}
 	
-	override function layer_objectRemoved(evt:LayerEvent):Void 
+	private function layer_objectRemoved(evt:LayerEvent):Void 
 	{
-		super.layer_objectRemoved(evt);
+		this._objects.remove(evt.object.id);
+		this._objectToLayer.remove(evt.object);
 		
 		var editorObject:ValEditorObject = cast evt.object;
 		
@@ -429,9 +454,12 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this.objectCollection.remove(editorObject);
 	}
 	
-	override function layer_renamed(evt:RenameEvent):Void 
+	private function layer_renamed(evt:RenameEvent):Void 
 	{
-		super.layer_renamed(evt);
+		var layer:ValEditLayer = cast evt.target;
+		this._layerMap.remove(evt.previousNameOrID);
+		this._layerMap.set(layer.name, layer);
+		
 		this.layerCollection.updateAt(this.layerCollection.indexOf(cast evt.target));
 	}
 	
