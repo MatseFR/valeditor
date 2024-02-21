@@ -37,6 +37,7 @@ import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import valedit.events.PlayEvent;
+import valedit.utils.ReverseIterator;
 import valeditor.ValEditor;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
@@ -894,12 +895,11 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._timeLineRulerList.dataProvider = null;
 		this._timeLineNumberList.dataProvider = null;
 		
-		for (item in this._timeLineItems)
+		for (i in new ReverseIterator(this._timeLineItems.length - 1, 0))
 		{
-			destroyTimeLineItem(item);
+			destroyTimeLineItem(this._timeLineItems[i]);
 		}
-		//this._timeLineItems.resize(0);
-		//this._timeLineList.removeChildren();
+		
 		this._currentTimeLineItem = null;
 	}
 	
@@ -921,7 +921,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		for (layer in this._container.layerCollection)
 		{
-			//createTimeLineItem(cast layer.timeLine, this._timeLineItems.length);
 			layerRegister(layer);
 		}
 		this._timeLineList.validateNow();
