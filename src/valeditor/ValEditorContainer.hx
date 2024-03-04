@@ -524,24 +524,24 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		this._mouseObject.isMouseDown = true;
 		this.selection.isMouseDown = true;
 		
-		if (this._mouseObject.hasPivotProperties)
-			{
-				if (this._mouseObject.usePivotScaling)
-				{
-					this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
-					this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
-				}
-				else
-				{
-					this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
-					this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
-				}
-			}
-			else
-			{
-				this._mouseObjectOffsetX = evt.localX;
-				this._mouseObjectOffsetY = evt.localY;
-			}
+		//if (this._mouseObject.hasPivotProperties)
+		//{
+			//if (this._mouseObject.usePivotScaling)
+			//{
+				//this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
+				//this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
+			//}
+			//else
+			//{
+				//this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
+				//this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
+			//}
+		//}
+		//else
+		//{
+			this._mouseObjectOffsetX = evt.localX;
+			this._mouseObjectOffsetY = evt.localY;
+		//}
 		
 		if (this.selection.hasObject(this._mouseObject))
 		{
