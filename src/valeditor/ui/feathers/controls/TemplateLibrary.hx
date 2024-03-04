@@ -4,9 +4,12 @@ import feathers.controls.Button;
 import feathers.controls.GridView;
 import feathers.controls.GridViewColumn;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
 import feathers.controls.dataRenderers.ItemRenderer;
+import feathers.controls.popups.CalloutPopUpAdapter;
 import feathers.data.ArrayCollection;
 import feathers.data.GridViewCellState;
+import feathers.data.ListViewItemState;
 import feathers.events.GridViewEvent;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
@@ -15,13 +18,17 @@ import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
+import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
+import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
+import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
+import openfl.geom.Point;
 import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
@@ -34,9 +41,12 @@ import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
+import valeditor.ui.feathers.data.MenuItem;
+import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.ItemRendererVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.variant.ListViewVariant;
 import valeditor.ui.feathers.variant.SortOrderHeaderRendererVariant;
 
 /**
@@ -54,6 +64,15 @@ class TemplateLibrary extends LayoutGroup
 	private var _templateAddButton:Button;
 	private var _templateRemoveButton:Button;
 	private var _templateRenameButton:Button;
+	
+	private var _contextMenu:ListView;
+	private var _contextMenuCollection:ArrayCollection<MenuItem>;
+	private var _popupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
+	private var _contextMenuSprite:Sprite;
+	private var _contextMenuPt:Point = new Point();
+	
+	private var _addTemplateMenuItem:MenuItem;
+	private var _removeTemplateMenuItem:MenuItem;
 
 	public function new() 
 	{
@@ -153,7 +172,160 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.addEventListener(MouseEvent.CLICK, onGridMouseClick);
 		this._grid.addEventListener(MouseEvent.MOUSE_DOWN, onGridMouseDown);
 		
+		// context menu
+		this._addTemplateMenuItem = new MenuItem("add", "Add template");
+		this._removeTemplateMenuItem = new MenuItem("remove", "Remove selected template(s)", true, "Del");
+		
+		this._contextMenuCollection = new ArrayCollection<MenuItem>([
+			this._addTemplateMenuItem,
+			this._removeTemplateMenuItem
+		]);
+		
+		var contextRecycler = DisplayObjectRecycler.withFunction(()->{
+			return new MenuItemRenderer();
+		});
+		
+		contextRecycler.update = (renderer:MenuItemRenderer, state:ListViewItemState) -> {
+			renderer.text = state.data.text;
+			renderer.shortcutText = state.data.shortcutText;
+			renderer.iconBitmapData = state.data.iconBitmapData;
+			renderer.enabled = state.data.enabled;
+		};
+		
+		this._contextMenu = new ListView(this._contextMenuCollection);
+		this._contextMenu.variant = ListViewVariant.CONTEXT_MENU;
+		var listLayout:VerticalListLayout = new VerticalListLayout();
+		listLayout.requestedRowCount = this._contextMenuCollection.length;
+		this._contextMenu.layout = listLayout;
+		this._contextMenu.itemRendererRecycler = contextRecycler;
+		this._contextMenu.itemToEnabled = function(item:Dynamic):Bool {
+			return item.enabled;
+		};
+		this._contextMenu.itemToText = function(item:Dynamic):String {
+			return item.text;
+		};
+		
+		this._contextMenu.addEventListener(Event.CHANGE, onContextMenuChange);
+		this._contextMenu.addEventListener(ListViewEvent.ITEM_TRIGGER, onContextMenuItemTrigger);
+		this._grid.addEventListener(MouseEvent.RIGHT_CLICK, onContextMenuRightClick);
+		
+		this._contextMenuSprite = new Sprite();
+		this._contextMenuSprite.mouseEnabled = false;
+		this._contextMenuSprite.graphics.beginFill(0xff0000, 0);
+		this._contextMenuSprite.graphics.drawRect( -2, -2, 2, 2);
+		this._contextMenuSprite.graphics.endFill();
+		addChild(this._contextMenuSprite);
+		//Lib.current.stage.addChild(this._contextMenuSprite);
+		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
+	}
+	
+	private function closeContextMenu():Void
+	{
+		this._popupAdapter.close();
+		this._contextMenu.selectedIndex = -1;
+		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
+	}
+	
+	private function onContextMenuChange(evt:Event):Void
+	{
+		if (this._contextMenu.selectedItem == null) return;
+		
+		if (!this._contextMenu.selectedItem.enabled) return;
+		
+		var action:MultiAction;
+		
+		switch (this._contextMenu.selectedItem.id)
+		{
+			case "add" :
+				FeathersWindows.showTemplateCreationWindow();
+			
+			case "remove" :
+				action = MultiAction.fromPool();
+				var templateRemove:TemplateRemove;
+				
+				for (template in this._grid.selectedItems)
+				{
+					templateRemove = TemplateRemove.fromPool();
+					templateRemove.setup(template);
+					action.add(templateRemove);
+				}
+				ValEditor.actionStack.add(action);
+		}
+	}
+	
+	private function onContextMenuItemTrigger(evt:ListViewEvent):Void
+	{
+		if (!evt.state.enabled)
+		{
+			return;
+		}
+		closeContextMenu();
+	}
+	
+	private function onContextMenuRightClick(evt:MouseEvent):Void
+	{
+		var object:DisplayObject = evt.target;
+		var template:ValEditorTemplate = null;
+		while (true)
+		{
+			if (object == null) break;
+			if (object is ItemRenderer)
+			{
+				template = cast(object, ItemRenderer).data;
+				break;
+			}
+			object = object.parent;
+		}
+		
+		if (template != null && this._grid.selectedItems.indexOf(template) == -1)
+		{
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var selectionClear:SelectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
+			var templateSelect:TemplateSelect = TemplateSelect.fromPool();
+			templateSelect.setup();
+			templateSelect.addTemplate(template);
+			action.add(templateSelect);
+			
+			ValEditor.actionStack.add(templateSelect);
+		}
+		
+		this._contextMenuPt.x = evt.stageX;
+		this._contextMenuPt.y = evt.stageY;
+		this._contextMenuPt = globalToLocal(this._contextMenuPt);
+		this._contextMenuSprite.x = this._contextMenuPt.x;
+		this._contextMenuSprite.y = this._contextMenuPt.y;
+		
+		if (this._popupAdapter.active)
+		{
+			closeContextMenu();
+		}
+		
+		var singleTemplateSelected:Bool = this._grid.selectedItems.length == 1;
+		var templateSelected:Bool = this._grid.selectedItems.length != 0;
+		
+		this._removeTemplateMenuItem.enabled = templateSelected;
+		this._contextMenuCollection.updateAll();
+		
+		this._contextMenu.selectedIndex = -1;
+		
+		this._popupAdapter.open(this._contextMenu, this._contextMenuSprite);
+		this.stage.addEventListener(MouseEvent.MOUSE_DOWN, onContextMenuStageMouseDown);
+		this.stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onContextMenuStageMouseDown);
+	}
+	
+	private function onContextMenuStageMouseDown(evt:MouseEvent):Void
+	{
+		if (this._contextMenu.parent.hitTestPoint(evt.stageX, evt.stageY))
+		{
+			return;
+		}
+		closeContextMenu();
 	}
 	
 	private function onTemplateAddButton(evt:TriggerEvent):Void
