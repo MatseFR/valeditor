@@ -796,16 +796,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		itemRenderer.layer = state.data;
 	}
 	
-	//private function listsChangeDisable():Void
-	//{
-		//this._layerList.removeEventListener(Event.CHANGE, onLayerListChange);
-	//}
-	
-	//private function listsChangeEnable():Void
-	//{
-		//this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
-	//}
-	
 	private function updateHScrollBar():Void
 	{
 		this._timeLineRulerList.validateNow();
@@ -847,7 +837,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		var timeLine:ValEditorTimeLine = cast layer.timeLine;
 		var item:TimeLineItem = TimeLineItem.fromPool(layer);
-		//item.addEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
 		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
 		this._timeLineItems.insert(index, item);
@@ -859,7 +848,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function destroyTimeLineItem(item:TimeLineItem):Void
 	{
-		//item.removeEventListener(Event.SELECT, onTimeLineItemSelected);
 		item.removeEventListener(Event.SCROLL, onTimeLineItemScroll);
 		item.removeEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
 		this._timeLineItems.remove(item);
@@ -985,8 +973,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerAdded(evt:ContainerEvent):Void
 	{
-		trace("onLayerAdded");
-		
 		layerRegister(evt.object);
 		this._timeLineList.validateNow();
 		updateVScrollBar();
@@ -1227,12 +1213,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		var timeLineItem:TimeLineItem = cast evt.target;
 		this._hScrollBar.value = timeLineItem.scrollX;
 	}
-	
-	//private function onTimeLineItemSelected(evt:Event):Void
-	//{
-		//var layer:ValEditLayer = this._container.getLayerAt(this._timeLineItems.indexOf(cast evt.target));
-		//this._container.currentLayer = layer;
-	//}
 	
 	private function onTimeLineListScroll(evt:ScrollEvent):Void
 	{
