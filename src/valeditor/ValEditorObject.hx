@@ -1,16 +1,15 @@
 package valeditor;
 
 import haxe.Constraints.Function;
-import openfl.errors.Error;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
-import valedit.ValEditKeyFrame;
-import valedit.value.ExposedFunction;
-import valedit.value.base.ExposedValue;
 import valedit.IValEditContainer;
 import valedit.ValEditClass;
+import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
+import valedit.value.ExposedFunction;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.ObjectEvent;
 import valeditor.ui.IInteractiveObject;

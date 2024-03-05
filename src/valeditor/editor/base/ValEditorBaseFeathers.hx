@@ -4,8 +4,6 @@ import feathers.controls.Application;
 import feathers.controls.navigators.StackNavigator;
 import feathers.style.Theme;
 import openfl.display.StageScaleMode;
-import valedit.ValEdit;
-import valedit.asset.AssetLib;
 import valedit.value.ExposedBitmap;
 import valedit.value.ExposedBitmapData;
 import valedit.value.ExposedBool;
