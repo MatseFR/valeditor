@@ -1,6 +1,7 @@
 package valeditor.ui.feathers.controls;
 
 import openfl.display.Sprite;
+import openfl.geom.Rectangle;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -87,57 +88,86 @@ class SelectionBox extends Sprite
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		this.x = object.getProperty(RegularPropertyName.X);
-		this.y = object.getProperty(RegularPropertyName.Y);
-		if (object.hasPivotProperties)
+		if (object.useBounds)
 		{
-			this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
-			this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
+			var bounds:Rectangle = object.getBounds(object.object.parent);
+			this.x = bounds.x;
+			this.y = bounds.y;
+			
+			//var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			//object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			//this.rotation = 0;
+			
+			//refreshShape(bounds.width, bounds.height);
+			this.realWidth = bounds.width;
+			this.realHeight = bounds.height;
+			
+			//object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+			//if (object.hasRadianRotation)
+			//{
+				//this.rotation = MathUtil.rad2deg(rotation);
+			//}
+			//else
+			//{
+				//this.rotation = rotation;
+			//}
+			
+			//this.transform.matrix = object.object.transform.matrix;
 		}
 		else
 		{
-			this.pivotX = 0;
-			this.pivotY = 0;
-		}
-		
-		if (object.hasPivotProperties)
-		{
-			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
-			
-			if (scaleX < 0)
+			this.x = object.getProperty(RegularPropertyName.X);
+			this.y = object.getProperty(RegularPropertyName.Y);
+			if (object.hasPivotProperties)
 			{
-				this.scaleX = -1;
+				this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
+				this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
 			}
 			else
 			{
-				this.scaleX = 1;
+				this.pivotX = 0;
+				this.pivotY = 0;
 			}
 			
-			if (scaleY < 0)
+			if (object.hasPivotProperties)
 			{
-				this.scaleY = -1;
+				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+			}
+			
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			this.rotation = 0;
+			this.realWidth = object.getProperty(RegularPropertyName.WIDTH);
+			this.realHeight = object.getProperty(RegularPropertyName.HEIGHT);
+			
+			object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+			if (object.hasRadianRotation)
+			{
+				this.rotation = MathUtil.rad2deg(rotation);
 			}
 			else
 			{
-				this.scaleY = 1;
+				this.rotation = rotation;
 			}
-		}
-		
-		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
-		this.rotation = 0;
-		this.realWidth = object.getProperty(RegularPropertyName.WIDTH);
-		this.realHeight = object.getProperty(RegularPropertyName.HEIGHT);
-		
-		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-		if (object.hasRadianRotation)
-		{
-			this.rotation = MathUtil.rad2deg(rotation);
-		}
-		else
-		{
-			this.rotation = rotation;
 		}
 	}
 	
