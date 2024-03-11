@@ -9,6 +9,7 @@ import valeditor.ui.feathers.theme.components.FrameItemRendererStyles;
 import valeditor.ui.feathers.theme.components.LabelStyles;
 import valeditor.ui.feathers.theme.components.LayerItemStyles;
 import valeditor.ui.feathers.theme.components.LayoutGroupStyles;
+import valeditor.ui.feathers.theme.components.PopUpListViewStyles;
 import valeditor.ui.feathers.theme.components.ScenarioViewStyles;
 import valeditor.ui.feathers.theme.components.ScrollContainerStyles;
 import valeditor.ui.feathers.theme.components.SelectionGroupStyles;
@@ -48,6 +49,7 @@ class ValEditorTheme extends SimpleTheme
 		LayoutGroupStyles.initialize(this, this.styleProvider);
 		ListViewStyles.initialize(this, this.styleProvider);
 		NumericDraggerStyles.initialize(this, this.styleProvider);
+		PopUpListViewStyles.initialize(this, this.styleProvider);
 		ScenarioViewStyles.initialize(this, this.styleProvider);
 		ScrollContainerStyles.initialize(this, this.styleProvider);
 		SelectionGroupStyles.initialize(this, this.styleProvider);
