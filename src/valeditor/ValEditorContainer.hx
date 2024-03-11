@@ -83,7 +83,7 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		return false;
 	}
 	
-	private var _isOpen:Bool;
+	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
 	
 	override function set_x(value:Float):Float 
