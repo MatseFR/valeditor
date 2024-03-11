@@ -34,6 +34,9 @@ class ValEditorClassSettings extends ValEditClassSettings
 	 *  this is only useful if isDisplayObject is set to true **/
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 	
+	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
+	public var useBounds:Bool;
+	
 	/** tells if pivot values should be scaled when clicking/moving object
 	 *  @default false */
 	public var usePivotScaling:Bool;
@@ -52,6 +55,7 @@ class ValEditorClassSettings extends ValEditClassSettings
 		this.hasRadianRotation = false;
 		this.iconBitmapData = null;
 		this.interactiveFactory = null;
+		this.useBounds = false;
 		this.usePivotScaling = false;
 	}
 	
