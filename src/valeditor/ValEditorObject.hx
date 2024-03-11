@@ -32,6 +32,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	
 	public var container(get, set):IValEditContainer;
 	public var getBoundsFunctionName(get, set):String;
+	public var hasBoundsFunction(get, never):Bool;
 	public var hasPivotProperties:Bool;
 	public var hasScaleProperties:Bool;
 	public var hasTransformProperty:Bool;
@@ -47,6 +48,8 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
 	public var selectionBox(get, set):SelectionBox;
+	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
+	public var useBounds:Bool;
 	public var usePivotScaling:Bool;
 	
 	private var _container:IValEditContainer;
@@ -88,6 +91,8 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		}
 		return this._getBoundsFunctionName = value;
 	}
+	
+	private function get_hasBoundsFunction():Bool { return this._boundsFunction != null; }
 	
 	override function set_id(value:String):String 
 	{
