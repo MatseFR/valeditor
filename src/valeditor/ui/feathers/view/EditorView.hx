@@ -34,8 +34,10 @@ import valeditor.ui.feathers.controls.TemplateLibrary;
 import valeditor.ui.feathers.controls.ToggleLayoutGroup;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
+import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.variant.PopUpListViewVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
 
 /**
@@ -139,6 +141,8 @@ class EditorView extends LayoutGroup
 		var itemToText:Dynamic->String;
 		var collection:ArrayCollection<Dynamic> = this._menuCollections.get(menuID);
 		var menu:PopUpListView = new PopUpListView(collection, onMenuChange);
+		menu.variant = PopUpListViewVariant.MENU;
+		
 		var openListener:Event->Void = this._menuOpenListeners.get(menuID);
 		
 		if (openListener != null)
