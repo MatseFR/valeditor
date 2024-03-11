@@ -32,6 +32,8 @@ class ValEditorClass extends ValEditClass
 	public var hasRadianRotation:Bool;
 	public var iconBitmapData:BitmapData;
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
+	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
+	public var useBounds:Bool;
 	public var usePivotScaling:Bool;
 
 	public function new(classReference:Class<Dynamic>)
@@ -52,6 +54,7 @@ class ValEditorClass extends ValEditClass
 		this.hasRadianRotation = false;
 		this.iconBitmapData = null;
 		this.interactiveFactory = null;
+		this.useBounds = false;
 		this.usePivotScaling = false;
 		
 		super.clear();
