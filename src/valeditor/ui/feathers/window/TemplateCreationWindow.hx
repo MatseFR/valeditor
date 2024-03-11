@@ -5,6 +5,7 @@ import feathers.controls.ComboBox;
 import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
@@ -18,6 +19,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
+import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.display.Bitmap;
 import openfl.events.Event;
@@ -109,6 +111,7 @@ class TemplateCreationWindow extends Panel
 		
 		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
+		var maxRows:Int = 12;
 		
 		// header
 		this._headerGroup = new Header(this._title);
@@ -158,6 +161,14 @@ class TemplateCreationWindow extends Panel
 		this._categoryGroup.addChild(this._categoryControlsGroup);
 		
 		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
+		this._categoryPicker.listViewFactory = function():ListView
+		{
+			var layout:VerticalListLayout = new VerticalListLayout();
+			layout.requestedRowCount = Std.int(Math.min(this._categoryCollection.length, maxRows));
+			var listView:ListView = new ListView();
+			listView.layout = layout;
+			return listView;
+		}
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
 		this._categoryPicker.itemToText = function(item:Dynamic):String {
 			return item.value;
@@ -191,6 +202,14 @@ class TemplateCreationWindow extends Panel
 		};
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
+		this._classPicker.listViewFactory = function():ListView
+		{
+			var layout:VerticalListLayout = new VerticalListLayout();
+			layout.requestedRowCount = Std.int(Math.min(this._classCollection.length, maxRows));
+			var listView:ListView = new ListView();
+			listView.layout = layout;
+			return listView;
+		}
 		this._classPicker.itemToText = function(item:Dynamic):String {
 			return item.className;
 		};
