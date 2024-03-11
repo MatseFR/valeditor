@@ -2,6 +2,7 @@ package valeditor.ui;
 
 import openfl.display.Shape;
 import openfl.display.Sprite;
+import openfl.geom.Rectangle;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -135,62 +136,87 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		this.x = object.getProperty(RegularPropertyName.X);
-		this.y = object.getProperty(RegularPropertyName.Y);
-		if (object.hasPivotProperties)
+		if (object.useBounds)
 		{
-			this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
-			this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
+			var bounds:Rectangle = object.getBounds(object.object.parent);
+			this.x = bounds.x;
+			this.y = bounds.y;
+			
+			//var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			//object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			//this.rotation = 0;
+			
+			refreshShape(bounds.width, bounds.height);
+			
+			//object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+			//if (object.hasRadianRotation)
+			//{
+				//this.rotation = MathUtil.rad2deg(rotation);
+			//}
+			//else
+			//{
+				//this.rotation = rotation;
+			//}
 		}
 		else
 		{
-			this.pivotX = 0;
-			this.pivotY = 0;
-		}
-		
-		if (object.hasScaleProperties)
-		{
-			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
-			
-			if (scaleX < 0)
+			this.x = object.getProperty(RegularPropertyName.X);
+			this.y = object.getProperty(RegularPropertyName.Y);
+			if (object.hasPivotProperties)
 			{
-				this.scaleX = -1;
+				this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
+				this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
+			}
+			else
+			{
+				this.pivotX = 0;
+				this.pivotY = 0;
+			}
+			
+			if (object.hasScaleProperties)
+			{
+				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
 			}
 			else
 			{
 				this.scaleX = 1;
+				this.scaleY = 1;
 			}
 			
-			if (scaleY < 0)
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			this.rotation = 0;
+			
+			refreshShape(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
+			
+			object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+			if (object.hasRadianRotation)
 			{
-				this.scaleY = -1;
+				this.rotation = MathUtil.rad2deg(rotation);
 			}
 			else
 			{
-				this.scaleY = 1;
+				this.rotation = rotation;
 			}
-		}
-		else
-		{
-			this.scaleX = 1;
-			this.scaleY = 1;
-		}
-		
-		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
-		this.rotation = 0;
-		
-		refreshShape(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
-		
-		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-		if (object.hasRadianRotation)
-		{
-			this.rotation = MathUtil.rad2deg(rotation);
-		}
-		else
-		{
-			this.rotation = rotation;
 		}
 		
 		if (!this.visibilityLocked && object.hasVisibleProperty)
@@ -204,7 +230,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		if (width < this._minWidth) width = this._minWidth;
 		if (height < this._minHeight) height = this._minHeight;
 		this._shape.graphics.clear();
-		this._shape.graphics.beginFill(0xff0000, 0);
+		this._shape.graphics.beginFill(0xff0000, 0.0);
 		this._shape.graphics.drawRect(0, 0, width, height);
 		this._shape.graphics.endFill();
 	}
