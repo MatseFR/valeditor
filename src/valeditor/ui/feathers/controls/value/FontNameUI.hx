@@ -221,7 +221,7 @@ class FontNameUI extends ValueUI
 				var action:MultiAction = MultiAction.fromPool();
 				
 				var valueChange:ValueChange = ValueChange.fromPool();
-				valueChange.setup(this._exposedValue, this._list.selectedItem);
+				valueChange.setup(this._exposedValue, this._list.selectedItem.value);
 				action.add(valueChange);
 				
 				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
