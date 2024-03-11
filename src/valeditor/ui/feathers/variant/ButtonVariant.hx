@@ -6,6 +6,7 @@ package valeditor.ui.feathers.variant;
  */
 class ButtonVariant 
 {
+	inline static public var MENU:String = "menu";
 	
 	inline static public var ADD:String = "add";
 	inline static public var REMOVE:String = "remove";
