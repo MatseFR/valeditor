@@ -375,6 +375,7 @@ class ValEditor
 		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
+		v.useBounds = settings.useBounds;
 		v.usePivotScaling = settings.usePivotScaling;
 		
 		v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
@@ -782,6 +783,7 @@ class ValEditor
 		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.useBounds = valClass.useBounds;
 		valObject.usePivotScaling = valClass.usePivotScaling;
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
