@@ -20,6 +20,11 @@ class ButtonStyles
 	{
 		ButtonStyles.theme = theme;
 		
+		if (styleProvider.getStyleFunction(Button, ButtonVariant.MENU) == null)
+		{
+			styleProvider.setStyleFunction(Button, ButtonVariant.MENU, menu);
+		}
+		
 		if (styleProvider.getStyleFunction(Button, ButtonVariant.ADD) == null)
 		{
 			styleProvider.setStyleFunction(Button, ButtonVariant.ADD, add);
@@ -89,19 +94,32 @@ class ButtonStyles
 			focusRectSkin.cornerRadius = 3.0;
 			btn.focusRectSkin = focusRectSkin;
 		}
+	}
+	
+	static private function menu(btn:Button):Void
+	{
+		if (btn.backgroundSkin == null)
+		{
+			var skin = new RectangleSkin();
+			skin.fill = theme.getLightFill();
+			skin.setFillForState(DOWN, theme.getLightFillDark());
+			skin.setFillForState(HOVER, theme.getLightFillDark());
+			btn.backgroundSkin = skin;
+		}
+		if (btn.textFormat == null)
+		{
+			btn.textFormat = theme.getTextFormat();
+		}
+		if (btn.disabledTextFormat == null)
+		{
+			btn.disabledTextFormat = theme.getTextFormat_disabled();
+		}
 		
-		//if (btn.textFormat == null) {
-			//btn.textFormat = theme.getTextFormat();
-		//}
-		//if (btn.disabledTextFormat == null) {
-			//btn.disabledTextFormat = theme.getTextFormat_disabled();
-		//}
-		
-		//btn.paddingTop = 4.0;
-		//btn.paddingRight = 10.0;
-		//btn.paddingBottom = 4.0;
-		//btn.paddingLeft = 10.0;
-		//btn.gap = 4.0;
+		btn.paddingTop = 4.0;
+		btn.paddingRight = 10.0;
+		btn.paddingBottom = 4.0;
+		btn.paddingLeft = 10.0;
+		btn.gap = 4.0;
 	}
 	
 	static private function add(btn:Button):Void
