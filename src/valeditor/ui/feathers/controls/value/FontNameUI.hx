@@ -144,6 +144,7 @@ class FontNameUI extends ValueUI
 		this._label.text = this._exposedValue.name;
 		
 		this._collection.array = null;
+		this._fontNameList.resize(0);
 		StringData.poolArray(this._fontStringDataList);
 		this._fontStringDataList.resize(0);
 		var fonts:Array<Font> = Font.enumerateFonts(this._fontName.includeSystemFonts);
@@ -153,6 +154,7 @@ class FontNameUI extends ValueUI
 			this._fontStringDataList.push(StringData.fromPool(font.fontName));
 		}
 		this._collection.array = this._fontStringDataList;
+		this._collection.refresh();
 		
 		this._list.enabled = !this._readOnly;
 		
@@ -173,7 +175,7 @@ class FontNameUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			this._list.selectedIndex = this._fontNameList.indexOf(_exposedValue.value);
+			this._list.selectedIndex = this._fontNameList.indexOf(this._exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
 	}
