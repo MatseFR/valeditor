@@ -12,6 +12,8 @@ import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.ObjectEvent;
+import valeditor.events.ObjectFunctionEvent;
+import valeditor.events.ObjectPropertyEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
@@ -325,35 +327,32 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	}
 	
 	@:access(valedit.value.base.ExposedValue)
-	public function templatePropertyChange(templateValue:ExposedValue):Void
+	public function templatePropertyChange(templateValue:ExposedValue, propertyNames:Array<String>):Void
 	{
-		templateValue.cloneValue(this._defaultCollection.getValue(templateValue.propertyName));
+		templateValue.cloneValue(this._defaultCollection.getValueDeep(propertyNames));
 		
 		for (collection in this._keyFrameToCollection)
 		{
-			templateValue.cloneValue(collection.getValue(templateValue.propertyName));
+			templateValue.cloneValue(collection.getValueDeep(propertyNames));
 		}
 	}
 	
-	public function valueChange(propertyName:String):Void
+	public function valueChange(value:ExposedValue):Void
 	{
 		// this value changed on object, reflect changes on interactiveObject & realObject if needed
-		this._regularPropertyName = this.propertyMap.getRegularPropertyName(propertyName);
-		if (this._regularPropertyName == null) this._regularPropertyName = propertyName;
-		
 		registerForChangeUpdate();
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
+		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, value.getPropertyNames());
 	}
 	
 	private function onValueChange(evt:ValueEvent):Void
 	{
-		this._regularPropertyName = this.propertyMap.getRegularPropertyName(evt.value.propertyName);
-		if (this._regularPropertyName == null) this._regularPropertyName = evt.value.propertyName;
+		//this._regularPropertyName = this.propertyMap.getRegularPropertyName(evt.value.propertyName);
+		//if (this._regularPropertyName == null) this._regularPropertyName = evt.value.propertyName;
 		
 		registerForChangeUpdate();
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, this._regularPropertyName);
+		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, evt.value.getPropertyNames());
 	}
 	
 	public function modifyProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
@@ -374,7 +373,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			registerForChangeUpdate();
 		}
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, regularPropertyName);
+		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, [this._realPropertyName]);
 	}
 	
 	public function setProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
@@ -395,7 +394,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			registerForChangeUpdate();
 		}
 		
-		ObjectEvent.dispatch(this, ObjectEvent.PROPERTY_CHANGE, this, regularPropertyName);
+		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, [this._realPropertyName]);
 	}
 	
 	public function registerForChangeUpdate():Void
@@ -426,7 +425,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	
 	public function functionCalled(propertyName:String, parameters:Array<Dynamic>):Void
 	{
-		ObjectEvent.dispatch(this, ObjectEvent.FUNCTION_CALLED, this, propertyName, parameters);
+		ObjectFunctionEvent.dispatch(this, ObjectFunctionEvent.CALLED, this, propertyName, parameters);
 	}
 	
 	public function getBounds(targetSpace:Dynamic):Rectangle
