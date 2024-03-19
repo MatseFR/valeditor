@@ -1,5 +1,6 @@
 package valeditor.editor.action.value;
 import openfl.errors.Error;
+import valedit.ValEdit;
 import valedit.value.base.ExposedValue;
 import valeditor.editor.action.ValEditorAction;
 
@@ -19,6 +20,8 @@ class ValueChange extends ValEditorAction
 	
 	public var exposedValue:ExposedValue;
 	public var newValue:Dynamic;
+	public var previousLastChanged:Float;
+	public var previousLastModified:Float;
 	public var previousValue:Dynamic;
 	
 	public function new() 
@@ -45,6 +48,8 @@ class ValueChange extends ValEditorAction
 	{
 		this.exposedValue = exposedValue;
 		this.newValue = newValue;
+		this.previousLastChanged = this.exposedValue.lastChanged;
+		this.previousLastModified = this.exposedValue.lastModified;
 		if (previousValue == null)
 		{
 			this.previousValue = this.exposedValue.value;
@@ -62,6 +67,7 @@ class ValueChange extends ValEditorAction
 			throw new Error("ValueChange already applied");
 		}
 		
+		this.exposedValue.lastModified = ValEdit.TIME_STAMP_CURRENT;
 		this.exposedValue.value = this.newValue;
 		this.status = ValEditorActionStatus.DONE;
 	}
@@ -74,6 +80,8 @@ class ValueChange extends ValEditorAction
 		}
 		
 		this.exposedValue.value = this.previousValue;
+		this.exposedValue.lastChanged = this.previousLastChanged;
+		this.exposedValue.lastModified = this.previousLastModified;
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
