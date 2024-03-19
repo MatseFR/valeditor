@@ -6,7 +6,8 @@ import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.utils.ReverseIterator;
 import valedit.value.base.ExposedValue;
-import valeditor.events.ObjectEvent;
+import valeditor.events.ObjectFunctionEvent;
+import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 
@@ -63,14 +64,14 @@ class ValEditorTemplate extends ValEditTemplate
 		
 		if (this._object != null)
 		{
-			this._object.removeEventListener(ObjectEvent.PROPERTY_CHANGE, onTemplateObjectPropertyChange);
-			this._object.removeEventListener(ObjectEvent.FUNCTION_CALLED, onTemplateObjectFunctionCalled);
+			this._object.removeEventListener(ObjectPropertyEvent.CHANGE, onTemplateObjectPropertyChange);
+			this._object.removeEventListener(ObjectFunctionEvent.CALLED, onTemplateObjectFunctionCalled);
 		}
 		
 		if (value != null)
 		{
-			value.addEventListener(ObjectEvent.PROPERTY_CHANGE, onTemplateObjectPropertyChange);
-			value.addEventListener(ObjectEvent.FUNCTION_CALLED, onTemplateObjectFunctionCalled);
+			value.addEventListener(ObjectPropertyEvent.CHANGE, onTemplateObjectPropertyChange);
+			value.addEventListener(ObjectFunctionEvent.CALLED, onTemplateObjectFunctionCalled);
 		}
 		
 		return super.set_object(value);
@@ -179,19 +180,20 @@ class ValEditorTemplate extends ValEditTemplate
 	}
 	
 	@:access(valedit.value.base.ExposedValue)
-	private function onTemplateObjectPropertyChange(evt:ObjectEvent):Void
+	private function onTemplateObjectPropertyChange(evt:ObjectPropertyEvent):Void
 	{
 		if (this.lockInstanceUpdates)
 		{
 			return;
 		}
 		
-		var templateValue:ExposedValue = evt.object.currentCollection.getValue(evt.propertyName);
+		var templateValue:ExposedValue = evt.object.currentCollection.getValueDeep(evt.propertyNames);
+		if (!templateValue.visible) return;
 		
 		// check for corresponding constructor value
 		if (this.constructorCollection != null)
 		{
-			var value:ExposedValue = this.constructorCollection.getValue(templateValue.propertyName);
+			var value:ExposedValue = this.constructorCollection.getValueDeep(evt.propertyNames);
 			if (value != null)
 			{
 				templateValue.cloneValue(value);
@@ -200,11 +202,11 @@ class ValEditorTemplate extends ValEditTemplate
 		
 		for (instance in this._instances)
 		{
-			cast(instance, ValEditorObject).templatePropertyChange(templateValue);
+			cast(instance, ValEditorObject).templatePropertyChange(templateValue, evt.propertyNames);
 		}
 	}
 	
-	private function onTemplateObjectFunctionCalled(evt:ObjectEvent):Void
+	private function onTemplateObjectFunctionCalled(evt:ObjectFunctionEvent):Void
 	{
 		if (this.lockInstanceUpdates)
 		{
@@ -213,7 +215,7 @@ class ValEditorTemplate extends ValEditTemplate
 		
 		for (instance in this._instances)
 		{
-			cast(instance, ValEditorObject).templateFunctionCall(evt.propertyName, evt.parameters);
+			cast(instance, ValEditorObject).templateFunctionCall(evt.functionName, evt.parameters);
 		}
 	}
 	
