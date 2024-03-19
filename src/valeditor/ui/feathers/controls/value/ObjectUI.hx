@@ -46,9 +46,9 @@ class ObjectUI extends ValueUI
 		else
 		{
 			this._exposedObject = cast value;
-			if (this._exposedObject.objectCollection.uiContainer == null)
+			if (this._exposedObject.childCollection.uiContainer == null)
 			{
-				ValEditor.edit(value.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
+				ValEditor.edit(value.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
 			}
 		}
 		return super.set_exposedValue(value);
@@ -78,7 +78,7 @@ class ObjectUI extends ValueUI
 		super.clear();
 		if (this._exposedObject != null)
 		{
-			if (this._exposedObject.objectCollection.uiContainer != null)
+			if (this._exposedObject.childCollection.uiContainer != null)
 			{
 				ValEditor.edit(null, this._valueGroup);
 			}
@@ -174,10 +174,10 @@ class ObjectUI extends ValueUI
 			}
 		}
 		
-		if (this._exposedObject.objectCollection.uiContainer == null)
+		if (this._exposedObject.childCollection.uiContainer == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			ValEditor.edit(this._exposedValue.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
+			ValEditor.edit(this._exposedValue.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
 		}
 		
 		updateEditable();
@@ -216,13 +216,13 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		if (this._exposedObject.objectCollection.uiContainer == null)
+		if (this._exposedObject.childCollection.uiContainer == null)
 		{
-			ValEditor.edit(this._exposedObject.value, this._exposedObject.objectCollection, this._valueGroup, this._exposedObject);
+			ValEditor.edit(this._exposedObject.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
 		}
 		else
 		{
-			this._exposedObject.objectCollection.readAndSetObject(this._exposedObject.value);
+			this._exposedObject.childCollection.readAndSetObject(this._exposedObject.value);
 		}
 		super.onValueObjectChange(evt);
 	}
