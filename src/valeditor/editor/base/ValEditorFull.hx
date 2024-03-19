@@ -7,6 +7,9 @@ import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
 import openfl.Lib;
 import openfl.display.Bitmap;
+import openfl.display.GradientType;
+import openfl.display.InterpolationMethod;
+import openfl.display.SpreadMethod;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.filters.BlurFilter;
@@ -36,8 +39,10 @@ import valedit.data.valedit.ShapeData;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
 import valedit.object.openfl.display.ArcShape;
+import valedit.object.openfl.display.ArrowShape;
 import valedit.object.openfl.display.BurstShape;
 import valedit.object.openfl.display.CircleShape;
+import valedit.object.openfl.display.DonutShape;
 import valedit.object.openfl.display.EllipseShape;
 import valedit.object.openfl.display.FlowerShape;
 import valedit.object.openfl.display.GearShape;
@@ -250,6 +255,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClassSimple(ValEditorTheme, false, SimpleThemeData.exposeSimpleTheme());
 		
 		// OpenFL Display
+		// Sprite
 		settings.canBeCreated = false;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -260,6 +266,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(Sprite, settings);
 		settings.clear();
 		
+		// Bitmap
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -273,6 +280,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(Bitmap, settings);
 		settings.clear();
 		
+		// ArcShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -286,6 +294,21 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(ArcShape, settings);
 		settings.clear();
 		
+		// ArrowShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.objectCollection = ShapeData.exposeArrowShapeInstance();
+		settings.templateCollection = ShapeData.exposeArrowShapeTemplate();
+		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(ArrowShape, settings);
+		settings.clear();
+		
+		// BurstShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -299,6 +322,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(BurstShape, settings);
 		settings.clear();
 		
+		// CircleShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -312,6 +336,21 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(CircleShape, settings);
 		settings.clear();
 		
+		// DonutShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.objectCollection = ShapeData.exposeDonutShapeInstance();
+		settings.templateCollection = ShapeData.exposeDonutShapeTemplate();
+		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(DonutShape, settings);
+		settings.clear();
+		
+		// EllipseShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -325,6 +364,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(EllipseShape, settings);
 		settings.clear();
 		
+		// FlowerShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -338,6 +378,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(FlowerShape, settings);
 		settings.clear();
 		
+		// GearShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -351,6 +392,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(GearShape, settings);
 		settings.clear();
 		
+		// PolygonShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -364,6 +406,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(PolygonShape, settings);
 		settings.clear();
 		
+		// RectangleShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -377,6 +420,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(RectangleShape, settings);
 		settings.clear();
 		
+		// RoundRectangleShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -390,6 +434,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(RoundRectangleShape, settings);
 		settings.clear();
 		
+		// StarShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -403,6 +448,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(StarShape, settings);
 		settings.clear();
 		
+		// WedgeShape
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -429,6 +475,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), null, GeomData.exposeRectangleConstructor());
 		
 		// OpenFL Text
+		// TextField
 		settings.canBeCreated = true;
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_TEXT);
@@ -449,6 +496,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClassSimple(TextureCreationParameters, false, StarlingTextureData.exposeTextureCreationParameters());
 		
 		// Starling Display
+		// Quad
 		settings.canBeCreated = true;
 		settings.disposeFunctionName = "dispose";
 		settings.addCategory(CategoryID.STARLING);
@@ -465,6 +513,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(Quad, settings);
 		settings.clear();
 		
+		// Image
 		settings.canBeCreated = true;
 		settings.disposeFunctionName = "dispose";
 		settings.addCategory(CategoryID.STARLING);
@@ -484,6 +533,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		// Starling Filters
 		
 		// Starling Text
+		// TextField
 		settings.canBeCreated = true;
 		settings.disposeFunctionName = "dispose";
 		settings.addCategory(CategoryID.STARLING);
@@ -518,6 +568,34 @@ class ValEditorFull extends ValEditorBaseFeathers
 	override function ready():Void 
 	{
 		super.ready();
+		
+		//trace("openfl-juggler v" + ValEdit.OPENFL_JUGGLER_VERSION);
+		
+		//var sprite:Sprite = new Sprite();
+		//var matrix:Matrix = new Matrix();
+		//matrix.createGradientBox(this.stage.stageWidth, this.stage.stageHeight);// , Math.PI / 2); // make vertical
+		//sprite.graphics.beginGradientFill(GradientType.LINEAR, [0x000000, 0x000000], [0.0, 0.0], [127, 255], matrix);
+		//sprite.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+		//sprite.graphics.endFill();
+		//addChild(sprite);
+		
+		//var sprite:Sprite = new Sprite();
+		//var matrix:Matrix = new Matrix();
+		//matrix.createGradientBox(this.stage.stageWidth, this.stage.stageHeight, -Math.PI / 2); // make vertical
+		//sprite.graphics.beginGradientFill(GradientType.LINEAR, [0x000000, 0x000000, 0x000000, 0x000000], [0.0, 1.0, 1.0, 0.0], [127, 157, 225, 255], matrix);
+		//sprite.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
+		//sprite.graphics.endFill();
+		//addChild(sprite);
+		
+		//var tf:TextField = new TextField();
+		//tf.y = 100;
+		//var format:TextFormat = tf.defaultTextFormat;
+		//format.size = 20;
+		////tf.defaultTextFormat = format;
+		//tf.text = "yop yop yop";
+		//tf.defaultTextFormat = format;
+		//tf.text = tf.text;
+		//addChild(tf);
 		
 		this.screenNavigator.rootItemID = EditorView.ID;
 		
