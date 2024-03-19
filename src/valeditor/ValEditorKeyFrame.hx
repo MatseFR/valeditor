@@ -11,7 +11,8 @@ import valeditor.editor.action.object.ObjectAddKeyFrame;
 import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.DefaultEvent;
-import valeditor.events.ObjectEvent;
+import valeditor.events.ObjectFunctionEvent;
+import valeditor.events.ObjectPropertyEvent;
 
 /**
  * ...
@@ -210,14 +211,14 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	
 	private function registerObject(object:ValEditObject):Void
 	{
-		object.addEventListener(ObjectEvent.PROPERTY_CHANGE, onObjectPropertyChange);
-		object.addEventListener(ObjectEvent.FUNCTION_CALLED, onObjectPropertyChange);
+		object.addEventListener(ObjectPropertyEvent.CHANGE, onObjectPropertyChange);
+		object.addEventListener(ObjectFunctionEvent.CALLED, onObjectPropertyChange);
 	}
 	
 	private function unregisterObject(object:ValEditObject):Void
 	{
-		object.removeEventListener(ObjectEvent.PROPERTY_CHANGE, onObjectPropertyChange);
-		object.removeEventListener(ObjectEvent.FUNCTION_CALLED, onObjectPropertyChange);
+		object.removeEventListener(ObjectPropertyEvent.CHANGE, onObjectPropertyChange);
+		object.removeEventListener(ObjectFunctionEvent.CALLED, onObjectPropertyChange);
 	}
 	
 	override public function enter():Void 
@@ -298,7 +299,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		rebuildTweens();
 	}
 	
-	private function onObjectPropertyChange(evt:ObjectEvent):Void
+	private function onObjectPropertyChange(evt:Event):Void
 	{
 		ValEditor.registerForChangeUpdate(this);
 		
