@@ -26,13 +26,14 @@ import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
+import valedit.animation.ValEditUpdater;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetSource;
 import valedit.ui.IValueUI;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ZipUtil;
 import valedit.value.base.ExposedValue;
-import valedit.value.base.ExposedValueWithChildren;
+import valedit.value.base.ExposedValueWithCollection;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import valeditor.editor.action.MultiAction;
@@ -222,6 +223,7 @@ class ValEditor
 	
 	static private var _liveActionManager:LiveInputActionManager;
 	static private var _changeUpdateQueue:ChangeUpdateQueue;
+	static private var _valEditUpdater:ValEditUpdater;
 	static private var _zipSaveLoader:ZipSaveLoader;
 	
 	static public function init(completeCallback:Void->Void):Void
@@ -240,10 +242,12 @@ class ValEditor
 		input.addController(keyboardController);
 		_liveActionManager = new LiveInputActionManager();
 		_changeUpdateQueue = new ChangeUpdateQueue();
+		_valEditUpdater = new ValEditUpdater();
 		_zipSaveLoader = new ZipSaveLoader();
 		juggler = new Juggler();
 		Juggler.start();
 		Juggler.root.add(juggler);
+		juggler.add(_valEditUpdater);
 		juggler.add(input);
 		juggler.add(_liveActionManager);
 		juggler.add(_changeUpdateQueue);
@@ -571,7 +575,7 @@ class ValEditor
 	   @param	object	instance of a registered Class
 	   @param	uiContainer	if left null uiContainerDefault is used
 	**/
-	static public function edit(object:Dynamic, collection:ExposedCollection = null, container:DisplayObjectContainer = null, parentValue:ExposedValueWithChildren = null):ExposedCollection
+	static public function edit(object:Dynamic, collection:ExposedCollection = null, container:DisplayObjectContainer = null, parentValue:ExposedValueWithCollection = null):ExposedCollection
 	{
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
