@@ -23,6 +23,11 @@ import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 class ObjectEditWindow extends Panel 
 {
 	public var cancelCallback(get, set):Void->Void;
+	public var confirmCallback(get, set):Void->Void;
+	public var editContainer(get, never):ScrollContainer;
+	public var editObject(get, set):Dynamic;
+	public var title(get, set):String;
+	
 	private var _cancelCallback:Void->Void;
 	private function get_cancelCallback():Void->Void { return this._cancelCallback; }
 	private function set_cancelCallback(value:Void->Void):Void->Void
@@ -30,7 +35,6 @@ class ObjectEditWindow extends Panel
 		return this._cancelCallback = value;
 	}
 	
-	public var confirmCallback(get, set):Void->Void;
 	private var _confirmCallback:Void->Void;
 	private function get_confirmCallback():Void->Void { return this._confirmCallback; }
 	private function set_confirmCallback(value:Void->Void):Void->Void
@@ -38,10 +42,8 @@ class ObjectEditWindow extends Panel
 		return this._confirmCallback = value;
 	}
 	
-	public var editContainer(get, never):ScrollContainer;
 	private function get_editContainer():ScrollContainer { return this._contentGroup; }
 	
-	public var editObject(get, set):Dynamic;
 	private var _editObject:Dynamic;
 	private function get_editObject():Dynamic { return this._editObject; }
 	private function set_editObject(value:Dynamic):Dynamic
@@ -54,7 +56,6 @@ class ObjectEditWindow extends Panel
 		return this._editObject = value;
 	}
 	
-	public var title(get, set):String;
 	private var _title:String = "";
 	private function get_title():String { return this._title; }
 	private function set_title(value:String):String
