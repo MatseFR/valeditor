@@ -45,6 +45,7 @@ import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.editor.file.ZipSaveLoader;
+import valeditor.editor.settings.EditorSettings;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
 import valeditor.events.EditorEvent;
@@ -54,6 +55,7 @@ import valeditor.input.LiveInputActionManager;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
+import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.utils.ArraySort;
 #if desktop
 import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
@@ -78,6 +80,7 @@ class ValEditor
 	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var currentContainer(get, set):ValEditorContainer;
+	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
 	static public var fileDescription:String = "ValEditor Source file (*.ves)";
@@ -96,6 +99,8 @@ class ValEditor
 	/** can be either the root container or an open container template */
 	static public var sceneContainer(get, set):ValEditorContainer;
 	static public var selection(default, null):Selection = new Selection();
+	static public var theme:ValEditorTheme;
+	static public var themeDefaultValues:ExposedCollection;
 	static public var uiContainerDefault:DisplayObjectContainer;
 	static public var viewPort(default, null):ViewPort = new ViewPort();
 	
@@ -390,7 +395,6 @@ class ValEditor
 		
 		var objCollection:ArrayCollection<ValEditorObject>;
 		var clssCollection:ArrayCollection<ValEditorClass>;
-		var strCollection:ArrayCollection<StringData>;
 		var templateCollection:ArrayCollection<ValEditorTemplate>;
 		var stringData:StringData;
 		
@@ -501,14 +505,10 @@ class ValEditor
 		_classNameToStringData.remove(className);
 		
 		var strCategory:StringData;
-		//var strCollection:ArrayCollection<StringData>;
 		var clssCollection:ArrayCollection<ValEditorClass>;
 		for (category in valClass.categories)
 		{
-			//strCollection = _categoryToClassCollection.get(category);
-			//strCollection.remove(strClass);
 			clssCollection = _categoryToClassCollection.get(category);
-			//if (strCollection.length == 0)
 			if (clssCollection.length == 0)
 			{
 				// no more class associated with this category : remove category
@@ -552,7 +552,7 @@ class ValEditor
 		var className:String = Type.getClassName(exposedValueClass);
 		if (_uiClassMap.exists(className))
 		{
-			trace("ValEdit.registerUIClass ::: Class " + className + " already registered");
+			trace("ValEditor.registerUIClass ::: Class " + className + " already registered");
 			return;
 		}
 		
@@ -564,7 +564,7 @@ class ValEditor
 		var className:String = Type.getClassName(exposedValueClass);
 		if (!_uiClassMap.exists(className))
 		{
-			trace("ValEdit.unregisterUIClass ::: Class " + className + " not registered");
+			trace("ValEditor.unregisterUIClass ::: Class " + className + " not registered");
 		}
 		
 		_uiClassMap.remove(className);
@@ -580,7 +580,7 @@ class ValEditor
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
 		{
-			throw new Error("ValEdit.edit ::: null container");
+			throw new Error("ValEditor.edit ::: null container");
 		}
 		
 		clearContainer(container);
@@ -589,13 +589,15 @@ class ValEditor
 		
 		var clss:Class<Dynamic> = Type.getClass(object);
 		var className:String = Type.getClassName(clss);
-		//var collection:ExposedCollection = null;
 		var valClass:ValEditClass = _classMap[className];
 		
 		if (Std.isOfType(object, ValEditObject))
 		{
 			valClass = cast(object, ValEditObject).clss;
-			collection = cast(object, ValEditObject).currentCollection;
+			if (collection == null)
+			{
+				collection = cast(object, ValEditObject).currentCollection;
+			}
 		}
 		else
 		{
@@ -623,7 +625,7 @@ class ValEditor
 					return valClass.addContainer(container, object, collection, parentValue);
 				}
 			}
-			throw new Error("ValEdit.edit ::: unknown Class " + Type.getClassName(Type.getClass(object)));
+			throw new Error("ValEditor.edit ::: unknown Class " + Type.getClassName(Type.getClass(object)));
 		}
 	}
 	
@@ -632,7 +634,7 @@ class ValEditor
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
 		{
-			throw new Error("ValEdit.editConstructor ::: null container");
+			throw new Error("ValEditor.editConstructor ::: null container");
 		}
 		
 		clearContainer(container);
@@ -654,7 +656,7 @@ class ValEditor
 		}
 		else
 		{
-			throw new Error("ValEdit.edit ::: unknown Class " + className);
+			throw new Error("ValEditor.editConstructor ::: unknown Class " + className);
 		}
 	}
 	
@@ -674,7 +676,7 @@ class ValEditor
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
 		{
-			throw new Error("ValEdit.editTemplate ::: null container");
+			throw new Error("ValEditor.editTemplate ::: null container");
 		}
 		
 		clearContainer(container);
@@ -686,6 +688,11 @@ class ValEditor
 		valClass.addTemplateContainer(container, template);
 	}
 	
+	static public function editUITheme():Void
+	{
+		FeathersWindows.showThemeEditWindow(theme, editorSettings.themeCustomValues, themeDefaultValues, "UI Theme");
+	}
+	
 	/**
 	   
 	   @param	container
@@ -695,7 +702,7 @@ class ValEditor
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
 		{
-			throw new Error("ValEdit.clearContainer ::: null container");
+			throw new Error("ValEditor.clearContainer ::: null container");
 		}
 		
 		var valClass:ValEditClass = _displayMap[container];
@@ -717,7 +724,7 @@ class ValEditor
 		var className:String = Type.getClassName(clss);
 		var control:IValueUI = _uiClassMap[className]();
 		control.exposedValue = cast exposedValue;
-		cast(exposedValue, ExposedValue).uiControl = control;
+		//cast(exposedValue, ExposedValue).uiControl = control;
 		return control;
 	}
 	
@@ -911,16 +918,6 @@ class ValEditor
 	static private function unregisterObjectInternal(valObject:ValEditorObject):Void
 	{
 		ValEdit.unregisterObjectInternal(valObject);
-		
-		//if (valObject.container != null)
-		//{
-			//valObject.container.remove(valObject);
-		//}
-		
-		//if (selection.hasObject(valObject))
-		//{
-			//selection.removeObject(valObject);
-		//}
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.remove(valObject);
