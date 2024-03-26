@@ -79,6 +79,7 @@ class ObjectFunctionEvent extends Event
 		this.parameters = parameters;
 		this.bubbles = bubbles;
 		this.cancelable = cancelable;
+		return this;
 	}
 	#end
 	
