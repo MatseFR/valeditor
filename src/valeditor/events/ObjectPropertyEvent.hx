@@ -17,7 +17,8 @@ class ObjectPropertyEvent extends Event
 	
 	static private function fromPool(type:String, object:ValEditorObject, propertyNames:Array<String>, bubbles:Bool, cancelable:Bool):ObjectPropertyEvent
 	{
-		if (_POOL.length != 0) return _POOL.pop()
+		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, propertyNames, bubbles, cancelable);
+		return new ObjectPropertyEvent(type, object, propertyNames, bubbles, cancelable);
 	}
 	#end
 	
