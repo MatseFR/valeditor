@@ -9,6 +9,7 @@ import feathers.text.TextFormat;
 import feathers.themes.ClassVariantTheme;
 import feathers.themes.steel.DefaultSteelTheme;
 import openfl.text.TextFormatAlign;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.ui.feathers.theme.simple.components.ActivityIndicatorStyles;
 import valeditor.ui.feathers.theme.simple.components.AlertStyles;
 import valeditor.ui.feathers.theme.simple.components.ApplicationStyles;
@@ -45,7 +46,7 @@ import valeditor.utils.ColorUtil;
  * ...
  * @author Matse
  */
-class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme 
+class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme implements IChangeUpdate
 {
 	public var defaultTheme:DefaultSteelTheme;
 	
@@ -642,6 +643,14 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme
 	
 	private function styleChanged():Void
 	{
+		ValEditor.registerForChangeUpdate(this);
+	}
+	
+	public function changeUpdate():Void
+	{
+		// DEBUG
+		trace("SimpleTheme.changeUpdate");
+		//\DEBUG
 		StyleProviderEvent.dispatch(this.styleProvider, StyleProviderEvent.STYLES_CHANGE);
 	}
 	
