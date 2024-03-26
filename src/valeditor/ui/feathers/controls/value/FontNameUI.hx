@@ -150,6 +150,10 @@ class FontNameUI extends ValueUI
 		var fonts:Array<Font> = Font.enumerateFonts(this._fontName.includeSystemFonts);
 		for (font in fonts)
 		{
+			#if neko
+			// on my PC on neko target I get a bunch of "null" entries in the list returned by Font.enumerateFonts
+			if (font == null) continue;
+			#end
 			this._fontNameList.push(font.fontName);
 			this._fontStringDataList.push(StringData.fromPool(font.fontName));
 		}
