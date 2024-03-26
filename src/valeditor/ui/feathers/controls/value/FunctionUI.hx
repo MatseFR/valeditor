@@ -9,17 +9,17 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ExposedCollection;
+import valedit.events.ValueEvent;
+import valedit.ui.IValueUI;
+import valedit.value.base.ExposedFunctionBase;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.CollectionClone;
+import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
-import valedit.ui.IValueUI;
-import valedit.value.ExposedFunction;
-import valeditor.ui.feathers.Padding;
 
 /**
  * ...
@@ -46,7 +46,7 @@ class FunctionUI extends ValueUI
 		return super.set_exposedValue(value);
 	}
 	
-	private var _func:ExposedFunction;
+	private var _func:ExposedFunctionBase;
 	
 	private var _button:Button;
 	
