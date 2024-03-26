@@ -12,10 +12,30 @@ class ValEditorActionStack extends EventDispatcher
 	public var canRedo(get, never):Bool;
 	public var canUndo(get, never):Bool;
 	public var hasChanges(get, never):Bool;
+	public var undoLevels(get, set):Int;
 	
 	private function get_canRedo():Bool { return this._undoneActions.length != 0; }
 	private function get_canUndo():Bool { return this._doneActions.length != 0; }
 	private function get_hasChanges():Bool { return this._lastAction != this._lastSavedAction; }
+	
+	private var _undoLevels:Int;
+	private function get_undoLevels():Int { return this._undoLevels; }
+	private function set_undoLevels(value:Int):Int
+	{
+		if (this._undoLevels == value) return value;
+		
+		var count:Int = this._doneActions.length;
+		if (count > value)
+		{
+			for (i in value...count)
+			{
+				this._doneActions[i].pool();
+			}
+			this._doneActions.resize(value);
+		}
+		
+		return this._undoLevels = value;
+	}
 	
 	private var _doneActions:Array<ValEditorAction> = new Array<ValEditorAction>();
 	private var _undoneActions:Array<ValEditorAction> = new Array<ValEditorAction>();
@@ -72,6 +92,15 @@ class ValEditorActionStack extends EventDispatcher
 		}
 		//\DEBUG
 		this._doneActions.unshift(action);
+		var count:Int = this._doneActions.length;
+		if (count > this._undoLevels)
+		{
+			for (i in this._undoLevels...count)
+			{
+				this._doneActions[i].pool();
+			}
+			this._doneActions.resize(this._undoLevels);
+		}
 		clearUndoneActions();
 		this._lastAction = action;
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
