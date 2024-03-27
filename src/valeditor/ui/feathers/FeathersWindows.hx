@@ -3,12 +3,16 @@ import feathers.core.PopUpManager;
 import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.events.MouseEvent;
+import valedit.ExposedCollection;
 import valedit.ValEditObject;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
+import valeditor.editor.settings.EditorSettings;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
+import valeditor.ui.feathers.theme.ValEditorTheme;
+import valeditor.ui.feathers.window.EditorSettingsWindow;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.FileSettingsWindow;
 import valeditor.ui.feathers.window.LayerRenameWindow;
@@ -21,6 +25,7 @@ import valeditor.ui.feathers.window.ObjectSelectWindow;
 import valeditor.ui.feathers.window.StartMenuWindow;
 import valeditor.ui.feathers.window.TemplateCreationWindow;
 import valeditor.ui.feathers.window.TemplateRenameWindow;
+import valeditor.ui.feathers.window.ThemeEditWindow;
 import valeditor.ui.feathers.window.asset.AssetBrowser;
 import valeditor.ui.feathers.window.asset.BinaryAssetsWindow;
 import valeditor.ui.feathers.window.asset.BitmapAssetsWindow;
@@ -61,6 +66,8 @@ class FeathersWindows
 	static private var _starlingTextureAssets:StarlingTextureAssetsWindow;
 	#end
 	
+	static private var _editorSettings:EditorSettingsWindow;
+	static private var _themeEdit:ThemeEditWindow;
 	static private var _exportSettings:ExportSettingsWindow;
 	static private var _fileSettings:FileSettingsWindow;
 	
@@ -270,6 +277,42 @@ class FeathersWindows
 		openWindow(_starlingTextureAssets);
 	}
 	#end
+	
+	static public function showEditorSettingsWindow(settings:EditorSettings, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
+	{
+		if (_editorSettings == null)
+		{
+			_editorSettings = new EditorSettingsWindow();
+		}
+		
+		_editorSettings.settings = settings;
+		_editorSettings.title = title;
+		_editorSettings.cancelCallback = cancelCallback;
+		_editorSettings.confirmCallback = confirmCallback;
+		
+		_editorSettings.width = Lib.current.stage.stageWidth / 2;
+		_editorSettings.height = Lib.current.stage.stageHeight / 2;
+		
+		openWindow(_editorSettings);
+	}
+	
+	static public function showThemeEditWindow(theme:ValEditorTheme, customCollection:ExposedCollection, defaultCollection:ExposedCollection, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
+	{
+		if (_themeEdit == null)
+		{
+			_themeEdit = new ThemeEditWindow();
+		}
+		
+		_themeEdit.setTheme(theme, customCollection, defaultCollection);
+		_themeEdit.title = title;
+		_themeEdit.confirmCallback = confirmCallback;
+		_themeEdit.cancelCallback = cancelCallback;
+		
+		_themeEdit.width = Lib.current.stage.stageWidth / 2;
+		_themeEdit.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2;
+		
+		openWindow(_themeEdit);
+	}
 	
 	static public function showExportSettingsWindow(settings:ExportSettings, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
 	{
