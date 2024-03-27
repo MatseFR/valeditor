@@ -130,8 +130,8 @@ class FileSettingsWindow extends Panel
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingTop = Spacing.DEFAULT;
-		vLayout.paddingBottom = Spacing.DEFAULT;
+		vLayout.paddingTop = Padding.DEFAULT;
+		vLayout.paddingBottom = Padding.DEFAULT;
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
 		this._editContainer.layout = vLayout;
 		addChild(this._editContainer);
@@ -166,7 +166,7 @@ class FileSettingsWindow extends Panel
 		var fullPath:String = this._editSettings.fullPath;
 		this._editSettings.clear();
 		this._editSettings.fullPath = fullPath;
-		this._settingsCollection.readValuesFromObject(this._editSettings);
+		this._settingsCollection.readValuesFromObject(this._editSettings, false);
 	}
 	
 }
