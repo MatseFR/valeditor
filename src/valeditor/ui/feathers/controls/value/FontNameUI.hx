@@ -4,14 +4,21 @@ import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.data.ArrayCollection;
+import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
-import openfl.events.Event;
+import openfl.errors.Error;
 import openfl.text.Font;
+import openfl.text.FontType;
+import valedit.events.ValueEvent;
+import valedit.ui.IValueUI;
+import valedit.value.ExposedFontName;
+import valedit.value.base.ExposedValue;
+import valedit.value.data.FontSelection;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -19,12 +26,8 @@ import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
-import valeditor.ui.feathers.data.StringData;
+import valeditor.ui.feathers.data.FontData;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
-import valedit.ui.IValueUI;
-import valedit.value.ExposedFontName;
 
 /**
  * ...
@@ -32,6 +35,83 @@ import valedit.value.ExposedFontName;
  */
 class FontNameUI extends ValueUI 
 {
+	static private var FONT_DATA_INITIALIZED:Bool = false;
+	
+	static private var FONT_DATA_LIST_ALL:Array<FontData> = new Array<FontData>();
+	static private var FONT_DATA_LIST_EMBEDDED:Array<FontData> = new Array<FontData>();
+	static private var FONT_DATA_LIST_SYSTEM:Array<FontData> = new Array<FontData>();
+	
+	static private var FONT_DATA_COLLECTION_ALL:ArrayCollection<FontData> = new ArrayCollection<FontData>(FONT_DATA_LIST_ALL);
+	static private var FONT_DATA_COLLECTION_EMBEDDED:ArrayCollection<FontData> = new ArrayCollection<FontData>(FONT_DATA_LIST_EMBEDDED);
+	static private var FONT_DATA_COLLECTION_SYSTEM:ArrayCollection<FontData> = new ArrayCollection<FontData>(FONT_DATA_LIST_SYSTEM);
+	
+	static private var DISPLAY_NAME_TO_FONT_DATA:Map<String, FontData> = new Map<String, FontData>();
+	static private var FONT_NAME_TO_FONT_DATA:Map<String, FontData> = new Map<String, FontData>();
+	
+	static private function clearFontData():Void
+	{
+		FontData.poolArray(FONT_DATA_LIST_ALL);
+		FONT_DATA_LIST_ALL.resize(0);
+		FONT_DATA_LIST_EMBEDDED.resize(0);
+		FONT_DATA_LIST_SYSTEM.resize(0);
+		
+		DISPLAY_NAME_TO_FONT_DATA.clear();
+		FONT_NAME_TO_FONT_DATA.clear();
+		
+		FONT_DATA_INITIALIZED = false;
+	}
+	
+	static private function initFontData():Void
+	{
+		if (FONT_DATA_INITIALIZED)
+		{
+			clearFontData();
+		}
+		
+		var data:FontData;
+		data = FontData.fromPool("_sans (generic)", "_sans", FontType.DEVICE);
+		registerFontData(data);
+		data = FontData.fromPool("_serif (generic)", "_serif", FontType.DEVICE);
+		registerFontData(data);
+		data = FontData.fromPool("_typewriter (generic)", "_typewriter", FontType.DEVICE);
+		
+		var fonts:Array<Font> = Font.enumerateFonts(true);
+		for (font in fonts)
+		{
+			#if neko
+			// on my PC on neko target I get a bunch of "null" entries in the list returned by Font.enumerateFonts
+			if (font == null) continue;
+			#end
+			if (font.fontType == FontType.DEVICE)
+			{
+				data = FontData.fromPool(font.fontName, font.fontName, font.fontType);
+			}
+			else
+			{
+				data = FontData.fromPool(font.fontName + "*", font.fontName, font.fontType);
+			}
+			registerFontData(data);
+		}
+		
+		FONT_DATA_INITIALIZED = true;
+	}
+	
+	static private function registerFontData(data:FontData):Void
+	{
+		FONT_DATA_LIST_ALL[FONT_DATA_LIST_ALL.length] = data;
+		if (data.fontType == FontType.DEVICE)
+		{
+			FONT_DATA_LIST_SYSTEM[FONT_DATA_LIST_SYSTEM.length] = data;
+		}
+		else
+		{
+			FONT_DATA_LIST_EMBEDDED[FONT_DATA_LIST_EMBEDDED.length] = data;
+		}
+		
+		DISPLAY_NAME_TO_FONT_DATA.set(data.displayName, data);
+		FONT_NAME_TO_FONT_DATA.set(data.fontName, data);
+	}
+	
 	static private var _POOL:Array<FontNameUI> = new Array<FontNameUI>();
 	
 	static public function disposePool():Void
@@ -67,10 +147,6 @@ class FontNameUI extends ValueUI
 	private var _nullGroup:LayoutGroup;
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
-	
-	private var _fontStringDataList:Array<StringData> = new Array<StringData>();
-	private var _fontNameList:Array<String> = new Array<String>();
-	private var _collection:ArrayCollection<StringData> = new ArrayCollection<StringData>();
 
 	public function new() 
 	{
@@ -80,8 +156,8 @@ class FontNameUI extends ValueUI
 	
 	override public function clear():Void 
 	{
-		super.clear();
 		this._fontName = null;
+		super.clear();
 	}
 	
 	public function pool():Void
@@ -116,10 +192,10 @@ class FontNameUI extends ValueUI
 		this._label.variant = LabelVariant.VALUE_NAME;
 		this._mainGroup.addChild(this._label);
 		
-		this._list = new ComboBox(this._collection);
+		this._list = new ComboBox();
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String {
-			return item.value;
+			return item.displayName;
 		};
 		this._mainGroup.addChild(this._list);
 		
@@ -144,22 +220,25 @@ class FontNameUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
-		this._collection.array = null;
-		this._fontNameList.resize(0);
-		StringData.poolArray(this._fontStringDataList);
-		this._fontStringDataList.resize(0);
-		var fonts:Array<Font> = Font.enumerateFonts(this._fontName.includeSystemFonts);
-		for (font in fonts)
+		if (!FONT_DATA_INITIALIZED)
 		{
-			#if neko
-			// on my PC on neko target I get a bunch of "null" entries in the list returned by Font.enumerateFonts
-			if (font == null) continue;
-			#end
-			this._fontNameList.push(font.fontName);
-			this._fontStringDataList.push(StringData.fromPool(font.fontName));
+			initFontData();
 		}
-		this._collection.array = this._fontStringDataList;
-		this._collection.refresh();
+		
+		switch (this._fontName.fontSelection)
+		{
+			case FontSelection.ALL :
+				this._list.dataProvider = FONT_DATA_COLLECTION_ALL;
+			
+			case FontSelection.CUSTOM :
+				throw new Error("FontNameUI ::: FontSelection.CUSTOM not supported yet");
+			
+			case FontSelection.EMBEDDED :
+				this._list.dataProvider = FONT_DATA_COLLECTION_EMBEDDED;
+			
+			case FontSelection.SYSTEM :
+				this._list.dataProvider = FONT_DATA_COLLECTION_SYSTEM;
+		}
 		
 		this._list.enabled = !this._readOnly;
 		
@@ -180,7 +259,8 @@ class FontNameUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			this._list.selectedIndex = this._fontNameList.indexOf(this._exposedValue.value);
+			var data:FontData = FONT_NAME_TO_FONT_DATA.get(this._exposedValue.value);
+			this._list.selectedIndex = this._list.dataProvider.indexOf(data);
 			if (controlsEnabled) controlsEnable();
 		}
 	}
@@ -204,7 +284,7 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
-		this._list.removeEventListener(Event.CHANGE, onListChange);
+		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -213,22 +293,22 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		this._list.addEventListener(Event.CHANGE, onListChange);
+		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
-	private function onListChange(evt:Event):Void
+	private function onListItemTrigger(evt:ListViewEvent):Void
 	{
-		if (this._list.selectedItem == null) return;
+		var fontName:String = evt.state.data.fontName;
 		
 		if (!this._exposedValue.isConstructor)
 		{
-			if (this._exposedValue.value != this._list.selectedItem)
+			if (this._exposedValue.value != fontName)
 			{
 				var action:MultiAction = MultiAction.fromPool();
 				
 				var valueChange:ValueChange = ValueChange.fromPool();
-				valueChange.setup(this._exposedValue, this._list.selectedItem.value);
+				valueChange.setup(this._exposedValue, fontName);
 				action.add(valueChange);
 				
 				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
@@ -240,7 +320,7 @@ class FontNameUI extends ValueUI
 		}
 		else
 		{
-			this._exposedValue.value = this._list.selectedItem;
+			this._exposedValue.value = fontName;
 		}
 	}
 	
