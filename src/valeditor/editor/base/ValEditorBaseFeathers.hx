@@ -4,6 +4,9 @@ import feathers.controls.Application;
 import feathers.controls.navigators.StackNavigator;
 import feathers.style.Theme;
 import openfl.display.StageScaleMode;
+import valedit.ExposedCollection;
+import valedit.data.feathers.themes.SimpleThemeData;
+import valedit.data.valeditor.SettingsData;
 import valedit.value.ExposedBitmap;
 import valedit.value.ExposedBitmapData;
 import valedit.value.ExposedBool;
@@ -15,6 +18,7 @@ import valedit.value.ExposedFloatDrag;
 import valedit.value.ExposedFloatRange;
 import valedit.value.ExposedFontName;
 import valedit.value.ExposedFunction;
+import valedit.value.ExposedFunctionExternal;
 import valedit.value.ExposedGroup;
 import valedit.value.ExposedInt;
 import valedit.value.ExposedIntDrag;
@@ -31,8 +35,10 @@ import valedit.value.ExposedString;
 import valedit.value.ExposedText;
 import valedit.value.ExposedTextAsset;
 import valedit.value.base.ExposedValue;
+import valeditor.editor.settings.EditorSettings;
 import valeditor.ui.feathers.FeathersFactories;
 import valeditor.ui.feathers.theme.ValEditorTheme;
+import valeditor.utils.file.FileUtil;
 
 #if desktop
 import valedit.value.ExposedFilePath;
@@ -71,6 +77,7 @@ class ValEditorBaseFeathers extends Application
 		stage.showDefaultContextMenu = false;
 		
 		theme = new ValEditorTheme();
+		ValEditor.theme = theme;
 		Theme.setTheme(theme);
 		
 		ValEditor.init(assetsLoaded);
@@ -82,6 +89,7 @@ class ValEditorBaseFeathers extends Application
 		registerExposedValuesUI();
 		editorSetup();
 		exposeData();
+		loadEditorSettings();
 		initUI();
 		ready();
 	}
@@ -93,7 +101,29 @@ class ValEditorBaseFeathers extends Application
 	
 	private function exposeData():Void
 	{
+		// UI Theme
+		ValEditor.registerClassSimple(ValEditorTheme, false, SimpleThemeData.exposeSimpleTheme());
 		
+		// Editor Settings
+		ValEditor.registerClassSimple(EditorSettings, false, SettingsData.exposeEditorSettings());
+	}
+	
+	private function loadEditorSettings():Void
+	{
+		var collection:ExposedCollection;
+		
+		// store default values for easy restoration
+		collection = ValEditor.getCollectionForObject(this.theme);
+		collection.readValuesFromObject(this.theme, false);
+		ValEditor.themeDefaultValues = collection;
+		
+		collection = ValEditor.getCollectionForObject(this.theme);
+		collection.readValuesFromObject(this.theme, false);
+		ValEditor.editorSettings.themeCustomValues = collection;
+		
+		FileUtil.loadEditorSettings();
+		
+		ValEditor.editorSettings.apply();
 	}
 	
 	private function initUI():Void
@@ -120,6 +150,7 @@ class ValEditorBaseFeathers extends Application
 		ExposedValue.registerFactory(ExposedFloatRange, ExposedFloatRange.fromPool);
 		ExposedValue.registerFactory(ExposedFontName, ExposedFontName.fromPool);
 		ExposedValue.registerFactory(ExposedFunction, ExposedFunction.fromPool);
+		ExposedValue.registerFactory(ExposedFunctionExternal, ExposedFunctionExternal.fromPool);
 		ExposedValue.registerFactory(ExposedGroup, ExposedGroup.fromPool);
 		ExposedValue.registerFactory(ExposedInt, ExposedInt.fromPool);
 		ExposedValue.registerFactory(ExposedIntDrag, ExposedIntDrag.fromPool);
@@ -163,6 +194,7 @@ class ValEditorBaseFeathers extends Application
 		ValEditor.registerUIClass(ExposedFloatRange, FeathersFactories.exposedFloatRange);
 		ValEditor.registerUIClass(ExposedFontName, FeathersFactories.exposedFontName);
 		ValEditor.registerUIClass(ExposedFunction, FeathersFactories.exposedFunction);
+		ValEditor.registerUIClass(ExposedFunctionExternal, FeathersFactories.exposedFunctionExternal);
 		ValEditor.registerUIClass(ExposedGroup, FeathersFactories.exposedGroup);
 		ValEditor.registerUIClass(ExposedInt, FeathersFactories.exposedInt);
 		ValEditor.registerUIClass(ExposedIntDrag, FeathersFactories.exposedIntDrag);
