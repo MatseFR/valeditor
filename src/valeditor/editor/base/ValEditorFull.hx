@@ -116,6 +116,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private var _editMenuCollection:ArrayCollection<MenuItem>;
 	private var _undoItem:MenuItem;
 	private var _redoItem:MenuItem;
+	private var _preferencesItem:MenuItem;
 	
 	// asset menu
 	private var _assetMenuCollection:ArrayCollection<MenuItem>;
@@ -217,10 +218,12 @@ class ValEditorFull extends ValEditorBaseFeathers
 		// Edit menu
 		this._undoItem = new MenuItem("undo", "Undo", true, "Ctrl+Z");
 		this._redoItem = new MenuItem("redo", "Redo", true, "Ctrl+Y");
+		this._preferencesItem = new MenuItem("preferences", "Preferences", true, "Ctrl+P");
 		
 		this._editMenuCollection = new ArrayCollection<MenuItem>([
 			this._undoItem,
-			this._redoItem
+			this._redoItem,
+			this._preferencesItem
 		]);
 		this.editView.addMenu("edit", "Edit", onEditMenuCallback, onEditMenuOpen, this._editMenuCollection);
 		
@@ -250,9 +253,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 		super.exposeData();
 		
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
-		
-		// UI Theme
-		ValEditor.registerClassSimple(ValEditorTheme, false, SimpleThemeData.exposeSimpleTheme());
 		
 		// OpenFL Display
 		// Sprite
@@ -569,6 +569,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.ready();
 		
+		//Reflect.callMethod(FeathersWindows, FeathersWindows.showAssetBrowser, []);
+		//Reflect.callMethod(null, FeathersWindows.showAssetBrowser, []);
+		//Reflect.callMethod(null, Reflect.getProperty(FeathersWindows, "showAssetBrowser"), []);
+		
 		//trace("openfl-juggler v" + ValEdit.OPENFL_JUGGLER_VERSION);
 		
 		//var sprite:Sprite = new Sprite();
@@ -733,6 +737,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 			
 			case "redo" :
 				ValEditor.actionStack.redo();
+			
+			case "preferences" :
+				FeathersWindows.showEditorSettingsWindow(ValEditor.editorSettings, "ValEditor settings");
 		}
 		
 		Lib.current.stage.focus = null;
