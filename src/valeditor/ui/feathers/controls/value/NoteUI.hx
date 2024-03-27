@@ -4,6 +4,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
+import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valedit.value.base.ExposedValue;
 import valedit.value.ExposedNote;

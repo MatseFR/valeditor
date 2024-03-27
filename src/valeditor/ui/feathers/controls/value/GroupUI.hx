@@ -8,7 +8,7 @@ import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
 import openfl.events.Event;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ToggleButtonVariant;
 import valedit.value.base.ExposedValue;

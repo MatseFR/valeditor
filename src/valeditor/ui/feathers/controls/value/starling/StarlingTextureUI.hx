@@ -18,7 +18,7 @@ import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 
 /**

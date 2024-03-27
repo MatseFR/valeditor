@@ -13,7 +13,7 @@ import valedit.value.ExposedObject;
 import valedit.value.base.ExposedValue;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ToggleCustom;
-import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 

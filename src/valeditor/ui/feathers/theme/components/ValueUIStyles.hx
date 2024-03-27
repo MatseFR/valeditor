@@ -1,7 +1,7 @@
 package valeditor.ui.feathers.theme.components;
 import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
-import valeditor.ui.feathers.controls.value.ValueUI;
+import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 
 /**
