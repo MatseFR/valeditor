@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.controls.value;
+package valeditor.ui.feathers.controls.value.base;
 
 import feathers.controls.LayoutGroup;
 import openfl.errors.Error;
