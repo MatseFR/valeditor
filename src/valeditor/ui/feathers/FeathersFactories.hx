@@ -147,6 +147,11 @@ class FeathersFactories
 		return FunctionUI.fromPool();
 	}
 	
+	static public function exposedFunctionExternal():IValueUI
+	{
+		return FunctionUI.fromPool();
+	}
+	
 	static public function exposedGroup():IValueUI
 	{
 		return GroupUI.fromPool();
