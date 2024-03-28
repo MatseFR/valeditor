@@ -7,6 +7,8 @@ package valeditor.ui.feathers.variant;
 class LabelVariant 
 {
 	
+	static public inline var FONT_DATA_ITEM_SAMPLE:String = "font-data-item-sample";
+	static public inline var FONT_DATA_ITEM_TEXT:String = "font-data-item-text";
 	static public inline var MENU_ITEM_SHORTCUT:String = "menu-item-shortcut";
 	static public inline var MENU_ITEM_TEXT:String = "menu-item-text";
 	static public inline var NOTE:String = "note";

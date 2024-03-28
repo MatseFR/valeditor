@@ -4,6 +4,7 @@ import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
@@ -11,6 +12,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.utils.DisplayObjectRecycler;
 import openfl.errors.Error;
 import openfl.text.Font;
 import openfl.text.FontType;
@@ -27,6 +29,7 @@ import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.data.FontData;
+import valeditor.ui.feathers.renderers.FontDataItemRenderer;
 import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
@@ -74,6 +77,7 @@ class FontNameUI extends ValueUI
 		data = FontData.fromPool("_serif (generic)", "_serif", FontType.DEVICE);
 		registerFontData(data);
 		data = FontData.fromPool("_typewriter (generic)", "_typewriter", FontType.DEVICE);
+		registerFontData(data);
 		
 		var fonts:Array<Font> = Font.enumerateFonts(true);
 		for (font in fonts)
@@ -197,6 +201,16 @@ class FontNameUI extends ValueUI
 		this._list.itemToText = function(item:Dynamic):String {
 			return item.displayName;
 		};
+		
+		var recycler = DisplayObjectRecycler.withFunction(()->{
+			var renderer:FontDataItemRenderer = new FontDataItemRenderer();
+			return renderer;
+		});
+		
+		recycler.update = (renderer:FontDataItemRenderer, state:ListViewItemState) -> {
+			renderer.fontData = state.data;
+		};
+		this._list.itemRendererRecycler = recycler;
 		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();

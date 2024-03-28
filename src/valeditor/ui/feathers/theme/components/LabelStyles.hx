@@ -23,6 +23,8 @@ class LabelStyles
 	{
 		LabelStyles.theme = theme;
 		
+		styleProvider.setStyleFunction(Label, LabelVariant.FONT_DATA_ITEM_SAMPLE, fontDataItem_sample);
+		styleProvider.setStyleFunction(Label, LabelVariant.FONT_DATA_ITEM_TEXT, fontDataItem_text);
 		styleProvider.setStyleFunction(Label, LabelVariant.MENU_ITEM_SHORTCUT, menuItem_shortcut);
 		styleProvider.setStyleFunction(Label, LabelVariant.MENU_ITEM_TEXT, menuItem_text);
 		styleProvider.setStyleFunction(Label, LabelVariant.NOTE, note);
@@ -32,16 +34,42 @@ class LabelStyles
 		styleProvider.setStyleFunction(Label, LabelVariant.VALUE_NAME, value_name);
 	}
 	
+	static private function fontDataItem_sample(label:Label):Void
+	{
+		if (label.textFormat == null)
+		{
+			label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
+		}
+		else
+		{
+			label.textFormat.color = theme.contrastColor;
+		}
+		if (label.disabledTextFormat == null)
+		{
+			label.disabledTextFormat = theme.getTextFormat_disabled(TextFormatAlign.RIGHT);
+		}
+		else
+		{
+			label.disabledTextFormat.color = theme.contrastColorLighter;
+		}
+	}
+	
+	static private function fontDataItem_text(label:Label):Void
+	{
+		label.textFormat = theme.getTextFormat();
+		label.disabledTextFormat = theme.getTextFormat_disabled();
+	}
+	
 	static private function menuItem_shortcut(label:Label):Void
 	{
 		label.textFormat = theme.getTextFormat(TextFormatAlign.RIGHT);
-		label.disabledTextFormat = theme.getTextFormat(TextFormatAlign.RIGHT, theme.contrastColorLighter);
+		label.disabledTextFormat = theme.getTextFormat_disabled(TextFormatAlign.RIGHT);
 	}
 	
 	static private function menuItem_text(label:Label):Void
 	{
 		label.textFormat = theme.getTextFormat();
-		label.disabledTextFormat = theme.getTextFormat(theme.contrastColorLighter);
+		label.disabledTextFormat = theme.getTextFormat_disabled();
 	}
 	
 	static private function note(label:Label):Void
