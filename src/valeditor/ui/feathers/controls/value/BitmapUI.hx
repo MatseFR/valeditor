@@ -220,7 +220,7 @@ class BitmapUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{
@@ -260,7 +260,7 @@ class BitmapUI extends ValueUI
 	
 	private function assetSelected(asset:BitmapAsset):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			

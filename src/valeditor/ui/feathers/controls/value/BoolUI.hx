@@ -184,7 +184,7 @@ class BoolUI extends ValueUI
 	
 	private function onCheckChange(evt:Event):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			
@@ -207,7 +207,7 @@ class BoolUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{

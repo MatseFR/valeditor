@@ -193,7 +193,7 @@ class ByteArrayUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{
@@ -225,7 +225,7 @@ class ByteArrayUI extends ValueUI
 	
 	private function assetSelected(asset:BinaryAsset):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			

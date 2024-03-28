@@ -225,7 +225,7 @@ class TextUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{
@@ -251,7 +251,7 @@ class TextUI extends ValueUI
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
-		if (this._exposedValue.isConstructor) return;
+		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
 		{
@@ -271,7 +271,7 @@ class TextUI extends ValueUI
 	
 	private function onValueChangeEnd(evt:ValueUIEvent):Void
 	{
-		if (this._exposedValue.isConstructor) return;
+		if (!this._exposedValue.useActions) return;
 		
 		if (this._action == null)
 		{

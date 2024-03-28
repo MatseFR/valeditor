@@ -207,7 +207,7 @@ class SelectUI extends ValueUI
 	{
 		if (this._list.selectedItem == null) return;
 		
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != this._list.selectedItem.value)
 			{
@@ -232,7 +232,7 @@ class SelectUI extends ValueUI
 	
 	private function onNullButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{

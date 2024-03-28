@@ -217,7 +217,7 @@ class FunctionUI extends ValueUI
 	
 	private function onButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			var collection:ExposedCollection = this._exposedValue.collection.clone(true);

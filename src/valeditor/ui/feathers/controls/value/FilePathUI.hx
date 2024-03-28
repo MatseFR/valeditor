@@ -234,7 +234,7 @@ class FilePathUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{
@@ -264,7 +264,7 @@ class FilePathUI extends ValueUI
 	
 	private function onFileSelected(path:String):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != path)
 			{
@@ -300,7 +300,7 @@ class FilePathUI extends ValueUI
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
-		if (this._exposedValue.isConstructor) return;
+		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
 		{
@@ -320,7 +320,7 @@ class FilePathUI extends ValueUI
 	
 	private function onValueChangeEnd(evt:ValueUIEvent):Void
 	{
-		if (this._exposedValue.isConstructor) return;
+		if (!this._exposedValue.useActions) return;
 		
 		if (this._action == null)
 		{

@@ -223,7 +223,7 @@ class SoundUI extends ValueUI
 	
 	private function onClearButton(evt:TriggerEvent):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			if (this._exposedValue.value != null)
 			{
@@ -255,7 +255,7 @@ class SoundUI extends ValueUI
 	
 	private function assetSelected(asset:SoundAsset):Void
 	{
-		if (!this._exposedValue.isConstructor)
+		if (this._exposedValue.useActions)
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			
