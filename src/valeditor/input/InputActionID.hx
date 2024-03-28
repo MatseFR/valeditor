@@ -42,7 +42,7 @@ class InputActionID
 	inline static public var SAVE:String = "save";
 	inline static public var SAVE_AS:String = "save_as";
 	
-	// ui
+	// window
 	inline static public var ASSET_BROWSER:String = "asset_browser";
 	
 }

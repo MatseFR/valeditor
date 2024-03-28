@@ -218,7 +218,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		// Edit menu
 		this._undoItem = new MenuItem("undo", "Undo", true, "Ctrl+Z");
 		this._redoItem = new MenuItem("redo", "Redo", true, "Ctrl+Y");
-		this._preferencesItem = new MenuItem("preferences", "Preferences", true, "Ctrl+P");
+		this._preferencesItem = new MenuItem("preferences", "Preferences", true);
 		
 		this._editMenuCollection = new ArrayCollection<MenuItem>([
 			this._undoItem,
@@ -822,6 +822,30 @@ class ValEditorFull extends ValEditorBaseFeathers
 					action.pool();
 				}
 			
+			case InputActionID.DELETE :
+				action = MultiAction.fromPool();
+				ValEditor.delete(action);
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
+				}
+			
+			case InputActionID.EXPORT :
+				trace("export");
+			
+			case InputActionID.EXPORT_AS :
+				trace("export as");
+			
+			case InputActionID.NEW_FILE :
+				onNewFile();
+			
+			case InputActionID.OPEN :
+				onLoadFile();
+			
 			case InputActionID.PASTE :
 				action = MultiAction.fromPool();
 				ValEditor.paste(action);
@@ -834,17 +858,17 @@ class ValEditorFull extends ValEditorBaseFeathers
 					action.pool();
 				}
 			
-			case InputActionID.DELETE :
-				action = MultiAction.fromPool();
-				ValEditor.delete(action);
-				if (action.numActions != 0)
-				{
-					ValEditor.actionStack.add(action);
-				}
-				else
-				{
-					action.pool();
-				}
+			case InputActionID.PLAY_STOP :
+				ValEditor.playStop();
+			
+			case InputActionID.REDO :
+				ValEditor.actionStack.redo();
+			
+			case InputActionID.SAVE :
+				FileController.save();
+			
+			case InputActionID.SAVE_AS :
+				FileController.save(true);
 			
 			case InputActionID.SELECT_ALL :
 				action = MultiAction.fromPool();
@@ -858,6 +882,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 					action.pool();
 				}
 			
+			case InputActionID.UNDO :
+				ValEditor.actionStack.undo();
+			
 			case InputActionID.UNSELECT_ALL :
 				action = MultiAction.fromPool();
 				ValEditor.unselectAll(action);
@@ -869,34 +896,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 				{
 					action.pool();
 				}
-			
-			case InputActionID.PLAY_STOP :
-				ValEditor.playStop();
-			
-			case InputActionID.UNDO :
-				ValEditor.actionStack.undo();
-			
-			case InputActionID.REDO :
-				ValEditor.actionStack.redo();
-			
-			// file
-			case InputActionID.NEW_FILE :
-				onNewFile();
-			
-			case InputActionID.OPEN :
-				onLoadFile();
-			
-			case InputActionID.EXPORT :
-				trace("export");
-			
-			case InputActionID.EXPORT_AS :
-				trace("export as");
-			
-			case InputActionID.SAVE :
-				FileController.save();
-			
-			case InputActionID.SAVE_AS :
-				FileController.save(true);
 		}
 		
 	}
