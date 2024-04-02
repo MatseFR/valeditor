@@ -14,6 +14,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.errors.Error;
+import openfl.events.Event;
 import openfl.text.Font;
 import openfl.text.FontType;
 import valedit.events.ValueEvent;
@@ -298,6 +299,7 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
+		this._list.removeEventListener(Event.CLOSE, onListClose);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
@@ -307,8 +309,15 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
+		this._list.addEventListener(Event.CLOSE, onListClose);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+	}
+	
+	private function onListClose(evt:Event):Void
+	{
+		var fontData:FontData = FONT_NAME_TO_FONT_DATA.get(this._exposedValue.value);
+		this._list.selectedItem = fontData;
 	}
 	
 	private function onListItemTrigger(evt:ListViewEvent):Void
