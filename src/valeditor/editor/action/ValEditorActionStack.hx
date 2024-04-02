@@ -11,37 +11,46 @@ class ValEditorActionStack extends EventDispatcher
 {
 	public var canRedo(get, never):Bool;
 	public var canUndo(get, never):Bool;
+	public var currentSession(default, null):ValEditorActionSession;
 	public var hasChanges(get, never):Bool;
+	public var lastAction(get, never):ValEditorAction;
+	public var numSessions(get, never):Int;
+	/* -1 means don't affect sessions undoLevels */
 	public var undoLevels(get, set):Int;
 	
-	private function get_canRedo():Bool { return this._undoneActions.length != 0; }
-	private function get_canUndo():Bool { return this._doneActions.length != 0; }
-	private function get_hasChanges():Bool { return this._lastAction != this._lastSavedAction; }
+	private function get_canRedo():Bool { return this.currentSession != null ? this.currentSession.canRedo : false; }
+	private function get_canUndo():Bool { return this.currentSession != null ? this.currentSession.canUndo : false; }
+	private function get_hasChanges():Bool
+	{
+		for (session in this._sessions)
+		{
+			if (session.hasChanges) return true;
+		}
+		return false;
+	}
 	
-	private var _undoLevels:Int;
+	private function get_lastAction():ValEditorAction { return this.currentSession != null ? this.currentSession.lastAction : null; }
+	private function get_numSessions():Int { return this._sessions.length; }
+	
+	private var _undoLevels:Int = -1;
 	private function get_undoLevels():Int { return this._undoLevels; }
 	private function set_undoLevels(value:Int):Int
 	{
 		if (this._undoLevels == value) return value;
 		
-		var count:Int = this._doneActions.length;
-		if (count > value)
+		if (value != -1)
 		{
-			for (i in value...count)
+			for (session in this._sessions)
 			{
-				this._doneActions[i].pool();
+				session.undoLevels = value;
 			}
-			this._doneActions.resize(value);
 		}
 		
 		return this._undoLevels = value;
 	}
 	
-	private var _doneActions:Array<ValEditorAction> = new Array<ValEditorAction>();
-	private var _undoneActions:Array<ValEditorAction> = new Array<ValEditorAction>();
-	
-	private var _lastAction:ValEditorAction;
-	private var _lastSavedAction:ValEditorAction;
+	private var _sessions:Array<ValEditorActionSession> = new Array<ValEditorActionSession>();
+	private var _sessionsMap:Map<String, ValEditorActionSession> = new Map<String, ValEditorActionSession>();
 	
 	public function new() 
 	{
@@ -50,125 +59,168 @@ class ValEditorActionStack extends EventDispatcher
 	
 	public function clear():Void
 	{
-		clearDoneActions();
-		clearUndoneActions();
-		
-		this._lastAction = null;
-		this._lastSavedAction = null;
+		clearSessions();
+		this._undoLevels = -1;
 	}
 	
-	private function clearDoneActions():Void
+	public function clearSessions():Void
 	{
-		for (action in this._doneActions)
+		for (session in this._sessions)
 		{
-			action.pool();
+			session.removeEventListener(ActionStackEvent.CHANGED, onSessionEvent);
+			session.pool();
 		}
-		this._doneActions.resize(0);
+		this._sessions.resize(0);
+		this._sessionsMap.clear();
 	}
 	
-	private function clearUndoneActions():Void
+	public function addSession(session:ValEditorActionSession, makeCurrent:Bool = true):Void
 	{
-		for (action in this._undoneActions)
+		registerSession(session);
+		if (makeCurrent || this.currentSession == null)
 		{
-			action.pool();
+			this.currentSession = session;
+			ActionStackEvent.dispatch(this, ActionStackEvent.SESSION_CHANGED, this.currentSession);
 		}
-		this._undoneActions.resize(0);
+	}
+	
+	public function removeSession(session:ValEditorActionSession, pool:Bool = true):Void
+	{
+		if (this._sessionsMap.exists(session.id))
+		{
+			unregisterSession(session);
+			if (this.currentSession == session)
+			{
+				this.currentSession = getCurrentSession();
+				ActionStackEvent.dispatch(this, ActionStackEvent.SESSION_CHANGED, this.currentSession);
+			}
+			if (pool)
+			{
+				session.pool();
+			}
+		}
+	}
+	
+	public function removeSessionByID(id:String, pool:Bool = true):Void
+	{
+		if (this._sessionsMap.exists(id))
+		{
+			var session:ValEditorActionSession = this._sessionsMap.get(id);
+			this._sessions.remove(session);
+			this._sessionsMap.remove(id);
+			if (this.currentSession == session)
+			{
+				this.currentSession = getCurrentSession();
+				ActionStackEvent.dispatch(this, ActionStackEvent.SESSION_CHANGED, this.currentSession);
+			}
+			if (pool)
+			{
+				session.pool();
+			}
+		}
+	}
+	
+	public function pushSession(?session:ValEditorActionSession):ValEditorActionSession
+	{
+		if (session == null) session = ValEditorActionSession.fromPool();
+		registerSession(session);
+		return session;
+	}
+	
+	public function popSession(pool:Bool = true):Void
+	{
+		var session:ValEditorActionSession = this._sessions.pop();
+		unregisterSession(session);
+		if (this.currentSession == session)
+		{
+			this.currentSession = getCurrentSession();
+			ActionStackEvent.dispatch(this, ActionStackEvent.SESSION_CHANGED, this.currentSession);
+		}
+		if (pool)
+		{
+			session.pool();
+		}
+	}
+	
+	private function getCurrentSession(createIfNoneAvailable:Bool = false):ValEditorActionSession
+	{
+		if (this._sessions.length != 0)
+		{
+			return this._sessions[this._sessions.length - 1];
+		}
+		else if (createIfNoneAvailable)
+		{
+			return pushSession();
+		}
+		return null;
 	}
 	
 	/**
-	   applies specified action and adds it to the "done" stack
+	   applies specified action if its status is ValeditorActionStatus.UNDONE and adds it to the "done" stack of the current session (if there is no session one is created automatically)
 	   @param	action
 	**/
 	public function add(action:ValEditorAction):Void
 	{
-		if (action.status == ValEditorActionStatus.UNDONE)
+		if (this.currentSession == null)
 		{
-			action.apply();
+			this.currentSession = getCurrentSession(true);
 		}
-		// DEBUG
-		if (Std.isOfType(action, MultiAction) && cast(action, MultiAction).numActions == 0)
-		{
-			throw new Error("ValEditorActionStack : trying to add MultiAction with no actions");
-		}
-		//\DEBUG
-		this._doneActions.unshift(action);
-		var count:Int = this._doneActions.length;
-		if (count > this._undoLevels)
-		{
-			for (i in this._undoLevels...count)
-			{
-				this._doneActions[i].pool();
-			}
-			this._doneActions.resize(this._undoLevels);
-		}
-		clearUndoneActions();
-		this._lastAction = action;
-		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
+		this.currentSession.add(action);
 	}
 	
 	public function remove(action:ValEditorAction):Void
 	{
-		var removed:Bool = this._doneActions.remove(action);
-		if (!removed) this._undoneActions.remove(action);
-		if (this._lastAction == action)
+		if (this.currentSession != null)
 		{
-			if (this._doneActions.length != 0)
-			{
-				this._lastAction = this._doneActions[this._doneActions.length - 1];
-			}
-			else
-			{
-				this._lastAction = null;
-			}
-		}
-		if (this._lastSavedAction == action)
-		{
-			this._lastSavedAction = null;
+			this.currentSession.remove(action);
 		}
 	}
 	
 	public function redo():Void
 	{
-		if (this._undoneActions.length == 0) return;
-		var action:ValEditorAction;
-		while (true)
+		if (this.currentSession != null)
 		{
-			action = this._undoneActions.shift();
-			action.apply();
-			this._doneActions.unshift(action);
-			this._lastAction = action;
-			if (action.isStepAction) break;
-			if (this._undoneActions.length == 0) break;
+			this.currentSession.redo();
 		}
-		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
 	}
 	
 	public function undo():Void
 	{
-		if (this._doneActions.length == 0) return;
-		var action:ValEditorAction;
-		while (true)
+		if (this.currentSession != null)
 		{
-			action = this._doneActions.shift();
-			action.cancel();
-			this._undoneActions.unshift(action);
-			if (this._doneActions.length != 0)
-			{
-				this._lastAction = this._doneActions[0];
-			}
-			else
-			{
-				this._lastAction = null;
-				break;
-			}
-			if (action.isStepAction) break;
+			this.currentSession.undo();
 		}
-		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED);
 	}
 	
-	public function fileSaved():Void
+	public function changesSaved():Void
 	{
-		this._lastSavedAction = this._lastAction;
+		for (session in this._sessions)
+		{
+			session.changesSaved();
+		}
+	}
+	
+	private function registerSession(session:ValEditorActionSession):Void
+	{
+		this._sessions[this._sessions.length] = session;
+		this._sessionsMap.set(session.id, session);
+		if (this._undoLevels != -1)
+		{
+			session.undoLevels = this._undoLevels;
+		}
+		session.addEventListener(ActionStackEvent.CHANGED, onSessionEvent);
+	}
+	
+	private function unregisterSession(session:ValEditorActionSession):Void
+	{
+		this._sessions.remove(session);
+		this._sessionsMap.remove(session.id);
+		session.removeEventListener(ActionStackEvent.CHANGED, onSessionEvent);
+	}
+	
+	private function onSessionEvent(evt:ActionStackEvent):Void
+	{
+		dispatchEvent(evt);
 	}
 	
 }
