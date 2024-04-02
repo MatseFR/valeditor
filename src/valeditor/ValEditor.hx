@@ -280,14 +280,14 @@ class ValEditor
 	static public function fileSaved():Void
 	{
 		isNewFile = false;
-		actionStack.fileSaved();
+		actionStack.changesSaved();
 	}
 	
 	/** Creates an empty "new file" but does not clear exposed data */
 	static public function reset():Void
 	{
 		FeathersWindows.closeAll();
-		actionStack.clear();
+		actionStack.clearSessions();
 		assetFileLoader.clear();
 		selection.clear();
 		
