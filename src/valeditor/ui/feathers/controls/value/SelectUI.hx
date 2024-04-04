@@ -13,6 +13,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -194,6 +195,8 @@ class SelectUI extends ValueUI
 		this._list.removeEventListener(Event.CHANGE, onListChange);
 		this._list.removeEventListener(Event.CLOSE, onListClose);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
+		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -211,6 +214,8 @@ class SelectUI extends ValueUI
 			this._list.addEventListener(Event.CLOSE, onListClose);
 			this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		}
+		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -280,6 +285,16 @@ class SelectUI extends ValueUI
 		{
 			this._exposedValue.value = evt.state.data.value;
 		}
+	}
+	
+	private function onListKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onListKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void
