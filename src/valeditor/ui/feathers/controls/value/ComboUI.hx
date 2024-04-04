@@ -144,7 +144,7 @@ class ComboUI extends ValueUI
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
 		{
-			_collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
+			this._collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
 		}
 		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);

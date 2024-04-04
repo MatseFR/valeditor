@@ -158,10 +158,10 @@ class IntUI extends ValueUI
 		switch (this._intValue.numericMode)
 		{
 			case NumericMode.Positive :
-				_input.restrict = "0123456789";
+				this._input.restrict = "0123456789";
 			
 			default :
-				_input.restrict = "-0123456789";
+				this._input.restrict = "-0123456789";
 		}
 		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
@@ -235,7 +235,7 @@ class IntUI extends ValueUI
 	private function onInputChange(evt:Event):Void
 	{
 		if (this._input.text == "") return;
-		_exposedValue.value = Std.parseInt(_input.text);
+		this._exposedValue.value = Std.parseInt(this._input.text);
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void

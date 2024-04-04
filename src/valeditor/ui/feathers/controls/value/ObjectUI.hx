@@ -239,7 +239,7 @@ class ObjectUI extends ValueUI
 	override function controlsEnable():Void 
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._topButton.addEventListener(Event.CHANGE, onTopButtonChange);
 	}

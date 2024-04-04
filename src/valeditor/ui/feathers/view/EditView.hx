@@ -66,67 +66,67 @@ class EditView extends LayoutGroup
 		
 		this.layout = new AnchorLayout();
 		
-		topBar = new LayoutGroup();
-		//topBar.variant = LayoutGroup.VARIANT_TOOL_BAR;
-		topBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
+		this.topBar = new LayoutGroup();
+		//this.topBar.variant = LayoutGroup.VARIANT_TOOL_BAR;
+		this.topBar.layoutData = new AnchorLayoutData(0, 0, null, 0);
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
-		topBar.layout = hLayout;
-		addChild(topBar);
+		this.topBar.layout = hLayout;
+		addChild(this.topBar);
 		
 		// File menu
-		_fileMenuCollection = new ArrayCollection();
-		_fileMenuCollection.add({text:"New", id:"new"});
-		_fileMenuCollection.add({text:"Save", id:"save"});
-		_fileMenuCollection.add({text:"Save As", id:"save as"});
-		_fileMenuCollection.add({text:"Load", id:"load"});
-		_fileMenuCollection.add({text:"export simple JSON", id:"export simple json"});
+		this._fileMenuCollection = new ArrayCollection();
+		this._fileMenuCollection.add({text:"New", id:"new"});
+		this._fileMenuCollection.add({text:"Save", id:"save"});
+		this._fileMenuCollection.add({text:"Save As", id:"save as"});
+		this._fileMenuCollection.add({text:"Load", id:"load"});
+		this._fileMenuCollection.add({text:"export simple JSON", id:"export simple json"});
 		
-		_fileMenu = new PopUpListView(_fileMenuCollection, onFileMenuChange);
-		_fileMenu.prompt = "File";
-		_fileMenu.selectedIndex = -1;
-		_fileMenu.itemToText = function(item:Dynamic):String
+		this._fileMenu = new PopUpListView(this._fileMenuCollection, onFileMenuChange);
+		this._fileMenu.prompt = "File";
+		this._fileMenu.selectedIndex = -1;
+		this._fileMenu.itemToText = function(item:Dynamic):String
 		{
 			return item.text;
 		};
-		topBar.addChild(_fileMenu);
+		this.topBar.addChild(this._fileMenu);
 		
 		// Asset menu
-		_assetMenuCollection = new ArrayCollection();
-		_assetMenuCollection.add({text:"Browser", id:"browser"});
+		this._assetMenuCollection = new ArrayCollection();
+		this._assetMenuCollection.add({text:"Browser", id:"browser"});
 		
-		_assetMenu = new PopUpListView(_assetMenuCollection, onAssetMenuChange);
-		_assetMenu.prompt = "Asset";
-		_assetMenu.selectedIndex = -1;
-		_assetMenu.itemToText = function(item:Dynamic):String
+		this._assetMenu = new PopUpListView(this._assetMenuCollection, onAssetMenuChange);
+		this._assetMenu.prompt = "Asset";
+		this._assetMenu.selectedIndex = -1;
+		this._assetMenu.itemToText = function(item:Dynamic):String
 		{
 			return item.text;
 		}
-		topBar.addChild(_assetMenu);
+		this.topBar.addChild(this._assetMenu);
 		
-		_box = new HDividedBox();
-		_box.layoutData = new AnchorLayoutData(new Anchor(0, topBar), 0, 0, 0);
-		addChild(_box);
+		this._box = new HDividedBox();
+		this._box.layoutData = new AnchorLayoutData(new Anchor(0, this.topBar), 0, 0, 0);
+		addChild(this._box);
 		
-		stageArea = new LayoutGroup();
-		_box.addChild(stageArea);
+		this.stageArea = new LayoutGroup();
+		this._box.addChild(this.stageArea);
 		
-		valEditContainer = new ScrollContainer();
-		valEditContainer.minWidth = UIConfig.VALUE_MIN_WIDTH;
-		valEditContainer.maxWidth = UIConfig.VALUE_MAX_WIDTH;
-		valEditContainer.width = UIConfig.VALUE_MIN_WIDTH + (UIConfig.VALUE_MAX_WIDTH - UIConfig.VALUE_MIN_WIDTH) / 2;
-		valEditContainer.scrollPolicyX = ScrollPolicy.OFF;
-		valEditContainer.scrollPolicyY = ScrollPolicy.ON;
-		valEditContainer.fixedScrollBars = true;
+		this.valEditContainer = new ScrollContainer();
+		this.valEditContainer.minWidth = UIConfig.VALUE_MIN_WIDTH;
+		this.valEditContainer.maxWidth = UIConfig.VALUE_MAX_WIDTH;
+		this.valEditContainer.width = UIConfig.VALUE_MIN_WIDTH + (UIConfig.VALUE_MAX_WIDTH - UIConfig.VALUE_MIN_WIDTH) / 2;
+		this.valEditContainer.scrollPolicyX = ScrollPolicy.OFF;
+		this.valEditContainer.scrollPolicyY = ScrollPolicy.ON;
+		this.valEditContainer.fixedScrollBars = true;
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingBottom = Spacing.DEFAULT;
-		valEditContainer.layout = vLayout;
-		_box.addChild(valEditContainer);
+		this.valEditContainer.layout = vLayout;
+		this._box.addChild(this.valEditContainer);
 	}
 	
 	private function onAssetMenuChange(evt:Event):Void

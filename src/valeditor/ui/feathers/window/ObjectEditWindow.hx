@@ -104,10 +104,10 @@ class ObjectEditWindow extends Panel
 		this.footer = _footerGroup;
 		
 		this._confirmButton = new Button("confirm", onConfirmButton);
-		this._footerGroup.addChild(_confirmButton);
+		this._footerGroup.addChild(this._confirmButton);
 		
 		this._cancelButton = new Button("cancel", onCancelButton);
-		this._footerGroup.addChild(_cancelButton);
+		this._footerGroup.addChild(this._cancelButton);
 		
 		this._contentGroup = new ScrollContainer();
 		this._contentGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);

@@ -17,7 +17,7 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 	public var exposedValue(get, set):ExposedValue;
 	
 	private var _exposedValue:ExposedValue;
-	private function get_exposedValue():ExposedValue { return _exposedValue; }
+	private function get_exposedValue():ExposedValue { return this._exposedValue; }
 	private function set_exposedValue(value:ExposedValue):ExposedValue
 	{
 		if (this._exposedValue == value) return value;

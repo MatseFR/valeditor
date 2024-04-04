@@ -361,7 +361,7 @@ class ColorUI extends ValueUI
 	override function controlsEnable():Void
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._hexInput.addEventListener(Event.CHANGE, onHexInputChange);
 		this._redDragger.addEventListener(Event.CHANGE, onRedDraggerChange);

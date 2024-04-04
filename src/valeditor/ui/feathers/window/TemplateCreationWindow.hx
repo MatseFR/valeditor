@@ -315,13 +315,13 @@ class TemplateCreationWindow extends Panel
 	
 	private function onCategoryChange(evt:Event):Void
 	{
-		if (_categoryPicker.selectedItem != null)
+		if (this._categoryPicker.selectedItem != null)
 		{
-			_categoryClearButton.enabled = true;
+			this._categoryClearButton.enabled = true;
 		}
 		else
 		{
-			_categoryClearButton.enabled = false;
+			this._categoryClearButton.enabled = false;
 		}
 	}
 	

@@ -815,19 +815,19 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 			{
 				if (this._mouseObject.usePivotScaling)
 				{
-					this._mouseObjectOffsetX = _pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
-					this._mouseObjectOffsetY = _pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
+					this._mouseObjectOffsetX = this._pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
+					this._mouseObjectOffsetY = this._pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
 				}
 				else
 				{
-					this._mouseObjectOffsetX = _pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
-					this._mouseObjectOffsetY = _pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
+					this._mouseObjectOffsetX = this._pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
+					this._mouseObjectOffsetY = this._pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
 				}
 			}
 			else
 			{
-				this._mouseObjectOffsetX = _pt.x;
-				this._mouseObjectOffsetY = _pt.y;
+				this._mouseObjectOffsetX = this._pt.x;
+				this._mouseObjectOffsetY = this._pt.y;
 			}
 			
 			if (this.selection.hasObject(this._mouseObject))

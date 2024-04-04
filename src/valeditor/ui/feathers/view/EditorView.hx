@@ -132,7 +132,7 @@ class EditorView extends LayoutGroup
 	
 	public function addMenuItem(menuID:String, item:MenuItem):Void
 	{
-		_menuCollections.get(menuID).add(item);
+		this._menuCollections.get(menuID).add(item);
 	}
 	
 	private function createMenu(menuID:String):Void

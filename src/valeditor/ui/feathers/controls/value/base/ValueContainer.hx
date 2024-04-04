@@ -100,7 +100,7 @@ class ValueContainer extends LayoutGroup implements IGroupUI
 	
 	public function updateExposedValues():Void
 	{
-		for (control in _controls)
+		for (control in this._controls)
 		{
 			control.updateExposedValue();
 		}

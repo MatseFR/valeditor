@@ -36,7 +36,7 @@ class FilesOpener
 		this._fileRefList.removeEventListener(Event.SELECT, onFilesSelected);
 		this._fileRefList.removeEventListener(Event.CANCEL, onFilesCancelled);
 		
-		this._completeCallback(_fileRefList.fileList);
+		this._completeCallback(this._fileRefList.fileList);
 	}
 	
 	private function onFilesCancelled(evt:Event):Void

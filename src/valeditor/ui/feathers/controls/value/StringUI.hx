@@ -208,7 +208,7 @@ class StringUI extends ValueUI
 	override function controlsEnable():Void
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._input.addEventListener(Event.CHANGE, onInputChange);
 		this._input.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);

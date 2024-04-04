@@ -106,7 +106,7 @@ class AssetBrowser extends Panel
 		this._bitmapAssets.cancelEnabled = false;
 		this._bitmapAssets.removeEnabled = true;
 		item = StackItem.withDisplayObject(AssetType.BITMAP, this._bitmapAssets);
-		_navigator.addItem(item);
+		this._navigator.addItem(item);
 		
 		this._soundAssets = new SoundAssetsWindow();
 		this._soundAssets.headerEnabled = false;

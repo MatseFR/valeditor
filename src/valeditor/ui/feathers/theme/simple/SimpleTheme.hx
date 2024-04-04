@@ -55,7 +55,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme implements
 	function get_darkMode():Bool { return this._darkMode; }
 	function set_darkMode(value:Bool):Bool 
 	{
-		if (_darkMode == value) return value;
+		if (this._darkMode == value) return value;
 		//defaultTheme.darkMode = value;
 		this._darkMode = value;
 		this.refreshColors();

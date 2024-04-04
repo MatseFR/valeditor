@@ -5,6 +5,7 @@ import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.PopUpListView;
 import feathers.data.ArrayCollection;
+import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -113,12 +114,12 @@ class SelectUI extends ValueUI
 		
 		this._label = new Label();
 		this._label.variant = LabelVariant.VALUE_NAME;
-		this._mainGroup.addChild(_label);
+		this._mainGroup.addChild(this._label);
 		
-		this._list = new PopUpListView(_collection);
+		this._list = new PopUpListView(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String { return item.text; };
-		this._mainGroup.addChild(_list);
+		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
@@ -139,9 +140,9 @@ class SelectUI extends ValueUI
 	{
 		super.initExposedValue();
 		
-		this._label.text = _exposedValue.name;
+		this._label.text = this._exposedValue.name;
 		
-		cast(_list.layoutData, HorizontalLayoutData).percentWidth = this._select.listPercentWidth;
+		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._select.listPercentWidth;
 		
 		this._collection.removeAll();
 		var count:Int = this._select.choiceList.length;
@@ -191,15 +192,25 @@ class SelectUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
+		this._list.removeEventListener(Event.CLOSE, onListClose);
+		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
 	override function controlsEnable():Void
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		this._list.addEventListener(Event.CHANGE, onListChange);
+		if (this._select.selectOnKeyboardNavigation)
+		{
+			this._list.addEventListener(Event.CHANGE, onListChange);
+		}
+		else
+		{
+			this._list.addEventListener(Event.CLOSE, onListClose);
+			this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
+		}
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -227,6 +238,47 @@ class SelectUI extends ValueUI
 		else
 		{
 			this._exposedValue.value = this._list.selectedItem.value;
+		}
+	}
+	
+	private function onListClose(evt:Event):Void
+	{
+		var value:Dynamic = this._exposedValue.value;
+		if ((this._list.selectedItem == null && value != null) || (this._list.selectedItem != null && this._list.selectedItem.value != value))
+		{
+			for (item in this._collection)
+			{
+				if (item.value == value)
+				{
+					this._list.selectedItem = item;
+					break;
+				}
+			}
+		}
+	}
+	
+	private function onListItemTrigger(evt:ListViewEvent):Void
+	{
+		if (this._exposedValue.useActions)
+		{
+			if (this._exposedValue.value != evt.state.data.value)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, evt.state.data.value);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = evt.state.data.value;
 		}
 	}
 	

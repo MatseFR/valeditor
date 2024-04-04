@@ -59,8 +59,8 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		super.initialize();
 		
 		this._addAtlasButton = new Button("add Atlas");
-		this._footerGroup.addChildAt(_addAtlasButton, 0);
-		this._buttonList.push(_addAtlasButton);
+		this._footerGroup.addChildAt(this._addAtlasButton, 0);
+		this._buttonList.push(this._addAtlasButton);
 		
 		this._assetList.dataProvider = ValEdit.assetLib.starlingAtlasCollection;
 		

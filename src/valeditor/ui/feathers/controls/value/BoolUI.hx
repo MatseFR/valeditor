@@ -89,10 +89,10 @@ class BoolUI extends ValueUI
 		
 		this._label = new Label();
 		this._label.variant = LabelVariant.VALUE_NAME;
-		this._mainGroup.addChild(_label);
+		this._mainGroup.addChild(this._label);
 		
 		this._check = new Check();
-		this._mainGroup.addChild(_check);
+		this._mainGroup.addChild(this._check);
 		
 		this._nullGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();

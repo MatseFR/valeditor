@@ -204,7 +204,7 @@ class StarlingTextureUI extends ValueUI
 	override function controlsEnable():Void 
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._loadButton.addEventListener(TriggerEvent.TRIGGER, onLoadButton);
 		this._clearButton.addEventListener(TriggerEvent.TRIGGER, onClearButton);

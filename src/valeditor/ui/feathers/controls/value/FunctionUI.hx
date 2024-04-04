@@ -44,7 +44,7 @@ class FunctionUI extends ValueUI
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		_func = cast value;
+		this._func = cast value;
 		return super.set_exposedValue(value);
 	}
 	
@@ -139,7 +139,7 @@ class FunctionUI extends ValueUI
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingTop = Spacing.VERTICAL_GAP;
 		this._valueGroup.layout = vLayout;
-		_bottomGroup.addChild(this._valueGroup);
+		this._bottomGroup.addChild(this._valueGroup);
 		
 		this._valueGroup.addEventListener(Event.RESIZE, onParametersResize);
 	}
@@ -209,7 +209,7 @@ class FunctionUI extends ValueUI
 	override function controlsEnable():Void 
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._button.addEventListener(TriggerEvent.TRIGGER, onButton);
 		this._parameterGroup.addEventListener(Event.CHANGE, onParameterGroupChange);

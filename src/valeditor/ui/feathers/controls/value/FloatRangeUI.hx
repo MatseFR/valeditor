@@ -240,7 +240,7 @@ class FloatRangeUI extends ValueUI
 	override function controlsEnable():Void
 	{
 		if (this._readOnly) return;
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._slider.addEventListener(Event.CHANGE, onSliderChange);
 		this._input.addEventListener(Event.CHANGE, onInputChange);

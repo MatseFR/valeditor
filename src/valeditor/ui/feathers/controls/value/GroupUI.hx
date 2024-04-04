@@ -41,7 +41,7 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
-		_group = cast value;
+		this._group = cast value;
 		return super.set_exposedValue(value);
 	}
 	
@@ -105,7 +105,7 @@ class GroupUI extends ValueUI implements IGroupUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		_valueGroup.layout = vLayout;
+		this._valueGroup.layout = vLayout;
 	}
 	
 	public function addExposedControl(control:IValueUI):Void
@@ -168,8 +168,8 @@ class GroupUI extends ValueUI implements IGroupUI
 		
 		if (this._group.isCollapsable)
 		{
-			this._topButton.icon = _arrowRight;
-			this._topButton.selectedIcon = _arrowDown;
+			this._topButton.icon = this._arrowRight;
+			this._topButton.selectedIcon = this._arrowDown;
 			
 			if (this._group.isCollapsedDefault)
 			{
@@ -237,7 +237,7 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	override function controlsEnable():Void 
 	{
-		if (_controlsEnabled) return;
+		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._topButton.addEventListener(Event.CHANGE, onTopButtonChange);
 	}

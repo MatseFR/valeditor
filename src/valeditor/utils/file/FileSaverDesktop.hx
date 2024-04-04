@@ -14,7 +14,6 @@ class FileSaverDesktop
 {
 	private var _file:File = new File();
 	private var _fileStream:FileStream = new FileStream();
-	//private var _filterList:Array<FileFilter>;
 	
 	private var _data:Dynamic;
 	
@@ -23,7 +22,7 @@ class FileSaverDesktop
 	
 	public function new() 
 	{
-		//this._filterList = [new FileFilter(ValEditor.fileDescription, "*." + ValEditor.fileExtension)];
+		
 	}
 	
 	public function clear():Void
@@ -120,7 +119,7 @@ class FileSaverDesktop
 		{
 			this._fileStream.writeUTFBytes(this._data);
 		}
-		else if (Std.isOfType(_data, ByteArrayData))
+		else if (Std.isOfType(this._data, ByteArrayData))
 		{
 			this._fileStream.writeBytes(this._data);
 		}

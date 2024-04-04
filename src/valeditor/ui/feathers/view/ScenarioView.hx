@@ -930,7 +930,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._contextMenuPt.setTo(this._frameContextMenu.x, this._frameContextMenu.y);
 		var pt:Point = this._frameContextMenu.localToGlobal(this._contextMenuPt);
 		this._contextMenuRect.setTo(pt.x, pt.y, this._frameContextMenu.width, this._frameContextMenu.height);
-		if (_contextMenuRect.contains(evt.stageX, evt.stageY))
+		if (this._contextMenuRect.contains(evt.stageX, evt.stageY))
 		{
 			return;
 		}

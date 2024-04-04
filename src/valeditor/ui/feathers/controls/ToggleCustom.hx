@@ -57,7 +57,7 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 	private var _currentState:ToggleButtonState = ToggleButtonState.UP(false);
 	private function get_currentState():#if flash Dynamic #else ToggleButtonState #end
 	{
-		return _currentState;
+		return this._currentState;
 	}
 	
 	override function set_enabled(value:Bool):Bool 
@@ -66,67 +66,68 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 		super.enabled = value;
 		if (this._enabled)
 		{
-			switch (_currentState)
+			switch (this._currentState)
 			{
 				case ToggleButtonState.DISABLED(selected) :
 					this.changeState(ToggleButtonState.UP(selected));
+				
 				default : // do nothing
 			}
 		}
 		else
 		{
-			this.changeState(ToggleButtonState.DISABLED(_selected));
+			this.changeState(ToggleButtonState.DISABLED(this._selected));
 		}
 		return this._enabled;
 	}
 	
 	private var _htmlText:String = null;
-	private function get_htmlText():String { return _htmlText; }
+	private function get_htmlText():String { return this._htmlText; }
 	private function set_htmlText(value:String):String
 	{
-		if (_htmlText == value) return value;
-		if (_label != null)
+		if (this._htmlText == value) return value;
+		if (this._label != null)
 		{
-			_label.htmlText = value;
+			this._label.htmlText = value;
 		}
-		return _htmlText = value;
+		return this._htmlText = value;
 	}
 	
 	private var _labelVariant:String;
 	private function get_labelVariant():String { return _labelVariant; }
 	private function set_labelVariant(value:String):String
 	{
-		if (_labelVariant == value) return value;
-		if (_label != null)
+		if (this._labelVariant == value) return value;
+		if (this._label != null)
 		{
-			_label.variant = value;
+			this._label.variant = value;
 		}
-		return _labelVariant = value;
+		return this._labelVariant = value;
 	}
 	
 	private var _selected:Bool = false;
 	private function get_selected():Bool { return _selected; }
 	private function set_selected(value:Bool):Bool
 	{
-		if (_selected == value) return value;
-		_selected = value;
+		if (this._selected == value) return value;
+		this._selected = value;
 		this.setInvalid(InvalidationFlag.SELECTION);
 		this.setInvalid(InvalidationFlag.STATE);
 		FeathersEvent.dispatch(this, Event.CHANGE);
-		this.changeState(_currentState);
-		return _selected;
+		this.changeState(this._currentState);
+		return this._selected;
 	}
 	
 	private var _text:String = null;
 	private function get_text():String { return _text; }
 	private function set_text(value:String):String
 	{
-		if (_text == value) return value;
-		if (_label != null)
+		if (this._text == value) return value;
+		if (this._label != null)
 		{
-			_label.text = value;
+			this._label.text = value;
 		}
-		return _text = value;
+		return this._text = value;
 	}
 	
 	private var _toggleable:Bool = true;
@@ -233,15 +234,15 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 	
 	override private function initialize():Void {
 		super.initialize();
-
+		
 		if (this._pointerToState == null) {
 			this._pointerToState = new PointerToState(this, this.changeState, UP(false), DOWN(false), HOVER(false));
 		}
-
+		
 		if (this._keyToState == null) {
 			this._keyToState = new KeyToState(this, this.changeState, UP(false), DOWN(false));
 		}
-
+		
 		if (this._pointerTrigger == null) {
 			this._pointerTrigger = new PointerTrigger(this);
 		}
@@ -251,19 +252,19 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		this.layout = hLayout;
 		
-		_contentGroup = new LayoutGroup();
-		_contentGroup.variant = LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT;
-		_contentGroup.layout = new AnchorLayout();
-		addChild(_contentGroup);
+		this._contentGroup = new LayoutGroup();
+		this._contentGroup.variant = LayoutGroupVariant.TOGGLE_CUSTOM_CONTENT;
+		this._contentGroup.layout = new AnchorLayout();
+		addChild(this._contentGroup);
 		
-		_iconGroup = new LayoutGroup();
-		_iconGroup.layoutData = AnchorLayoutData.middleLeft(0, 2);
-		_contentGroup.addChild(_iconGroup);
+		this._iconGroup = new LayoutGroup();
+		this._iconGroup.layoutData = AnchorLayoutData.middleLeft(0, 2);
+		this._contentGroup.addChild(this._iconGroup);
 		
-		_label = new Label(_text);
-		_label.variant = _labelVariant;
-		_label.layoutData = new AnchorLayoutData(null, 0, null, new Anchor(Spacing.DEFAULT, _iconGroup), null, 0);
-		_contentGroup.addChild(_label);
+		this._label = new Label(this._text);
+		this._label.variant = this._labelVariant;
+		this._label.layoutData = new AnchorLayoutData(null, 0, null, new Anchor(Spacing.DEFAULT, this._iconGroup), null, 0);
+		this._contentGroup.addChild(this._label);
 	}
 	
 	override private function update():Void {
@@ -322,7 +323,7 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 		var textFormat = this.getCurrentTextFormat();
 		if (textFormat != null)
 		{
-			_label.textFormat = textFormat;
+			this._label.textFormat = textFormat;
 		}
 	}
 	
@@ -369,12 +370,12 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 			cast(icon, IUIControl).initializeNow();
 		}
 		if ((icon is IProgrammaticSkin)) {
-			cast(icon, IProgrammaticSkin).uiContext = _iconGroup;
+			cast(icon, IProgrammaticSkin).uiContext = this._iconGroup;
 		}
 		if ((icon is IStateObserver)) {
 			cast(icon, IStateObserver).stateContext = this;
 		}
-		_iconGroup.addChild(icon);
+		this._iconGroup.addChild(icon);
 	}
 	
 	private function removeCurrentIcon(icon:DisplayObject):Void {
@@ -387,38 +388,38 @@ class ToggleCustom extends LayoutGroup implements IToggle implements IStateConte
 		if ((icon is IStateObserver)) {
 			cast(icon, IStateObserver).stateContext = null;
 		}
-		if (icon.parent == _iconGroup)
+		if (icon.parent == this._iconGroup)
 		{
-			_iconGroup.removeChild(icon);
+			this._iconGroup.removeChild(icon);
 		}
 	}
 	
 	private function changeState(state:ToggleButtonState):Void
 	{
 		var toggleState = cast(state, ToggleButtonState);
-		if (!this._enabled) toggleState = ToggleButtonState.DISABLED(_selected);
+		if (!this._enabled) toggleState = ToggleButtonState.DISABLED(this._selected);
 		
 		switch (toggleState)
 		{
 			case ToggleButtonState.UP(selected) :
-				if (_selected != selected)
+				if (this._selected != selected)
 				{
-					toggleState = ToggleButtonState.UP(_selected);
+					toggleState = ToggleButtonState.UP(this._selected);
 				}
 			case ToggleButtonState.DOWN(selected) :
-				if (_selected != selected)
+				if (this._selected != selected)
 				{
-					toggleState = ToggleButtonState.DOWN(_selected);
+					toggleState = ToggleButtonState.DOWN(this._selected);
 				}
 			case ToggleButtonState.HOVER(selected) :
-				if (_selected != selected)
+				if (this._selected != selected)
 				{
-					toggleState = ToggleButtonState.HOVER(_selected);
+					toggleState = ToggleButtonState.HOVER(this._selected);
 				}
 			case ToggleButtonState.DISABLED(selected) :
-				if (_selected != selected)
+				if (this._selected != selected)
 				{
-					toggleState = ToggleButtonState.DISABLED(_selected);
+					toggleState = ToggleButtonState.DISABLED(this._selected);
 				}
 			default : // do nothing
 		}

@@ -284,7 +284,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	
 	private function onCategoryChange(evt:Event):Void
 	{
-		_categoryClearButton.enabled = _categoryPicker.selectedItem != null;
+		this._categoryClearButton.enabled = this._categoryPicker.selectedItem != null;
 		updateClassCollection();
 	}
 	

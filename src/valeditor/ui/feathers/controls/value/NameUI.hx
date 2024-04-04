@@ -61,7 +61,7 @@ class NameUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
-		this._label.text = _exposedValue.name;
+		this._label.text = this._exposedValue.name;
 	}
 	
 }

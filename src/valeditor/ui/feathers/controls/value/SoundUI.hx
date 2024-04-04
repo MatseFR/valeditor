@@ -110,7 +110,7 @@ class SoundUI extends ValueUI
 		addChild(this._contentGroup);
 		
 		this._nameLabel = new Label();
-		this._contentGroup.addChild(_nameLabel);
+		this._contentGroup.addChild(this._nameLabel);
 		
 		this._pathLabel = new Label();
 		this._pathLabel.wordWrap = true;
