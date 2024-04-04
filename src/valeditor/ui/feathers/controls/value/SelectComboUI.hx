@@ -4,6 +4,7 @@ import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.data.ArrayCollection;
+import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -12,6 +13,10 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
+import valedit.events.ValueEvent;
+import valedit.ui.IValueUI;
+import valedit.value.ExposedSelectCombo;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -20,28 +25,24 @@ import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.variant.LabelVariant;
-import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
-import valedit.ui.IValueUI;
-import valedit.value.ExposedCombo;
 
 /**
  * ...
  * @author Matse
  */
-class ComboUI extends ValueUI 
+class SelectComboUI extends ValueUI 
 {
-	static private var _POOL:Array<ComboUI> = new Array<ComboUI>();
+	static private var _POOL:Array<SelectComboUI> = new Array<SelectComboUI>();
 	
 	static public function disposePool():Void
 	{
 		_POOL.resize(0);
 	}
 	
-	static public function fromPool():ComboUI
+	static public function fromPool():SelectComboUI
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new ComboUI();
+		return new SelectComboUI();
 	}
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
@@ -57,7 +58,7 @@ class ComboUI extends ValueUI
 		return super.set_exposedValue(value);
 	}
 	
-	private var _combo:ExposedCombo;
+	private var _combo:ExposedSelectCombo;
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
@@ -139,7 +140,9 @@ class ComboUI extends ValueUI
 		super.initExposedValue();
 		
 		this._label.text = this._exposedValue.name;
-		this._list.enabled = !this._readOnly;
+		
+		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._combo.listPercentWidth;
+		
 		this._collection.removeAll();
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
@@ -188,6 +191,8 @@ class ComboUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
+		this._list.removeEventListener(Event.CLOSE, onListClose);
+		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
 		this._list.removeEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
@@ -198,7 +203,15 @@ class ComboUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		this._list.addEventListener(Event.CHANGE, onListChange);
+		if (this._combo.selectOnKeyboardNavigation)
+		{
+			this._list.addEventListener(Event.CHANGE, onListChange);
+		}
+		else
+		{
+			this._list.addEventListener(Event.CLOSE, onListClose);
+			this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
+		}
 		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
 		this._list.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
@@ -238,6 +251,47 @@ class ComboUI extends ValueUI
 		else
 		{
 			this._exposedValue.value = this._list.selectedItem.value;
+		}
+	}
+	
+	private function onListClose(evt:Event):Void
+	{
+		var value:Dynamic = this._exposedValue.value;
+		if ((this._list.selectedItem == null && value != null) || (this._list.selectedItem != null && this._list.selectedItem.value != value))
+		{
+			for (item in this._collection)
+			{
+				if (item.value == value)
+				{
+					this._list.selectedItem = item;
+					break;
+				}
+			}
+		}
+	}
+	
+	private function onListItemTrigger(evt:ListViewEvent):Void
+	{
+		if (this._exposedValue.useActions)
+		{
+			if (this._exposedValue.value != evt.state.data.value)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, evt.state.data.value);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = evt.state.data.value;
 		}
 	}
 	

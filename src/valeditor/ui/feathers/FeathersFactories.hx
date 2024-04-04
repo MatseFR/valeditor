@@ -1,10 +1,10 @@
 package valeditor.ui.feathers;
+import valedit.ui.IValueUI;
 import valedit.ui.UICollection;
 import valeditor.ui.feathers.controls.value.BitmapUI;
 import valeditor.ui.feathers.controls.value.BoolUI;
 import valeditor.ui.feathers.controls.value.ByteArrayUI;
 import valeditor.ui.feathers.controls.value.ColorUI;
-import valeditor.ui.feathers.controls.value.ComboUI;
 import valeditor.ui.feathers.controls.value.FloatDraggerUI;
 import valeditor.ui.feathers.controls.value.FloatRangeUI;
 import valeditor.ui.feathers.controls.value.FloatUI;
@@ -15,17 +15,17 @@ import valeditor.ui.feathers.controls.value.IntDraggerUI;
 import valeditor.ui.feathers.controls.value.IntRangeUI;
 import valeditor.ui.feathers.controls.value.IntUI;
 import valeditor.ui.feathers.controls.value.NameUI;
+import valeditor.ui.feathers.controls.value.NoteUI;
 import valeditor.ui.feathers.controls.value.ObjectReferenceUI;
 import valeditor.ui.feathers.controls.value.ObjectUI;
+import valeditor.ui.feathers.controls.value.SelectComboUI;
 import valeditor.ui.feathers.controls.value.SelectUI;
 import valeditor.ui.feathers.controls.value.SeparatorUI;
 import valeditor.ui.feathers.controls.value.SoundUI;
 import valeditor.ui.feathers.controls.value.SpacingUI;
 import valeditor.ui.feathers.controls.value.StringUI;
-import valeditor.ui.feathers.controls.value.NoteUI;
 import valeditor.ui.feathers.controls.value.TextAssetUI;
 import valeditor.ui.feathers.controls.value.TextUI;
-import valedit.ui.IValueUI;
 
 #if desktop
 import valeditor.ui.feathers.controls.value.FilePathUI;
@@ -51,7 +51,6 @@ class FeathersFactories
 		BoolUI.disposePool();
 		ByteArrayUI.disposePool();
 		ColorUI.disposePool();
-		ComboUI.disposePool();
 		#if desktop
 		FilePathUI.disposePool();
 		#end
@@ -71,6 +70,7 @@ class FeathersFactories
 		#if desktop
 		PathUI.disposePool();
 		#end
+		SelectComboUI.disposePool();
 		SelectUI.disposePool();
 		SeparatorUI.disposePool();
 		SoundUI.disposePool();
@@ -108,11 +108,6 @@ class FeathersFactories
 	static public function exposedColor():IValueUI
 	{
 		return ColorUI.fromPool();
-	}
-	
-	static public function exposedCombo():IValueUI
-	{
-		return ComboUI.fromPool();
 	}
 	
 	#if desktop
@@ -202,6 +197,11 @@ class FeathersFactories
 	static public function exposedSelect():IValueUI
 	{
 		return SelectUI.fromPool();
+	}
+	
+	static public function exposedSelectCombo():IValueUI
+	{
+		return SelectComboUI.fromPool();
 	}
 	
 	static public function exposedSeparator():IValueUI
