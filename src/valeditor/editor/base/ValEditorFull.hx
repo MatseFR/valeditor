@@ -7,9 +7,6 @@ import inputAction.controllers.KeyAction;
 import inputAction.events.InputActionEvent;
 import openfl.Lib;
 import openfl.display.Bitmap;
-import openfl.display.GradientType;
-import openfl.display.InterpolationMethod;
-import openfl.display.SpreadMethod;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.filters.BlurFilter;
@@ -29,7 +26,6 @@ import valedit.DisplayObjectType;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
-import valedit.data.feathers.themes.SimpleThemeData;
 import valedit.data.openfl.display.DisplayData;
 import valedit.data.openfl.filters.FiltersData;
 import valedit.data.openfl.geom.GeomData;
@@ -63,7 +59,6 @@ import valeditor.input.InputActionID;
 import valeditor.ui.InteractiveFactories;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.MenuItem;
-import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.view.EditorView;
 
 #if air
@@ -122,12 +117,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private var _assetMenuCollection:ArrayCollection<MenuItem>;
 	private var _assetBrowserItem:MenuItem;
 	
-	// theme menu
-	private var _themeMenuCollection:ArrayCollection<MenuItem>;
-	private var _lightModeItem:MenuItem;
-	private var _darkModeItem:MenuItem;
-	private var _editThemeItem:MenuItem;
-
 	public function new() 
 	{
 		super();
@@ -234,18 +223,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 			this._assetBrowserItem
 		]);
 		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, onAssetMenuOpen, this._assetMenuCollection);
-		
-		// Theme menu
-		this._lightModeItem = new MenuItem("light mode", "Light mode");
-		this._darkModeItem = new MenuItem("dark mode", "Dark mode");
-		this._editThemeItem = new MenuItem("edit", "Edit");
-		
-		this._themeMenuCollection = new ArrayCollection<MenuItem>([
-			this._lightModeItem,
-			this._darkModeItem,
-			this._editThemeItem
-		]);
-		this.editView.addMenu("theme", "Theme", onThemeMenuCallback, onThemeMenuOpen, this._themeMenuCollection);
 	}
 	
 	override function exposeData():Void 
@@ -761,30 +738,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 		Lib.current.stage.focus = null;
 	}
 	
-	private function onThemeMenuOpen(evt:Event):Void
-	{
-		this._lightModeItem.enabled = this.theme.darkMode;
-		this._darkModeItem.enabled = !this.theme.darkMode;
-		this._themeMenuCollection.updateAll();
-	}
-	
-	private function onThemeMenuCallback(item:MenuItem):Void
-	{
-		switch (item.id)
-		{
-			case "light mode" :
-				this.theme.darkMode = false;
-			
-			case "dark mode" :
-				this.theme.darkMode = true;
-			
-			case "edit" :
-				ValEditor.edit(this.theme);
-		}
-		
-		Lib.current.stage.focus = null;
-	}
-	
 	private function onInputActionBegin(evt:InputActionEvent):Void
 	{
 		if (this._isStartUp) return;
@@ -865,7 +818,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 				ValEditor.actionStack.redo();
 			
 			case InputActionID.SAVE :
-				FileController.save();
+				if (ValEditor.actionStack.hasChanges)
+				{
+					FileController.save();
+				}
 			
 			case InputActionID.SAVE_AS :
 				FileController.save(true);
