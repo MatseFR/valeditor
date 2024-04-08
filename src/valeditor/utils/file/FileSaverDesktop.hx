@@ -20,6 +20,8 @@ class FileSaverDesktop
 	private var _completeCallback:String->Void;
 	private var _cancelCallback:Void->Void;
 	
+	private var _forcedExtension:String;
+	
 	public function new() 
 	{
 		
@@ -32,11 +34,12 @@ class FileSaverDesktop
 		this._cancelCallback = null;
 	}
 	
-	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, path:String = null, browseForSave:Bool = true, dialogTitle:String = "Save as"):Void
+	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, path:String = null, browseForSave:Bool = true, forcedExtension:String = null, dialogTitle:String = "Save as"):Void
 	{
 		this._data = data;
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
+		this._forcedExtension = forcedExtension;
 		
 		if (path != null)
 		{
@@ -113,6 +116,11 @@ class FileSaverDesktop
 		this._file.removeEventListener(Event.SELECT, onFileSelected);
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
 		
+		if (this._forcedExtension != null && (this._file.extension != this._forcedExtension.toLowerCase() && this._file.extension != this._forcedExtension.toUpperCase()))
+		{
+			this._file = new File(this._file.nativePath + "." + this._forcedExtension);
+		}
+		
 		this._fileStream.open(this._file, FileMode.WRITE);
 		
 		if (Std.isOfType(this._data, String))
@@ -134,6 +142,8 @@ class FileSaverDesktop
 	{
 		this._file.removeEventListener(Event.SELECT, onFileSelected);
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
+		
+		this._data = null;
 		
 		this._cancelCallback();
 	}
