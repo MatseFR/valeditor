@@ -13,6 +13,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import valedit.ExposedCollection;
+import valedit.events.ValueEvent;
 import valeditor.editor.settings.EditorSettings;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -47,12 +48,14 @@ class EditorSettingsWindow extends Panel
 	private function get_settings():EditorSettings { return this._settings; }
 	private function set_settings(value:EditorSettings):EditorSettings
 	{
-		if (value != null)
+		this._settings = value;
+		if (this._settings != null)
 		{
-			value.clone(this._editSettings);
+			this._settings.clone(this._backupSettings);
 			if (this._initialized)
 			{
-				this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
+				this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+				this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 			}
 		}
 		else
@@ -60,10 +63,11 @@ class EditorSettingsWindow extends Panel
 			if (this._initialized)
 			{
 				ValEditor.edit(null, null, this._editContainer);
+				this._settingsCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 				this._settingsCollection = null;
 			}
 		}
-		return this._settings = value;
+		return this._settings;
 	}
 	
 	private var _title:String;
@@ -85,8 +89,8 @@ class EditorSettingsWindow extends Panel
 	private var _cancelButton:Button;
 	private var _confirmButton:Button;
 	
-	private var _editSettings:EditorSettings = new EditorSettings();
 	private var _settingsCollection:ExposedCollection;
+	private var _backupSettings:EditorSettings = new EditorSettings();
 	
 	public function new() 
 	{
@@ -138,12 +142,15 @@ class EditorSettingsWindow extends Panel
 		
 		if (this._settings != null)
 		{
-			this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
+			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+			this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 		}
 	}
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
+		this._backupSettings.clone(this._settings);
+		this._settings.apply();
 		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null)
 		{
@@ -153,7 +160,6 @@ class EditorSettingsWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		this._editSettings.clone(this._settings);
 		this._settings.apply();
 		FileUtil.saveEditorSettings();
 		FeathersWindows.closeWindow(this);
@@ -165,8 +171,16 @@ class EditorSettingsWindow extends Panel
 	
 	private function onRestoreDefaultsButton(evt:TriggerEvent):Void
 	{
-		this._settings.clone(this._editSettings);
-		this._settingsCollection.readValuesFromObject(this._editSettings, false);
+		this._backupSettings.clone(this._settings);
+		this._settingsCollection.readValuesFromObject(this._settings, false);
+	}
+	
+	private function onValueChange(evt:ValueEvent):Void
+	{
+		if (evt.value.propertyName == "uiDarkMode")
+		{
+			ValEditor.theme.darkMode = evt.value.value;
+		}
 	}
 	
 }
