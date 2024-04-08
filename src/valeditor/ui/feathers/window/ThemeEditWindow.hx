@@ -12,7 +12,9 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.events.Event;
 import valedit.ExposedCollection;
+import valedit.value.base.ExposedValue;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
@@ -67,6 +69,7 @@ class ThemeEditWindow extends Panel
 	public function new() 
 	{
 		super();
+		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
 	override function initialize():Void 
@@ -127,12 +130,12 @@ class ThemeEditWindow extends Panel
 		if (this._editCollection == null)
 		{
 			this._editCollection = this._customCollection.clone(true);
-			this._editCollection.object = this._theme;
 		}
 		else
 		{
 			this._editCollection.copyValuesFrom(this._customCollection);
 		}
+		this._editCollection.readAndSetObject(this._theme);
 		
 		if (this._initialized)
 		{
@@ -140,8 +143,28 @@ class ThemeEditWindow extends Panel
 		}
 	}
 	
+	private function onAddedToStage(evt:Event):Void
+	{
+		this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		this.addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		
+		ValEditor.actionStack.pushSession();
+	}
+	
+	private function onRemovedFromStage(evt:Event):Void
+	{
+		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		this.removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		
+		ValEditor.actionStack.popSession();
+		
+		this._editCollection.object = null;
+	}
+	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
+		var value:ExposedValue = this._customCollection.getValue("darkMode");
+		value.value = ValEditor.editorSettings.uiDarkMode;
 		this._customCollection.applyToObject(this._theme);
 		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null)
@@ -152,6 +175,8 @@ class ThemeEditWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
+		var value:ExposedValue = this._editCollection.getValue("darkMode");
+		value.value = ValEditor.editorSettings.uiDarkMode;
 		this._customCollection.copyValuesFrom(this._editCollection);
 		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null)
@@ -163,6 +188,7 @@ class ThemeEditWindow extends Panel
 	private function onRestoreDefaultsButton(evt:TriggerEvent):Void
 	{
 		this._editCollection.copyValuesFrom(this._defaultCollection);
+		
 	}
 	
 }
