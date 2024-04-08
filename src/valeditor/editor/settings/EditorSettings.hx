@@ -7,6 +7,10 @@ import valedit.ExposedCollection;
  */
 class EditorSettings 
 {
+	#if desktop
+	public var autoSave:Bool = true;
+	public var autoSaveInterval:Int = 5;
+	#end
 	public var themeCustomValues:ExposedCollection;
 	public var uiDarkMode:Bool = false;
 	public var undoLevels:Int = 300;
@@ -23,6 +27,8 @@ class EditorSettings
 			this.themeCustomValues.pool();
 			this.themeCustomValues = null;
 		}
+		this.uiDarkMode = false;
+		this.undoLevels = 300;
 	}
 	
 	public function apply():Void
@@ -36,6 +42,10 @@ class EditorSettings
 	{
 		if (toSettings == null) toSettings = new EditorSettings();
 		
+		#if desktop
+		toSettings.autoSave = this.autoSave;
+		toSettings.autoSaveInterval = this.autoSaveInterval;
+		#end
 		if (toSettings.themeCustomValues == null)
 		{
 			toSettings.themeCustomValues = this.themeCustomValues.clone(true);
@@ -44,7 +54,6 @@ class EditorSettings
 		{
 			toSettings.themeCustomValues.copyValuesFrom(this.themeCustomValues);
 		}
-		
 		toSettings.uiDarkMode = this.uiDarkMode;
 		toSettings.undoLevels = this.undoLevels;
 		
@@ -53,6 +62,10 @@ class EditorSettings
 	
 	public function fromJSON(json:Dynamic):Void
 	{
+		#if desktop
+		this.autoSave = json.autoSave;
+		this.autoSaveInterval = json.autoSaveInterval;
+		#end
 		if (json.themeCustomValues != null)
 		{
 			this.themeCustomValues.fromJSONSave(json.themeCustomValues);
@@ -65,6 +78,10 @@ class EditorSettings
 	{
 		if (json == null) json = {};
 		
+		#if desktop
+		json.autoSave = this.autoSave;
+		json.autoSaveInterval = this.autoSaveInterval;
+		#end
 		if (this.themeCustomValues.hasDifferenceWith(ValEditor.themeDefaultValues))
 		{
 			json.themeCustomValues = this.themeCustomValues.toJSONSave(null, false, ValEditor.themeDefaultValues);
