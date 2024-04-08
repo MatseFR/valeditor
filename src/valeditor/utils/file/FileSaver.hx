@@ -13,6 +13,8 @@ class FileSaver
 	private var _completeCallback:String->Void;
 	private var _cancelCallback:Void->Void;
 	
+	private var _defaultFileName:String;
+	
 	public function new() 
 	{
 		
@@ -22,18 +24,20 @@ class FileSaver
 	{
 		this._completeCallback = null;
 		this._cancelCallback = null;
+		this._defaultFileName = null;
 	}
 	
 	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, defaultFileName:String = null):Void
 	{
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
+		this._defaultFileName = defaultFileName;
 		
 		this._fileReference.addEventListener(Event.SELECT, onFileSelected);
 		this._fileReference.addEventListener(Event.CANCEL, onFileCancelled);
 		this._fileReference.addEventListener(Event.COMPLETE, onFileCompleted);
 		
-		this._fileReference.save(data, defaultFileName);
+		this._fileReference.save(data, this._defaultFileName);
 	}
 	
 	private function onFileSelected(evt:Event):Void
@@ -55,7 +59,9 @@ class FileSaver
 	{
 		this._fileReference.removeEventListener(Event.COMPLETE, onFileCompleted);
 		
-		this._completeCallback(this._fileReference.name);
+		// on Chrome browser there is no dialog by default and _fileReference.name remains null 
+		// even though a non-null defaultFileName was passed when calling `save`
+		this._completeCallback(this._fileReference.name != null ? this._fileReference.name : this._defaultFileName);
 	}
 	
 }
