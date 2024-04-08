@@ -668,7 +668,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onFileMenuOpen(evt:Event):Void
 	{
-		this._saveFileItem.enabled = ValEditor.actionStack.hasChanges;
+		this._saveFileItem.enabled = ValEditor.isNewFile || ValEditor.actionStack.hasChanges;
 		this._fileMenuCollection.updateAt(this._fileMenuCollection.indexOf(this._saveFileItem));
 	}
 	
@@ -818,7 +818,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 				ValEditor.actionStack.redo();
 			
 			case InputActionID.SAVE :
-				if (ValEditor.actionStack.hasChanges)
+				if (ValEditor.isNewFile || ValEditor.actionStack.hasChanges)
 				{
 					FileController.save();
 				}
