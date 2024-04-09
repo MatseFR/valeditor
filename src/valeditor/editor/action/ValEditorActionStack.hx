@@ -120,10 +120,14 @@ class ValEditorActionStack extends EventDispatcher
 		}
 	}
 	
-	public function pushSession(?session:ValEditorActionSession):ValEditorActionSession
+	public function pushSession(?session:ValEditorActionSession, makeCurrent:Bool = true):ValEditorActionSession
 	{
 		if (session == null) session = ValEditorActionSession.fromPool();
 		registerSession(session);
+		if (makeCurrent)
+		{
+			this.currentSession = session;
+		}
 		return session;
 	}
 	
