@@ -740,7 +740,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onInputActionBegin(evt:InputActionEvent):Void
 	{
-		if (this._isStartUp) return;
+		//if (this._isStartUp) return;
 		
 		var action:MultiAction;
 		var inputAction:InputAction = evt.action;
@@ -748,9 +748,11 @@ class ValEditorFull extends ValEditorBaseFeathers
 		switch (inputAction.actionID)
 		{
 			case InputActionID.ASSET_BROWSER :
+				if (this._isStartUp) return;
 				FeathersWindows.toggleAssetBrowser();
 			
 			case InputActionID.COPY :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				action.isStepAction = false;
 				ValEditor.copy(action);
@@ -764,6 +766,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 				}
 			
 			case InputActionID.CUT :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				ValEditor.cut(action);
 				if (action.numActions != 0)
@@ -776,6 +779,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 				}
 			
 			case InputActionID.DELETE :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				ValEditor.delete(action);
 				if (action.numActions != 0)
@@ -788,18 +792,23 @@ class ValEditorFull extends ValEditorBaseFeathers
 				}
 			
 			case InputActionID.EXPORT :
+				if (this._isStartUp) return;
 				trace("export");
 			
 			case InputActionID.EXPORT_AS :
+				if (this._isStartUp) return;
 				trace("export as");
 			
 			case InputActionID.NEW_FILE :
+				if (this._isStartUp) return;
 				onNewFile();
 			
 			case InputActionID.OPEN :
+				if (this._isStartUp) return;
 				onLoadFile();
 			
 			case InputActionID.PASTE :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				ValEditor.paste(action);
 				if (action.numActions != 0)
@@ -812,21 +821,25 @@ class ValEditorFull extends ValEditorBaseFeathers
 				}
 			
 			case InputActionID.PLAY_STOP :
+				if (this._isStartUp) return;
 				ValEditor.playStop();
 			
 			case InputActionID.REDO :
 				ValEditor.actionStack.redo();
 			
 			case InputActionID.SAVE :
+				if (this._isStartUp) return;
 				if (ValEditor.isNewFile || ValEditor.actionStack.hasChanges)
 				{
 					FileController.save();
 				}
 			
 			case InputActionID.SAVE_AS :
+				if (this._isStartUp) return;
 				FileController.save(true);
 			
 			case InputActionID.SELECT_ALL :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				ValEditor.selectAll(action);
 				if (action.numActions != 0)
@@ -842,6 +855,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 				ValEditor.actionStack.undo();
 			
 			case InputActionID.UNSELECT_ALL :
+				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
 				ValEditor.unselectAll(action);
 				if (action.numActions != 0)
