@@ -57,7 +57,6 @@ import valedit.value.starling.ExposedStarlingTexture;
 class ValEditorBaseFeathers extends Application 
 {
 	public var screenNavigator(default, null):StackNavigator;
-	public var theme(default, null):ValEditorTheme;
 	
 	/**
 	   
@@ -71,14 +70,13 @@ class ValEditorBaseFeathers extends Application
 	{
 		super.initialize();
 		
-		stage.scaleMode = StageScaleMode.NO_SCALE;
-		stage.stageFocusRect = false;
+		this.stage.scaleMode = StageScaleMode.NO_SCALE;
+		this.stage.stageFocusRect = false;
 		
-		stage.showDefaultContextMenu = false;
+		this.stage.showDefaultContextMenu = false;
 		
-		theme = new ValEditorTheme();
-		ValEditor.theme = theme;
-		Theme.setTheme(theme);
+		ValEditor.theme = new ValEditorTheme();
+		Theme.setTheme(ValEditor.theme);
 		
 		ValEditor.init(assetsLoaded);
 	}
@@ -113,12 +111,12 @@ class ValEditorBaseFeathers extends Application
 		var collection:ExposedCollection;
 		
 		// store default values for easy restoration
-		collection = ValEditor.getCollectionForObject(this.theme);
-		collection.readValuesFromObject(this.theme, false);
+		collection = ValEditor.getCollectionForObject(ValEditor.theme);
+		collection.readValuesFromObject(ValEditor.theme, false);
 		ValEditor.themeDefaultValues = collection;
 		
-		collection = ValEditor.getCollectionForObject(this.theme);
-		collection.readValuesFromObject(this.theme, false);
+		collection = ValEditor.getCollectionForObject(ValEditor.theme);
+		collection.readValuesFromObject(ValEditor.theme, false);
 		ValEditor.editorSettings.themeCustomValues = collection;
 		
 		FileUtil.loadEditorSettings();
@@ -128,8 +126,8 @@ class ValEditorBaseFeathers extends Application
 	
 	private function initUI():Void
 	{
-		screenNavigator = new StackNavigator();
-		addChild(screenNavigator);
+		this.screenNavigator = new StackNavigator();
+		addChild(this.screenNavigator);
 	}
 	
 	private function ready():Void
