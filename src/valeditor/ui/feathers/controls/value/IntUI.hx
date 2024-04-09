@@ -24,7 +24,7 @@ import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedInt;
-import valedit.value.NumericMode;
+import valedit.value.data.NumericMode;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ValueWedge;
