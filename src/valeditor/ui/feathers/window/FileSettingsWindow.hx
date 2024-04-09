@@ -12,6 +12,7 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import openfl.events.Event;
 import valedit.ExposedCollection;
 import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -91,6 +92,7 @@ class FileSettingsWindow extends Panel
 	public function new() 
 	{
 		super();
+		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
 	override function initialize():Void 
@@ -140,6 +142,22 @@ class FileSettingsWindow extends Panel
 		{
 			this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
 		}
+	}
+	
+	private function onAddedToStage(evt:Event):Void
+	{
+		this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		this.addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		
+		ValEditor.actionStack.pushSession();
+	}
+	
+	private function onRemovedFromStage(evt:Event):Void
+	{
+		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		this.removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
+		
+		ValEditor.actionStack.popSession();
 	}
 	
 	private function onCancelButton(evt:TriggerEvent):Void
