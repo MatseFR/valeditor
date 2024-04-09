@@ -143,6 +143,7 @@ class ValEditorActionSession extends EventDispatcher
 		}
 		
 		this._doneActions.unshift(action);
+		clearUndoneActions();
 		limitToUndoLevels();
 		this._lastAction = action;
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED, this, action);
