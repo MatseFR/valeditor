@@ -17,6 +17,9 @@ import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
+import valedit.value.ExposedColor;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -51,6 +54,14 @@ class ColorUI extends ValueUI
 		if (_POOL.length != 0) return _POOL.pop();
 		return new ColorUI();
 	}
+	
+	override function set_exposedValue(value:ExposedValue):ExposedValue
+	{
+		this._colorValue = cast value;
+		return super.set_exposedValue(value);
+	}
+	
+	private var _colorValue:ExposedColor;
 	
 	private var _previewGroup:LayoutGroup;
 	private var _label:Label;
@@ -100,6 +111,7 @@ class ColorUI extends ValueUI
 		}
 		
 		super.clear();
+		this._colorValue = null;
 	}
 	
 	public function pool():Void
@@ -250,6 +262,13 @@ class ColorUI extends ValueUI
 		super.initExposedValue();
 		this._label.text = this._exposedValue.name;
 		
+		this._redDragger.liveDragging = this._colorValue.liveDragging;
+		this._redDragger.liveTyping = this._colorValue.liveTyping;
+		this._greenDragger.liveDragging = this._colorValue.liveDragging;
+		this._greenDragger.liveTyping = this._colorValue.liveTyping;
+		this._blueDragger.liveDragging = this._colorValue.liveDragging;
+		this._blueDragger.liveTyping = this._colorValue.liveTyping;
+		
 		if (this._readOnly)
 		{
 			if (this._redGroup.parent != null)
@@ -350,6 +369,7 @@ class ColorUI extends ValueUI
 		
 		this._hexInput.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._hexInput.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._hexInput.removeEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		this._redDragger.removeEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
 		this._redDragger.removeEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 		this._greenDragger.removeEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
@@ -377,6 +397,7 @@ class ColorUI extends ValueUI
 		
 		this._hexInput.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._hexInput.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._hexInput.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		this._redDragger.addEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
 		this._redDragger.addEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 		this._greenDragger.addEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
@@ -387,6 +408,8 @@ class ColorUI extends ValueUI
 	
 	private function onHexInputChange(evt:Event):Void
 	{
+		if (!this._colorValue.liveTyping) return;
+		
 		this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
 		colorUpdate();
 	}
@@ -515,6 +538,41 @@ class ColorUI extends ValueUI
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
 		onValueChangeEnd(null);
+		if (!this._colorValue.liveTyping)
+		{
+			this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
+			colorUpdate();
+		}
+	}
+	
+	private function input_keyUpHandler(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
+			colorUpdate();
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			this._exposedValue.value = this._valueChangeAction.previousValue;
+			this._hexInput.text = ColorUtil.RGBtoHexString(this._exposedValue.value);
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
 	}
 	
 }
