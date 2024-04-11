@@ -14,6 +14,7 @@ import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -61,6 +62,7 @@ class StringUI extends ValueUI
 	}
 	
 	private var _stringValue:ExposedString;
+	private var _previousValue:String;
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
@@ -221,6 +223,7 @@ class StringUI extends ValueUI
 	
 	private function onInputChange(evt:Event):Void
 	{
+		if (!this._stringValue.liveTyping) return;
 		this._exposedValue.value = this._input.text;
 	}
 	
@@ -231,6 +234,30 @@ class StringUI extends ValueUI
 	
 	private function onInputKeyUp(evt:KeyboardEvent):Void
 	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			this._exposedValue.value = this._previousValue;
+			this._input.text = this._previousValue;
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
@@ -262,6 +289,8 @@ class StringUI extends ValueUI
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
+		this._previousValue = this._exposedValue.value;
+		
 		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
@@ -309,6 +338,10 @@ class StringUI extends ValueUI
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
+		if (!this._stringValue.liveTyping)
+		{
+			this._exposedValue.value = this._input.text;
+		}
 		onValueChangeEnd(null);
 	}
 	

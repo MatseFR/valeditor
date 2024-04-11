@@ -62,6 +62,7 @@ class ColorUI extends ValueUI
 	}
 	
 	private var _colorValue:ExposedColor;
+	private var _previousValue:Int;
 	
 	private var _previewGroup:LayoutGroup;
 	private var _label:Label;
@@ -329,7 +330,7 @@ class ColorUI extends ValueUI
 		updateEditable();
 	}
 	
-	private function colorUpdate():Void
+	private function colorUpdate(updateText:Bool = true):Void
 	{
 		var controlsEnabled:Bool = this._controlsEnabled;
 		if (controlsEnabled) controlsDisable();
@@ -342,7 +343,10 @@ class ColorUI extends ValueUI
 		{
 			var value:Int = this._exposedValue.value;
 			this._previewSkin.fill = FillStyle.SolidColor(value);
-			this._hexInput.text = ColorUtil.RGBtoHexString(value);
+			if (updateText)
+			{
+				this._hexInput.text = ColorUtil.RGBtoHexString(value);
+			}
 			this._redDragger.value = ColorUtil.getRed(value);
 			this._greenDragger.value = ColorUtil.getGreen(value);
 			this._blueDragger.value = ColorUtil.getBlue(value);
@@ -369,6 +373,7 @@ class ColorUI extends ValueUI
 		
 		this._hexInput.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._hexInput.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._hexInput.removeEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
 		this._hexInput.removeEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		this._redDragger.removeEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
 		this._redDragger.removeEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
@@ -397,6 +402,7 @@ class ColorUI extends ValueUI
 		
 		this._hexInput.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._hexInput.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._hexInput.addEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
 		this._hexInput.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 		this._redDragger.addEventListener(ValueUIEvent.CHANGE_BEGIN, onValueChangeBegin);
 		this._redDragger.addEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
@@ -411,7 +417,7 @@ class ColorUI extends ValueUI
 		if (!this._colorValue.liveTyping) return;
 		
 		this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
-		colorUpdate();
+		colorUpdate(false);
 	}
 	
 	private function onRedDraggerChange(evt:Event):Void
@@ -490,6 +496,8 @@ class ColorUI extends ValueUI
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
+		this._previousValue = this._exposedValue.value;
+		
 		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
@@ -537,20 +545,23 @@ class ColorUI extends ValueUI
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
-		onValueChangeEnd(null);
 		if (!this._colorValue.liveTyping)
 		{
 			this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
-			colorUpdate();
 		}
+		colorUpdate();
+		onValueChangeEnd(null);
+	}
+	
+	private function input_keyDownHandler(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function input_keyUpHandler(evt:KeyboardEvent):Void
 	{
 		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
 		{
-			this._exposedValue.value = Std.parseInt("0x" + this._hexInput.text);
-			colorUpdate();
 			if (this.focusManager != null)
 			{
 				this.focusManager.focus = null;
@@ -562,8 +573,12 @@ class ColorUI extends ValueUI
 		}
 		else if (evt.keyCode == Keyboard.ESCAPE)
 		{
-			this._exposedValue.value = this._valueChangeAction.previousValue;
+			this._exposedValue.value = this._previousValue;
 			this._hexInput.text = ColorUtil.RGBtoHexString(this._exposedValue.value);
+			if (this._colorValue.liveTyping)
+			{
+				colorUpdate();
+			}
 			if (this.focusManager != null)
 			{
 				this.focusManager.focus = null;
@@ -573,6 +588,7 @@ class ColorUI extends ValueUI
 				this.stage.focus = null;
 			}
 		}
+		evt.stopPropagation();
 	}
 	
 }

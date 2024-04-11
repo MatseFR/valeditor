@@ -3,6 +3,8 @@ import feathers.controls.TextInput;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valedit.value.base.ExposedValue;
 import valedit.value.ExposedPath;
 import valeditor.editor.action.MultiAction;
@@ -59,6 +61,7 @@ class PathUI extends ValueUI
 	}
 	
 	private var _pathValue:ExposedPath;
+	private var _previousValue:String;
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
@@ -217,6 +220,8 @@ class PathUI extends ValueUI
 		
 		this._pathInput.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._pathInput.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._pathInput.removeEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
+		this._pathInput.removeEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 	}
 	
 	override function controlsEnable():Void 
@@ -230,6 +235,8 @@ class PathUI extends ValueUI
 		
 		this._pathInput.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._pathInput.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._pathInput.addEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
+		this._pathInput.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 	}
 	
 	private function onClearButton(evt:TriggerEvent):Void
@@ -293,11 +300,14 @@ class PathUI extends ValueUI
 	
 	private function onPathInputChange(evt:Event):Void
 	{
+		if (!this._pathValue.liveTyping) return;
 		this._exposedValue.value = this._pathInput.text;
 	}
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
+		this._previousValue = this._exposedValue.value;
+		
 		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
@@ -345,7 +355,45 @@ class PathUI extends ValueUI
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
+		if (!this._pathValue.liveTyping)
+		{
+			this._exposedValue.value = this._pathInput.text;
+		}
 		onValueChangeEnd(null);
+	}
+	
+	private function input_keyDownHandler(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function input_keyUpHandler(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			this._exposedValue.value = this._previousValue;
+			this._pathInput.text = this._exposedValue.value;
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		evt.stopPropagation();
 	}
 	
 }

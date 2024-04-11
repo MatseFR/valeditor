@@ -14,6 +14,8 @@ import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -62,6 +64,7 @@ class IntRangeUI extends ValueUI
 	}
 	
 	private var _intRange:ExposedIntRange;
+	private var _previousValue:Int;
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
@@ -235,6 +238,8 @@ class IntRangeUI extends ValueUI
 		this._slider.removeEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 		this._input.removeEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._input.removeEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._input.removeEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
+		this._input.removeEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 	}
 	
 	override function controlsEnable():Void
@@ -250,10 +255,13 @@ class IntRangeUI extends ValueUI
 		this._slider.addEventListener(ValueUIEvent.CHANGE_END, onValueChangeEnd);
 		this._input.addEventListener(FocusEvent.FOCUS_IN, input_focusInHandler);
 		this._input.addEventListener(FocusEvent.FOCUS_OUT, input_focusOutHandler);
+		this._input.addEventListener(KeyboardEvent.KEY_DOWN, input_keyDownHandler);
+		this._input.addEventListener(KeyboardEvent.KEY_UP, input_keyUpHandler);
 	}
 	
 	private function onInputChange(evt:Event):Void
 	{
+		if (!this._intRange.liveTyping) return;
 		if (this._input.text == "") return;
 		this._exposedValue.value = Std.parseInt(this._input.text);
 		this._slider.value = this._exposedValue.value;
@@ -293,6 +301,8 @@ class IntRangeUI extends ValueUI
 	
 	private function onValueChangeBegin(evt:ValueUIEvent):Void
 	{
+		this._previousValue = this._exposedValue.value;
+		
 		if (!this._exposedValue.useActions) return;
 		
 		if (this._action != null)
@@ -340,7 +350,47 @@ class IntRangeUI extends ValueUI
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
+		if (!this._intRange.liveTyping)
+		{
+			this._exposedValue.value = Std.parseInt(this._input.text);
+			this._slider.value = this._exposedValue.value;
+		}
 		onValueChangeEnd(null);
+	}
+	
+	private function input_keyDownHandler(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function input_keyUpHandler(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			this._exposedValue.value = this._previousValue;
+			this._slider.value = this._exposedValue.value;
+			this._input.text = Std.string(this._exposedValue.value);
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		evt.stopPropagation();
 	}
 	
 }
