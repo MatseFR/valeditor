@@ -11,6 +11,7 @@ class EditorSettings
 	public var autoSave:Bool = true;
 	public var autoSaveInterval:Int = 5;
 	#end
+	public var releaseUIFocusOnValidation:Bool = true;
 	public var themeCustomValues:ExposedCollection;
 	public var uiDarkMode:Bool = false;
 	public var undoLevels:Int = 300;
@@ -22,6 +23,11 @@ class EditorSettings
 	
 	public function clear():Void
 	{
+		#if desktop
+		this.autoSave = true;
+		this.autoSaveInterval = 5;
+		#end
+		this.releaseUIFocusOnValidation = true;
 		if (this.themeCustomValues != null)
 		{
 			this.themeCustomValues.pool();
@@ -46,6 +52,7 @@ class EditorSettings
 		toSettings.autoSave = this.autoSave;
 		toSettings.autoSaveInterval = this.autoSaveInterval;
 		#end
+		toSettings.releaseUIFocusOnValidation = this.releaseUIFocusOnValidation;
 		if (toSettings.themeCustomValues == null)
 		{
 			toSettings.themeCustomValues = this.themeCustomValues.clone(true);
@@ -66,6 +73,7 @@ class EditorSettings
 		this.autoSave = json.autoSave;
 		this.autoSaveInterval = json.autoSaveInterval;
 		#end
+		this.releaseUIFocusOnValidation = json.releaseUIFocusOnValidation;
 		if (json.themeCustomValues != null)
 		{
 			this.themeCustomValues.fromJSONSave(json.themeCustomValues);
@@ -82,6 +90,7 @@ class EditorSettings
 		json.autoSave = this.autoSave;
 		json.autoSaveInterval = this.autoSaveInterval;
 		#end
+		json.releaseUIFocusOnValidation = this.releaseUIFocusOnValidation;
 		if (this.themeCustomValues.hasDifferenceWith(ValEditor.themeDefaultValues))
 		{
 			json.themeCustomValues = this.themeCustomValues.toJSONSave(null, false, ValEditor.themeDefaultValues);
