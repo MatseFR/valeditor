@@ -153,6 +153,8 @@ class FunctionUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._button.toolTip = this._exposedValue.toolTip;
+		
 		this._button.text = this._func.name;
 		
 		if (this._parameterControls.length != 0)

@@ -160,6 +160,8 @@ class SoundUI extends ValueUI
 			this._buttonGroup.addChild(this._clearButton);
 		}
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		updateEditable();
 	}

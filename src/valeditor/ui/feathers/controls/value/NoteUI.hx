@@ -82,6 +82,8 @@ class NoteUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._textValue.text;
 		cast(this._label.layoutData, HorizontalLayoutData).percentWidth = this._textValue.textPercentWidth;
 	}

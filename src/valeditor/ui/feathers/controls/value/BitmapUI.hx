@@ -136,6 +136,8 @@ class BitmapUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		if (this._readOnly)

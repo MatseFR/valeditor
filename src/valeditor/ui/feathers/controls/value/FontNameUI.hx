@@ -3,6 +3,7 @@ import feathers.controls.Button;
 import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
 import feathers.events.ListViewEvent;
@@ -15,6 +16,8 @@ import feathers.layout.VerticalLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.errors.Error;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.events.MouseEvent;
 import openfl.text.Font;
 import openfl.text.FontType;
 import valedit.events.ValueEvent;
@@ -188,7 +191,7 @@ class FontNameUI extends ValueUI
 		this._mainGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.TOP;
+		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
 		this._mainGroup.layout = hLayout;
 		addChild(this._mainGroup);
@@ -201,6 +204,14 @@ class FontNameUI extends ValueUI
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String {
 			return item.displayName;
+		};
+		this._list.listViewFactory = () ->
+		{
+			var lv:ListView = new ListView();
+			lv.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+			lv.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
+			lv.addEventListener(MouseEvent.CLICK, onListMouseClick);
+			return lv;
 		};
 		
 		var recycler = DisplayObjectRecycler.withFunction(()->{
@@ -232,6 +243,8 @@ class FontNameUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		
+		this._label.toolTip = this._exposedValue.toolTip;
 		
 		this._label.text = this._exposedValue.name;
 		
@@ -299,8 +312,11 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
+		this._list.removeEventListener(Event.CHANGE, onListChange);
 		this._list.removeEventListener(Event.CLOSE, onListClose);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
+		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -309,9 +325,41 @@ class FontNameUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
+		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(Event.CLOSE, onListClose);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
+		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+	}
+	
+	private function onListChange(evt:Event):Void
+	{
+		if (!this._fontName.selectOnKeyboardNavigation && this._list.open) return;
+		
+		if (this._list.selectedItem == null) return;
+		
+		if (this._exposedValue.useActions)
+		{
+			if (this._exposedValue.value != this._list.selectedItem.value)
+			{
+				var action:MultiAction = MultiAction.fromPool();
+				
+				var valueChange:ValueChange = ValueChange.fromPool();
+				valueChange.setup(this._exposedValue, this._list.selectedItem.value);
+				action.add(valueChange);
+				
+				var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+				valueUIUpdate.setup(this._exposedValue);
+				action.addPost(valueUIUpdate);
+				
+				ValEditor.actionStack.add(action);
+			}
+		}
+		else
+		{
+			this._exposedValue.value = this._list.selectedItem.value;
+		}
 	}
 	
 	private function onListClose(evt:Event):Void
@@ -344,6 +392,28 @@ class FontNameUI extends ValueUI
 		else
 		{
 			this._exposedValue.value = fontName;
+		}
+	}
+	
+	private function onListKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onListKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onListMouseClick(evt:MouseEvent):Void
+	{
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
 		}
 	}
 	

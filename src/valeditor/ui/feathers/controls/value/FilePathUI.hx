@@ -164,6 +164,8 @@ class FilePathUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		if (this._readOnly)
@@ -339,7 +341,7 @@ class FilePathUI extends ValueUI
 		}
 		
 		this._valueChangeAction.newValue = this._exposedValue.value;
-		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue || (this._valueChangeAction.newValue == "" && this._valueChangeAction.previousValue == null))
 		{
 			this._action.pool();
 		}

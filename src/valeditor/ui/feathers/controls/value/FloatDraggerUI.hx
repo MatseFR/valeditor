@@ -150,6 +150,8 @@ class FloatDraggerUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		this._dragger.minimum = this._floatValue.minimum;

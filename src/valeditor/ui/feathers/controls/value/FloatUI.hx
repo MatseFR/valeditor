@@ -156,6 +156,8 @@ class FloatUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		this._input.variant = this._floatValue.inputVariant;

@@ -3,6 +3,7 @@ import feathers.controls.Button;
 import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
 import feathers.data.ArrayCollection;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
@@ -13,6 +14,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
+import openfl.events.MouseEvent;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedSelectCombo;
@@ -117,6 +119,14 @@ class SelectComboUI extends ValueUI
 		this._list = new ComboBox(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String { return item.text; }
+		this._list.listViewFactory = () ->
+		{
+			var lv:ListView = new ListView();
+			lv.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
+			lv.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
+			lv.addEventListener(MouseEvent.CLICK, onListMouseClick);
+			return lv;
+		};
 		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();
@@ -138,6 +148,8 @@ class SelectComboUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		
+		this._label.toolTip = this._exposedValue.toolTip;
 		
 		this._label.text = this._exposedValue.name;
 		
@@ -203,15 +215,9 @@ class SelectComboUI extends ValueUI
 		if (this._readOnly) return;
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
-		if (this._combo.selectOnKeyboardNavigation)
-		{
-			this._list.addEventListener(Event.CHANGE, onListChange);
-		}
-		else
-		{
-			this._list.addEventListener(Event.CLOSE, onListClose);
-			this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
-		}
+		this._list.addEventListener(Event.CHANGE, onListChange);
+		this._list.addEventListener(Event.CLOSE, onListClose);
+		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
 		this._list.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
@@ -229,6 +235,8 @@ class SelectComboUI extends ValueUI
 	
 	private function onListChange(evt:Event):Void
 	{
+		if (!this._combo.selectOnKeyboardNavigation && this._list.open) return;
+		
 		if (this._list.selectedItem == null) return;
 		
 		if (this._exposedValue.useActions)
@@ -292,6 +300,18 @@ class SelectComboUI extends ValueUI
 		else
 		{
 			this._exposedValue.value = evt.state.data.value;
+		}
+	}
+	
+	private function onListMouseClick(evt:MouseEvent):Void
+	{
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
 		}
 	}
 	

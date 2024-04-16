@@ -152,6 +152,8 @@ class StringUI extends ValueUI
 	{
 		super.initExposedValue();
 		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		this._input.restrict = this._stringValue.restrict;
 		this._input.maxChars = this._stringValue.maxChars;
@@ -319,7 +321,7 @@ class StringUI extends ValueUI
 		}
 		
 		this._valueChangeAction.newValue = this._exposedValue.value;
-		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue)
+		if (this._valueChangeAction.newValue == this._valueChangeAction.previousValue || (this._valueChangeAction.newValue == "" && this._valueChangeAction.previousValue == null))
 		{
 			this._action.pool();
 		}

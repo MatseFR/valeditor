@@ -11,6 +11,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.MouseEvent;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
@@ -113,6 +114,9 @@ class BoolUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
@@ -170,6 +174,7 @@ class BoolUI extends ValueUI
 		if (!this._controlsEnabled) return;
 		super.controlsDisable();
 		this._check.removeEventListener(Event.CHANGE, onCheckChange);
+		this._check.removeEventListener(MouseEvent.CLICK, onCheckMouseClick);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -179,6 +184,7 @@ class BoolUI extends ValueUI
 		if (this._controlsEnabled) return;
 		super.controlsEnable();
 		this._check.addEventListener(Event.CHANGE, onCheckChange);
+		this._check.addEventListener(MouseEvent.CLICK, onCheckMouseClick);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -202,6 +208,18 @@ class BoolUI extends ValueUI
 		{
 			this._check.text = "";
 			this._exposedValue.value = this._check.selected;
+		}
+	}
+	
+	private function onCheckMouseClick(evt:MouseEvent):Void
+	{
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
 		}
 	}
 	

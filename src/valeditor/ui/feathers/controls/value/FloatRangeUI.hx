@@ -160,6 +160,9 @@ class FloatRangeUI extends ValueUI
 	override public function initExposedValue():Void 
 	{
 		super.initExposedValue();
+		
+		this._label.toolTip = this._exposedValue.toolTip;
+		
 		this._label.text = this._exposedValue.name;
 		
 		this._input.variant = this._floatRange.inputVariant;
