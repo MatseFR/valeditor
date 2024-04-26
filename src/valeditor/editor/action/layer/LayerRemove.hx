@@ -4,6 +4,7 @@ import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 import valeditor.editor.action.object.ObjectUnselect;
 import valeditor.utils.ArraySort;
 
@@ -25,6 +26,7 @@ class LayerRemove extends ValEditorAction
 	public var layers:Array<ValEditorLayer>;
 	public var layerIndices:Array<Int> = new Array<Int>();
 	
+	private var _action:MultiAction = MultiAction.fromPool();
 	private var _objectUnselect:ObjectUnselect = new ObjectUnselect();
 	
 	public function new() 
@@ -45,6 +47,7 @@ class LayerRemove extends ValEditorAction
 		this.layers = null;
 		this.layerIndices.resize(0);
 		
+		this._action.clear();
 		this._objectUnselect.clear();
 		
 		super.clear();
@@ -61,6 +64,7 @@ class LayerRemove extends ValEditorAction
 		this.container = container;
 		this.layers = layers;
 		
+		// unselect objects
 		this._objectUnselect.setup();
 		for (layer in this.layers)
 		{
@@ -69,6 +73,22 @@ class LayerRemove extends ValEditorAction
 				if (ValEditor.selection.hasObject(cast object))
 				{
 					this._objectUnselect.addObject(cast object);
+				}
+			}
+		}
+		
+		this._action.autoApply = false;
+		// remove objects
+		var objectRemoveKeyFrame:ObjectRemoveKeyFrame;
+		for (layer in this.layers)
+		{
+			for (keyFrame in layer.timeLine.keyFrames)
+			{
+				for (object in keyFrame.objects)
+				{
+					objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
+					objectRemoveKeyFrame.setup(cast object, cast keyFrame);
+					this._action.add(objectRemoveKeyFrame);
 				}
 			}
 		}
@@ -100,6 +120,7 @@ class LayerRemove extends ValEditorAction
 		}
 		
 		this._objectUnselect.apply();
+		this._action.apply();
 		
 		this.status = ValEditorActionStatus.DONE;
 	}
@@ -117,6 +138,7 @@ class LayerRemove extends ValEditorAction
 			this.container.addLayerAt(this.layers[i], this.layerIndices[i]);
 		}
 		
+		this._action.cancel();
 		this._objectUnselect.cancel();
 		
 		this.status = ValEditorActionStatus.UNDONE;
