@@ -310,6 +310,14 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 		this.layerCollection.addAt(cast layer, index);
 		super.addLayerAt(layer, index);
+		
+		// update layer indexes
+		var count:Int = this._layers.length;
+		for (i in index+1...count)
+		{
+			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);// this._layers[i].index++);
+		}
+		
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_ADDED, layer);
 		this.currentLayer = layer;
 	}
@@ -339,6 +347,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		var index:Int = this.layerCollection.indexOf(cast layer);
 		this.layerCollection.remove(cast layer);
 		super.removeLayer(layer);
+		
+		var count:Int = this._layers.length;
+		for (i in index...count)
+		{
+			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);
+		}
+		
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_REMOVED, layer);
 		if (this._currentLayer == layer)
 		{
@@ -355,6 +370,13 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		var layer:ValEditLayer = this._layers[index];
 		this.layerCollection.removeAt(index);
 		super.removeLayerAt(index);
+		
+		var count:Int = this._layers.length;
+		for (i in index...count)
+		{
+			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);
+		}
+		
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_REMOVED, layer);
 		if (this._currentLayer == layer)
 		{
@@ -366,8 +388,34 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		}
 	}
 	
+	public function setLayerIndex(layer:ValEditLayer, index:Int):Void
+	{
+		var prevIndex:Int = this._layers.indexOf(layer);
+		this._layers.splice(prevIndex, 1);
+		this._layers.insert(index, layer);
+		var layerCount:Int = this._layers.length - 1;
+		cast(layer, ValEditorLayer).index = layerCount - index;
+		
+		if (index > prevIndex)
+		{
+			for (i in prevIndex...index)
+			{
+				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);// this._layers[i].index--);
+			}
+		}
+		else
+		{
+			for (i in index + 1...prevIndex + 1)
+			{
+				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);// this._layers[i].index++);
+			}
+		}
+	}
+	
 	override function layerRegister(layer:ValEditLayer, index:Int):Void 
 	{
+		cast(layer, ValEditorLayer).index = this._layers.length - 1 - index;
+		
 		super.layerRegister(layer, index);
 		
 		layer.addEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
@@ -1235,9 +1283,9 @@ class ValEditorContainer extends ValEditContainer implements IAnimatable impleme
 		var layers:Array<Dynamic> = json.layers;
 		for (node in layers)
 		{
-			layer = ValEditorLayer.fromPool();
+			layer = ValEditorLayer.fromPool(ValEditorTimeLine.fromPool(0));
 			layer.fromJSONSave(node);
-			addLayer(layer);
+			addLayerAt(layer, 0);
 		}
 		
 		this.frameIndex = json.frameIndex;
