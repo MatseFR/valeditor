@@ -865,6 +865,11 @@ class ValEditor
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
 		
+		if (template.isSuspended)
+		{
+			cast(template.clss, ValEditorClass).unsuspendTemplate(template);
+		}
+		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.add(template);
 		
@@ -965,6 +970,8 @@ class ValEditor
 		template.removeEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
+		
+		cast(template.clss, ValEditorClass).suspendTemplate(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.remove(template);
