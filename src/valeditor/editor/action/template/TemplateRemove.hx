@@ -32,7 +32,8 @@ class TemplateRemove extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			this.template.pool();
+			//this.template.pool();
+			ValEditor.destroyTemplate(this.template);
 		}
 		this.template = null;
 		
