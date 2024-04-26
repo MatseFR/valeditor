@@ -4,6 +4,8 @@ import openfl.display.DisplayObjectContainer;
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
 import valedit.ValEditTemplate;
+import valeditor.editor.visibility.ClassVisibilityCollection;
+import valeditor.events.ClassEvent;
 import valeditor.events.RenameEvent;
 import valeditor.ui.IInteractiveObject;
 
@@ -35,6 +37,20 @@ class ValEditorClass extends ValEditClass
 	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
 	public var usePivotScaling:Bool;
+	public var visibilityCollection:ClassVisibilityCollection;
+	
+	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
+	private var _suspendedTemplates:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
+	
+	override function get_numInstances():Int 
+	{
+		return this._numObjects - this._suspendedInstances.length;
+	}
+	
+	override function get_numTemplates():Int 
+	{
+		return this._numTemplates - this._suspendedTemplates.length;
+	}
 
 	public function new(classReference:Class<Dynamic>)
 	{
@@ -56,6 +72,11 @@ class ValEditorClass extends ValEditClass
 		this.interactiveFactory = null;
 		this.useBounds = false;
 		this.usePivotScaling = false;
+		if (this.visibilityCollection != null)
+		{
+			this.visibilityCollection.pool();
+			this.visibilityCollection = null;
+		}
 		
 		super.clear();
 	}
@@ -166,7 +187,27 @@ class ValEditorClass extends ValEditClass
 	{
 		super.removeTemplate(template);
 		
+		if (cast(template, ValEditorTemplate).isSuspended)
+		{
+			this._suspendedTemplates.remove(cast template);
+			cast(template, ValEditorTemplate).isSuspended = false;
+		}
+		
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
+	}
+	
+	public function suspendTemplate(template:ValEditorTemplate):Void
+	{
+		this._suspendedTemplates.push(template);
+		template.isSuspended = true;
+		ClassEvent.dispatch(this, ClassEvent.TEMPLATE_SUSPENDED, this);
+	}
+	
+	public function unsuspendTemplate(template:ValEditorTemplate):Void
+	{
+		this._suspendedTemplates.remove(template);
+		template.isSuspended = false;
+		ClassEvent.dispatch(this, ClassEvent.TEMPLATE_UNSUSPENDED, this);
 	}
 	
 	private function onTemplateRenamed(evt:RenameEvent):Void
