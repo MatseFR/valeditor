@@ -2,6 +2,7 @@ package valeditor;
 
 import openfl.display.BitmapData;
 import valedit.ValEditClassSettings;
+import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.ui.IInteractiveObject;
 
 /**
@@ -40,6 +41,8 @@ class ValEditorClassSettings extends ValEditClassSettings
 	/** tells if pivot values should be scaled when clicking/moving object
 	 *  @default false */
 	public var usePivotScaling:Bool;
+	
+	public var visibilityCollection:ClassVisibilityCollection;
 
 	public function new() 
 	{
@@ -48,6 +51,12 @@ class ValEditorClassSettings extends ValEditClassSettings
 	
 	override public function clear():Void 
 	{
+		if (this.visibilityCollection != null)
+		{
+			this.visibilityCollection.pool();
+			this.visibilityCollection = null;
+		}
+		
 		super.clear();
 		
 		this.canBeCreated = true;
