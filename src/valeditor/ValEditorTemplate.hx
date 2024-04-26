@@ -6,6 +6,7 @@ import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.utils.ReverseIterator;
 import valedit.value.base.ExposedValue;
+import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
@@ -28,7 +29,9 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	public var isInClipboard:Bool = false;
 	public var isInLibrary:Bool = false;
+	public var isSuspended:Bool = false;
 	public var lockInstanceUpdates:Bool = false;
+	public var visibilityCollection:TemplateVisibilityCollection;
 	
 	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
@@ -88,6 +91,7 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		this.isInClipboard = false;
 		this.isInLibrary = false;
+		this.isSuspended = false;
 		this.lockInstanceUpdates = false;
 		this._objectIDIndex = -1;
 		
@@ -95,6 +99,12 @@ class ValEditorTemplate extends ValEditTemplate
 		{
 			ValEditor.destroyObject(cast this.object);
 			this.object = null;
+		}
+		
+		if (this.visibilityCollection != null)
+		{
+			this.visibilityCollection.pool();
+			this.visibilityCollection = null;
 		}
 		
 		for (i in new ReverseIterator(this._instances.length - 1, 0))
@@ -115,7 +125,7 @@ class ValEditorTemplate extends ValEditTemplate
 	
 	override public function canBeDestroyed():Bool 
 	{
-		return super.canBeDestroyed() && !this.isInLibrary && !this.isInClipboard;
+		return super.canBeDestroyed() && !this.isInLibrary && !this.isInClipboard && !this.isSuspended;
 	}
 	
 	override public function addInstance(instance:ValEditObject):Void 
@@ -225,6 +235,14 @@ class ValEditorTemplate extends ValEditTemplate
 		this.collection.fromJSONSave(json.collection);
 		this.collection.apply();
 		this.constructorCollection.fromJSONSave(json.constructorCollection);
+		if (json.visibilityCollection != null)
+		{
+			if (this.visibilityCollection == null)
+			{
+				this.visibilityCollection = TemplateVisibilityCollection.fromPool();
+			}
+			this.visibilityCollection.fromJSON(json.visibilityCollection);
+		}
 		
 		var instance:ValEditorObject;
 		var instances:Array<Dynamic> = json.instances;
@@ -240,6 +258,11 @@ class ValEditorTemplate extends ValEditTemplate
 		json.id = this.id;
 		json.collection = this.collection.toJSONSave();
 		json.constructorCollection = this.constructorCollection.toJSONSave();
+		
+		if (this.visibilityCollection != null)
+		{
+			json.visibilityCollection = this.visibilityCollection.toJSON();
+		}
 		
 		var instances:Array<Dynamic> = [];
 		for (instance in this._instances)
