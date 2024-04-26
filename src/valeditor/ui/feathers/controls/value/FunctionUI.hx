@@ -80,9 +80,11 @@ class FunctionUI extends ValueUI
 			control.pool();
 		}
 		this._parameterControls.resize(0);
+		this._parameterGroup.selected = false;
 		if (this._parameterGroup.parent != null)
 		{
 			removeChild(this._parameterGroup);
+			removeChild(this._bottomGroup);
 		}
 		this._func = null;
 	}
@@ -166,6 +168,7 @@ class FunctionUI extends ValueUI
 			}
 			this._parameterControls.resize(0);
 			removeChild(this._parameterGroup);
+			removeChild(this._bottomGroup);
 		}
 		
 		var exposedValues:Array<ExposedValue> = this._func.getExposedValueParameters();
@@ -179,6 +182,11 @@ class FunctionUI extends ValueUI
 				this._parameterControls.push(uiControl);
 			}
 			addChild(this._parameterGroup);
+			this._parameterGroup.selected = this._func.isParametersUIOpen;
+			if (this._func.isParametersUIOpen)
+			{
+				addChild(this._bottomGroup);
+			}
 		}
 		
 		updateEditable();
@@ -248,6 +256,7 @@ class FunctionUI extends ValueUI
 	
 	private function onParameterGroupChange(evt:Event):Void
 	{
+		this._func.isParametersUIOpen = this._parameterGroup.selected;
 		if (this._parameterGroup.selected)
 		{
 			addChild(this._bottomGroup);
