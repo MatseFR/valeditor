@@ -1,6 +1,7 @@
 package valeditor;
 
 import feathers.data.ArrayCollection;
+import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
 import valedit.DisplayObjectType;
 import valedit.ValEditLayer;
@@ -24,8 +25,34 @@ class ValEditorLayer extends ValEditLayer
 		return new ValEditorLayer(timeLine);
 	}
 	
+	public var index(get, set):Int;
 	public var objectCollection(default, null):ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	public var selected(get, set):Bool;
+	
+	private var _index:Int = -1;
+	private function get_index():Int { return this._index; }
+	private function set_index(value:Int):Int
+	{
+		if (this._index == value) return value;
+		
+		if (this._rootContainer != null)
+		{
+			if (this._displayContainer != null)
+			{
+				this._rootContainer.setChildIndex(this._displayContainer, value);
+			}
+		}
+		#if starling
+		if (this._rootContainerStarling != null)
+		{
+			if (this._displayContainerStarling != null)
+			{
+				this._rootContainerStarling.setChildIndex(this._displayContainerStarling, value);
+			}
+		}
+		#end
+		return this._index = value;
+	}
 	
 	override function set_locked(value:Bool):Bool 
 	{
@@ -43,6 +70,48 @@ class ValEditorLayer extends ValEditLayer
 		RenameEvent.dispatch(this, RenameEvent.RENAMED, previousName);
 		return this._name;
 	}
+	
+	override function set_rootContainer(value:DisplayObjectContainer):DisplayObjectContainer 
+	{
+		if (this._rootContainer == value) return value;
+		if (value != null)
+		{
+			if (this._displayContainer != null && this._index != -1)
+			{
+				value.addChildAt(this._displayContainer, this._index);
+			}
+		}
+		else if (this._rootContainer != null)
+		{
+			if (this._displayContainer != null)
+			{
+				this._rootContainer.removeChild(this._displayContainer);
+			}
+		}
+		return this._rootContainer = value;
+	}
+	
+	#if starling
+	override function set_rootContainerStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer 
+	{
+		if (this._rootContainerStarling == value) return value;
+		if (value != null)
+		{
+			if (this._displayContainerStarling != null && this._index != -1)
+			{
+				value.addChildAt(this._displayContainerStarling, this._index);
+			}
+		}
+		else if (this._rootContainerStarling != null)
+		{
+			if (this._displayContainerStarling != null)
+			{
+				this._rootContainerStarling.removeChild(this._displayContainerStarling);
+			}
+		}
+		return this._rootContainerStarling = value;
+	}
+	#end
 	
 	private var _selected:Bool = false;
 	private function get_selected():Bool { return this._selected; }
@@ -75,6 +144,9 @@ class ValEditorLayer extends ValEditLayer
 	{
 		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(0);
 		super(timeLine);
+		createDisplayContainer();
+		createDisplayContainerStarling();
+		this._clearContainers = false;
 	}
 	
 	override public function clear():Void 
@@ -89,6 +161,15 @@ class ValEditorLayer extends ValEditLayer
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	/**
+	   This will change the layer's index without triggering removeChild/AddChild calls
+	   @param	newIndex
+	**/
+	public function indexUpdate(newIndex:Int):Void
+	{
+		this._index = newIndex;
 	}
 	
 	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
@@ -177,6 +258,22 @@ class ValEditorLayer extends ValEditLayer
 		}
 		
 		this.objectCollection.remove(editorObject);
+	}
+	
+	override function addDisplayContainer():Void 
+	{
+		if (this._rootContainer != null && this._index != -1)
+		{
+			this._rootContainer.addChildAt(this._displayContainer, this._index);
+		}
+	}
+	
+	override function addDisplayContainerStarling():Void 
+	{
+		if (this._rootContainerStarling != null && this._index != -1)
+		{
+			this._rootContainerStarling.addChildAt(this._displayContainerStarling, this._index);
+		}
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void
