@@ -16,11 +16,15 @@ class ClassVisibilityCollection
 		return new ClassVisibilityCollection();
 	}
 	
+	public var classID:String;
 	public var numValues(get, never):Int;
+	public var valueList(get, never):Array<ClassValueVisibility>;
 	
 	private function get_numValues():Int { return this._valueList.length; }
 	
 	private var _valueList:Array<ClassValueVisibility> = new Array<ClassValueVisibility>();
+	private function get_valueList():Array<ClassValueVisibility> { return this._valueList; }
+	
 	private var _valueMap:Map<String, ClassValueVisibility> = new Map<String, ClassValueVisibility>();
 
 	public function new() 
@@ -30,6 +34,7 @@ class ClassVisibilityCollection
 	
 	public function clear():Void
 	{
+		this.classID = null;
 		for (value in this._valueList)
 		{
 			value.pool();
@@ -57,6 +62,8 @@ class ClassVisibilityCollection
 			value = collection.getValue(visibility.propertyName);
 			value.visible = visibility.objectVisible;
 		}
+		collection.checkGroupsVisibility(false);
+		collection.updateUI();
 	}
 	
 	public function applyToTemplateCollection(collection:ExposedCollection):Void
@@ -67,6 +74,8 @@ class ClassVisibilityCollection
 			value = collection.getValue(visibility.propertyName);
 			value.visible = visibility.templateVisible;
 		}
+		collection.checkGroupsVisibility(false);
+		collection.updateUI();
 	}
 	
 	public function applyToTemplateObjectCollection(collection:ExposedCollection):Void
@@ -77,6 +86,8 @@ class ClassVisibilityCollection
 			value = collection.getValue(visibility.propertyName);
 			value.visible = visibility.templateObjectVisible;
 		}
+		collection.checkGroupsVisibility(false);
+		collection.updateUI();
 	}
 	
 	public function add(visibility:ClassValueVisibility):Void
@@ -93,6 +104,17 @@ class ClassVisibilityCollection
 	public function has(propertyName:String):Bool
 	{
 		return this._valueMap.exists(propertyName);
+	}
+	
+	public function isDifferentFrom(collection:ClassVisibilityCollection):Bool
+	{
+		var otherValue:ClassValueVisibility;
+		for (value in this._valueList)
+		{
+			otherValue = collection.get(value.propertyName);
+			if (value.isDifferentFrom(otherValue)) return true;
+		}
+		return false;
 	}
 	
 	public function remove(visibility:ClassValueVisibility):Void
@@ -120,8 +142,22 @@ class ClassVisibilityCollection
 		}
 	}
 	
+	public function clone(?toCollection:ClassVisibilityCollection):ClassVisibilityCollection
+	{
+		if (toCollection == null) toCollection = fromPool();
+		
+		toCollection.classID = this.classID;
+		for (value in this._valueList)
+		{
+			toCollection.add(value.clone());
+		}
+		
+		return toCollection;
+	}
+	
 	public function fromJSON(json:Dynamic):Void
 	{
+		this.classID = json.id;
 		var data:Array<Dynamic> = json.values;
 		var value:ClassValueVisibility;
 		for (node in data)
@@ -136,6 +172,7 @@ class ClassVisibilityCollection
 	{
 		if (json == null) json = {};
 		
+		json.id = this.classID;
 		var data:Array<Dynamic> = [];
 		for (value in this._valueList)
 		{

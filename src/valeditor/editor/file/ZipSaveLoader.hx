@@ -5,7 +5,9 @@ import haxe.io.Bytes;
 import haxe.io.BytesInput;
 import haxe.zip.Entry;
 import haxe.zip.Reader;
+#if !air
 import lime.media.AudioBuffer;
+#end
 import openfl.display.BitmapData;
 import openfl.errors.Error;
 import openfl.events.Event;
@@ -174,7 +176,9 @@ class ZipSaveLoader extends EventDispatcher
 	
 	private function nextSoundAsset():Void
 	{
+		#if !air
 		var buffer:AudioBuffer;
+		#end
 		var sound:Sound;
 		for (i in 0...this._assetCount)
 		{

@@ -1,6 +1,9 @@
 package valeditor.editor.settings;
 import haxe.io.Path;
 import juggler.animation.Transitions;
+import valeditor.ValEditorClass;
+import valeditor.editor.visibility.ClassVisibilitiesCollection;
+import valeditor.editor.visibility.ClassVisibilityCollection;
 
 /**
  * ...
@@ -17,6 +20,7 @@ class FileSettings
 	}
 	
 	public var compress:Bool = false;
+	public var customClassVisibilities:ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
 	public var fileName:String;
 	public var filePath:String;
 	public var frameRateDefault:Float = 60;
@@ -56,6 +60,7 @@ class FileSettings
 	public function clear():Void
 	{
 		this.compress = false;
+		this.customClassVisibilities.clear();
 		this.fileName = "untitled." + ValEditor.fileExtension;
 		this.filePath = null;
 		this.frameRateDefault = 60;
@@ -64,10 +69,32 @@ class FileSettings
 		this.tweenTransitionDefault = Transitions.LINEAR;
 	}
 	
+	public function reset():Void
+	{
+		this.customClassVisibilities.clear();
+	}
+	
 	public function pool():Void
 	{
 		clear();
 		_POOL.push(this);
+	}
+	
+	public function apply():Void
+	{
+		//var clss:ValEditorClass;
+		//for (collection in this.customClassVisibilities)
+		//{
+			//clss = ValEditor.getValEditorClassByClassName(collection.classID);
+			//clss.visibilityCollectionFile = collection;
+		//}
+		
+		var collection:ClassVisibilityCollection;
+		for (clss in ValEditor.classCollection)
+		{
+			collection = this.customClassVisibilities.get(clss.className);
+			clss.visibilityCollectionFile = collection;
+		}
 	}
 	
 	public function clone(toSettings:FileSettings = null):FileSettings
@@ -75,6 +102,9 @@ class FileSettings
 		if (toSettings == null) toSettings = fromPool();
 		
 		toSettings.compress = this.compress;
+		
+		this.customClassVisibilities.clone(toSettings.customClassVisibilities);
+		
 		toSettings.fileName = this.fileName;
 		toSettings.filePath = this.filePath;
 		toSettings.frameRateDefault = this.frameRateDefault;
@@ -88,6 +118,12 @@ class FileSettings
 	public function fromJSON(json:Dynamic):Void
 	{
 		this.compress = json.compress;
+		
+		if (json.customClassVisibilities != null)
+		{
+			this.customClassVisibilities.fromJSON(json.customClassVisibilities);
+		}
+		
 		this.frameRateDefault = json.frameRateDefault;
 		this.numFramesAutoIncrease = json.numFramesAutoIncrease;
 		this.numFramesDefault = json.numFramesDefault;
@@ -99,6 +135,12 @@ class FileSettings
 		if (json == null) json = {};
 		
 		json.compress = this.compress;
+		
+		if (this.customClassVisibilities.numClasses != 0)
+		{
+			json.customClassVisibilities = this.customClassVisibilities.toJSON();
+		}
+		
 		json.frameRateDefault = this.frameRateDefault;
 		json.numFramesAutoIncrease = this.numFramesAutoIncrease;
 		json.numFramesDefault = this.numFramesDefault;

@@ -11,6 +11,8 @@ import valedit.events.ValueEvent;
 import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
 import valeditor.editor.change.IChangeUpdate;
+import valeditor.editor.visibility.ClassVisibilityCollection;
+import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ObjectEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
@@ -228,6 +230,62 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	{
 		super.ready();
 		this._boundsFunction = Reflect.field(this.object, this.getBoundsFunctionName);
+	}
+	
+	public function applyClassVisibility(visibility:ClassVisibilityCollection):Void
+	{
+		if (this.template == null)
+		{
+			visibility.applyToObjectCollection(this._defaultCollection);
+			for (collection in this._keyFrameToCollection)
+			{
+				visibility.applyToObjectCollection(collection);
+			}
+		}
+		else
+		{
+			visibility.applyToTemplateObjectCollection(this._defaultCollection);
+			for (collection in this._keyFrameToCollection)
+			{
+				visibility.applyToTemplateObjectCollection(collection);
+			}
+		}
+	}
+	
+	public function applyTemplateVisibility(visibility:TemplateVisibilityCollection):Void
+	{
+		visibility.applyToTemplateObjectCollection(this._defaultCollection);
+		for (collection in this._keyFrameToCollection)
+		{
+			visibility.applyToTemplateObjectCollection(collection);
+		}
+	}
+	
+	override public function createCollectionForKeyFrame(keyFrame:ValEditKeyFrame):ExposedCollection 
+	{
+		var collection:ExposedCollection = null;
+		var previousFrame:ValEditKeyFrame = keyFrame.timeLine.getPreviousKeyFrame(keyFrame);
+		if (previousFrame != null && this._keyFrameToCollection.exists(previousFrame))
+		{
+			collection = this._keyFrameToCollection.get(previousFrame).clone(true);
+		}
+		
+		if (collection == null)
+		{
+			collection = this.clss.getCollection();
+			collection.readValuesFromObject(this.object);
+		}
+		
+		if (this.template != null)
+		{
+			cast(this.template, ValEditorTemplate).visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
+		}
+		else
+		{
+			cast(this.clss, ValEditorClass).visibilityCollectionCurrent.applyToObjectCollection(collection);
+		}
+		
+		return collection;
 	}
 	
 	public function backupKeyFrames():Void

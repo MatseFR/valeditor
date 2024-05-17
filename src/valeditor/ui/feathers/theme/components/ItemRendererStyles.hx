@@ -1,9 +1,12 @@
 package valeditor.ui.feathers.theme.components;
 import feathers.controls.ToggleButtonState;
 import feathers.controls.dataRenderers.ItemRenderer;
+import feathers.layout.HorizontalAlign;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
+import openfl.text.TextFormatAlign;
+import valeditor.ui.feathers.renderers.CheckItemRenderer;
 import valeditor.ui.feathers.renderers.FontDataItemRenderer;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.variant.ItemRendererVariant;
@@ -23,6 +26,16 @@ class ItemRendererStyles
 		if (styleProvider.getStyleFunction(ItemRenderer, ItemRendererVariant.CRAMPED) == null)
 		{
 			styleProvider.setStyleFunction(ItemRenderer, ItemRendererVariant.CRAMPED, cramped);
+		}
+		
+		if (styleProvider.getStyleFunction(ItemRenderer, ItemRendererVariant.RIGHT_ALIGNED) == null)
+		{
+			styleProvider.setStyleFunction(ItemRenderer, ItemRendererVariant.RIGHT_ALIGNED, rightAligned);
+		}
+		
+		if (styleProvider.getStyleFunction(CheckItemRenderer, null) == null)
+		{
+			styleProvider.setStyleFunction(CheckItemRenderer, null, checkItem);
 		}
 		
 		if (styleProvider.getStyleFunction(FontDataItemRenderer, null) == null)
@@ -83,6 +96,20 @@ class ItemRendererStyles
 		itemRenderer.horizontalAlign = LEFT;
 	}
 	
+	static private function checkItem(itemRenderer:CheckItemRenderer):Void
+	{
+		if (itemRenderer.backgroundSkin == null)
+		{
+			var skin = new UnderlineSkin();
+			skin.fill = theme.getLightFillLight();
+			skin.border = theme.getLightBorderDark();
+			skin.selectedFill = theme.getThemeFill();
+			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+			itemRenderer.backgroundSkin = skin;
+		}
+	}
+	
 	static private function fontDataItem(itemRenderer:FontDataItemRenderer):Void
 	{
 		var isDesktop = DeviceUtil.isDesktop();
@@ -134,6 +161,49 @@ class ItemRendererStyles
 			}
 			itemRenderer.backgroundSkin = skin;
 		}
+	}
+	
+	static private function rightAligned(itemRenderer:ItemRenderer):Void
+	{
+		var isDesktop = DeviceUtil.isDesktop();
+		
+		if (itemRenderer.backgroundSkin == null) {
+			var skin = new UnderlineSkin();
+			skin.fill = theme.getLightFillLight();
+			skin.border = theme.getLightBorderDark();
+			skin.selectedFill = theme.getThemeFill();
+			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+			if (isDesktop) {
+				skin.width = 32.0;
+				skin.height = 32.0;
+				skin.minWidth = 32.0;
+				skin.minHeight = 32.0;
+			} else {
+				skin.width = 44.0;
+				skin.height = 44.0;
+				skin.minWidth = 44.0;
+				skin.minHeight = 44.0;
+			}
+			itemRenderer.backgroundSkin = skin;
+		}
+		
+		if (itemRenderer.textFormat == null) {
+			itemRenderer.textFormat = theme.getTextFormat();
+		}
+		if (itemRenderer.disabledTextFormat == null) {
+			itemRenderer.disabledTextFormat = theme.getTextFormat_disabled();
+		}
+		if (itemRenderer.secondaryTextFormat == null) {
+			itemRenderer.secondaryTextFormat = theme.getTextFormat_small();
+		}
+		if (itemRenderer.disabledSecondaryTextFormat == null) {
+			itemRenderer.disabledSecondaryTextFormat = theme.getTextFormat_small_disabled();
+		}
+		
+		itemRenderer.horizontalAlign = HorizontalAlign.RIGHT;
+		itemRenderer.paddingLeft = Padding.DEFAULT;
+		itemRenderer.paddingRight = Padding.DEFAULT;
 	}
 	
 }

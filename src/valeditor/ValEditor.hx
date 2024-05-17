@@ -25,7 +25,6 @@ import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
-import valedit.ValEditTemplate;
 import valedit.animation.ValEditUpdater;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetSource;
@@ -48,6 +47,9 @@ import valeditor.editor.file.ZipSaveLoader;
 import valeditor.editor.settings.EditorSettings;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
+import valeditor.editor.visibility.ClassVisibilitiesCollection;
+import valeditor.editor.visibility.ClassVisibilityCollection;
+import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.EditorEvent;
 import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
@@ -108,6 +110,8 @@ class ValEditor
 	static public var classCollection(default, null):ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	static public var classNameCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
+	
+	static public var classVisibilities(default, null):ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
 	
 	static public var isMouseOverUI:Bool;
 	static public var juggler(default, null):Juggler;
@@ -223,7 +227,7 @@ class ValEditor
 	static private var _classNameToStringData:Map<String, StringData> = new Map<String, StringData>();
 	
 	static private var _classMap:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
-	static private var _displayMap:Map<DisplayObjectContainer, ValEditClass> = new Map<DisplayObjectContainer, ValEditClass>();
+	static private var _displayMap:Map<DisplayObjectContainer, ValEditorClass> = new Map<DisplayObjectContainer, ValEditorClass>();
 	static private var _uiClassMap:Map<String, Void->IValueUI> = new Map<String, Void->IValueUI>();
 	
 	static private var _liveActionManager:LiveInputActionManager;
@@ -305,7 +309,7 @@ class ValEditor
 		
 		ValEdit.assetLib.reset();
 		
-		fileSettings.clear();
+		//fileSettings.clear();
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -363,7 +367,7 @@ class ValEditor
 			_classNameToStringData.set(className, strClass);
 		}
 		
-		var v:ValEditorClass = ValEditorClass.fromPool(type);
+		var v:ValEditorClass = ValEditorClass.fromPool(type, className, settings.collection, settings.constructorCollection);
 		
 		var result:ValEditClass = ValEdit.registerClass(type, settings, v);
 		if (result == null)
@@ -381,6 +385,16 @@ class ValEditor
 		{
 			v.addCategory(category);
 		}
+		if (settings.visibilityCollection == null)
+		{
+			settings.visibilityCollection = ClassVisibilityCollection.fromPool();
+			settings.visibilityCollection.populateFromExposedCollection(settings.collection);
+		}
+		v.visibilityCollectionDefault = settings.visibilityCollection;
+		v.visibilityCollectionDefault.classID = className;
+		
+		classVisibilities.add(v.visibilityCollectionDefault);
+		
 		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
@@ -466,13 +480,11 @@ class ValEditor
 		return v;
 	}
 	
-	static public function registerClassSimple(type:Class<Dynamic>, canBeCreated:Bool = true, objectCollection:ExposedCollection, templateCollection:ExposedCollection = null,
-											   constructorCollection:ExposedCollection = null, categories:Array<String> = null, iconBitmapData:BitmapData = null):ValEditorClass
+	static public function registerClassSimple(type:Class<Dynamic>, canBeCreated:Bool = true, collection:ExposedCollection, constructorCollection:ExposedCollection = null, categories:Array<String> = null, iconBitmapData:BitmapData = null):ValEditorClass
 	{
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		settings.canBeCreated = canBeCreated;
-		settings.objectCollection = objectCollection;
-		settings.templateCollection = templateCollection;
+		settings.collection = collection;
 		settings.constructorCollection = constructorCollection;
 		getClassSettings(type, settings);
 		
@@ -589,14 +601,14 @@ class ValEditor
 		
 		var clss:Class<Dynamic> = Type.getClass(object);
 		var className:String = Type.getClassName(clss);
-		var valClass:ValEditClass = _classMap[className];
+		var valClass:ValEditorClass = _classMap[className];
 		
-		if (Std.isOfType(object, ValEditObject))
+		if (Std.isOfType(object, ValEditorObject))
 		{
-			valClass = cast(object, ValEditObject).clss;
+			valClass = cast cast(object, ValEditorObject).clss;
 			if (collection == null)
 			{
-				collection = cast(object, ValEditObject).currentCollection;
+				collection = cast(object, ValEditorObject).currentCollection;
 			}
 		}
 		else
@@ -629,6 +641,16 @@ class ValEditor
 		}
 	}
 	
+	static public function editClassVisibilitiesEditor():Void
+	{
+		FeathersWindows.showClassVisibilitiesWindow(editorSettings.customClassVisibilities, classVisibilities, "Editor classes visibilities");
+	}
+	
+	static public function editClassVisibilitiesFile():Void
+	{
+		FeathersWindows.showClassVisibilitiesWindow(fileSettings.customClassVisibilities, editorSettings.customClassVisibilities, "File classes visibilities");
+	}
+	
 	static public function editConstructor(className:String, ?container:DisplayObjectContainer):ExposedCollection
 	{
 		if (container == null) container = uiContainerDefault;
@@ -641,7 +663,7 @@ class ValEditor
 		
 		if (className == null) return null;
 		
-		var valClass:ValEditClass = _classMap[className];
+		var valClass:ValEditorClass = _classMap[className];
 		if (valClass != null)
 		{
 			if (valClass.constructorCollection != null)
@@ -671,7 +693,7 @@ class ValEditor
 	}
 	
 	
-	static public function editTemplate(template:ValEditTemplate, ?container:DisplayObjectContainer):Void
+	static public function editTemplate(template:ValEditorTemplate, ?container:DisplayObjectContainer):Void
 	{
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
@@ -683,7 +705,7 @@ class ValEditor
 		
 		if (template == null) return;
 		
-		var valClass:ValEditClass = template.clss;
+		var valClass:ValEditorClass = cast template.clss;
 		_displayMap[container] = valClass;
 		valClass.addTemplateContainer(container, template);
 	}
@@ -705,7 +727,7 @@ class ValEditor
 			throw new Error("ValEditor.clearContainer ::: null container");
 		}
 		
-		var valClass:ValEditClass = _displayMap[container];
+		var valClass:ValEditorClass = _displayMap[container];
 		if (valClass != null)
 		{
 			valClass.removeContainer(container);
@@ -740,6 +762,8 @@ class ValEditor
 		
 		ValEdit.createObjectWithClassName(className, id, params, valObject, collection);
 		
+		valObject.applyClassVisibility(valClass.visibilityCollectionCurrent);
+		
 		if (valClass.interactiveFactory != null)
 		{
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
@@ -772,6 +796,10 @@ class ValEditor
 		template.object = createObjectWithTemplate(template, id, template.collection, false);
 		template.object.currentCollection.readValues();
 		
+		var visibility:TemplateVisibilityCollection = TemplateVisibilityCollection.fromPool();
+		visibility.populateFromClassVisibilityCollection(valClass.visibilityCollectionCurrent);
+		template.visibilityCollectionDefault = visibility;
+		
 		registerTemplateInternal(template);
 		
 		return template;
@@ -799,6 +827,11 @@ class ValEditor
 		
 		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
 		
+		if (registerToTemplate)
+		{
+			valObject.applyTemplateVisibility(template.visibilityCollectionCurrent);
+		}
+		
 		if (valClass.interactiveFactory != null)
 		{
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
@@ -812,9 +845,9 @@ class ValEditor
 		return valObject;
 	}
 	
-	static public function cloneObject(object:ValEditObject, ?id:String):ValEditObject
+	static public function cloneObject(object:ValEditorObject, ?id:String):ValEditorObject
 	{
-		var newObject:ValEditObject;
+		var newObject:ValEditorObject;
 		if (object.template != null)
 		{
 			newObject = createObjectWithTemplate(cast object.template, id, object.currentCollection.clone(true));
@@ -993,7 +1026,7 @@ class ValEditor
 	
 	static public function checkForClassProperty(clss:ValEditorClass, propertyName:String):Bool
 	{
-		if (clss.objectCollection.hasValue(propertyName))
+		if (clss.collection.hasValue(propertyName))
 		{
 			return true;
 		}
@@ -1020,7 +1053,7 @@ class ValEditor
 	
 	static public function getCollectionForObject(object:Dynamic):ExposedCollection
 	{
-		var valClass:ValEditorClass = getValEditClassByClass(ValEdit.getObjectClass(object));
+		var valClass:ValEditorClass = getValEditorClassByClass(ValEdit.getObjectClass(object));
 		if (valClass != null)
 		{
 			return valClass.getCollection();
@@ -1028,12 +1061,12 @@ class ValEditor
 		return null;
 	}
 	
-	static public function getValEditClassByClass(clss:Class<Dynamic>):ValEditorClass
+	static public function getValEditorClassByClass(clss:Class<Dynamic>):ValEditorClass
 	{
 		return _classMap.get(Type.getClassName(clss));
 	}
 	
-	static public function getValEditClassByClassName(className:String):ValEditorClass
+	static public function getValEditorClassByClassName(className:String):ValEditorClass
 	{
 		return _classMap.get(className);
 	}
@@ -1458,6 +1491,7 @@ class ValEditor
 	{
 		_zipSaveLoader.removeEventListener(Event.COMPLETE, fromZipSaveComplete);
 		_zipSaveLoader.clear();
+		fileSettings.apply();
 	}
 	
 	static public function toZipSave():ByteArray

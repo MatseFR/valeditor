@@ -52,6 +52,7 @@ class EditorSettingsWindow extends Panel
 		this._settings = value;
 		if (this._settings != null)
 		{
+			this._backupSettings.clear();
 			this._settings.clone(this._backupSettings);
 			if (this._initialized)
 			{
@@ -167,6 +168,7 @@ class EditorSettingsWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
+		this._settings.clear();
 		this._backupSettings.clone(this._settings);
 		this._settings.apply();
 		FeathersWindows.closeWindow(this);
@@ -189,7 +191,7 @@ class EditorSettingsWindow extends Panel
 	
 	private function onRestoreDefaultsButton(evt:TriggerEvent):Void
 	{
-		this._backupSettings.clone(this._settings);
+		this._settings.clear();
 		this._settingsCollection.readValuesFromObject(this._settings, false);
 	}
 	

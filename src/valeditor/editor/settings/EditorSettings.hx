@@ -1,5 +1,8 @@
 package valeditor.editor.settings;
 import valedit.ExposedCollection;
+import valeditor.ValEditorClass;
+import valeditor.editor.visibility.ClassVisibilitiesCollection;
+import valeditor.editor.visibility.ClassVisibilityCollection;
 
 /**
  * ...
@@ -11,6 +14,7 @@ class EditorSettings
 	public var autoSave:Bool = true;
 	public var autoSaveInterval:Int = 5;
 	#end
+	public var customClassVisibilities:ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
 	public var releaseUIFocusOnValidation:Bool = true;
 	public var themeCustomValues:ExposedCollection;
 	public var uiDarkMode:Bool = false;
@@ -27,6 +31,7 @@ class EditorSettings
 		this.autoSave = true;
 		this.autoSaveInterval = 5;
 		#end
+		this.customClassVisibilities.clear();
 		this.releaseUIFocusOnValidation = true;
 		if (this.themeCustomValues != null)
 		{
@@ -42,6 +47,13 @@ class EditorSettings
 		this.themeCustomValues.applyToObject(ValEditor.theme);
 		ValEditor.theme.darkMode = this.uiDarkMode;
 		ValEditor.actionStack.undoLevels = this.undoLevels;
+		
+		var collection:ClassVisibilityCollection;
+		for (clss in ValEditor.classCollection)
+		{
+			collection = this.customClassVisibilities.get(clss.className);
+			clss.visibilityCollectionSettings = collection;
+		}
 	}
 	
 	public function clone(?toSettings:EditorSettings):EditorSettings
@@ -52,6 +64,9 @@ class EditorSettings
 		toSettings.autoSave = this.autoSave;
 		toSettings.autoSaveInterval = this.autoSaveInterval;
 		#end
+		
+		this.customClassVisibilities.clone(toSettings.customClassVisibilities);
+		
 		toSettings.releaseUIFocusOnValidation = this.releaseUIFocusOnValidation;
 		if (toSettings.themeCustomValues == null)
 		{
@@ -73,6 +88,12 @@ class EditorSettings
 		this.autoSave = json.autoSave;
 		this.autoSaveInterval = json.autoSaveInterval;
 		#end
+		
+		if (json.customClassVisibilities != null)
+		{
+			this.customClassVisibilities.fromJSON(json.customClassVisibilities);
+		}
+		
 		this.releaseUIFocusOnValidation = json.releaseUIFocusOnValidation;
 		if (json.themeCustomValues != null)
 		{
@@ -90,6 +111,12 @@ class EditorSettings
 		json.autoSave = this.autoSave;
 		json.autoSaveInterval = this.autoSaveInterval;
 		#end
+		
+		if (this.customClassVisibilities.numClasses != 0)
+		{
+			json.customClassVisibilities = this.customClassVisibilities.toJSON();
+		}
+		
 		json.releaseUIFocusOnValidation = this.releaseUIFocusOnValidation;
 		if (this.themeCustomValues.hasDifferenceWith(ValEditor.themeDefaultValues))
 		{

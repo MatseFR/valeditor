@@ -31,9 +31,9 @@ class ValEditorTemplate extends ValEditTemplate
 	public var isInLibrary:Bool = false;
 	public var isSuspended:Bool = false;
 	public var lockInstanceUpdates:Bool = false;
-	public var visibilityCollection:TemplateVisibilityCollection;
-	
-	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
+	public var visibilityCollectionCurrent(default, null):TemplateVisibilityCollection;
+	public var visibilityCollectionDefault(get, set):TemplateVisibilityCollection;
+	public var visibilityCollectionFile(get, set):TemplateVisibilityCollection;
 	
 	override function set_id(value:String):String 
 	{
@@ -80,7 +80,28 @@ class ValEditorTemplate extends ValEditTemplate
 		return super.set_object(value);
 	}
 	
+	private var _visibilityCollectionDefault:TemplateVisibilityCollection;
+	private function get_visibilityCollectionDefault():TemplateVisibilityCollection { return this._visibilityCollectionDefault; }
+	private function set_visibilityCollectionDefault(value:TemplateVisibilityCollection):TemplateVisibilityCollection
+	{
+		//if (this._visibilityCollectionDefault == value) return value;
+		this._visibilityCollectionDefault = value;
+		updateVisibilityCollection();
+		return this._visibilityCollectionDefault;
+	}
+	
+	private var _visibilityCollectionFile:TemplateVisibilityCollection;
+	private function get_visibilityCollectionFile():TemplateVisibilityCollection { return this._visibilityCollectionFile; }
+	private function set_visibilityCollectionFile(value:TemplateVisibilityCollection):TemplateVisibilityCollection
+	{
+		//if (this._visibilityCollectionFile == value) return value;
+		this._visibilityCollectionFile = value;
+		updateVisibilityCollection();
+		return this._visibilityCollectionFile;
+	}
+	
 	private var _objectIDIndex:Int = -1;
+	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
 
 	public function new(clss:ValEditClass, ?id:String, ?collection:ExposedCollection, ?constructorCollection:ExposedCollection) 
 	{
@@ -101,18 +122,25 @@ class ValEditorTemplate extends ValEditTemplate
 			this.object = null;
 		}
 		
-		if (this.visibilityCollection != null)
-		{
-			this.visibilityCollection.pool();
-			this.visibilityCollection = null;
-		}
-		
 		for (i in new ReverseIterator(this._instances.length - 1, 0))
 		{
 			ValEditor.destroyObject(cast this._instances[i]);
 		}
 		
 		this._suspendedInstances.resize(0);
+		
+		this.visibilityCollectionCurrent = null;
+		
+		if (this._visibilityCollectionDefault != null)
+		{
+			this._visibilityCollectionDefault = null;
+		}
+		
+		if (this._visibilityCollectionFile != null)
+		{
+			this._visibilityCollectionFile.pool();
+			this._visibilityCollectionFile = null;
+		}
 		
 		super.clear();
 	}
@@ -121,6 +149,34 @@ class ValEditorTemplate extends ValEditTemplate
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	public function updateVisibilityCollection():Void
+	{
+		var newVisibility:TemplateVisibilityCollection;
+		if (this._visibilityCollectionFile != null)
+		{
+			newVisibility = this._visibilityCollectionFile;
+		}
+		else
+		{
+			newVisibility = this._visibilityCollectionDefault;
+		}
+		
+		//if (this.visibilityCollectionCurrent != newVisibility)
+		//{
+			this.visibilityCollectionCurrent = newVisibility;
+			applyVisibility();
+		//}
+	}
+	
+	public function applyVisibility():Void
+	{
+		this.visibilityCollectionCurrent.applyToTemplateCollection(cast(this.object, ValEditorObject).defaultCollection);
+		for (instance in this._instances)
+		{
+			cast(instance, ValEditorObject).applyTemplateVisibility(this.visibilityCollectionCurrent);
+		}
 	}
 	
 	override public function canBeDestroyed():Bool 
@@ -237,11 +293,12 @@ class ValEditorTemplate extends ValEditTemplate
 		this.constructorCollection.fromJSONSave(json.constructorCollection);
 		if (json.visibilityCollection != null)
 		{
-			if (this.visibilityCollection == null)
+			if (this._visibilityCollectionFile == null)
 			{
-				this.visibilityCollection = TemplateVisibilityCollection.fromPool();
+				this._visibilityCollectionFile = TemplateVisibilityCollection.fromPool();
 			}
-			this.visibilityCollection.fromJSON(json.visibilityCollection);
+			this._visibilityCollectionFile.fromJSON(json.visibilityCollection);
+			updateVisibilityCollection();
 		}
 		
 		var instance:ValEditorObject;
@@ -259,9 +316,9 @@ class ValEditorTemplate extends ValEditTemplate
 		json.collection = this.collection.toJSONSave();
 		json.constructorCollection = this.constructorCollection.toJSONSave();
 		
-		if (this.visibilityCollection != null)
+		if (this._visibilityCollectionFile != null)
 		{
-			json.visibilityCollection = this.visibilityCollection.toJSON();
+			json.visibilityCollection = this._visibilityCollectionFile.toJSON();
 		}
 		
 		var instances:Array<Dynamic> = [];

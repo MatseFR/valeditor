@@ -130,13 +130,13 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 				var newObject:ValEditorObject;
 				for (object in keyFrame.objects)
 				{
-					newObject = cast ValEditor.cloneObject(object);
+					newObject = ValEditor.cloneObject(cast object);
 					objectCreate = ObjectCreate.fromPool();
 					objectCreate.setup(newObject);
 					action.add(objectCreate);
 					
 					objectAdd = ObjectAddKeyFrame.fromPool();
-					objectAdd.setup(cast object, this);
+					objectAdd.setup(newObject, this);
 					action.add(objectAdd);
 				}
 			}
@@ -154,7 +154,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			{
 				for (object in keyFrame.objects)
 				{
-					add(ValEditor.cloneObject(object));
+					add(ValEditor.cloneObject(cast object));
 				}
 			}
 		}
@@ -326,6 +326,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			collection = template.clss.getCollection();
 			collection.readValuesFromObject(object.object);
 			collection.fromJSONSave(node.collection);
+			template.visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
 			collection.apply();
 			add(object, collection);
 		}

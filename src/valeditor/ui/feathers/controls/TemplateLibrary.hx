@@ -10,7 +10,6 @@ import feathers.controls.popups.CalloutPopUpAdapter;
 import feathers.data.ArrayCollection;
 import feathers.data.GridViewCellState;
 import feathers.data.ListViewItemState;
-import feathers.events.GridViewEvent;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
@@ -20,7 +19,6 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
-import openfl.Lib;
 import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
@@ -37,6 +35,7 @@ import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.action.template.TemplateRemove;
 import valeditor.editor.action.template.TemplateSelect;
 import valeditor.editor.action.template.TemplateUnselect;
+import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.Padding;
@@ -72,7 +71,10 @@ class TemplateLibrary extends LayoutGroup
 	private var _contextMenuPt:Point = new Point();
 	
 	private var _addTemplateMenuItem:MenuItem;
+	private var _editTemplateVisibilityMenuItem:MenuItem;
 	private var _removeTemplateMenuItem:MenuItem;
+	
+	private var _templateVisibility:TemplateVisibilityCollection;
 
 	public function new() 
 	{
@@ -175,10 +177,12 @@ class TemplateLibrary extends LayoutGroup
 		// context menu
 		this._addTemplateMenuItem = new MenuItem("add", "Add template");
 		this._removeTemplateMenuItem = new MenuItem("remove", "Remove selected template(s)", true, "Del");
+		this._editTemplateVisibilityMenuItem = new MenuItem("editVisibility", "Edit properties visibility", true);
 		
 		this._contextMenuCollection = new ArrayCollection<MenuItem>([
 			this._addTemplateMenuItem,
-			this._removeTemplateMenuItem
+			this._removeTemplateMenuItem,
+			this._editTemplateVisibilityMenuItem
 		]);
 		
 		var contextRecycler = DisplayObjectRecycler.withFunction(()->{
@@ -241,14 +245,28 @@ class TemplateLibrary extends LayoutGroup
 			case "add" :
 				FeathersWindows.showTemplateCreationWindow();
 			
+			case "editVisibility" :
+				var template:ValEditorTemplate = this._grid.selectedItem;
+				var title:String = template.id + " properties visibility";
+				if (template.visibilityCollectionFile != null)
+				{
+					FeathersWindows.showTemplateVisibilityWindow(template.visibilityCollectionFile, template.visibilityCollectionDefault, title, onTemplateVisibilityEditConfirm, onTemplateVisibilityEditCancel);
+				}
+				else
+				{
+					this._templateVisibility = TemplateVisibilityCollection.fromPool();
+					template.visibilityCollectionDefault.clone(this._templateVisibility);
+					FeathersWindows.showTemplateVisibilityWindow(this._templateVisibility, template.visibilityCollectionDefault, title, onTemplateVisibilityEditConfirm, onTemplateVisibilityEditCancel);
+				}
+			
 			case "remove" :
 				action = MultiAction.fromPool();
 				var templateRemove:TemplateRemove;
 				
-				for (template in this._grid.selectedItems)
+				for (tpl in this._grid.selectedItems)
 				{
 					templateRemove = TemplateRemove.fromPool();
-					templateRemove.setup(template);
+					templateRemove.setup(tpl);
 					action.add(templateRemove);
 				}
 				ValEditor.actionStack.add(action);
@@ -310,6 +328,7 @@ class TemplateLibrary extends LayoutGroup
 		var templateSelected:Bool = this._grid.selectedItems.length != 0;
 		
 		this._removeTemplateMenuItem.enabled = templateSelected;
+		this._editTemplateVisibilityMenuItem.enabled = singleTemplateSelected;
 		this._contextMenuCollection.updateAll();
 		
 		this._contextMenu.selectedIndex = -1;
@@ -350,6 +369,45 @@ class TemplateLibrary extends LayoutGroup
 	private function onTemplateRenameButton(evt:TriggerEvent):Void
 	{
 		FeathersWindows.showTemplateRenameWindow(this._grid.selectedItem);
+	}
+	
+	private function onTemplateVisibilityEditCancel():Void
+	{
+		if (this._templateVisibility != null)
+		{
+			this._templateVisibility.pool();
+			this._templateVisibility = null;
+		}
+	}
+	
+	private function onTemplateVisibilityEditConfirm():Void
+	{
+		var template:ValEditorTemplate = this._grid.selectedItem;
+		if (this._templateVisibility != null)
+		{
+			if (this._templateVisibility.isDifferentFrom(template.visibilityCollectionDefault))
+			{
+				template.visibilityCollectionFile = this._templateVisibility;
+			}
+			else
+			{
+				this._templateVisibility.pool();
+			}
+			this._templateVisibility = null;
+		}
+		else
+		{
+			if (template.visibilityCollectionFile.isDifferentFrom(template.visibilityCollectionDefault))
+			{
+				// force update
+				template.visibilityCollectionFile = template.visibilityCollectionFile;
+			}
+			else
+			{
+				template.visibilityCollectionFile.pool();
+				template.visibilityCollectionFile = null;
+			}
+		}
 	}
 	
 	private var _templatesToRemove:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();

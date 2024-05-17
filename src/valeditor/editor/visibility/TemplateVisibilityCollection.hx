@@ -17,10 +17,13 @@ class TemplateVisibilityCollection
 	}
 	
 	public var numValues(get, never):Int;
+	public var valueList(get, never):Array<TemplateValueVisibility>;
 	
 	private function get_numValues():Int { return this._valueList.length; }
 	
 	private var _valueList:Array<TemplateValueVisibility> = new Array<TemplateValueVisibility>();
+	private function get_valueList():Array<TemplateValueVisibility> { return this._valueList; }
+	
 	private var _valueMap:Map<String, TemplateValueVisibility> = new Map<String, TemplateValueVisibility>();
 	
 	public function new() 
@@ -49,18 +52,6 @@ class TemplateVisibilityCollection
 		return this._valueList.iterator();
 	}
 	
-	public function clone(?collection:TemplateVisibilityCollection):TemplateVisibilityCollection
-	{
-		if (collection == null) collection = fromPool();
-		
-		for (visibility in this._valueList)
-		{
-			collection.add(visibility.clone());
-		}
-		
-		return collection;
-	}
-	
 	public function applyToTemplateCollection(collection:ExposedCollection):Void
 	{
 		var value:ExposedValue;
@@ -69,6 +60,8 @@ class TemplateVisibilityCollection
 			value = collection.getValue(visibility.propertyName);
 			value.visible = visibility.templateVisible;
 		}
+		collection.checkGroupsVisibility(false);
+		collection.updateUI();
 	}
 	
 	public function applyToTemplateObjectCollection(collection:ExposedCollection):Void
@@ -79,6 +72,8 @@ class TemplateVisibilityCollection
 			value = collection.getValue(visibility.propertyName);
 			value.visible = visibility.templateObjectVisible;
 		}
+		collection.checkGroupsVisibility(false);
+		collection.updateUI();
 	}
 	
 	public function add(visibility:TemplateValueVisibility):Void
@@ -95,6 +90,17 @@ class TemplateVisibilityCollection
 	public function has(propertyName:String):Bool
 	{
 		return this._valueMap.exists(propertyName);
+	}
+	
+	public function isDifferentFrom(collection:TemplateVisibilityCollection):Bool
+	{
+		var otherValue:TemplateValueVisibility;
+		for (value in this._valueList)
+		{
+			otherValue = collection.get(value.propertyName);
+			if (value.isDifferentFrom(otherValue)) return true;
+		}
+		return false;
 	}
 	
 	public function remove(visibility:TemplateValueVisibility):Void
@@ -130,6 +136,18 @@ class TemplateVisibilityCollection
 				add(visibility);
 			}
 		}
+	}
+	
+	public function clone(?toCollection:TemplateVisibilityCollection):TemplateVisibilityCollection
+	{
+		if (toCollection == null) toCollection = fromPool();
+		
+		for (value in this._valueList)
+		{
+			toCollection.add(value.clone());
+		}
+		
+		return toCollection;
 	}
 	
 	public function fromJSON(json:Dynamic):Void

@@ -7,4 +7,5 @@ package valeditor.ui.feathers.variant;
 class ItemRendererVariant 
 {
 	inline static public var CRAMPED:String = "cramped";
+	inline static public var RIGHT_ALIGNED:String = "right-aligned";
 }

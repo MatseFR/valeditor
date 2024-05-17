@@ -649,7 +649,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme implements
 	public function changeUpdate():Void
 	{
 		// DEBUG
-		trace("SimpleTheme.changeUpdate");
+		//trace("SimpleTheme.changeUpdate");
 		//\DEBUG
 		StyleProviderEvent.dispatch(this.styleProvider, StyleProviderEvent.STYLES_CHANGE);
 	}

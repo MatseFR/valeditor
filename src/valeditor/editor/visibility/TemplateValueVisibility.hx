@@ -43,6 +43,13 @@ class TemplateValueVisibility
 		return visibility;
 	}
 	
+	public function isDifferentFrom(visibility:TemplateValueVisibility):Bool
+	{
+		if (this.templateObjectVisible != visibility.templateObjectVisible) return true;
+		if (this.templateVisible != visibility.templateVisible) return true;
+		return false;
+	}
+	
 	private function setTo(propertyName:String, templateVisible:Bool, templateObjectVisible:Bool):TemplateValueVisibility
 	{
 		this.propertyName = propertyName;

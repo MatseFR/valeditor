@@ -46,13 +46,15 @@ class FileSettingsWindow extends Panel
 	private function get_settings():FileSettings { return this._settings; }
 	private function set_settings(value:FileSettings):FileSettings
 	{
-		if (value != null)
+		//this._editSettings.clear();
+		this._settings = value;
+		if (this._settings != null)
 		{
-			value.clone(this._editSettings);
-			
+			this._backupSettings.clear();
+			this._settings.clone(this._backupSettings);
 			if (this._initialized)
 			{
-				this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
+				this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
 			}
 		}
 		else
@@ -64,7 +66,7 @@ class FileSettingsWindow extends Panel
 			}
 		}
 		
-		return this._settings = value;
+		return this._settings;
 	}
 	
 	private var _title:String;
@@ -86,8 +88,9 @@ class FileSettingsWindow extends Panel
 	private var _cancelButton:Button;
 	private var _confirmButton:Button;
 	
-	private var _editSettings:FileSettings = FileSettings.fromPool();
+	//private var _editSettings:FileSettings = FileSettings.fromPool();
 	private var _settingsCollection:ExposedCollection;
+	private var _backupSettings:FileSettings = new FileSettings();
 
 	public function new() 
 	{
@@ -140,7 +143,7 @@ class FileSettingsWindow extends Panel
 		
 		if (this._settings != null)
 		{
-			this._settingsCollection = ValEditor.edit(this._editSettings, null, this._editContainer);
+			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
 		}
 	}
 	
@@ -162,6 +165,9 @@ class FileSettingsWindow extends Panel
 	
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
+		this._settings.clear();
+		this._backupSettings.clone(this._settings);
+		this._settings.apply();
 		FeathersWindows.closeWindow(this);
 		if (this._cancelCallback != null)
 		{
@@ -171,8 +177,8 @@ class FileSettingsWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
+		this._settings.apply();
 		FeathersWindows.closeWindow(this);
-		this._editSettings.clone(this._settings);
 		if (this._confirmCallback != null)
 		{
 			this._confirmCallback();
@@ -181,10 +187,10 @@ class FileSettingsWindow extends Panel
 	
 	private function onRestoreDefaultsButton(evt:TriggerEvent):Void
 	{
-		var fullPath:String = this._editSettings.fullPath;
-		this._editSettings.clear();
-		this._editSettings.fullPath = fullPath;
-		this._settingsCollection.readValuesFromObject(this._editSettings, false);
+		var fullPath:String = this._settings.fullPath;
+		this._settings.clear();
+		this._settings.fullPath = fullPath;
+		this._settingsCollection.readValuesFromObject(this._settings, false);
 	}
 	
 }

@@ -238,7 +238,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = DisplayData.exposeSprite();
+		settings.collection = DisplayData.exposeSprite();
+		settings.visibilityCollection = DisplayData.getSpriteVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(Sprite, settings);
 		settings.clear();
@@ -250,8 +251,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = DisplayData.exposeBitmapInstance();
-		settings.templateCollection = DisplayData.exposeBitmapTemplate();
+		settings.collection = DisplayData.exposeBitmap();
+		settings.visibilityCollection = DisplayData.getBitmapVisibility();
 		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(Bitmap, settings);
@@ -264,8 +265,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeArcShapeInstance();
-		settings.templateCollection = ShapeData.exposeArcShapeTemplate();
+		settings.collection = ShapeData.exposeArcShape();
+		settings.visibilityCollection = ShapeData.getArcShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArcShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(ArcShape, settings);
@@ -278,8 +279,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeArrowShapeInstance();
-		settings.templateCollection = ShapeData.exposeArrowShapeTemplate();
+		settings.collection = ShapeData.exposeArrowShape();
+		settings.visibilityCollection = ShapeData.getArrowShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(ArrowShape, settings);
@@ -292,8 +293,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeBurstShapeInstance();
-		settings.templateCollection = ShapeData.exposeBurstShapeTemplate();
+		settings.collection = ShapeData.exposeBurstShape();
+		settings.visibilityCollection = ShapeData.getBurstShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeBurstShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(BurstShape, settings);
@@ -306,8 +307,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeCircleShapeInstance();
-		settings.templateCollection = ShapeData.exposeCircleShapeTemplate();
+		settings.collection = ShapeData.exposeCircleShape();
+		settings.visibilityCollection = ShapeData.getCircleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeCircleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(CircleShape, settings);
@@ -320,8 +321,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeDonutShapeInstance();
-		settings.templateCollection = ShapeData.exposeDonutShapeTemplate();
+		settings.collection = ShapeData.exposeDonutShape();
+		settings.visibilityCollection = ShapeData.getDonutShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(DonutShape, settings);
@@ -334,8 +335,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeEllipseShapeInstance();
-		settings.templateCollection = ShapeData.exposeEllipseShapeTemplate();
+		settings.collection = ShapeData.exposeEllipseShape();
+		settings.visibilityCollection = ShapeData.getEllipseShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeEllipseShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(EllipseShape, settings);
@@ -348,8 +349,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeFlowerShapeInstance();
-		settings.templateCollection = ShapeData.exposeFlowerShapeTemplate();
+		settings.collection = ShapeData.exposeFlowerShape();
+		settings.visibilityCollection = ShapeData.getFlowerShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeFlowerShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(FlowerShape, settings);
@@ -362,8 +363,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeGearShapeInstance();
-		settings.templateCollection = ShapeData.exposeGearShapeTemplate();
+		settings.collection = ShapeData.exposeGearShape();
+		settings.visibilityCollection = ShapeData.getGearShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeGearShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(GearShape, settings);
@@ -376,8 +377,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposePolygonShapeInstance();
-		settings.templateCollection = ShapeData.exposePolygonShapeTemplate();
+		settings.collection = ShapeData.exposePolygonShape();
+		settings.visibilityCollection = ShapeData.getPolygonShapeVisibility();
 		settings.constructorCollection = ShapeData.exposePolygonShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(PolygonShape, settings);
@@ -390,8 +391,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeRectangleShapeInstance();
-		settings.templateCollection = ShapeData.exposeRectangleShapeTemplate();
+		settings.collection = ShapeData.exposeRectangleShape();
+		settings.visibilityCollection = ShapeData.getRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRectangleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(RectangleShape, settings);
@@ -404,8 +405,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeRoundRectangleShapeInstance();
-		settings.templateCollection = ShapeData.exposeRoundRectangleShapeTemplate();
+		settings.collection = ShapeData.exposeRoundRectangleShape();
+		settings.visibilityCollection = ShapeData.getRoundRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRoundRectangleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(RoundRectangleShape, settings);
@@ -418,8 +419,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeStarShapeInstance();
-		settings.templateCollection = ShapeData.exposeStarShapeTemplate();
+		settings.collection = ShapeData.exposeStarShape();
+		settings.visibilityCollection = ShapeData.getStarShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeStarShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(StarShape, settings);
@@ -432,24 +433,24 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = ShapeData.exposeWedgeShapeInstance();
-		settings.templateCollection = ShapeData.exposeWedgeShapeTemplate();
+		settings.collection = ShapeData.exposeWedgeShape();
+		settings.visibilityCollection = ShapeData.getWedgeShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeWedgeShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(WedgeShape, settings);
 		settings.clear();
 		
 		// OpenFL Filters
-		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), null, FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), null, FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), null, FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
 		
 		// OpenFL Geom
 		ValEditor.registerClassSimple(ColorTransform, false, GeomData.exposeColorTransform());
 		ValEditor.registerClassSimple(Matrix, false, GeomData.exposeMatrix());
 		ValEditor.registerClassSimple(Transform, false, GeomData.exposeTransform());
-		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), null, GeomData.exposePointConstructor());
-		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), null, GeomData.exposeRectangleConstructor());
+		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), GeomData.exposePointConstructor());
+		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), GeomData.exposeRectangleConstructor());
 		
 		// OpenFL Text
 		// TextField
@@ -459,14 +460,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.objectCollection = TextData.exposeTextFieldInstance();
-		settings.templateCollection = TextData.exposeTextFieldTemplate();
+		settings.collection = TextData.exposeTextField();
+		settings.visibilityCollection = TextData.getTextFieldVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_visible;
 		ValEditor.registerClass(TextField, settings);
 		settings.clear();
 		
 		ValEditor.registerClassSimple(Font, false, TextData.exposeFont());
-		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), null, TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
+		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
 		
 		#if starling
 		// Starling Texture Creation
@@ -481,8 +482,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.objectCollection = StarlingDisplayData.exposeQuadInstance();
-		settings.templateCollection = StarlingDisplayData.exposeQuadTemplate();
+		settings.collection = StarlingDisplayData.exposeQuad();
+		settings.visibilityCollection = StarlingDisplayData.getQuadVisibility();
 		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_default;
 		settings.hasRadianRotation = true;
@@ -498,8 +499,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.objectCollection = StarlingDisplayData.exposeImageInstance();
-		settings.templateCollection = StarlingDisplayData.exposeImageTemplate();
+		settings.collection = StarlingDisplayData.exposeImage();
+		settings.visibilityCollection = StarlingDisplayData.getImageVisibility();
 		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_default;
 		settings.hasRadianRotation = true;
@@ -518,8 +519,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.objectCollection = StarlingTextData.exposeTextFieldInstance();
-		settings.templateCollection = StarlingTextData.exposeTextFieldTemplate();
+		settings.collection = StarlingTextData.exposeTextField();
+		settings.visibilityCollection = StarlingTextData.getTextFieldVisibility();
 		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_visible;
 		settings.hasRadianRotation = true;
@@ -598,19 +599,26 @@ class ValEditorFull extends ValEditorBaseFeathers
 		{
 			FeathersWindows.closeStartMenuWindow();
 		}
-		FeathersWindows.showFileSettingsWindow(this._fileSettings, "New File", onNewFileSettingsConfirm, onNewFileSettingsCancel);
+		this._fileSettings.clear();
+		ValEditor.fileSettings.clone(this._fileSettings);
+		ValEditor.fileSettings.reset();
+		FeathersWindows.showFileSettingsWindow(ValEditor.fileSettings, "New File", onNewFileSettingsConfirm, onNewFileSettingsCancel);
 	}
 	
 	private function onNewFileSettingsConfirm():Void
 	{
 		ValEditor.reset();
-		this._fileSettings.clone(ValEditor.fileSettings);
+		//this._fileSettings.clone(ValEditor.fileSettings);
 		ValEditor.newFile();
+		ValEditor.fileSettings.apply();
 		this._isStartUp = false;
 	}
 	
 	private function onNewFileSettingsCancel():Void
 	{
+		ValEditor.fileSettings.clear();
+		this._fileSettings.clone(ValEditor.fileSettings);
+		ValEditor.fileSettings.apply();
 		if (this._isStartUp)
 		{
 			FeathersWindows.showStartMenuWindow(onNewFile, onLoadFile);

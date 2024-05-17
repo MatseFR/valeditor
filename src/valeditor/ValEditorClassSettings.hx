@@ -51,11 +51,7 @@ class ValEditorClassSettings extends ValEditClassSettings
 	
 	override public function clear():Void 
 	{
-		if (this.visibilityCollection != null)
-		{
-			this.visibilityCollection.pool();
-			this.visibilityCollection = null;
-		}
+		this.visibilityCollection = null;
 		
 		super.clear();
 		

@@ -96,7 +96,7 @@ class TemplateCreationWindow extends Panel
 	private var _constructorButtonGroup:LayoutGroup;
 	private var _constructorDefaultsButton:Button;
 	
-	private var _valEditClass:ValEditorClass;
+	private var _valEditorClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
 	
 	public function new() 
@@ -128,15 +128,15 @@ class TemplateCreationWindow extends Panel
 		this._footerGroup.layout = hLayout;
 		this.footer = this._footerGroup;
 		
-		this._confirmButton = new Button("confirm", onConfirmButton);
-		this._footerGroup.addChild(this._confirmButton);
-		
 		this._cancelButton = new Button("cancel", onCancelButton);
 		this._footerGroup.addChild(this._cancelButton);
 		
+		this._confirmButton = new Button("confirm", onConfirmButton);
+		this._footerGroup.addChild(this._confirmButton);
+		
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.MIDDLE;
+		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		vLayout.setPadding(Padding.DEFAULT * 2);
 		this.layout = vLayout;
@@ -168,7 +168,7 @@ class TemplateCreationWindow extends Panel
 			var listView:ListView = new ListView();
 			listView.layout = layout;
 			return listView;
-		}
+		};
 		this._categoryPicker.layoutData = new HorizontalLayoutData(100);
 		this._categoryPicker.itemToText = function(item:Dynamic):String {
 			return item.value;
@@ -190,7 +190,7 @@ class TemplateCreationWindow extends Panel
 		this._classLabel = new Label("Template Class");
 		this._classGroup.addChild(this._classLabel);
 		
-		var recycler = DisplayObjectRecycler.withFunction(()->{
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			var renderer:ItemRenderer = new ItemRenderer();
 			renderer.icon = new Bitmap();
 			return renderer;
@@ -209,7 +209,7 @@ class TemplateCreationWindow extends Panel
 			var listView:ListView = new ListView();
 			listView.layout = layout;
 			return listView;
-		}
+		};
 		this._classPicker.itemToText = function(item:Dynamic):String {
 			return item.className;
 		};
@@ -289,13 +289,13 @@ class TemplateCreationWindow extends Panel
 	private function checkValid():Void
 	{
 		var isValid:Bool = true;
-		if (this._valEditClass == null)
+		if (this._valEditorClass == null)
 		{
 			isValid = false;
 		}
 		else if (this._idInput.text != "")
 		{
-			if (this._valEditClass.objectIDExists(this._idInput.text))
+			if (this._valEditorClass.objectIDExists(this._idInput.text))
 			{
 				isValid = false;
 				this._idInput.errorString = "ID already in use";
@@ -315,14 +315,7 @@ class TemplateCreationWindow extends Panel
 	
 	private function onCategoryChange(evt:Event):Void
 	{
-		if (this._categoryPicker.selectedItem != null)
-		{
-			this._categoryClearButton.enabled = true;
-		}
-		else
-		{
-			this._categoryClearButton.enabled = false;
-		}
+		this._categoryClearButton.enabled = this._categoryPicker.selectedItem != null;
 	}
 	
 	private function onCategoryClear(evt:TriggerEvent):Void
@@ -334,15 +327,15 @@ class TemplateCreationWindow extends Panel
 	{
 		if (this._classPicker.selectedItem != null)
 		{
-			this._valEditClass = this._classPicker.selectedItem;
-			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
-			this._idInput.prompt = this._valEditClass.makeTemplateIDPreview();
+			this._valEditorClass = this._classPicker.selectedItem;
+			this._constructorCollection = ValEditor.editConstructor(this._valEditorClass.className, this._constructorContainer);
+			this._idInput.prompt = this._valEditorClass.makeTemplateIDPreview();
 		}
 		else
 		{
 			ValEditor.editConstructor(null, this._constructorContainer);
 			this._constructorCollection = null;
-			this._valEditClass = null;
+			this._valEditorClass = null;
 			this._idInput.prompt = null;
 		}
 		checkValid();
@@ -363,7 +356,7 @@ class TemplateCreationWindow extends Panel
 		}
 		if (id == null)
 		{
-			id = this._valEditClass.makeTemplateID();
+			id = this._valEditorClass.makeTemplateID();
 		}
 		
 		var constructorCollection:ExposedCollection;
@@ -376,7 +369,7 @@ class TemplateCreationWindow extends Panel
 			constructorCollection = null;
 		}
 		
-		var template:ValEditorTemplate = ValEditor.createTemplateWithClassName(this._valEditClass.className, id, constructorCollection);
+		var template:ValEditorTemplate = ValEditor.createTemplateWithClassName(this._valEditorClass.className, id, constructorCollection);
 		var action:TemplateAdd = TemplateAdd.fromPool();
 		action.setup(template);
 		ValEditor.actionStack.add(action);

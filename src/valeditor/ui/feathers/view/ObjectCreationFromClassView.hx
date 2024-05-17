@@ -64,7 +64,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private var _constructorButtonGroup:LayoutGroup;
 	private var _constructorDefaultsButton:Button;
 	
-	private var _valEditClass:ValEditorClass;
+	private var _valEditorClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
 	
 	public function new() 
@@ -225,7 +225,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		var params:Array<Dynamic> = null;
 		if (this._idInput.text != "") id = this._idInput.text;
 		if (this._constructorCollection != null) params = this._constructorCollection.toValueArray();
-		var object:ValEditorObject = ValEditor.createObjectWithClassName(this._valEditClass.className, id, params);
+		var object:ValEditorObject = ValEditor.createObjectWithClassName(this._valEditorClass.className, id, params);
 		return object;
 	}
 	
@@ -238,13 +238,13 @@ class ObjectCreationFromClassView extends LayoutGroup
 	private function checkValid():Void
 	{
 		var isValid:Bool = true;
-		if (this._valEditClass == null)
+		if (this._valEditorClass == null)
 		{
 			isValid = false;
 		}
 		else if (this._idInput.text != "")
 		{
-			if (this._valEditClass.objectIDExists(this._idInput.text))
+			if (this._valEditorClass.objectIDExists(this._idInput.text))
 			{
 				isValid = false;
 				this._idInput.errorString = "ID already in use";
@@ -297,14 +297,14 @@ class ObjectCreationFromClassView extends LayoutGroup
 	{
 		if (this._classPicker.selectedIndex != -1)
 		{
-			this._valEditClass = ValEditor.getValEditClassByClassName(this._classPicker.selectedItem.value);
-			this._constructorCollection = ValEditor.editConstructor(this._valEditClass.className, this._constructorContainer);
+			this._valEditorClass = ValEditor.getValEditorClassByClassName(this._classPicker.selectedItem.value);
+			this._constructorCollection = ValEditor.editConstructor(this._valEditorClass.className, this._constructorContainer);
 		}
 		else
 		{
 			ValEditor.editConstructor(null, this._constructorContainer);
 			this._constructorCollection = null;
-			this._valEditClass = null;
+			this._valEditorClass = null;
 		}
 		checkValid();
 	}
