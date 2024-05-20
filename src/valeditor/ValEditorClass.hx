@@ -5,6 +5,7 @@ import valedit.ExposedCollection;
 import valedit.ValEditClass;
 import valedit.ValEditTemplate;
 import valedit.value.base.ExposedValueWithCollection;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ClassEvent;
@@ -15,7 +16,7 @@ import valeditor.ui.IInteractiveObject;
  * ...
  * @author Matse
  */
-class ValEditorClass extends ValEditClass 
+class ValEditorClass extends ValEditClass implements IChangeUpdate
 {
 	static private var _POOL:Array<ValEditorClass> = new Array<ValEditorClass>();
 	
@@ -58,7 +59,6 @@ class ValEditorClass extends ValEditClass
 	private function get_visibilityCollectionFile():ClassVisibilityCollection { return this._visibilityCollectionDefault; }
 	private function set_visibilityCollectionFile(value:ClassVisibilityCollection):ClassVisibilityCollection
 	{
-		//if (this._visibilityCollectionDefault == value) return value;
 		this._visibilityCollectionFile = value;
 		updateVisibilityCollection();
 		return this._visibilityCollectionFile;
@@ -68,7 +68,6 @@ class ValEditorClass extends ValEditClass
 	private function get_visibilityCollectionSettings():ClassVisibilityCollection { return this._visibilityCollectionSettings; }
 	private function set_visibilityCollectionSettings(value:ClassVisibilityCollection):ClassVisibilityCollection
 	{
-		//if (this._visibilityCollectionSettings == value) return value;
 		this._visibilityCollectionSettings = value;
 		updateVisibilityCollection();
 		return this._visibilityCollectionSettings;
@@ -158,11 +157,13 @@ class ValEditorClass extends ValEditClass
 			newVisibility = this._visibilityCollectionDefault;
 		}
 		
-		//if (this.visibilityCollectionCurrent != newVisibility)
-		//{
-			this.visibilityCollectionCurrent = newVisibility;
-			applyVisibility();
-		//}
+		this.visibilityCollectionCurrent = newVisibility;
+		ValEditor.registerForChangeUpdate(this);
+	}
+	
+	public function changeUpdate():Void
+	{
+		applyVisibility();
 	}
 	
 	private function applyVisibility():Void
