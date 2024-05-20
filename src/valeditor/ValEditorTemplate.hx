@@ -6,6 +6,7 @@ import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.utils.ReverseIterator;
 import valedit.value.base.ExposedValue;
+import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
@@ -16,7 +17,7 @@ import valeditor.events.TemplateEvent;
  * ...
  * @author Matse
  */
-class ValEditorTemplate extends ValEditTemplate 
+class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 {
 	static private var _POOL:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	
@@ -84,7 +85,6 @@ class ValEditorTemplate extends ValEditTemplate
 	private function get_visibilityCollectionDefault():TemplateVisibilityCollection { return this._visibilityCollectionDefault; }
 	private function set_visibilityCollectionDefault(value:TemplateVisibilityCollection):TemplateVisibilityCollection
 	{
-		//if (this._visibilityCollectionDefault == value) return value;
 		this._visibilityCollectionDefault = value;
 		updateVisibilityCollection();
 		return this._visibilityCollectionDefault;
@@ -94,7 +94,6 @@ class ValEditorTemplate extends ValEditTemplate
 	private function get_visibilityCollectionFile():TemplateVisibilityCollection { return this._visibilityCollectionFile; }
 	private function set_visibilityCollectionFile(value:TemplateVisibilityCollection):TemplateVisibilityCollection
 	{
-		//if (this._visibilityCollectionFile == value) return value;
 		this._visibilityCollectionFile = value;
 		updateVisibilityCollection();
 		return this._visibilityCollectionFile;
@@ -163,11 +162,14 @@ class ValEditorTemplate extends ValEditTemplate
 			newVisibility = this._visibilityCollectionDefault;
 		}
 		
-		//if (this.visibilityCollectionCurrent != newVisibility)
-		//{
-			this.visibilityCollectionCurrent = newVisibility;
-			applyVisibility();
-		//}
+		this.visibilityCollectionCurrent = newVisibility;
+		// register for change update to avoid applying visibility multiple times
+		ValEditor.registerForChangeUpdate(this);
+	}
+	
+	public function changeUpdate():Void
+	{
+		applyVisibility();
 	}
 	
 	public function applyVisibility():Void
