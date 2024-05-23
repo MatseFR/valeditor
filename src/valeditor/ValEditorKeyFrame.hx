@@ -30,7 +30,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	
 	public var isInClipboard:Bool = false;
 	public var isPlaying(get, set):Bool;
-	public var objectCollection:ArrayCollection<ValEditObject> = new ArrayCollection();
+	public var objectCollection:ArrayCollection<ValEditorObject> = new ArrayCollection();
 	
 	override function set_indexCurrent(value:Int):Int 
 	{

@@ -164,7 +164,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_DOWN_1) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.Y);
 					if (value == null) continue;
@@ -195,7 +195,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.Y);
 						if (value == null) continue;
@@ -225,7 +225,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_DOWN_10) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.Y);
 					if (value == null) continue;
@@ -256,7 +256,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.Y);
 						if (value == null) continue;
@@ -287,7 +287,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_LEFT_1) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.X);
 					if (value == null) continue;
@@ -318,7 +318,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.X);
 						if (value == null) continue;
@@ -348,7 +348,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_LEFT_10) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.X);
 					if (value == null) continue;
@@ -379,7 +379,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.X);
 						if (value == null) continue;
@@ -410,7 +410,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_RIGHT_1) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.X);
 					if (value == null) continue;
@@ -441,7 +441,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.X);
 						if (value == null) continue;
@@ -471,7 +471,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_RIGHT_10) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.X);
 					if (value == null) continue;
@@ -502,7 +502,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.X);
 						if (value == null) continue;
@@ -533,7 +533,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_UP_1) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.Y);
 					if (value == null) continue;
@@ -564,7 +564,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.Y);
 						if (value == null) continue;
@@ -594,7 +594,7 @@ class LiveInputActionManager implements IAnimatable
 			if (input.justDid(InputActionID.MOVE_UP_10) != null)
 			{
 				action = MultiAction.fromPool();
-				for (obj in ValEditor.currentContainer.selection)
+				for (obj in ValEditor.containerController.selection)
 				{
 					value = obj.getValue(RegularPropertyName.Y);
 					if (value == null) continue;
@@ -625,7 +625,7 @@ class LiveInputActionManager implements IAnimatable
 				if (inputAction != null && inputAction.canRepeat())
 				{
 					action = MultiAction.fromPool();
-					for (obj in ValEditor.currentContainer.selection)
+					for (obj in ValEditor.containerController.selection)
 					{
 						value = obj.getValue(RegularPropertyName.Y);
 						if (value == null) continue;

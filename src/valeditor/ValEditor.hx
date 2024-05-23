@@ -25,6 +25,7 @@ import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
+import valeditor.ValEditorContainerController;
 import valedit.animation.ValEditUpdater;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetSource;
@@ -81,7 +82,8 @@ class ValEditor
 	static public var assetFileLoader:AssetFilesLoader;
 	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
-	static public var currentContainer(get, set):ValEditorContainer;
+	static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
+	static public var currentContainer(get, set):IValEditorContainer;
 	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
@@ -92,14 +94,14 @@ class ValEditor
 	static public var isNewFile(default, null):Bool = false;
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
-	static public var openedContainers(default, null):Array<ValEditorContainer> = new Array<ValEditorContainer>();
-	static public var rootContainer(get, set):ValEditorContainer;
+	static public var openedContainers(default, null):Array<IValEditorContainer> = new Array<IValEditorContainer>();
+	static public var rootContainer(get, set):IValEditorContainer;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
 	#end
 	/** can be either the root container or an open container template */
-	static public var sceneContainer(get, set):ValEditorContainer;
+	static public var sceneContainer(get, set):IValEditorContainer;
 	static public var selection(default, null):Selection = new Selection();
 	static public var theme:ValEditorTheme;
 	static public var themeDefaultValues:ExposedCollection;
@@ -116,29 +118,41 @@ class ValEditor
 	static public var isMouseOverUI:Bool;
 	static public var juggler(default, null):Juggler;
 	
-	static private var _currentContainer:ValEditorContainer;
-	static private function get_currentContainer():ValEditorContainer
+	static private var _currentContainer:IValEditorContainer;
+	static private function get_currentContainer():IValEditorContainer
 	{
-		if (_currentContainer == null) return _rootContainer;
+		//if (_currentContainer == null) return _rootContainer;
 		return _currentContainer;
 	}
-	static private function set_currentContainer(value:ValEditorContainer):ValEditorContainer
+	static private function set_currentContainer(value:IValEditorContainer):IValEditorContainer
 	{
 		if (value == _currentContainer) return value;
 		if (_currentContainer != null)
 		{
+			_currentContainer.juggler = null;
+			_currentContainer.rootContainer = null;
+			#if starling
+			_currentContainer.rootContainerStarling = null;
+			#end
 			_currentContainer.close();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
+			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
 		}
 		_currentContainer = value;
+		containerController.container = value;
 		if (_currentContainer != null)
 		{
+			_currentContainer.juggler = juggler;
 			_currentContainer.rootContainer = _rootScene;
 			#if starling
 			_currentContainer.rootContainerStarling = _rootSceneStarling;
 			#end
+			_currentContainer.x = viewPort.x;
+			_currentContainer.y = viewPort.y;
+			_currentContainer.viewWidth = viewPort.width;
+			_currentContainer.viewHeight = viewPort.height;
+			_currentContainer.adjustView();
 			_currentContainer.open();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
+			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
 		}
 		return _currentContainer;
 	}
@@ -146,44 +160,97 @@ class ValEditor
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 	static private function get_eventDispatcher():EventDispatcher { return _eventDispatcher; }
 	
-	static private var _rootContainer:ValEditorContainer;
-	static private function get_rootContainer():ValEditorContainer { return _rootContainer; }
-	static private function set_rootContainer(value:ValEditorContainer):ValEditorContainer
+	static private var _rootContainer:IValEditorContainer;
+	static private function get_rootContainer():IValEditorContainer { return _rootContainer; }
+	static private function set_rootContainer(value:IValEditorContainer):IValEditorContainer
 	{
 		if (value == _rootContainer) return value;
 		if (_rootContainer != null)
 		{
 			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
-			_rootContainer.close();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _rootContainer);
+			//_rootContainer.rootContainer = null;
+			//#if starling
+			//_rootContainer.rootContainerStarling = null;
+			//#end
+			//_rootContainer.close();
+			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _rootContainer);
 		}
 		_rootContainer = value;
 		if (_rootContainer != null)
 		{
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
-			_rootContainer.juggler = juggler;
-			_rootContainer.rootContainer = _rootScene;
-			#if starling
-			_rootContainer.rootContainerStarling = _rootSceneStarling;
-			#end
-			_rootContainer.x = viewPort.x;
-			_rootContainer.y = viewPort.y;
-			_rootContainer.viewWidth = viewPort.width;
-			_rootContainer.viewHeight = viewPort.height;
-			_rootContainer.adjustView();
-			_rootContainer.open();
-			EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _rootContainer);
+			//_rootContainer.juggler = juggler;
+			//_rootContainer.rootContainer = _rootScene;
+			//#if starling
+			//_rootContainer.rootContainerStarling = _rootSceneStarling;
+			//#end
+			//_rootContainer.x = viewPort.x;
+			//_rootContainer.y = viewPort.y;
+			//_rootContainer.viewWidth = viewPort.width;
+			//_rootContainer.viewHeight = viewPort.height;
+			//_rootContainer.adjustView();
+			//_rootContainer.open();
+			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _rootContainer);
 		}
 		return _rootContainer;
+	}
+	
+	static public function openContainer(container:IValEditorContainer):Void
+	{
+		openedContainers[openedContainers.length] = container;
+		
+		if (_rootContainer == null)
+		{
+			rootContainer = container;
+		}
+		
+		currentContainer = container;
+		container.open();
+		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, container);
+	}
+	
+	static public function closeContainer():Void
+	{
+		var container:IValEditorContainer = openedContainers.pop();
+		
+		if (openedContainers.length != 0)
+		{
+			currentContainer = openedContainers[openedContainers.length - 1];
+		}
+		else
+		{
+			currentContainer = null;
+			rootContainer = null;
+		}
+		
+		container.close();
+		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, container);
+		
+		if (_rootContainer == null)
+		{
+			container.pool();
+		}
+	}
+	
+	static public function closeAllContainers():Void
+	{
+		while (openedContainers.length != 0)
+		{
+			closeContainer();
+		}
 	}
 	
 	static private var _rootScene:DisplayObjectContainer;
 	static private function get_rootScene():DisplayObjectContainer { return _rootScene; }
 	static private function set_rootScene(value:DisplayObjectContainer):DisplayObjectContainer
 	{
-		if (_rootContainer != null)
+		//if (_rootContainer != null)
+		//{
+			//_rootContainer.rootContainer = value;
+		//}
+		if (_currentContainer != null)
 		{
-			_rootContainer.rootContainer = value;
+			_currentContainer.rootContainer = value;
 		}
 		return _rootScene = value;
 	}
@@ -193,28 +260,37 @@ class ValEditor
 	static private function get_rootSceneStarling():starling.display.DisplayObjectContainer { return _rootSceneStarling; }
 	static private function set_rootSceneStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer
 	{
-		if (_rootContainer != null)
+		//if (_rootContainer != null)
+		//{
+			//_rootContainer.rootContainerStarling = value;
+		//}
+		if (_currentContainer != null)
 		{
-			_rootContainer.rootContainerStarling = value;
+			_currentContainer.rootContainerStarling = value;
 		}
 		return _rootSceneStarling = value;
 	}
 	#end
 	
-	static private var _sceneContainer:ValEditorContainer;
-	static private function get_sceneContainer():ValEditorContainer { return _sceneContainer; }
-	static private function set_sceneContainer(value:ValEditorContainer):ValEditorContainer
+	static private var _sceneContainer:IValEditorContainer;
+	static private function get_sceneContainer():IValEditorContainer { return _sceneContainer; }
+	static private function set_sceneContainer(value:IValEditorContainer):IValEditorContainer
 	{
 		return _sceneContainer = value;
 	}
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
-		_rootContainer.x = viewPort.x;
-		_rootContainer.y = viewPort.y;
-		_rootContainer.viewWidth = viewPort.width;
-		_rootContainer.viewHeight = viewPort.height;
-		_rootContainer.adjustView();
+		//_rootContainer.x = viewPort.x;
+		//_rootContainer.y = viewPort.y;
+		//_rootContainer.viewWidth = viewPort.width;
+		//_rootContainer.viewHeight = viewPort.height;
+		//_rootContainer.adjustView();
+		_currentContainer.x = viewPort.x;
+		_currentContainer.y = viewPort.y;
+		_currentContainer.viewWidth = viewPort.width;
+		_currentContainer.viewHeight = viewPort.height;
+		_currentContainer.adjustView();
 	}
 	
 	static private var _categoryToClassCollection:Map<String, ArrayCollection<ValEditorClass>> = new Map<String, ArrayCollection<ValEditorClass>>();
@@ -278,7 +354,8 @@ class ValEditor
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		rootContainer = createContainer();
+		//rootContainer = createContainer();
+		openContainer(createContainer());
 	}
 	
 	static public function fileSaved():Void
@@ -300,12 +377,13 @@ class ValEditor
 			clss.reset();
 		}
 		
-		currentContainer = null;
-		if (_rootContainer != null)
-		{
-			_rootContainer.pool();
-			rootContainer = null;
-		}
+		//currentContainer = null;
+		//if (_rootContainer != null)
+		//{
+			//_rootContainer.pool();
+			//rootContainer = null;
+		//}
+		closeAllContainers();
 		
 		ValEdit.assetLib.reset();
 		
@@ -1207,7 +1285,7 @@ class ValEditor
 	
 	static public function selectAll(action:MultiAction):Void
 	{
-		currentContainer.selectAllVisible(action);
+		containerController.selectAllVisible(action);
 	}
 	
 	static public function unselectAll(action:MultiAction):Void
@@ -1450,7 +1528,8 @@ class ValEditor
 		
 		container.fromJSONSave(json.root);
 		
-		rootContainer = container;
+		//rootContainer = container;
+		openContainer(container);
 	}
 	
 	static public function toJSONSave(json:Dynamic = null):Dynamic

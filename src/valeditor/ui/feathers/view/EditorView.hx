@@ -496,7 +496,7 @@ class EditorView extends LayoutGroup
 	{
 		if (FeathersWindows.isWindowOpen) return;
 		
-		if (ValEditor.currentContainer.ignoreRightClick) return;
+		if (ValEditor.containerController.ignoreRightClick) return;
 		
 		if (this._displayRect.contains(evt.stageX, evt.stageY))
 		{

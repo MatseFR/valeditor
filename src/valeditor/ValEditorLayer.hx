@@ -172,6 +172,24 @@ class ValEditorLayer extends ValEditLayer
 		this._index = newIndex;
 	}
 	
+	public function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>
+	{
+		if (objects == null) objects = new Array<ValEditorObject>();
+		
+		for (keyFrame in this.timeLine.keyFrames)
+		{
+			for (object in keyFrame.objects)
+			{
+				if (objects.indexOf(cast object) == -1)
+				{
+					objects[objects.length] = cast object;
+				}
+			}
+		}
+		
+		return objects;
+	}
+	
 	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
 	{
 		if (visibleObjects == null) visibleObjects = new Array<ValEditorObject>();
