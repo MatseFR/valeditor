@@ -16,6 +16,9 @@ class ContainerEvent extends Event
 	inline static public var LAYER_REMOVED:String = "layer_removed";
 	inline static public var LAYER_SELECTED:String = "layer_selected";
 	
+	inline static public var OBJECT_ADDED:String = "object_added";
+	inline static public var OBJECT_REMOVED:String = "object_removed";
+	
 	#if !flash
 	static private var _POOL:Array<ContainerEvent> = new Array<ContainerEvent>();
 	
