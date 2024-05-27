@@ -5,6 +5,7 @@ import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectAdd;
 import valeditor.editor.action.object.ObjectAddKeyFrame;
 import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.action.object.ObjectSelect;
@@ -274,11 +275,19 @@ class ValEditorClipboard
 		}
 		
 		var copy:ValEditorObjectCopy = this._objectGroup.getCopyAt(this._pasteIndex);
-		// look for reusable objects
-		var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(copy.object.template, ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-		if (reusableObjects.length != 0)
+		
+		if (ValEditor.currentTimeLineContainer != null)
 		{
-			FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
+			// look for reusable objects
+			var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(copy.object.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+			if (reusableObjects.length != 0)
+			{
+				FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
+			}
+			else
+			{
+				onNewObject();
+			}
 		}
 		else
 		{
@@ -302,9 +311,18 @@ class ValEditorClipboard
 			objectCreate.setup(object);
 			this._pasteAction.add(objectCreate);
 			
-			var objectAdd:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-			objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-			this._pasteAction.add(objectAdd);
+			if (ValEditor.currentTimeLineContainer != null)
+			{
+				var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
+				objectAddKeyFrame.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+				this._pasteAction.add(objectAddKeyFrame);
+			}
+			else
+			{
+				var objectAdd:ObjectAdd = ObjectAdd.fromPool();
+				objectAdd.setup(object);
+				this._pasteAction.add(objectAdd);
+			}
 			
 			var objectSelect:ObjectSelect = ObjectSelect.fromPool();
 			objectSelect.setup();
@@ -327,10 +345,10 @@ class ValEditorClipboard
 		
 		if (this._pasteAction != null)
 		{
-			collection = object.createCollectionForKeyFrame(ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			collection = object.createCollectionForKeyFrame(ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 			
 			var objectAdd:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-			objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent, collection);
+			objectAdd.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent, collection);
 			this._pasteAction.add(objectAdd);
 			
 			collection.copyValuesFrom(copy.collection, this._pasteAction);
@@ -342,8 +360,8 @@ class ValEditorClipboard
 		}
 		else
 		{
-			ValEditor.currentContainer.currentLayer.timeLine.frameCurrent.add(object);
-			collection = object.getCollectionForKeyFrame(ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
+			ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent.add(object);
+			collection = object.getCollectionForKeyFrame(ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 			collection.copyValuesFrom(copy.collection);
 			
 			ValEditor.selection.addObject(object);

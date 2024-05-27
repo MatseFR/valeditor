@@ -1,7 +1,7 @@
 package valeditor.editor.action.container;
 
 import openfl.errors.Error;
-import valeditor.ValEditorContainer;
+import valeditor.IValEditorContainer;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -18,7 +18,7 @@ class ContainerOpen extends ValEditorAction
 		return new ContainerOpen();
 	}
 	
-	public var container:ValEditorContainer;
+	public var container:IValEditorContainer;
 	
 	public function new() 
 	{
@@ -38,7 +38,7 @@ class ContainerOpen extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:ValEditorContainer):Void
+	public function setup(container:IValEditorContainer):Void
 	{
 		this.container = container;
 	}
@@ -50,7 +50,7 @@ class ContainerOpen extends ValEditorAction
 			throw new Error("ContainerOpen already applied");
 		}
 		
-		// TODO
+		ValEditor.openContainer(this.container);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -61,7 +61,7 @@ class ContainerOpen extends ValEditorAction
 			throw new Error("ContainerOpen already cancelled");
 		}
 		
-		// TODO
+		ValEditor.closeContainer();
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	

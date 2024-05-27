@@ -1,23 +1,25 @@
-package valeditor.editor.action.container;
+package valeditor.editor.action.object;
 
 import openfl.errors.Error;
+import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
+import valeditor.editor.action.ValEditorActionStatus;
 
 /**
  * ...
  * @author Matse
  */
-class ContainerClose extends ValEditorAction 
+class ObjectRemove extends ValEditorAction 
 {
-	static private var _POOL:Array<ContainerClose> = new Array<ContainerClose>();
+	static private var _POOL:Array<ObjectRemove> = new Array<ObjectRemove>();
 	
-	static public function fromPool():ContainerClose
+	static public function fromPool():ObjectRemove
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new ContainerClose();
+		return new ObjectRemove();
 	}
 	
-	public var container:IValEditorContainer;
+	public var object:ValEditorObject;
 	
 	public function new() 
 	{
@@ -26,7 +28,7 @@ class ContainerClose extends ValEditorAction
 	
 	override public function clear():Void 
 	{
-		this.container = null;
+		this.object = null;
 		
 		super.clear();
 	}
@@ -37,19 +39,14 @@ class ContainerClose extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorContainer):Void
-	{
-		this.container = container;
-	}
-	
 	public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			throw new Error("ContainerClose already applied");
+			throw new Error("ObjectRemove already applied");
 		}
 		
-		ValEditor.closeContainer();
+		ValEditor.currentContainer.remove(this.object);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -57,10 +54,10 @@ class ContainerClose extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			throw new Error("ContainerClose already cancelled");
+			throw new Error("ObjectRemove already cancelled");
 		}
 		
-		ValEditor.openContainer(this.container);
+		ValEditor.currentContainer.add(this.object);
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	

@@ -84,6 +84,7 @@ class ValEditor
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
 	static public var currentContainer(get, set):IValEditorContainer;
+	static public var currentTimeLineContainer(get, never):IValEditorTimeLineContainer;
 	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
@@ -129,7 +130,11 @@ class ValEditor
 		if (value == _currentContainer) return value;
 		if (_currentContainer != null)
 		{
-			_currentContainer.juggler = null;
+			if (_currentTimeLineContainer != null)
+			{
+				_currentTimeLineContainer.juggler = null;
+				_currentTimeLineContainer = null;
+			}
 			_currentContainer.rootContainer = null;
 			#if starling
 			_currentContainer.rootContainerStarling = null;
@@ -141,7 +146,11 @@ class ValEditor
 		containerController.container = value;
 		if (_currentContainer != null)
 		{
-			_currentContainer.juggler = juggler;
+			if (Std.isOfType(_currentContainer, IValEditorTimeLineContainer))
+			{
+				_currentTimeLineContainer = cast _currentContainer;
+				_currentTimeLineContainer.juggler = juggler;
+			}
 			_currentContainer.rootContainer = _rootScene;
 			#if starling
 			_currentContainer.rootContainerStarling = _rootSceneStarling;
@@ -156,6 +165,9 @@ class ValEditor
 		}
 		return _currentContainer;
 	}
+	
+	static private var _currentTimeLineContainer:IValEditorTimeLineContainer;
+	static private function get_currentTimeLineContainer():IValEditorTimeLineContainer { return _currentTimeLineContainer; }
 	
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 	static private function get_eventDispatcher():EventDispatcher { return _eventDispatcher; }
@@ -205,7 +217,7 @@ class ValEditor
 		}
 		
 		currentContainer = container;
-		container.open();
+		//container.open();
 		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, container);
 	}
 	
@@ -244,10 +256,6 @@ class ValEditor
 	static private function get_rootScene():DisplayObjectContainer { return _rootScene; }
 	static private function set_rootScene(value:DisplayObjectContainer):DisplayObjectContainer
 	{
-		//if (_rootContainer != null)
-		//{
-			//_rootContainer.rootContainer = value;
-		//}
 		if (_currentContainer != null)
 		{
 			_currentContainer.rootContainer = value;
@@ -260,10 +268,6 @@ class ValEditor
 	static private function get_rootSceneStarling():starling.display.DisplayObjectContainer { return _rootSceneStarling; }
 	static private function set_rootSceneStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer
 	{
-		//if (_rootContainer != null)
-		//{
-			//_rootContainer.rootContainerStarling = value;
-		//}
 		if (_currentContainer != null)
 		{
 			_currentContainer.rootContainerStarling = value;
@@ -281,11 +285,6 @@ class ValEditor
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
-		//_rootContainer.x = viewPort.x;
-		//_rootContainer.y = viewPort.y;
-		//_rootContainer.viewWidth = viewPort.width;
-		//_rootContainer.viewHeight = viewPort.height;
-		//_rootContainer.adjustView();
 		_currentContainer.x = viewPort.x;
 		_currentContainer.y = viewPort.y;
 		_currentContainer.viewWidth = viewPort.width;
@@ -354,7 +353,6 @@ class ValEditor
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		//rootContainer = createContainer();
 		openContainer(createContainer());
 	}
 	
@@ -1307,96 +1305,96 @@ class ValEditor
 	
 	static public function insertFrame(?action:MultiAction):Void
 	{
-		if (currentContainer == null) return;
-		if (currentContainer.isPlaying) return;
-		if (currentContainer.currentLayer == null) return;
+		if (currentTimeLineContainer == null) return;
+		if (currentTimeLineContainer.isPlaying) return;
+		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame(action);
+		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame(action);
 	}
 	
 	static public function insertKeyFrame(?action:MultiAction):Void
 	{
-		if (currentContainer == null) return;
-		if (currentContainer.isPlaying) return;
-		if (currentContainer.currentLayer == null) return;
+		if (currentTimeLineContainer == null) return;
+		if (currentTimeLineContainer.isPlaying) return;
+		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame(action);
+		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame(action);
 	}
 	
 	static public function removeFrame(?action:MultiAction):Void
 	{
-		if (currentContainer == null) return;
-		if (currentContainer.isPlaying) return;
-		if (currentContainer.currentLayer == null) return;
+		if (currentTimeLineContainer == null) return;
+		if (currentTimeLineContainer.isPlaying) return;
+		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame(action);
+		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame(action);
 	}
 	
 	static public function removeKeyFrame(?action:MultiAction):Void
 	{
-		if (currentContainer == null) return;
-		if (currentContainer.isPlaying) return;
-		if (currentContainer.currentLayer == null) return;
+		if (currentTimeLineContainer == null) return;
+		if (currentTimeLineContainer.isPlaying) return;
+		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame(action);
+		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame(action);
 	}
 	
 	static public function firstFrame():Void
 	{
-		if (currentContainer.isPlaying)
+		if (currentTimeLineContainer.isPlaying)
 		{
-			currentContainer.stop();
+			currentTimeLineContainer.stop();
 		}
-		currentContainer.frameIndex = 0;
+		currentTimeLineContainer.frameIndex = 0;
 	}
 	
 	static public function lastFrame():Void
 	{
-		if (currentContainer.isPlaying)
+		if (currentTimeLineContainer.isPlaying)
 		{
-			currentContainer.stop();
+			currentTimeLineContainer.stop();
 		}
-		currentContainer.frameIndex = currentContainer.lastFrameIndex;
+		currentTimeLineContainer.frameIndex = currentTimeLineContainer.lastFrameIndex;
 	}
 	
 	static public function nextFrame():Void
 	{
-		if (currentContainer.isPlaying)
+		if (currentTimeLineContainer.isPlaying)
 		{
-			currentContainer.stop();
+			currentTimeLineContainer.stop();
 		}
-		if (currentContainer.frameIndex < currentContainer.lastFrameIndex)
+		if (currentTimeLineContainer.frameIndex < currentTimeLineContainer.lastFrameIndex)
 		{
-			currentContainer.frameIndex++;
+			currentTimeLineContainer.frameIndex++;
 		}
 	}
 	
 	static public function previousFrame():Void
 	{
-		if (currentContainer.isPlaying)
+		if (currentTimeLineContainer.isPlaying)
 		{
-			currentContainer.stop();
+			currentTimeLineContainer.stop();
 		}
-		if (currentContainer.frameIndex != 0)
+		if (currentTimeLineContainer.frameIndex != 0)
 		{
-			currentContainer.frameIndex--;
+			currentTimeLineContainer.frameIndex--;
 		}
 	}
 	
 	static public function playStop():Void
 	{
-		if (!currentContainer.isPlaying)
+		if (!currentTimeLineContainer.isPlaying)
 		{
-			currentContainer.timeLine.updateLastFrameIndex();
-			if (currentContainer.frameIndex >= currentContainer.lastFrameIndex)
+			currentTimeLineContainer.timeLine.updateLastFrameIndex();
+			if (currentTimeLineContainer.frameIndex >= currentTimeLineContainer.lastFrameIndex)
 			{
-				currentContainer.frameIndex = 0;
+				currentTimeLineContainer.frameIndex = 0;
 			}
-			currentContainer.play();
+			currentTimeLineContainer.play();
 		}
 		else
 		{
-			currentContainer.stop();
+			currentTimeLineContainer.stop();
 		}
 	}
 	

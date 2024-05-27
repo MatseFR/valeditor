@@ -8,6 +8,7 @@ import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTimeLine;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectAdd;
 import valeditor.editor.action.object.ObjectAddKeyFrame;
 import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.action.selection.SelectionSetObject;
@@ -104,12 +105,19 @@ class LibraryDragManager
 			this._mouseX = evt.stageX;
 			this._mouseY = evt.stageY;
 			
-			// look for reusable objects
-			var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(this.template, ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-			
-			if (reusableObjects.length != 0)
+			if (ValEditor.currentTimeLineContainer != null)
 			{
-				FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
+				// look for reusable objects
+				var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(this.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+				
+				if (reusableObjects.length != 0)
+				{
+					FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
+				}
+				else
+				{
+					onNewObject();
+				}
 			}
 			else
 			{
@@ -124,7 +132,6 @@ class LibraryDragManager
 	{
 		var action:MultiAction = MultiAction.fromPool();
 		var objectCreate:ObjectCreate;
-		var objectAdd:ObjectAddKeyFrame;
 		var selectionSetObject:SelectionSetObject;
 		
 		this.object = ValEditor.createObjectWithTemplate(this.template);
@@ -138,9 +145,18 @@ class LibraryDragManager
 			this.object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
 		}
 		
-		objectAdd = ObjectAddKeyFrame.fromPool();
-		objectAdd.setup(this.object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-		action.add(objectAdd);
+		if (ValEditor.currentTimeLineContainer != null)
+		{
+			var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
+			objectAddKeyFrame.setup(this.object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+			action.add(objectAddKeyFrame);
+		}
+		else
+		{
+			var objectAdd:ObjectAdd = ObjectAdd.fromPool();
+			objectAdd.setup(this.object);
+			action.add(objectAdd);
+		}
 		
 		selectionSetObject = SelectionSetObject.fromPool();
 		selectionSetObject.setup(this.object);
@@ -155,12 +171,11 @@ class LibraryDragManager
 	private function onReuseObject(object:ValEditorObject):Void
 	{
 		var action:MultiAction = MultiAction.fromPool();
-		var objectAdd:ObjectAddKeyFrame;
 		var selectionSetObject:SelectionSetObject;
 		
-		objectAdd = ObjectAddKeyFrame.fromPool();
-		objectAdd.setup(object, cast ValEditor.currentContainer.currentLayer.timeLine.frameCurrent);
-		action.add(objectAdd);
+		var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
+		objectAddKeyFrame.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+		action.add(objectAddKeyFrame);
 		
 		if (object.isDisplayObject)
 		{

@@ -15,7 +15,7 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorContainer extends ValEditContainer implements IValEditorContainer
+class ValEditorContainer extends ValEditContainer implements IValEditorContainer implements IValEditorTimeLineContainer
 {
 	static private var _POOL:Array<ValEditorContainer> = new Array<ValEditorContainer>();
 	
@@ -57,6 +57,33 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
+	
+	override function set_rotation(value:Float):Float 
+	{
+		if (this.containerUI != null)
+		{
+			this.containerUI.rotation = value;
+		}
+		return super.set_rotation(value);
+	}
+	
+	override function set_scaleX(value:Float):Float 
+	{
+		if (this.containerUI != null)
+		{
+			this.containerUI.scaleX = value;
+		}
+		return super.set_scaleX(value);
+	}
+	
+	override function set_scaleY(value:Float):Float 
+	{
+		if (this.containerUI != null)
+		{
+			this.containerUI.scaleY = value;
+		}
+		return super.set_scaleY(value);
+	}
 	
 	override function set_x(value:Float):Float 
 	{

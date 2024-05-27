@@ -535,9 +535,23 @@ class ValEditorFull extends ValEditorBaseFeathers
 		//ValEditor.registerClass(QuadDataProxy, MassiveData.exposeQuadDataProxy(), true, true, DisplayObjectType.STARLING);
 		#end
 		
+		// ValEditorContainer
+		settings.canBeCreated = true;
+		settings.disposeFunctionName = "pool";
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.collection = ContainerData.exposeValEditorContainer();
+		settings.visibilityCollection = ContainerData.getValEditorContainerVisibility();
+		ValEditor.registerClass(ValEditorContainer, settings);
+		settings.clear();
+		
 		settings.pool();
 		
-		ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
+		//ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditKeyFrame());
 		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
 		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
