@@ -30,6 +30,11 @@ class ButtonStyles
 			styleProvider.setStyleFunction(Button, ButtonVariant.ADD, add);
 		}
 		
+		if (styleProvider.getStyleFunction(Button, ButtonVariant.OPEN) == null)
+		{
+			styleProvider.setStyleFunction(Button, ButtonVariant.OPEN, open);
+		}
+		
 		if (styleProvider.getStyleFunction(Button, ButtonVariant.REMOVE) == null)
 		{
 			styleProvider.setStyleFunction(Button, ButtonVariant.REMOVE, remove);
@@ -132,6 +137,19 @@ class ButtonStyles
 		
 		icon = new Shape();
 		IconGraphics.drawAddIcon(icon, theme.contrastColorLighter);
+		btn.setIconForState(DISABLED, icon);
+	}
+	
+	static private function open(btn:Button):Void
+	{
+		common(btn);
+		
+		var icon:Shape = new Shape();
+		IconGraphics.drawOpenIcon(icon, theme.contrastColor);
+		btn.icon = icon;
+		
+		icon = new Shape();
+		IconGraphics.drawOpenIcon(icon, theme.contrastColorLighter);
 		btn.setIconForState(DISABLED, icon);
 	}
 	

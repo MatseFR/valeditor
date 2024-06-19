@@ -54,12 +54,13 @@ class LayerIndexDown extends ValEditorAction
 			throw new Error("LayerIndexDown already applied");
 		}
 		
-		var index:Int;
+		//var index:Int;
 		for (layer in this.layers)
 		{
-			index = this.container.getLayerIndex(layer);
-			this.container.removeLayerAt(index);
-			this.container.addLayerAt(layer, index + 1);
+			//index = this.container.getLayerIndex(layer);
+			//this.container.removeLayerAt(index);
+			//this.container.addLayerAt(layer, index + 1);
+			this.container.layerIndexDown(layer);
 		}
 		this.status = ValEditorActionStatus.DONE;
 	}
@@ -71,12 +72,13 @@ class LayerIndexDown extends ValEditorAction
 			throw new Error("LayerIndexDown already cancelled");
 		}
 		
-		var index:Int;
+		//var index:Int;
 		for (layer in this.layers)
 		{
-			index = this.container.getLayerIndex(layer);
-			this.container.removeLayerAt(index);
-			this.container.addLayerAt(layer, index - 1);
+			//index = this.container.getLayerIndex(layer);
+			//this.container.removeLayerAt(index);
+			//this.container.addLayerAt(layer, index - 1);
+			this.container.layerIndexUp(layer);
 		}
 		this.status = ValEditorActionStatus.UNDONE;
 	}

@@ -131,7 +131,7 @@ class LayerRenameWindow extends Panel
 		}
 		else
 		{
-			if (this._nameInput.text == this._layer.name || !cast(this._layer.container, IValEditorContainer).layerNameExists(this._nameInput.text))
+			if (this._nameInput.text == this._layer.name || !cast(this._layer.container, IValEditorTimeLineContainer).layerNameExists(this._nameInput.text))
 			{
 				this._nameInput.errorString = null;
 			}

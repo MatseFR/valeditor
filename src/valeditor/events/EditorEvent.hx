@@ -9,8 +9,9 @@ import openfl.events.IEventDispatcher;
  */
 class EditorEvent extends Event 
 {
-	inline static public var CONTAINER_OPEN:String = "container_open";
 	inline static public var CONTAINER_CLOSE:String = "container_close";
+	inline static public var CONTAINER_CURRENT:String = "container_current";
+	inline static public var CONTAINER_OPEN:String = "container_open";
 	
 	#if !flash
 	static private var _POOL:Array<EditorEvent> = new Array<EditorEvent>();

@@ -331,7 +331,7 @@ class ValEditorClipboard
 		}
 		else
 		{
-			ValEditor.currentContainer.add(object);
+			ValEditor.currentContainer.addObject(object);
 			ValEditor.selection.addObject(object);
 		}
 		

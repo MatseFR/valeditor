@@ -11,6 +11,7 @@ import valeditor.editor.action.object.ObjectAddKeyFrame;
 import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.events.DefaultEvent;
+import valeditor.events.KeyFrameEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
 
@@ -62,13 +63,22 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		return this._isPlaying;
 	}
 	
+	override function set_transition(value:String):String 
+	{
+		if (this._transition == value) return value;
+		super.set_transition(value);
+		KeyFrameEvent.dispatch(this, KeyFrameEvent.TRANSITION_CHANGE);
+		return this._transition;
+	}
+	
 	override function set_tween(value:Bool):Bool 
 	{
 		if (this._tween == value) return value;
 		super.set_tween(value);
 		updateObjectsSelectable();
 		updateTweens();
-		DefaultEvent.dispatch(this, Event.CHANGE); // this is used by the timeline UI item to update frames state
+		KeyFrameEvent.dispatch(this, KeyFrameEvent.STATE_CHANGE); // this is used by the timeline UI item to update frames state
+		KeyFrameEvent.dispatch(this, KeyFrameEvent.TWEEN_CHANGE);
 		return this._tween;
 	}
 	
@@ -179,7 +189,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			registerObject(object);
 		}
 		
-		if (this.objects.length == 1) DefaultEvent.dispatch(this, Event.CHANGE);
+		if (this.objects.length == 1) KeyFrameEvent.dispatch(this, KeyFrameEvent.STATE_CHANGE);
 	}
 	
 	public function hasObject(object:ValEditObject):Bool
@@ -206,7 +216,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 			unregisterObject(object);
 		}
 		
-		if (this.objects.length == 0) DefaultEvent.dispatch(this, Event.CHANGE);
+		if (this.objects.length == 0) KeyFrameEvent.dispatch(this, KeyFrameEvent.STATE_CHANGE);
 	}
 	
 	private function registerObject(object:ValEditObject):Void
@@ -308,6 +318,24 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		{
 			ValEditor.registerForChangeUpdate(cast prevFrame);
 		}
+	}
+	
+	public function cloneTo(keyFrame:ValEditorKeyFrame):Void
+	{
+		keyFrame.indexStart = this.indexStart;
+		keyFrame.indexEnd = this.indexEnd;
+		
+		//var cloneObject:ValEditorObject;
+		//var collection:ExposedCollection;
+		//for (object in this.objects)
+		//{
+			//cloneObject = ValEditor.cloneObject(cast object);
+			//collection = object.getCollectionForKeyFrame(this);
+			//keyFrame.add(cloneObject, collection.clone(true));
+		//}
+		
+		keyFrame.transition = this.transition;
+		keyFrame._tween = this.tween;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

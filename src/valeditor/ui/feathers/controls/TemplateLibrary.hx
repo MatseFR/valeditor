@@ -28,9 +28,13 @@ import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.ui.Keyboard;
+import valeditor.IValEditorContainer;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.container.ContainerMakeCurrent;
+import valeditor.editor.action.container.ContainerOpen;
+import valeditor.editor.action.container.ContainerTemplateOpen;
 import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.action.template.TemplateRemove;
 import valeditor.editor.action.template.TemplateSelect;
@@ -63,6 +67,7 @@ class TemplateLibrary extends LayoutGroup
 	private var _templateAddButton:Button;
 	private var _templateRemoveButton:Button;
 	private var _templateRenameButton:Button;
+	private var _templateOpenButton:Button;
 	
 	private var _contextMenu:ListView;
 	private var _contextMenuCollection:ArrayCollection<MenuItem>;
@@ -72,7 +77,9 @@ class TemplateLibrary extends LayoutGroup
 	
 	private var _addTemplateMenuItem:MenuItem;
 	private var _editTemplateVisibilityMenuItem:MenuItem;
+	private var _openTemplateContainerMenuItem:MenuItem;
 	private var _removeTemplateMenuItem:MenuItem;
+	private var _renameTemplateMenuItem:MenuItem;
 	
 	private var _templateVisibility:TemplateVisibilityCollection;
 
@@ -116,6 +123,12 @@ class TemplateLibrary extends LayoutGroup
 		this._templateRenameButton.toolTip = "rename selected template";
 		this._templateRenameButton.enabled = false;
 		this._footer.addChild(this._templateRenameButton);
+		
+		this._templateOpenButton = new Button(null, onTemplateOpenButton);
+		this._templateOpenButton.variant = ButtonVariant.OPEN;
+		this._templateOpenButton.toolTip = "open selected container template";
+		this._templateOpenButton.enabled = false;
+		this._footer.addChild(this._templateOpenButton);
 		
 		var recycler = DisplayObjectRecycler.withFunction(()->{
 			var renderer:ItemRenderer = new ItemRenderer();
@@ -176,12 +189,16 @@ class TemplateLibrary extends LayoutGroup
 		
 		// context menu
 		this._addTemplateMenuItem = new MenuItem("add", "Add template");
+		this._openTemplateContainerMenuItem = new MenuItem("open", "Open container");
 		this._removeTemplateMenuItem = new MenuItem("remove", "Remove selected template(s)", true, "Del");
+		this._renameTemplateMenuItem = new MenuItem("rename", "Rename");
 		this._editTemplateVisibilityMenuItem = new MenuItem("editVisibility", "Edit properties visibility", true);
 		
 		this._contextMenuCollection = new ArrayCollection<MenuItem>([
 			this._addTemplateMenuItem,
+			this._openTemplateContainerMenuItem,
 			this._removeTemplateMenuItem,
+			this._renameTemplateMenuItem,
 			this._editTemplateVisibilityMenuItem
 		]);
 		
@@ -239,6 +256,7 @@ class TemplateLibrary extends LayoutGroup
 		if (!this._contextMenu.selectedItem.enabled) return;
 		
 		var action:MultiAction;
+		var template:ValEditorTemplate = this._grid.selectedItem;
 		
 		switch (this._contextMenu.selectedItem.id)
 		{
@@ -246,7 +264,6 @@ class TemplateLibrary extends LayoutGroup
 				FeathersWindows.showTemplateCreationWindow();
 			
 			case "editVisibility" :
-				var template:ValEditorTemplate = this._grid.selectedItem;
 				var title:String = template.id + " properties visibility";
 				if (template.visibilityCollectionFile != null)
 				{
@@ -257,6 +274,27 @@ class TemplateLibrary extends LayoutGroup
 					this._templateVisibility = TemplateVisibilityCollection.fromPool();
 					template.visibilityCollectionDefault.clone(this._templateVisibility);
 					FeathersWindows.showTemplateVisibilityWindow(this._templateVisibility, template.visibilityCollectionDefault, title, onTemplateVisibilityEditConfirm, onTemplateVisibilityEditCancel);
+				}
+			
+			case "open" :
+				//var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
+				//containerOpen.setup(cast template.object.object);
+				//ValEditor.actionStack.add(containerOpen);
+				var container:IValEditorContainer = cast template.object.object;
+				if (container.isOpen)
+				{
+					if (ValEditor.currentContainer != container)
+					{
+						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
+						containerMakeCurrent.setup(container);
+						ValEditor.actionStack.add(containerMakeCurrent);
+					}
+				}
+				else
+				{
+					var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
+					containerOpen.setup(container);
+					ValEditor.actionStack.add(containerOpen);
 				}
 			
 			case "remove" :
@@ -270,6 +308,9 @@ class TemplateLibrary extends LayoutGroup
 					action.add(templateRemove);
 				}
 				ValEditor.actionStack.add(action);
+			
+			case "rename" :
+				onTemplateRenameButton(null);
 		}
 	}
 	
@@ -327,7 +368,9 @@ class TemplateLibrary extends LayoutGroup
 		var singleTemplateSelected:Bool = this._grid.selectedItems.length == 1;
 		var templateSelected:Bool = this._grid.selectedItems.length != 0;
 		
+		this._openTemplateContainerMenuItem.enabled = template != null && Std.isOfType(template.object.object, IValEditorContainer);
 		this._removeTemplateMenuItem.enabled = templateSelected;
+		this._renameTemplateMenuItem.enabled = singleTemplateSelected;
 		this._editTemplateVisibilityMenuItem.enabled = singleTemplateSelected;
 		this._contextMenuCollection.updateAll();
 		
@@ -350,6 +393,26 @@ class TemplateLibrary extends LayoutGroup
 	private function onTemplateAddButton(evt:TriggerEvent):Void
 	{
 		FeathersWindows.showTemplateCreationWindow();
+	}
+	
+	private function onTemplateOpenButton(evt:TriggerEvent):Void
+	{
+		var container:IValEditorContainer = cast cast(this._grid.selectedItem, ValEditorTemplate).object.object;
+		if (container.isOpen)
+		{
+			if (ValEditor.currentContainer != container)
+			{
+				var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
+				containerMakeCurrent.setup(container);
+				ValEditor.actionStack.add(containerMakeCurrent);
+			}
+		}
+		else
+		{
+			var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
+			containerOpen.setup(container);
+			ValEditor.actionStack.add(containerOpen);
+		}
 	}
 	
 	private function onTemplateRemoveButton(evt:TriggerEvent):Void
@@ -410,18 +473,19 @@ class TemplateLibrary extends LayoutGroup
 		}
 	}
 	
-	private var _templatesToRemove:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	private function onGridChange(evt:Event):Void
 	{
 		if (this._grid.selectedItems.length != 0)
 		{
 			this._templateRemoveButton.enabled = true;
 			this._templateRenameButton.enabled = this._grid.selectedItems.length == 1;
+			this._templateOpenButton.enabled = this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IValEditorContainer);
 		}
 		else
 		{
 			this._templateRemoveButton.enabled = false;
 			this._templateRenameButton.enabled = false;
+			this._templateOpenButton.enabled = false;
 		}
 	}
 	
@@ -496,6 +560,14 @@ class TemplateLibrary extends LayoutGroup
 					}
 					
 					ValEditor.actionStack.add(action);
+				}
+			
+			case Keyboard.ENTER, Keyboard.NUMPAD_ENTER :
+				if (this._grid.selectedItems.length == 1)
+				{
+					var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
+					containerOpen.setup(cast cast(this._grid.selectedItem, ValEditorTemplate).object.object);
+					ValEditor.actionStack.add(containerOpen);
 				}
 			
 			case Keyboard.UP:

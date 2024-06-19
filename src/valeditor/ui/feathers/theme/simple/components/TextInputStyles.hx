@@ -70,6 +70,7 @@ class TextInputStyles
 			inputSkin.fill = theme.getLightFillLight();
 			inputSkin.border = theme.getContrastBorderLight();
 			inputSkin.disabledFill = theme.getLightFill();
+			inputSkin.setBorderForState(TextInputState.DISABLED, theme.getContrastBorderLighter());
 			inputSkin.setBorderForState(TextInputState.FOCUSED, theme.getThemeBorder());
 			inputSkin.setBorderForState(TextInputState.ERROR, theme.getDangerBorder());
 			input.backgroundSkin = inputSkin;

@@ -384,7 +384,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		}
 	}
 	
-	@:access(valedit.value.base.ExposedValue)
+	//@:access(valedit.value.base.ExposedValue)
 	public function templatePropertyChange(templateValue:ExposedValue, propertyNames:Array<String>):Void
 	{
 		templateValue.cloneValue(this._defaultCollection.getValueDeep(propertyNames));
@@ -393,6 +393,11 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		{
 			templateValue.cloneValue(collection.getValueDeep(propertyNames));
 		}
+	}
+	
+	public function templateChildPropertyChange(templateValue:ExposedValue, propertyNames:Array<String>):Void
+	{
+		templateValue.cloneValue(this.currentCollection.getValueDeep(propertyNames));
 	}
 	
 	public function valueChange(value:ExposedValue):Void
@@ -494,6 +499,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.id = json.id;
+		if (json.objectID != null)
+		{
+			this.objectID = json.objectID;
+		}
 		if (json.defaultCollection != null)
 		{
 			if (this.defaultCollection == null)
@@ -509,6 +518,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (json == null) json = {};
 		
 		json.id = this.id;
+		if (this._objectID != null)
+		{
+			json.objectID = this._objectID;
+		}
 		if (this._defaultCollection != null && this.numKeyFrames == 0)
 		{
 			if (this.template != null)
@@ -529,6 +542,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (json == null) json = {};
 		
 		json.id = this.id;
+		if (this._objectID != null)
+		{
+			json.objectID = this._objectID;
+		}
 		json.templateID = this.template.id;
 		var collection:ExposedCollection = this._keyFrameToCollection.get(keyFrame);
 		

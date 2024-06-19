@@ -112,6 +112,7 @@ class ValEditor
 	static public var categoryCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var classCollection(default, null):ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	static public var classNameCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
+	static public var openedContainerCollection(default, null):ArrayCollection<IValEditorContainer> = new ArrayCollection<IValEditorContainer>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
 	
 	static public var classVisibilities(default, null):ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
@@ -122,12 +123,12 @@ class ValEditor
 	static private var _currentContainer:IValEditorContainer;
 	static private function get_currentContainer():IValEditorContainer
 	{
-		//if (_currentContainer == null) return _rootContainer;
 		return _currentContainer;
 	}
 	static private function set_currentContainer(value:IValEditorContainer):IValEditorContainer
 	{
 		if (value == _currentContainer) return value;
+		
 		if (_currentContainer != null)
 		{
 			if (_currentTimeLineContainer != null)
@@ -139,8 +140,6 @@ class ValEditor
 			#if starling
 			_currentContainer.rootContainerStarling = null;
 			#end
-			_currentContainer.close();
-			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _currentContainer);
 		}
 		_currentContainer = value;
 		containerController.container = value;
@@ -160,9 +159,8 @@ class ValEditor
 			_currentContainer.viewWidth = viewPort.width;
 			_currentContainer.viewHeight = viewPort.height;
 			_currentContainer.adjustView();
-			_currentContainer.open();
-			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _currentContainer);
 		}
+		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CURRENT, _currentContainer);
 		return _currentContainer;
 	}
 	
@@ -180,29 +178,11 @@ class ValEditor
 		if (_rootContainer != null)
 		{
 			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
-			//_rootContainer.rootContainer = null;
-			//#if starling
-			//_rootContainer.rootContainerStarling = null;
-			//#end
-			//_rootContainer.close();
-			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, _rootContainer);
 		}
 		_rootContainer = value;
 		if (_rootContainer != null)
 		{
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
-			//_rootContainer.juggler = juggler;
-			//_rootContainer.rootContainer = _rootScene;
-			//#if starling
-			//_rootContainer.rootContainerStarling = _rootSceneStarling;
-			//#end
-			//_rootContainer.x = viewPort.x;
-			//_rootContainer.y = viewPort.y;
-			//_rootContainer.viewWidth = viewPort.width;
-			//_rootContainer.viewHeight = viewPort.height;
-			//_rootContainer.adjustView();
-			//_rootContainer.open();
-			//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, _rootContainer);
 		}
 		return _rootContainer;
 	}
@@ -210,6 +190,7 @@ class ValEditor
 	static public function openContainer(container:IValEditorContainer):Void
 	{
 		openedContainers[openedContainers.length] = container;
+		openedContainerCollection.add(container);
 		
 		if (_rootContainer == null)
 		{
@@ -217,13 +198,33 @@ class ValEditor
 		}
 		
 		currentContainer = container;
-		//container.open();
+		currentContainer.open();
+		edit(container);
 		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, container);
+	}
+	
+	static public function openContainerTemplate(container:IValEditorContainer):Void
+	{
+		while (openedContainers.length != 1)
+		{
+			closeContainer();
+		}
+		
+		openContainer(container);
+	}
+	
+	static public function makeContainerCurrent(container:IValEditorContainer):Void
+	{
+		while (currentContainer != container)
+		{
+			closeContainer();
+		}
 	}
 	
 	static public function closeContainer():Void
 	{
 		var container:IValEditorContainer = openedContainers.pop();
+		openedContainerCollection.remove(container);
 		
 		if (openedContainers.length != 0)
 		{
@@ -353,7 +354,7 @@ class ValEditor
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		openContainer(createContainer());
+		openContainer(createContainerRoot());
 	}
 	
 	static public function fileSaved():Void
@@ -375,17 +376,9 @@ class ValEditor
 			clss.reset();
 		}
 		
-		//currentContainer = null;
-		//if (_rootContainer != null)
-		//{
-			//_rootContainer.pool();
-			//rootContainer = null;
-		//}
 		closeAllContainers();
 		
 		ValEdit.assetLib.reset();
-		
-		//fileSettings.clear();
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -671,7 +664,14 @@ class ValEditor
 			throw new Error("ValEditor.edit ::: null container");
 		}
 		
-		clearContainer(container);
+		// DEBUG
+		if (Std.isOfType(object, ValEditorKeyFrame))
+		{
+			trace("debug");
+		}
+		//\DEBUG
+		
+		clearUIContainer(container);
 		
 		if (object == null) return null;
 		
@@ -735,7 +735,7 @@ class ValEditor
 			throw new Error("ValEditor.editConstructor ::: null container");
 		}
 		
-		clearContainer(container);
+		clearUIContainer(container);
 		
 		if (className == null) return null;
 		
@@ -777,7 +777,7 @@ class ValEditor
 			throw new Error("ValEditor.editTemplate ::: null container");
 		}
 		
-		clearContainer(container);
+		clearUIContainer(container);
 		
 		if (template == null) return;
 		
@@ -795,7 +795,7 @@ class ValEditor
 	   
 	   @param	container
 	**/
-	static public function clearContainer(?container:DisplayObjectContainer):Void
+	static public function clearUIContainer(?container:DisplayObjectContainer):Void
 	{
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
@@ -831,12 +831,12 @@ class ValEditor
 		return createObjectWithClassName(Type.getClassName(clss), id, params, collection);
 	}
 	
-	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection):ValEditorObject
+	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection, ?objectID:String):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(className);
 		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
-		ValEdit.createObjectWithClassName(className, id, params, valObject, collection);
+		ValEdit.createObjectWithClassName(className, id, params, valObject, collection, objectID);
 		
 		valObject.applyClassVisibility(valClass.visibilityCollectionCurrent);
 		
@@ -881,7 +881,7 @@ class ValEditor
 		return template;
 	}
 	
-	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, registerToTemplate:Bool = true):ValEditorObject
+	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, ?objectID:String, registerToTemplate:Bool = true):ValEditorObject
 	{
 		var valClass:ValEditorClass = cast template.clss;
 		
@@ -901,7 +901,7 @@ class ValEditor
 		valObject.useBounds = valClass.useBounds;
 		valObject.usePivotScaling = valClass.usePivotScaling;
 		
-		ValEdit.createObjectWithTemplate(template, id, valObject, collection, registerToTemplate);
+		ValEdit.createObjectWithTemplate(template, id, valObject, collection, objectID, registerToTemplate);
 		
 		if (registerToTemplate)
 		{
@@ -926,11 +926,11 @@ class ValEditor
 		var newObject:ValEditorObject;
 		if (object.template != null)
 		{
-			newObject = createObjectWithTemplate(cast object.template, id, object.currentCollection.clone(true));
+			newObject = createObjectWithTemplate(cast object.template, id, object.currentCollection.clone(true), object.objectID);
 		}
 		else
 		{
-			newObject = createObjectWithClassName(object.className, id, object.currentCollection.clone(true));
+			newObject = createObjectWithClassName(object.className, id, null, object.currentCollection.clone(true), object.objectID);
 		}
 		return newObject;
 	}
@@ -1195,6 +1195,18 @@ class ValEditor
 	static public function createContainer():ValEditorContainer
 	{
 		var container:ValEditorContainer = ValEditorContainer.fromPool();
+		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
+		container.numFrames = fileSettings.numFramesDefault;
+		container.frameIndex = 0;
+		var layer:ValEditorLayer = createLayer();
+		container.addLayer(layer);
+		return container;
+	}
+	
+	static public function createContainerRoot():ValEditorContainerRoot
+	{
+		var container:ValEditorContainerRoot = ValEditorContainerRoot.fromPool();
+		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
 		var layer:ValEditorLayer = createLayer();
@@ -1217,9 +1229,12 @@ class ValEditor
 	
 	static public function createTimeLine():ValEditorTimeLine
 	{
-		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
+		//var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
+		//timeLine.frameIndex = 0;
+		//timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
+		//timeLine.insertKeyFrame();
+		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(1);
 		timeLine.frameIndex = 0;
-		timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		timeLine.insertKeyFrame();
 		return timeLine;
 	}
@@ -1510,7 +1525,7 @@ class ValEditor
 	
 	static public function fromJSONSave(json:Dynamic):Void
 	{
-		var container:ValEditorContainer = ValEditorContainer.fromPool();
+		var container:ValEditorContainerRoot = ValEditorContainerRoot.fromPool();
 		
 		var clss:ValEditorClass;
 		var classList:Array<Dynamic> = json.classes;
@@ -1526,7 +1541,6 @@ class ValEditor
 		
 		container.fromJSONSave(json.root);
 		
-		//rootContainer = container;
 		openContainer(container);
 	}
 	

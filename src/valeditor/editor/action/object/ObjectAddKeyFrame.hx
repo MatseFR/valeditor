@@ -2,6 +2,7 @@ package valeditor.editor.action.object;
 
 import openfl.errors.Error;
 import valedit.ExposedCollection;
+import valeditor.IValEditorTimeLineContainer;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
@@ -33,10 +34,6 @@ class ObjectAddKeyFrame extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			//if (this.object.canBeDestroyed())
-			//{
-				//ValEditor.destroyObject(this.object);
-			//}
 			if (this.collection != null)
 			{
 				this.collection.pool();
@@ -74,6 +71,7 @@ class ObjectAddKeyFrame extends ValEditorAction
 		{
 			this.collection = this.object.getCollectionForKeyFrame(this.keyFrame);
 		}
+		
 		this.status = ValEditorActionStatus.DONE;
 	}
 	

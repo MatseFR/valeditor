@@ -10,9 +10,15 @@ import valedit.ValEditObject;
  */
 class LayerEvent extends Event
 {
-	inline static public var LOCK_CHANGE:String = "lock_change";
+	#if valeditor
 	inline static public var OBJECT_ADDED:String = "object_added";
 	inline static public var OBJECT_REMOVED:String = "object_removed";
+	#end
+	
+	inline static public var OBJECT_ACTIVATED:String = "object_activated";
+	inline static public var OBJECT_DEACTIVATED:String = "object_deactivated";
+	
+	inline static public var LOCK_CHANGE:String = "lock_change";
 	inline static public var SELECTED:String = "selected";
 	inline static public var UNSELECTED:String = "unselected";
 	inline static public var VISIBLE_CHANGE:String = "visible_change";

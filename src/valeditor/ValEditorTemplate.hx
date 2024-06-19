@@ -2,16 +2,20 @@ package valeditor;
 
 import valedit.ExposedCollection;
 import valedit.ValEditClass;
+import valedit.ValEditLayer;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.utils.ReverseIterator;
 import valedit.value.base.ExposedValue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
+import valeditor.events.ContainerEvent;
+import valeditor.events.KeyFrameEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
+import valeditor.events.TimeLineActionEvent;
 
 /**
  * ...
@@ -70,12 +74,54 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		{
 			this._object.removeEventListener(ObjectPropertyEvent.CHANGE, onTemplateObjectPropertyChange);
 			this._object.removeEventListener(ObjectFunctionEvent.CALLED, onTemplateObjectFunctionCalled);
+			if (Std.isOfType(this._object.object, IValEditorContainer))
+			{
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_ADDED, onTemplateContainerLayerAdded);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_INDEX_DOWN, onTemplateContainerLayerIndexDown);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_INDEX_UP, onTemplateContainerLayerIndexUp);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_REMOVED, onTemplateContainerLayerRemoved);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_RENAMED, onTemplateContainerLayerRenamed);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_SELECTED, onTemplateContainerLayerSelected);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.LAYER_VISIBILITY_CHANGE, onTemplateContainerLayerVisibilityChange);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.OBJECT_ADDED, onTemplateContainerObjectAdded);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.OBJECT_REMOVED, onTemplateContainerObjectRemoved);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.OBJECT_FUNCTION_CALLED, onTemplateContainerObjectFunctionCalled);
+				cast(this._object.object, IValEditorContainer).removeEventListener(ContainerEvent.OBJECT_PROPERTY_CHANGE, onTemplateContainerObjectPropertyChange);
+				
+				cast(this._object.object, IValEditorContainer).removeEventListener(TimeLineActionEvent.INSERT_FRAME, onTemplateContainerInsertFrame);
+				cast(this._object.object, IValEditorContainer).removeEventListener(TimeLineActionEvent.INSERT_KEYFRAME, onTemplateContainerInsertKeyFrame);
+				cast(this._object.object, IValEditorContainer).removeEventListener(TimeLineActionEvent.REMOVE_FRAME, onTemplateContainerRemoveFrame);
+				cast(this._object.object, IValEditorContainer).removeEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, onTemplateContainerRemoveKeyFrame);
+				cast(this._object.object, IValEditorContainer).removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, onTemplateContainerKeyFrameTransitionChange);
+				cast(this._object.object, IValEditorContainer).removeEventListener(KeyFrameEvent.TWEEN_CHANGE, onTemplateContainerKeyFrameTweenChange);
+			}
 		}
 		
 		if (value != null)
 		{
 			value.addEventListener(ObjectPropertyEvent.CHANGE, onTemplateObjectPropertyChange);
 			value.addEventListener(ObjectFunctionEvent.CALLED, onTemplateObjectFunctionCalled);
+			if (Std.isOfType(value.object, IValEditorContainer))
+			{
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_ADDED, onTemplateContainerLayerAdded);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_INDEX_DOWN, onTemplateContainerLayerIndexDown);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_INDEX_UP, onTemplateContainerLayerIndexUp);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_REMOVED, onTemplateContainerLayerRemoved);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_RENAMED, onTemplateContainerLayerRenamed);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_SELECTED, onTemplateContainerLayerSelected);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.LAYER_VISIBILITY_CHANGE, onTemplateContainerLayerVisibilityChange);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.OBJECT_ADDED, onTemplateContainerObjectAdded);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.OBJECT_REMOVED, onTemplateContainerObjectRemoved);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.OBJECT_FUNCTION_CALLED, onTemplateContainerObjectFunctionCalled);
+				cast(value.object, IValEditorContainer).addEventListener(ContainerEvent.OBJECT_PROPERTY_CHANGE, onTemplateContainerObjectPropertyChange);
+				
+				cast(value.object, IValEditorContainer).addEventListener(TimeLineActionEvent.INSERT_FRAME, onTemplateContainerInsertFrame);
+				cast(value.object, IValEditorContainer).addEventListener(TimeLineActionEvent.INSERT_KEYFRAME, onTemplateContainerInsertKeyFrame);
+				cast(value.object, IValEditorContainer).addEventListener(TimeLineActionEvent.REMOVE_FRAME, onTemplateContainerRemoveFrame);
+				cast(value.object, IValEditorContainer).addEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, onTemplateContainerRemoveKeyFrame);
+				cast(value.object, IValEditorContainer).addEventListener(KeyFrameEvent.TRANSITION_CHANGE, onTemplateContainerKeyFrameTransitionChange);
+				cast(value.object, IValEditorContainer).addEventListener(KeyFrameEvent.TWEEN_CHANGE, onTemplateContainerKeyFrameTweenChange);
+			}
 		}
 		
 		return super.set_object(value);
@@ -245,6 +291,339 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	public function objectIDExists(id:String):Bool
 	{
 		return this._instanceMap.exists(id);
+	}
+	
+	private function onTemplateContainerKeyFrameTransitionChange(evt:KeyFrameEvent):Void
+	{
+		trace("onTemplateContainerKeyFrameTransitionChange");
+		
+		var currentFrame:ValEditorKeyFrame = cast cast(this.object.object, IValEditorTimeLineContainer).currentLayer.timeLine.frameCurrent;
+		var instanceContainer:IValEditorTimeLineContainer;
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			instanceContainer.currentLayer.timeLine.frameCurrent.transition = currentFrame.transition;
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
+	}
+	
+	private function onTemplateContainerKeyFrameTweenChange(evt:KeyFrameEvent):Void
+	{
+		trace("onTemplateContainerKeyFrameTweenChange");
+		
+		var currentFrame:ValEditorKeyFrame = cast cast(this.object.object, IValEditorTimeLineContainer).currentLayer.timeLine.frameCurrent;
+		var instanceContainer:IValEditorTimeLineContainer;
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			instanceContainer.currentLayer.timeLine.frameCurrent.tween = currentFrame.tween;
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
+	}
+	
+	private function onTemplateContainerLayerAdded(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerAdded");
+		
+		var layer:ValEditorLayer = evt.object;
+		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
+		var objectLayer:ValEditorLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = ValEditorLayer.fromPool();
+			layer.cloneTo(objectLayer);
+			cast(instance.object, IValEditorTimeLineContainer).addLayerAt(objectLayer, index);
+		}
+	}
+	
+	private function onTemplateContainerLayerIndexDown(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerIndexDown");
+		
+		var layer:ValEditorLayer = evt.object;
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayer(layer.name);
+			cast(instance.object, IValEditorTimeLineContainer).layerIndexDown(objectLayer);
+		}
+	}
+	
+	private function onTemplateContainerLayerIndexUp(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerIndexUp");
+		
+		var layer:ValEditorLayer = evt.object;
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayer(layer.name);
+			cast(instance.object, IValEditorTimeLineContainer).layerIndexUp(objectLayer);
+		}
+	}
+	
+	private function onTemplateContainerLayerRemoved(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerRemoved");
+		
+		var layer:ValEditorLayer = evt.object;
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayer(layer.name);
+			cast(instance.object, IValEditorTimeLineContainer).removeLayer(objectLayer);
+			objectLayer.pool();
+		}
+	}
+	
+	private function onTemplateContainerLayerRenamed(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerRenamed");
+		
+		var layer:ValEditorLayer = evt.object;
+		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayerAt(index);
+			objectLayer.name = layer.name;
+		}
+	}
+	
+	private function onTemplateContainerLayerSelected(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerSelected");
+		
+		var layer:ValEditorLayer = evt.object;
+		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayerAt(index);
+			cast(instance.object, IValEditorTimeLineContainer).currentLayer = objectLayer;
+		}
+	}
+	
+	private function onTemplateContainerLayerVisibilityChange(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerLayerVisibilityChange");
+		
+		var layer:ValEditorLayer = evt.object;
+		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
+		var objectLayer:ValEditLayer;
+		for (instance in this._instances)
+		{
+			objectLayer = cast(instance.object, IValEditorTimeLineContainer).getLayerAt(index);
+			objectLayer.visible = layer.visible;
+		}
+	}
+	
+	private function onTemplateContainerObjectAdded(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerObjectAdded");
+		
+		var object:ValEditorObject = evt.object;
+		var instanceObject:ValEditorObject;
+		
+		if (Std.isOfType(this.object.object, IValEditorTimeLineContainer))
+		{
+			var instanceContainer:IValEditorTimeLineContainer;
+			var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+			var prevFrameIndex:Int;
+			
+			for (instance in this._instances)
+			{
+				instanceContainer = cast instance.object;
+				prevFrameIndex = instanceContainer.frameIndex;
+				instanceContainer.frameIndex = frameIndex;
+				if (instanceContainer.hasActiveObject(object.objectID)) continue;
+				instanceObject = cast instanceContainer.getObject(object.objectID);
+				if (instanceObject == null)
+				{
+					instanceObject = ValEditor.cloneObject(object);
+				}
+				instanceContainer.addObject(instanceObject);
+				instanceContainer.frameIndex = prevFrameIndex;
+			}
+		}
+		else
+		{
+			for (instance in this._instances)
+			{
+				instanceObject = ValEditor.cloneObject(object);
+				cast(instance.object, IValEditorContainer).addObject(instanceObject);
+			}
+		}
+	}
+	
+	private function onTemplateContainerObjectRemoved(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerObjectRemoved");
+		
+		var object:ValEditorObject = evt.object;
+		var instanceObject:ValEditObject;
+		
+		if (Std.isOfType(this.object.object, IValEditorTimeLineContainer))
+		{
+			var timeLineContainer:IValEditorTimeLineContainer;
+			var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+			var prevFrameIndex:Int;
+			
+			for (instance in this._instances)
+			{
+				timeLineContainer = cast instance.object;
+				prevFrameIndex = timeLineContainer.frameIndex;
+				timeLineContainer.frameIndex = frameIndex;
+				if (!timeLineContainer.hasActiveObject(object.objectID)) continue;
+				instanceObject = timeLineContainer.getActiveObject(object.objectID);
+				timeLineContainer.removeObject(instanceObject);
+				if (instanceObject.canBeDestroyed())
+				{
+					ValEditor.destroyObject(cast instanceObject);
+				}
+				timeLineContainer.frameIndex = prevFrameIndex;
+			}
+		}
+		else
+		{
+			var instanceContainer:IValEditorContainer;
+			
+			for (instance in this._instances)
+			{
+				instanceContainer = cast instance.object;
+				if (!instanceContainer.hasActiveObject(object.objectID)) continue;
+				instanceObject = instanceContainer.getActiveObject(object.objectID);
+				instanceContainer.removeObject(instanceObject);
+				if (instanceObject.canBeDestroyed())
+				{
+					ValEditor.destroyObject(cast instanceObject);
+				}
+			}
+		}
+	}
+	
+	private function onTemplateContainerObjectFunctionCalled(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerObjectFunctionCalled");
+		
+		var functionEvent:ObjectFunctionEvent = cast evt.subEvent;
+		var object:ValEditorObject = functionEvent.object;
+		var instanceContainer:IValEditorContainer;
+		var instanceObject:ValEditorObject;
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			instanceObject = cast instanceContainer.getActiveObject(object.objectID);
+			instanceObject.templateFunctionCall(functionEvent.functionName, functionEvent.parameters);
+		}
+	}
+	
+	private function onTemplateContainerObjectPropertyChange(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerObjectPropertyChange");
+		
+		var propertyEvent:ObjectPropertyEvent = cast evt.subEvent;
+		var object:ValEditorObject = propertyEvent.object;
+		var templateValue:ExposedValue = object.currentCollection.getValueDeep(propertyEvent.propertyNames);
+		var instanceContainer:IValEditorContainer;
+		var instanceObject:ValEditorObject;
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			instanceObject = cast instanceContainer.getActiveObject(object.objectID);
+			instanceObject.templateChildPropertyChange(templateValue, propertyEvent.propertyNames);
+		}
+	}
+	
+	private function onTemplateContainerSelectedFrameIndexChange(evt:ContainerEvent):Void
+	{
+		trace("onTemplateContainerSelectedFrameIndexChange");
+		
+		var index:Int = cast(cast(cast(this.object.object, IValEditorTimeLineContainer).currentLayer, ValEditorLayer).timeLine, ValEditorTimeLine).selectedFrameIndex;
+		for (instance in this._instances)
+		{
+			cast(cast(cast(instance.object, IValEditorTimeLineContainer).currentLayer, ValEditorLayer).timeLine, ValEditorTimeLine).selectedFrameIndex = index;
+		}
+	}
+	
+	private function onTemplateContainerInsertFrame(evt:TimeLineActionEvent):Void
+	{
+		trace("onTemplateContainerInsertFrame");
+		
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		var instanceContainer:IValEditorTimeLineContainer;
+		
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			cast(instanceContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame(evt.action);
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
+	}
+	
+	private function onTemplateContainerInsertKeyFrame(evt:TimeLineActionEvent):Void
+	{
+		trace("onTemplateContainerInsertKeyFrame");
+		
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		var instanceContainer:IValEditorTimeLineContainer;
+		
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			cast(instanceContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame(evt.action);
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
+	}
+	
+	private function onTemplateContainerRemoveFrame(evt:TimeLineActionEvent):Void
+	{
+		trace("onTemplateContainerRemoveFrame");
+		
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		var instanceContainer:IValEditorTimeLineContainer;
+		
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			cast(instanceContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame(evt.action);
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
+	}
+	
+	private function onTemplateContainerRemoveKeyFrame(evt:TimeLineActionEvent):Void
+	{
+		trace("onTemplateContainerRemoveKeyFrame");
+		
+		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
+		var prevFrameIndex:Int;
+		var instanceContainer:IValEditorTimeLineContainer;
+		
+		for (instance in this._instances)
+		{
+			instanceContainer = cast instance.object;
+			prevFrameIndex = instanceContainer.frameIndex;
+			instanceContainer.frameIndex = frameIndex;
+			cast(instanceContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame(evt.action);
+			instanceContainer.frameIndex = prevFrameIndex;
+		}
 	}
 	
 	@:access(valedit.value.base.ExposedValue)

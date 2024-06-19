@@ -537,6 +537,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		// ValEditorContainer
 		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = ValEditor.createContainer;
 		settings.disposeFunctionName = "pool";
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -549,10 +551,20 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(ValEditorContainer, settings);
 		settings.clear();
 		
+		// ValEditorContainerRoot
+		settings.canBeCreated = false;
+		settings.disposeFunctionName = "pool";
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.collection = ContainerData.exposeValEditorContainerRoot();
+		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
+		ValEditor.registerClass(ValEditorContainerRoot, settings);
+		settings.clear();
+		
 		settings.pool();
 		
 		//ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
-		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditKeyFrame());
+		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
 		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
 		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
 	}

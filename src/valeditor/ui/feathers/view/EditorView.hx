@@ -15,8 +15,10 @@ import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
+import feathers.layout.HorizontalListLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalLayoutData;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
 import openfl.Lib;
@@ -25,7 +27,11 @@ import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
+import valeditor.IValEditorContainer;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.container.ContainerMakeCurrent;
+import valeditor.editor.action.container.ContainerOpen;
+import valeditor.events.EditorEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.controls.ObjectLibrary;
@@ -34,7 +40,6 @@ import valeditor.ui.feathers.controls.TemplateLibrary;
 import valeditor.ui.feathers.controls.ToggleLayoutGroup;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
-import valeditor.ui.feathers.variant.ButtonVariant;
 import valeditor.ui.feathers.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.variant.ListViewVariant;
 import valeditor.ui.feathers.variant.PopUpListViewVariant;
@@ -65,6 +70,8 @@ class EditorView extends LayoutGroup
 	private var _objectLib:ObjectLibrary;
 	
 	// center content
+	private var _sceneGroup:LayoutGroup;
+	private var _containerList:ListView;
 	private var _displayArea:LayoutGroup;
 	private var _displayRect:Rectangle = new Rectangle();
 	private var _scenario:ScenarioView;
@@ -98,6 +105,7 @@ class EditorView extends LayoutGroup
 	private var _cutMenuItem:MenuItem;
 	private var _pasteMenuItem:MenuItem;
 	private var _deleteMenuItem:MenuItem;
+	private var _openContainerMenuItem:MenuItem;
 	private var _selectAllMenuItem:MenuItem;
 	private var _unselectAllMenuItem:MenuItem;
 	
@@ -283,10 +291,23 @@ class EditorView extends LayoutGroup
 		//this._objectGroup.isOpen = true;
 		
 		// center content
+		this._sceneGroup = new LayoutGroup();
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		this._sceneGroup.layout = vLayout;
+		this._centerBox.addChild(this._sceneGroup);
+		
+		this._containerList = new ListView(ValEditor.openedContainerCollection);
+		this._containerList.layout = new HorizontalListLayout();
+		this._containerList.addEventListener(ListViewEvent.ITEM_TRIGGER, onContainerListItemTrigger);
+		this._sceneGroup.addChild(this._containerList);
+		
 		this._displayArea = new LayoutGroup();
 		//this._displayArea.variant = LayoutGroupVariant.VIEWPORT_DEBUG;
+		this._displayArea.layoutData = new VerticalLayoutData(null, 100);
 		this._displayArea.addEventListener(Event.RESIZE, onDisplayAreaResize);
-		this._centerBox.addChild(this._displayArea);
+		this._sceneGroup.addChild(this._displayArea);
 		
 		this._scenario = new ScenarioView();
 		startHeight = Lib.current.stage.stageHeight / 4;
@@ -330,6 +351,7 @@ class EditorView extends LayoutGroup
 		this._cutMenuItem = new MenuItem("cut", "Cut", true, "Ctrl+X");
 		this._pasteMenuItem = new MenuItem("paste", "Paste", true, "Ctrl+V");
 		this._deleteMenuItem = new MenuItem("delete", "Delete", true, "Del");
+		this._openContainerMenuItem = new MenuItem("open_container", "Open container");
 		this._selectAllMenuItem = new MenuItem("select all", "Select all", true, "Ctrl+A");
 		this._unselectAllMenuItem = new MenuItem("unselect all", "Unselect all", true, "Ctrl+Shift+A");
 		
@@ -338,6 +360,7 @@ class EditorView extends LayoutGroup
 			this._cutMenuItem,
 			this._pasteMenuItem,
 			this._deleteMenuItem,
+			this._openContainerMenuItem,
 			this._selectAllMenuItem,
 			this._unselectAllMenuItem
 		]);
@@ -378,6 +401,24 @@ class EditorView extends LayoutGroup
 		addChild(this._contextMenuSprite);
 		
 		this.addEventListener(Event.RESIZE, onResize);
+		
+		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
+	}
+	
+	private function onContainerOpen(evt:EditorEvent):Void
+	{
+		this._containerList.selectedIndex = this._containerList.dataProvider.length - 1;
+	}
+	
+	private function onContainerListItemTrigger(evt:ListViewEvent):Void
+	{
+		var container:IValEditorContainer = evt.state.data;
+		if (container != ValEditor.currentContainer)
+		{
+			var action:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
+			action.setup(container);
+			ValEditor.actionStack.add(action);
+		}
 	}
 	
 	private function closeContextMenu():Void
@@ -457,6 +498,24 @@ class EditorView extends LayoutGroup
 					action.pool();
 				}
 			
+			case "open_container" :
+				var container:IValEditorContainer = cast(ValEditor.selection.object, ValEditorObject).object;
+				if (container.isOpen)
+				{
+					if (ValEditor.currentContainer != container)
+					{
+						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
+						containerMakeCurrent.setup(container);
+						ValEditor.actionStack.add(containerMakeCurrent);
+					}
+				}
+				else
+				{
+					var containerOpen:ContainerOpen = ContainerOpen.fromPool();
+					containerOpen.setup(container);
+					ValEditor.actionStack.add(containerOpen);
+				}
+			
 			case "select all" :
 				action = MultiAction.fromPool();
 				ValEditor.selectAll(action);
@@ -510,6 +569,7 @@ class EditorView extends LayoutGroup
 				closeContextMenu();
 			}
 			
+			var isContainerSelected:Bool = ValEditor.selection.numObjects == 1 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) && Std.isOfType(ValEditor.selection.object.object, IValEditorContainer));
 			var isObjectSelected:Bool = ValEditor.selection.numObjects != 0 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) || Std.isOfType(ValEditor.selection.object, ValEditorObjectGroup));
 			var isObjectInClipboard:Bool = ValEditor.clipboard.numObjects != 0 && (Std.isOfType(ValEditor.clipboard.object, ValEditorObject) || Std.isOfType(ValEditor.clipboard.object, ValEditorObjectGroup));
 			
@@ -517,6 +577,7 @@ class EditorView extends LayoutGroup
 			this._cutMenuItem.enabled = isObjectSelected;
 			this._pasteMenuItem.enabled = isObjectInClipboard;
 			this._deleteMenuItem.enabled = isObjectSelected;
+			this._openContainerMenuItem.enabled = isContainerSelected;
 			this._selectAllMenuItem.enabled = ValEditor.currentContainer.hasVisibleObject();
 			this._unselectAllMenuItem.enabled = isObjectSelected;
 			this._contextMenuCollection.updateAll();

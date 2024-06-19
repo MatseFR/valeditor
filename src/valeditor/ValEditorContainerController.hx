@@ -49,8 +49,8 @@ class ValEditorContainerController implements IAnimatable
 		
 		if (this._container != null)
 		{
-			this._container.removeEventListener(ContainerEvent.OBJECT_ADDED, onObjectAdded);
-			this._container.removeEventListener(ContainerEvent.OBJECT_REMOVED, onObjectRemoved);
+			this._container.removeEventListener(ContainerEvent.OBJECT_ACTIVATED, onObjectActivated);
+			this._container.removeEventListener(ContainerEvent.OBJECT_DEACTIVATED, onObjectDeactivated);
 			
 			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageMouseClick);
@@ -69,8 +69,8 @@ class ValEditorContainerController implements IAnimatable
 		
 		if (value != null)
 		{
-			value.addEventListener(ContainerEvent.OBJECT_ADDED, onObjectAdded);
-			value.addEventListener(ContainerEvent.OBJECT_REMOVED, onObjectRemoved);
+			value.addEventListener(ContainerEvent.OBJECT_ACTIVATED, onObjectActivated);
+			value.addEventListener(ContainerEvent.OBJECT_DEACTIVATED, onObjectDeactivated);
 			
 			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			Lib.current.stage.addEventListener(MouseEvent.CLICK, onStageMouseClick);
@@ -151,8 +151,18 @@ class ValEditorContainerController implements IAnimatable
 					starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
 				#end
 				
+				case DisplayObjectType.MIXED :
+					cast(object.object, IValEditorContainer).container.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+					#if starling
+					cast(object.object, IValEditorContainer).containerStarling.addEventListener(TouchEvent.TOUCH, onObjectTouch);
+					#end
+					this._interactiveObjectToValEditObject.set(cast(object.object, IValEditorContainer).container, object);
+					#if starling
+					this._interactiveObjectToValEditObject.set(cast(object.object, IValEditorContainer).containerStarling, object);
+					#end
+				
 				default :
-					throw new Error("ValEditorContainer.layer_objectAdded ::: unknown display object type " + object.displayObjectType);
+					throw new Error("ValEditorContainerController.registerObject ::: unknown display object type " + object.displayObjectType);
 			}
 		}
 		
@@ -178,8 +188,18 @@ class ValEditorContainerController implements IAnimatable
 					starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
 				#end
 				
+				case DisplayObjectType.MIXED :
+					cast(object.object, IValEditorContainer).container.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+					#if starling
+					cast(object.object, IValEditorContainer).containerStarling.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
+					#end
+					this._interactiveObjectToValEditObject.remove(cast(object.object, IValEditorContainer).container);
+					#if starling
+					this._interactiveObjectToValEditObject.remove(cast(object.object, IValEditorContainer).containerStarling);
+					#end
+				
 				default :
-					throw new Error("ValEditorContainer.layer_objectRemoved ::: unknown display object type " + object.displayObjectType);
+					throw new Error("ValEditorContainerController.unregisterObject ::: unknown display object type " + object.displayObjectType);
 			}
 		}
 		
@@ -189,12 +209,12 @@ class ValEditorContainerController implements IAnimatable
 		}
 	}
 	
-	private function onObjectAdded(evt:ContainerEvent):Void
+	private function onObjectActivated(evt:ContainerEvent):Void
 	{
 		registerObject(evt.object);
 	}
 	
-	private function onObjectRemoved(evt:ContainerEvent):Void
+	private function onObjectDeactivated(evt:ContainerEvent):Void
 	{
 		unregisterObject(evt.object);
 	}
@@ -207,7 +227,7 @@ class ValEditorContainerController implements IAnimatable
 		// DEBUG
 		if (this._actionCurrent != null)
 		{
-			throw new Error("ValEditorContainer : this._actionCurrent should be null");
+			throw new Error("ValEditorContainerController : this._actionCurrent should be null");
 		}
 		this._actionCurrent = MultiAction.fromPool();
 		//\DEBUG
@@ -218,6 +238,7 @@ class ValEditorContainerController implements IAnimatable
 		this._mouseDownWithShift = evt.shiftKey;
 		
 		var object:ValEditorObject = this._interactiveObjectToValEditObject.get(evt.target);
+		if (object == null) object = this._interactiveObjectToValEditObject.get(evt.currentTarget);
 		if (!object.isSelectable) return;
 		if (this._mouseObject != null && this._mouseObject != object && !this._mouseDownWithCtrl && !this._mouseDownWithShift)
 		{
@@ -488,15 +509,17 @@ class ValEditorContainerController implements IAnimatable
 	{
 		var touch:Touch = evt.touches[0];
 		var object:ValEditorObject = this._interactiveObjectToValEditObject.get(evt.target);
+		if (object == null) object = this._interactiveObjectToValEditObject.get(evt.currentTarget);
 		if (touch.phase == TouchPhase.BEGAN)
 		{
+			if (!object.isSelectable) return;
 			if (this._mouseDownOnObject) return;
 			var selectionClear:SelectionClear;
 			
 			// DEBUG
 			if (this._actionCurrent != null)
 			{
-				throw new Error("ValEditorContainer : this._actionCurrent should be null");
+				throw new Error("ValEditorContainerController : this._actionCurrent should be null");
 			}
 			this._actionCurrent = MultiAction.fromPool();
 			//\DEBUG
@@ -518,7 +541,21 @@ class ValEditorContainerController implements IAnimatable
 			this._mouseObject = object;
 			this._mouseObject.isMouseDown = true;
 			this.selection.isMouseDown = true;
-			touch.getLocation(cast object.interactiveObject, _pt);
+			if (object.interactiveObject != null)
+			{
+				touch.getLocation(cast object.interactiveObject, _pt);
+			}
+			else
+			{
+				if (Std.isOfType(object.object, IValEditorContainer))
+				{
+					touch.getLocation(cast(object.object, IValEditorContainer).containerStarling, _pt);
+				}
+				else
+				{
+					throw new Error("ValEditorContainerController : object has no interactive object and is not a container");
+				}
+			}
 			if (this._mouseObject.hasPivotProperties)
 			{
 				if (this._mouseObject.usePivotScaling)

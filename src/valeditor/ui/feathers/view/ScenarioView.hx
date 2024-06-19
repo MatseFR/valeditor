@@ -494,8 +494,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._contextMenuSprite.graphics.endFill();
 		addChild(this._contextMenuSprite);
 		
-		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
-		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
+		ValEditor.addEventListener(EditorEvent.CONTAINER_CURRENT, onContainerCurrent);
 		
 		this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
 	}
@@ -870,59 +869,63 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		layer.removeEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
 	}
 	
-	private function onContainerClose(evt:EditorEvent):Void
+	private function onContainerCurrent(evt:EditorEvent):Void
 	{
-		this._container.removeEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
-		this._container.removeEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
-		this._container.removeEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
-		this._container.removeEventListener(PlayEvent.PLAY, onPlay);
-		this._container.removeEventListener(PlayEvent.STOP, onStop);
-		this._container.timeLine.removeEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
-		this._container.timeLine.removeEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
-		this._layerList.dataProvider = null;
-		this._timeLineRulerList.dataProvider = null;
-		this._timeLineNumberList.dataProvider = null;
-		
-		for (i in new ReverseIterator(this._timeLineItems.length - 1, 0))
+		if (this._container != null)
 		{
-			destroyTimeLineItem(this._timeLineItems[i]);
+			this._container.removeEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
+			this._container.removeEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
+			this._container.removeEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
+			this._container.removeEventListener(PlayEvent.PLAY, onPlay);
+			this._container.removeEventListener(PlayEvent.STOP, onStop);
+			this._container.timeLine.removeEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
+			this._container.timeLine.removeEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
+			this._layerList.dataProvider = null;
+			this._timeLineRulerList.dataProvider = null;
+			this._timeLineNumberList.dataProvider = null;
+			
+			for (i in new ReverseIterator(this._timeLineItems.length - 1, 0))
+			{
+				destroyTimeLineItem(this._timeLineItems[i]);
+			}
+			
+			this._currentTimeLineItem = null;
 		}
 		
-		this._currentTimeLineItem = null;
-	}
-	
-	private function onContainerOpen(evt:EditorEvent):Void
-	{
 		this._container = cast evt.object;
-		this._container.addEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
-		this._container.addEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
-		this._container.addEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
-		this._container.addEventListener(PlayEvent.PLAY, onPlay);
-		this._container.addEventListener(PlayEvent.STOP, onStop);
-		this._container.timeLine.addEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
-		this._container.timeLine.addEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
-		this._layerList.dataProvider = this._container.layerCollection;
-		this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
-		this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
 		
-		setPlayHeadIndex(this._container.frameIndex);
-		
-		for (layer in this._container.layerCollection)
+		if (this._container != null)
 		{
-			layerRegister(layer);
+			this._container.addEventListener(ContainerEvent.LAYER_ADDED, onLayerAdded);
+			this._container.addEventListener(ContainerEvent.LAYER_REMOVED, onLayerRemoved);
+			this._container.addEventListener(ContainerEvent.LAYER_SELECTED, onLayerSelected);
+			this._container.addEventListener(PlayEvent.PLAY, onPlay);
+			this._container.addEventListener(PlayEvent.STOP, onStop);
+			this._container.timeLine.addEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
+			this._container.timeLine.addEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
+			this._layerList.dataProvider = this._container.layerCollection;
+			this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+			this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+			
+			setPlayHeadIndex(this._container.frameIndex);
+			
+			for (layer in this._container.layerCollection)
+			{
+				layerRegister(layer);
+			}
+			this._timeLineList.validateNow();
+			
+			var layerIndex:Int = this._container.getLayerIndex(this._container.currentLayer);
+			this._layerList.selectedIndex = layerIndex;
+			
+			this._currentTimeLineItem = this._timeLineItems[layerIndex];
+			this._currentTimeLineItem.isCurrent = true;
+			
+			this._hScrollBar.value = 0.0;
+			
+			updateHScrollBar();
+			updateVScrollBar();
 		}
-		this._timeLineList.validateNow();
-		
-		var layerIndex:Int = this._container.getLayerIndex(this._container.currentLayer);
-		this._layerList.selectedIndex = layerIndex;
-		
-		this._currentTimeLineItem = this._timeLineItems[layerIndex];
-		this._currentTimeLineItem.isCurrent = true;
-		
-		this._hScrollBar.value = 0.0;
-		
-		updateHScrollBar();
-		updateVScrollBar();
 	}
 	
 	private function onFrameContextMenuStageMouseDown(evt:MouseEvent):Void

@@ -89,7 +89,7 @@ class ObjectLibrary extends LayoutGroup
 		
 		if (ValEditor.currentContainer != null)
 		{
-			this._grid.dataProvider = ValEditor.currentContainer.objectCollection;
+			this._grid.dataProvider = ValEditor.currentContainer.allObjectsCollection;
 		}
 		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onObjectSelectionChange);
@@ -98,7 +98,7 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onEditorContainerOpen(evt:EditorEvent):Void
 	{
-		this._grid.dataProvider = evt.object.objectCollection;
+		this._grid.dataProvider = evt.object.allObjectsCollection;
 	}
 	
 	private function onObjectAddButton(evt:TriggerEvent):Void

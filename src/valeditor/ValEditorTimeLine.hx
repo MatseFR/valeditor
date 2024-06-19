@@ -2,6 +2,7 @@ package valeditor;
 
 import feathers.data.ArrayCollection;
 import openfl.events.Event;
+import valedit.ExposedCollection;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
@@ -18,6 +19,8 @@ import valeditor.editor.action.timeline.TimeLineSetFrameIndex;
 import valeditor.editor.action.timeline.TimeLineSetNumFrames;
 import valeditor.editor.action.timeline.TimeLineUnregisterKeyFrame;
 import valeditor.editor.action.timeline.TimeLineUpdateLastFrameIndex;
+import valeditor.events.KeyFrameEvent;
+import valeditor.events.TimeLineActionEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.data.FrameData;
 import valedit.utils.ReverseIterator;
@@ -46,7 +49,34 @@ class ValEditorTimeLine extends ValEditTimeLine
 	override function set_frameIndex(value:Int):Int 
 	{
 		if (this._frameIndex == value) return value;
+		//if (value >= this._numFrames)
+		//{
+			//value = this._numFrames -1;
+		//}
+		//if (!this._isPlaying)
+		//{
+			//var time:Float = (value - this._frameIndex) * this._frameTime;
+			//for (child in this._children)
+			//{
+				//child.advanceTime(time);
+			//}
+		//}
 		super.set_frameIndex(value);
+		
+		if (!this._isPlaying && this._frameCurrent != null)
+		{
+			//var diff:Int = this._frameIndex - this._frameCurrent.indexStart;
+			//for (child in this._children)
+			//{
+				//child.frameIndex = diff;
+			//}
+			var diff:Float = (this._frameIndex - this._frameCurrent.indexStart) * this._frameTime;
+			for (child in this._children)
+			{
+				child.setTime(diff);
+			}
+		}
+		
 		TimeLineEvent.dispatch(this, TimeLineEvent.FRAME_INDEX_CHANGE);
 		return this._frameIndex;
 	}
@@ -107,10 +137,10 @@ class ValEditorTimeLine extends ValEditTimeLine
 			if (this.frameCollection != null) this.frameCollection.updateAll();
 		}
 		
-		// set numFrames on children too
-		for (child in this._children)
+		// set numFrames on slaves too
+		for (slave in this._slaves)
 		{
-			child.numFrames = value;
+			slave.numFrames = value;
 		}
 		
 		TimeLineEvent.dispatch(this, TimeLineEvent.NUM_FRAMES_CHANGE);
@@ -158,7 +188,9 @@ class ValEditorTimeLine extends ValEditTimeLine
 		this.frameCollection.removeAll();
 		for (keyFrame in this._keyFrames)
 		{
-			keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
+			keyFrame.removeEventListener(KeyFrameEvent.STATE_CHANGE, onKeyFrameStateChange);
+			keyFrame.removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, onKeyFrameTransitionChange);
+			keyFrame.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, onKeyFrameTweenChange);
 		}
 		super.clear();
 	}
@@ -194,24 +226,36 @@ class ValEditorTimeLine extends ValEditTimeLine
 	override public function registerKeyFrame(keyFrame:ValEditKeyFrame):Void 
 	{
 		super.registerKeyFrame(keyFrame);
-		keyFrame.addEventListener(Event.CHANGE, onKeyFrameChange);
+		keyFrame.addEventListener(KeyFrameEvent.STATE_CHANGE, onKeyFrameStateChange);
+		keyFrame.addEventListener(KeyFrameEvent.TRANSITION_CHANGE, onKeyFrameTransitionChange);
+		keyFrame.addEventListener(KeyFrameEvent.TWEEN_CHANGE, onKeyFrameTweenChange);
 	}
 	
 	override public function unregisterKeyFrame(keyFrame:ValEditKeyFrame):Void
 	{
 		super.unregisterKeyFrame(keyFrame);
-		keyFrame.removeEventListener(Event.CHANGE, onKeyFrameChange);
+		keyFrame.removeEventListener(KeyFrameEvent.STATE_CHANGE, onKeyFrameStateChange);
+		keyFrame.removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, onKeyFrameTransitionChange);
+		keyFrame.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, onKeyFrameTweenChange);
 	}
 	
-	private function onKeyFrameChange(evt:Event):Void
+	private function onKeyFrameStateChange(evt:KeyFrameEvent):Void
 	{
-		//if (this.frameCollection.length == 0) return;
-		
 		var keyFrame:ValEditorKeyFrame = cast evt.target;
 		for (i in keyFrame.indexStart...keyFrame.indexEnd + 1)
 		{
 			this.frameCollection.updateAt(i);
 		}
+	}
+	
+	private function onKeyFrameTransitionChange(evt:KeyFrameEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	private function onKeyFrameTweenChange(evt:KeyFrameEvent):Void
+	{
+		dispatchEvent(evt);
 	}
 	
 	override public function addKeyFrame(keyFrame:ValEditKeyFrame):Void 
@@ -233,6 +277,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 		var timeLineSetFrameCurrent:TimeLineSetFrameCurrent;
 		var timeLineFrameUpdateAll:TimeLineFrameUpdateAll;
 		var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
+		
+		TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_FRAME, action);
 		
 		if (this._frameCurrent != null)
 		{
@@ -380,6 +426,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
 		}
+		
+		//TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_FRAME, action);
 	}
 	
 	public function insertKeyFrame(?action:MultiAction):Void 
@@ -396,6 +444,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 		var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
 		
 		var indexEnd:Int;
+		
+		TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_KEYFRAME, action);
 		
 		if (this._frameCurrent != null)
 		{
@@ -636,7 +686,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 			{
 				keyFrame.indexStart = keyFrame.indexEnd = this._frameIndex;
 				this._frames[this._frameIndex] = keyFrame;
-				//this._frameDatas[this._frameIndex] = FrameData.fromPool(keyFrame);
 				this._frameDatas[this._frameIndex].frame = keyFrame;
 				
 				if (prevFrame != null)
@@ -691,6 +740,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
 		}
+		
+		//TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_KEYFRAME, action);
 	}
 	
 	public function removeFrame(?action:MultiAction):Void
@@ -775,6 +826,8 @@ class ValEditorTimeLine extends ValEditTimeLine
 					action.addPost(timeLineUpdateLastFrameIndex);
 				}
 			}
+			
+			TimeLineActionEvent.dispatch(this, TimeLineActionEvent.REMOVE_FRAME, action);
 		}
 	}
 	
@@ -891,7 +944,27 @@ class ValEditorTimeLine extends ValEditTimeLine
 					action.addPost(timeLineUpdateLastFrameIndex);
 				}
 			}
+			
+			TimeLineActionEvent.dispatch(this, TimeLineActionEvent.REMOVE_KEYFRAME, action);
 		}
+	}
+	
+	public function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>
+	{
+		if (objects == null) objects = new Array<ValEditorObject>();
+		
+		for (keyFrame in this._keyFrames)
+		{
+			for (object in keyFrame.objects)
+			{
+				if (objects.indexOf(cast object) == -1)
+				{
+					objects[objects.length] = cast object;
+				}
+			}
+		}
+		
+		return objects;
 	}
 	
 	public function getReusableObjectsWithTemplateForKeyFrame(template:ValEditTemplate, keyFrame:ValEditKeyFrame):Array<ValEditObject>
@@ -930,6 +1003,54 @@ class ValEditorTimeLine extends ValEditTimeLine
 	{
 		this.numFrames = numFrames;
 		return this;
+	}
+	
+	public function cloneTo(timeLine:ValEditorTimeLine):Void
+	{
+		timeLine.frameRate = this.frameRate;
+		timeLine.loop = this.loop;
+		timeLine.numFrames = this.numFrames;
+		timeLine.numLoops = this.numLoops;
+		timeLine.reverse = this.reverse;
+		
+		var cloneFrame:ValEditorKeyFrame;
+		for (keyFrame in this.keyFrames)
+		{
+			cloneFrame = ValEditorKeyFrame.fromPool();
+			cast(keyFrame, ValEditorKeyFrame).cloneTo(cloneFrame);
+			timeLine.addKeyFrame(cloneFrame);
+		}
+		
+		//timeLine.updateLastFrameIndex();
+		timeLine._lastFrameIndex = this._lastFrameIndex;
+		
+		var objects:Array<ValEditorObject> = getAllObjects();
+		var cloneObject:ValEditorObject;
+		//var cloneObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
+		var cloneObjectMap:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
+		var collection:ExposedCollection;
+		for (object in objects)
+		{
+			cloneObject = ValEditor.cloneObject(object);
+			//cloneObjects.push(cloneObject);
+			cloneObjectMap.set(cloneObject.objectID, cloneObject);
+		}
+		
+		for (keyFrame in this.keyFrames)
+		{
+			cloneFrame = cast timeLine.getKeyFrameAt(keyFrame.indexStart);
+			for (object in keyFrame.objects)
+			{
+				cloneObject = cloneObjectMap.get(object.objectID);
+				collection = object.getCollectionForKeyFrame(keyFrame).clone(true);
+				cloneFrame.add(cloneObject, collection);
+			}
+		}
+		
+		for (keyFrame in timeLine.keyFrames)
+		{
+			keyFrame.buildTweens();
+		}
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

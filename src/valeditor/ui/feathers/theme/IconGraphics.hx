@@ -115,6 +115,26 @@ class IconGraphics
 		icon.graphics.endFill();
 	}
 	
+	static public function drawOpenIcon(icon:Shape, color:Int):Void
+	{
+		icon.graphics.beginFill(0xff00ff, 0.0);
+		icon.graphics.drawRect(0.0, 0.0, 20.0, 20.0);
+		icon.graphics.endFill();
+		icon.graphics.beginFill(color);
+		// top left
+		icon.graphics.drawRect(4.0, 4.0, 4.0, 2.0);
+		icon.graphics.drawRect(4.0, 6.0, 2.0, 2.0);
+		// top right
+		icon.graphics.drawRect(12.0, 4.0, 4.0, 2.0);
+		icon.graphics.drawRect(14.0, 6.0, 2.0, 2.0);
+		// bottom left
+		icon.graphics.drawRect(4.0, 12.0, 2.0, 4.0);
+		icon.graphics.drawRect(6.0, 14.0, 2.0, 2.0);
+		// bottom right
+		icon.graphics.drawRect(14.0, 12.0, 2.0, 4.0);
+		icon.graphics.drawRect(12.0, 14.0, 2.0, 2.0);
+	}
+	
 	static public function drawPlayIcon(icon:Shape, color:Int):Void
 	{
 		icon.graphics.beginFill(0xff00ff, 0.0);

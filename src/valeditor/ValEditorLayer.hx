@@ -6,10 +6,14 @@ import openfl.errors.Error;
 import valedit.DisplayObjectType;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
+import valedit.ValEditTimeLine;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.StringIndexedMap;
+import valeditor.events.KeyFrameEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.RenameEvent;
+import valeditor.events.TimeLineActionEvent;
+import valeditor.events.TimeLineEvent;
 
 /**
  * ...
@@ -163,6 +167,11 @@ class ValEditorLayer extends ValEditLayer
 		_POOL[_POOL.length] = this;
 	}
 	
+	override public function remove(object:ValEditObject):Void 
+	{
+		super.remove(object);
+	}
+	
 	/**
 	   This will change the layer's index without triggering removeChild/AddChild calls
 	   @param	newIndex
@@ -170,24 +179,30 @@ class ValEditorLayer extends ValEditLayer
 	public function indexUpdate(newIndex:Int):Void
 	{
 		this._index = newIndex;
+		if (this._rootContainer != null && this._displayContainer != null)
+		{
+			this._rootContainer.removeChild(this._displayContainer);
+			if (this._index != -1)
+			{
+				this._rootContainer.addChildAt(this._displayContainer, this._index);
+			}
+		}
+		
+		#if starling
+		if (this._rootContainerStarling != null && this._displayContainerStarling != null)
+		{
+			this._rootContainerStarling.removeChild(this._displayContainerStarling);
+			if (this._index != -1)
+			{
+				this._rootContainerStarling.addChildAt(this._displayContainerStarling, this._index);
+			}
+		}
+		#end
 	}
 	
 	public function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>
 	{
-		if (objects == null) objects = new Array<ValEditorObject>();
-		
-		for (keyFrame in this.timeLine.keyFrames)
-		{
-			for (object in keyFrame.objects)
-			{
-				if (objects.indexOf(cast object) == -1)
-				{
-					objects[objects.length] = cast object;
-				}
-			}
-		}
-		
-		return objects;
+		return cast(this.timeLine, ValEditorTimeLine).getAllObjects(objects);
 	}
 	
 	public function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>
@@ -242,6 +257,9 @@ class ValEditorLayer extends ValEditLayer
 					this._displayContainerStarling.addChild(cast editorObject.interactiveObject);
 				#end
 				
+				case DisplayObjectType.MIXED :
+					// nothing ?
+				
 				default :
 					throw new Error("ValEditorLayer.add ::: unknown display object type " + object.displayObjectType);
 			}
@@ -270,6 +288,9 @@ class ValEditorLayer extends ValEditLayer
 					this._displayContainerStarling.removeChild(cast editorObject.interactiveObject);
 				#end
 				
+				case DisplayObjectType.MIXED :
+					// nothing ?
+				
 				default :
 					throw new Error("ValEditorContainer.remove ::: unknown display object type " + object.displayObjectType);
 			}
@@ -292,6 +313,52 @@ class ValEditorLayer extends ValEditLayer
 		{
 			this._rootContainerStarling.addChildAt(this._displayContainerStarling, this._index);
 		}
+	}
+	
+	override function onKeyFrameObjectAdded(evt:KeyFrameEvent):Void 
+	{
+		LayerEvent.dispatch(this, LayerEvent.OBJECT_ADDED, this, evt.object);
+	}
+	
+	override function onKeyFrameObjectRemoved(evt:KeyFrameEvent):Void 
+	{
+		LayerEvent.dispatch(this, LayerEvent.OBJECT_REMOVED, this, evt.object);
+	}
+	
+	//private function onTimeLineInsertFrame(evt:TimeLineActionEvent):Void
+	//{
+		//dispatchEvent(evt);
+	//}
+	
+	//private function onTimeLineInsertKeyFrame(evt:TimeLineActionEvent):Void
+	//{
+		//dispatchEvent(evt);
+	//}
+	
+	//private function onTimeLineRemoveFrame(evt:TimeLineActionEvent):Void
+	//{
+		//dispatchEvent(evt);
+	//}
+	
+	//private function onTimeLineRemoveKeyFrame(evt:TimeLineActionEvent):Void
+	//{
+		//dispatchEvent(evt);
+	//}
+	
+	private function onTimeLineSelectedFrameIndexChange(evt:TimeLineEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	public function cloneTo(layer:ValEditorLayer):Void
+	{
+		layer.index = this.index;
+		layer.name = this.name;
+		layer.visible = this.visible;
+		layer.x = this.x;
+		layer.y = this.y;
+		
+		cast(this.timeLine, ValEditorTimeLine).cloneTo(cast layer.timeLine);
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

@@ -5,9 +5,14 @@ import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
+import valedit.ValEditObject;
 import valeditor.events.ContainerEvent;
+import valeditor.events.KeyFrameEvent;
 import valeditor.events.LayerEvent;
+import valeditor.events.ObjectFunctionEvent;
+import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
+import valeditor.events.TimeLineActionEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.shape.PivotIndicator;
 
@@ -25,17 +30,25 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		return new ValEditorContainer();
 	}
 	
+	public var activeObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	public var allObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
+	public var autoIncreaseNumFrames(get, set):Bool;
 	public var containerUI(default, null):DisplayObjectContainer = new Sprite();
 	public var hasInvisibleLayer(get, never):Bool;
 	public var hasLockedLayer(get, never):Bool;
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
-	public var objectCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	public var selectedLayers(default, null):Array<ValEditorLayer> = new Array<ValEditorLayer>();
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
 	public var viewWidth(get, set):Float;
+	
+	private function get_autoIncreaseNumFrames():Bool { return cast(this.timeLine, ValEditorTimeLine).autoIncreaseNumFrames; }
+	private function set_autoIncreaseNumFrames(value:Bool):Bool
+	{
+		return cast(this.timeLine, ValEditorTimeLine).autoIncreaseNumFrames = value;
+	}
 	
 	private function get_hasInvisibleLayer():Bool
 	{
@@ -183,7 +196,6 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	{
 		this.timeLine = new ValEditorTimeLine(0);
 		super();
-		this.containerUI.addChild(this._pivotIndicator);
 	}
 	
 	override public function clear():Void
@@ -194,7 +206,8 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		}
 		
 		this.layerCollection.removeAll();
-		this.objectCollection.removeAll();
+		this.activeObjectsCollection.removeAll();
+		this.allObjectsCollection.removeAll();
 		this.viewCenterX = 0;
 		this.viewCenterY = 0;
 		this.viewWidth = 0;
@@ -243,6 +256,16 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		return cast(this._currentLayer, ValEditorLayer).canAddObject();
 	}
 	
+	public function hasActiveObject(objectID:String):Bool
+	{
+		return this._activeObjects.exists(objectID);
+	}
+	
+	public function hasObject(objectID:String):Bool
+	{
+		return this._allObjects.exists(objectID);
+	}
+	
 	public function hasVisibleObject():Bool
 	{
 		for (layer in this.layerCollection)
@@ -253,6 +276,20 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 			}
 		}
 		return false;
+	}
+	
+	override public function addObject(object:ValEditObject):Void 
+	{
+		super.addObject(object);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, cast object);
+	}
+	
+	override public function removeObject(object:ValEditObject):Void 
+	{
+		super.removeObject(object);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, cast object);
 	}
 	
 	override public function addLayer(layer:ValEditLayer):Void 
@@ -307,7 +344,43 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		return otherLayers;
 	}
 	
-	override public function removeLayer(layer:ValEditLayer):Void 
+	public function layerIndexDown(layer:ValEditLayer):Void
+	{
+		var index:Int = this._layers.indexOf(layer);
+		var count:Int = this._layers.length;
+		
+		this._layers.splice(index, 1);
+		this._layers.insert(index + 1, layer);
+		
+		this.layerCollection.removeAt(index);
+		this.layerCollection.addAt(cast layer, index + 1);
+		
+		cast(this._layers[index], ValEditorLayer).indexUpdate(count - 1 - index);
+		cast(this._layers[index + 1], ValEditorLayer).indexUpdate(count - 1 - (index + 1));
+		
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_INDEX_DOWN, layer);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_SELECTED, this._currentLayer);
+	}
+	
+	public function layerIndexUp(layer:ValEditLayer):Void
+	{
+		var index:Int = this._layers.indexOf(layer);
+		var count:Int = this._layers.length;
+		
+		this._layers.splice(index, 1);
+		this._layers.insert(index - 1, layer);
+		
+		this.layerCollection.removeAt(index);
+		this.layerCollection.addAt(cast layer, index - 1);
+		
+		cast(this._layers[index], ValEditorLayer).indexUpdate(count - 1 - index);
+		cast(this._layers[index - 1], ValEditorLayer).indexUpdate(count - 1 - (index - 1));
+		
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_INDEX_UP, layer);
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_SELECTED, this._currentLayer);
+	}
+	
+	override public function removeLayer(layer:ValEditLayer):Void
 	{
 		var index:Int = this.layerCollection.indexOf(cast layer);
 		this.layerCollection.remove(cast layer);
@@ -330,7 +403,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		}
 	}
 	
-	override public function removeLayerAt(index:Int):Void 
+	override public function removeLayerAt(index:Int):Void
 	{
 		var layer:ValEditLayer = this._layers[index];
 		this.layerCollection.removeAt(index);
@@ -365,14 +438,14 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		{
 			for (i in prevIndex...index)
 			{
-				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);// this._layers[i].index--);
+				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);
 			}
 		}
 		else
 		{
 			for (i in index + 1...prevIndex + 1)
 			{
-				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);// this._layers[i].index++);
+				cast(this._layers[i], ValEditorLayer).indexUpdate(layerCount - i);
 			}
 		}
 	}
@@ -380,12 +453,24 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	override function layerRegister(layer:ValEditLayer, index:Int):Void 
 	{
 		cast(layer, ValEditorLayer).index = this._layers.length - 1 - index;
+		cast(layer.timeLine, ValEditorTimeLine).autoIncreaseNumFrames = this.autoIncreaseNumFrames;
+		layer.timeLine.numFrames = this.numFrames;
+		layer.timeLine.frameIndex = this.frameIndex;
 		
 		super.layerRegister(layer, index);
 		
 		layer.addEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
 		layer.addEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
+		layer.addEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
+		layer.addEventListener(LayerEvent.VISIBLE_CHANGE, onLayerVisibilityChange);
 		layer.addEventListener(RenameEvent.RENAMED, layer_renamed);
+		
+		layer.timeLine.addEventListener(TimeLineActionEvent.INSERT_FRAME, timeLine_insertFrame);
+		layer.timeLine.addEventListener(TimeLineActionEvent.INSERT_KEYFRAME, timeLine_insertKeyFrame);
+		layer.timeLine.addEventListener(TimeLineActionEvent.REMOVE_FRAME, timeLine_removeFrame);
+		layer.timeLine.addEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, timeLine_removeKeyFrame);
+		layer.timeLine.addEventListener(KeyFrameEvent.TRANSITION_CHANGE, keyFrame_transitionChange);
+		layer.timeLine.addEventListener(KeyFrameEvent.TWEEN_CHANGE, keyFrame_tweenChange);
 	}
 	
 	override function layerUnregister(layer:ValEditLayer):Void 
@@ -394,35 +479,76 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		
 		layer.removeEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
 		layer.removeEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
+		layer.removeEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
+		layer.removeEventListener(LayerEvent.VISIBLE_CHANGE, onLayerVisibilityChange);
 		layer.removeEventListener(RenameEvent.RENAMED, layer_renamed);
+		
+		layer.timeLine.removeEventListener(TimeLineActionEvent.INSERT_FRAME, timeLine_insertFrame);
+		layer.timeLine.removeEventListener(TimeLineActionEvent.INSERT_KEYFRAME, timeLine_insertKeyFrame);
+		layer.timeLine.removeEventListener(TimeLineActionEvent.REMOVE_FRAME, timeLine_removeFrame);
+		layer.timeLine.removeEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, timeLine_removeKeyFrame);
+		layer.timeLine.removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, keyFrame_transitionChange);
+		layer.timeLine.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, keyFrame_tweenChange);
 	}
 	
-	private function layer_objectAdded(evt:LayerEvent):Void 
+	private function keyFrame_transitionChange(evt:KeyFrameEvent):Void
 	{
-		this._objects.set(evt.object.id, evt.object);
+		dispatchEvent(evt);
+	}
+	
+	private function keyFrame_tweenChange(evt:KeyFrameEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	private function layer_objectAdded(evt:LayerEvent):Void
+	{
+		this._allObjects.set(evt.object.objectID, evt.object);
 		this._objectToLayer.set(evt.object, evt.layer);
+		this.allObjectsCollection.add(cast evt.object);
+		
+		evt.object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
+		evt.object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, evt.object);
+	}
+	
+	private function layer_objectRemoved(evt:LayerEvent):Void
+	{
+		this._allObjects.remove(evt.object.objectID);
+		this._objectToLayer.remove(evt.object);
+		this.allObjectsCollection.remove(cast evt.object);
+		
+		evt.object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
+		evt.object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, evt.object);
+	}
+	
+	override function layer_objectActivated(evt:LayerEvent):Void 
+	{
+		super.layer_objectActivated(evt);
 		
 		var editorObject:ValEditorObject = cast evt.object;
 		
 		editorObject.container = this;
 		
-		this.objectCollection.add(editorObject);
+		this.activeObjectsCollection.add(editorObject);
 		
-		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, editorObject);
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ACTIVATED, editorObject);
 	}
 	
-	private function layer_objectRemoved(evt:LayerEvent):Void 
+	override function layer_objectDeactivated(evt:LayerEvent):Void 
 	{
-		this._objects.remove(evt.object.id);
-		this._objectToLayer.remove(evt.object);
+		super.layer_objectDeactivated(evt);
 		
 		var editorObject:ValEditorObject = cast evt.object;
 		
 		editorObject.container = null;
 		
-		this.objectCollection.remove(editorObject);
+		this.activeObjectsCollection.remove(editorObject);
 		
-		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, editorObject);
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_DEACTIVATED, editorObject);
 	}
 	
 	private function layer_renamed(evt:RenameEvent):Void 
@@ -434,11 +560,42 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		this.layerCollection.updateAt(this.layerCollection.indexOf(cast evt.target));
 	}
 	
+	private function object_functionCalled(evt:ObjectPropertyEvent):Void
+	{
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_FUNCTION_CALLED, evt.object, evt);
+	}
+	
+	private function object_propertyChange(evt:ObjectPropertyEvent):Void
+	{
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_PROPERTY_CHANGE, evt.object, evt);
+	}
+	
+	private function timeLine_insertFrame(evt:TimeLineActionEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	private function timeLine_insertKeyFrame(evt:TimeLineActionEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	private function timeLine_removeFrame(evt:TimeLineActionEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
+	private function timeLine_removeKeyFrame(evt:TimeLineActionEvent):Void
+	{
+		dispatchEvent(evt);
+	}
+	
 	public function open():Void
 	{
 		if (this._isOpen) return;
 		
 		this._isOpen = true;
+		this.containerUI.addChild(this._pivotIndicator);
 		ContainerEvent.dispatch(this, ContainerEvent.OPEN);
 	}
 	
@@ -447,6 +604,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		if (!this._isOpen) return;
 		
 		this._isOpen = false;
+		this.containerUI.removeChild(this._pivotIndicator);
 		ContainerEvent.dispatch(this, ContainerEvent.CLOSE);
 	}
 	
@@ -475,6 +633,60 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		}
 		
 		return visibleObjects;
+	}
+	
+	private function onLayerLockChange(evt:LayerEvent):Void
+	{
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_LOCK_CHANGE, evt.layer);
+	}
+	
+	private function onLayerVisibilityChange(evt:LayerEvent):Void
+	{
+		ContainerEvent.dispatch(this, ContainerEvent.LAYER_VISIBILITY_CHANGE, evt.layer);
+	}
+	
+	//private function onTimeLineFrameIndexChange(evt:TimeLineEvent):Void
+	//{
+		//ContainerEvent.dispatch(this, ContainerEvent.FRAME_INDEX_CHANGE, this);
+	//}
+	
+	//private function onTimeLineSelectedFrameIndexChange(evt:TimeLineEvent):Void
+	//{
+		//ContainerEvent.dispatch(this, ContainerEvent.SELECTED_FRAME_INDEX_CHANGE, this);
+	//}
+	
+	public function cloneTo(container:ValEditorContainer):Void
+	{
+		container.alpha = this.alpha;
+		container.autoPlay = this.autoPlay;
+		container.visible = this.visible;
+		container.x = this.x;
+		container.y = this.y;
+		container.viewCenterX = this.viewCenterX;
+		container.viewCenterY = this.viewCenterY;
+		
+		cast(this.timeLine, ValEditorTimeLine).cloneTo(cast container.timeLine);
+		
+		var layerCount:Int = this.numLayers;
+		var containerLayerCount:Int = container.numLayers;
+		var layer:ValEditorLayer;
+		var cloneLayer:ValEditorLayer;
+		for (i in 0...layerCount)
+		{
+			layer = cast this.getLayerAt(i);
+			//if (i < containerLayerCount)
+			//{
+				//cloneLayer = cast container.getLayerAt(i);
+			//}
+			//else
+			//{
+				cloneLayer = ValEditorLayer.fromPool();
+				layer.cloneTo(cloneLayer);
+				container.addLayer(cloneLayer);
+			//}
+		}
+		
+		container.frameIndex = this.frameIndex;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

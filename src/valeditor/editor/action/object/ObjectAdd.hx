@@ -50,7 +50,7 @@ class ObjectAdd extends ValEditorAction
 			throw new Error("ObjectAdd already applied");
 		}
 		
-		ValEditor.currentContainer.add(this.object);
+		ValEditor.currentContainer.addObject(this.object);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -61,7 +61,7 @@ class ObjectAdd extends ValEditorAction
 			throw new Error("ObjectAdd already cancelled");
 		}
 		
-		ValEditor.currentContainer.remove(this.object);
+		ValEditor.currentContainer.removeObject(this.object);
 		this.status = ValEditorActionStatus.UNDONE; 
 	}
 	

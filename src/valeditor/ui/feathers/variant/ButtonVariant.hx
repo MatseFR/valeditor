@@ -9,6 +9,7 @@ class ButtonVariant
 	inline static public var MENU:String = "menu";
 	
 	inline static public var ADD:String = "add";
+	inline static public var OPEN:String = "open";
 	inline static public var REMOVE:String = "remove";
 	inline static public var RENAME:String = "rename";
 	inline static public var UP:String = "up";

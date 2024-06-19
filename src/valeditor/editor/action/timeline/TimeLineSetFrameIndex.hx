@@ -67,7 +67,7 @@ class TimeLineSetFrameIndex extends MultiAction
 		}
 		
 		getActionsForTimeLine(this.timeLine, selection);
-		for (line in this.timeLine.children)
+		for (line in this.timeLine.slaves)
 		{
 			getActionsForTimeLine(cast line, selection);
 		}
