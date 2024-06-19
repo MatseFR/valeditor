@@ -140,6 +140,14 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		return this._isSelectable = value;
 	}
 	
+	override function set_objectID(value:String):String 
+	{
+		if (this._objectID == value) return value;
+		super.set_objectID(value);
+		ObjectEvent.dispatch(this, ObjectEvent.RENAMED, this);
+		return this._objectID;
+	}
+	
 	private var _pivotIndicator:PivotIndicator;
 	private function get_pivotIndicator():PivotIndicator { return this._pivotIndicator; }
 	private function set_pivotIndicator(value:PivotIndicator):PivotIndicator

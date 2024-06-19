@@ -29,6 +29,7 @@ import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.ui.Keyboard;
 import valeditor.IValEditorContainer;
+import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
 import valeditor.editor.action.MultiAction;
@@ -277,13 +278,10 @@ class TemplateLibrary extends LayoutGroup
 				}
 			
 			case "open" :
-				//var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
-				//containerOpen.setup(cast template.object.object);
-				//ValEditor.actionStack.add(containerOpen);
-				var container:IValEditorContainer = cast template.object.object;
-				if (container.isOpen)
+				var container:ValEditorObject = cast template.object;
+				if (cast(container.object, IValEditorContainer).isOpen)
 				{
-					if (ValEditor.currentContainer != container)
+					if (ValEditor.currentContainer != container.object)
 					{
 						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 						containerMakeCurrent.setup(container);
@@ -397,10 +395,10 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateOpenButton(evt:TriggerEvent):Void
 	{
-		var container:IValEditorContainer = cast cast(this._grid.selectedItem, ValEditorTemplate).object.object;
-		if (container.isOpen)
+		var container:ValEditorObject = cast cast(this._grid.selectedItem, ValEditorTemplate).object;
+		if (cast(container.object, IValEditorContainer).isOpen)
 		{
-			if (ValEditor.currentContainer != container)
+			if (ValEditor.currentContainer != container.object)
 			{
 				var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 				containerMakeCurrent.setup(container);

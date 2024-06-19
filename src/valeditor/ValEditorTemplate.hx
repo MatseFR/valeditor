@@ -48,6 +48,8 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		
 		if (oldID != null)
 		{
+			this.object.id = this._id;
+			
 			this._instanceMap.clear();
 			var objID:String = oldID + "-";
 			for (instance in this._instances)

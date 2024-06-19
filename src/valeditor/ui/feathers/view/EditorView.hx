@@ -28,6 +28,7 @@ import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import valeditor.IValEditorContainer;
+import valeditor.ValEditorObject;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
 import valeditor.editor.action.container.ContainerOpen;
@@ -301,6 +302,9 @@ class EditorView extends LayoutGroup
 		this._containerList = new ListView(ValEditor.openedContainerCollection);
 		this._containerList.layout = new HorizontalListLayout();
 		this._containerList.addEventListener(ListViewEvent.ITEM_TRIGGER, onContainerListItemTrigger);
+		this._containerList.itemToText = function(item:Dynamic):String {
+			return cast(item, ValEditorObject).objectID;
+		};
 		this._sceneGroup.addChild(this._containerList);
 		
 		this._displayArea = new LayoutGroup();
@@ -412,8 +416,8 @@ class EditorView extends LayoutGroup
 	
 	private function onContainerListItemTrigger(evt:ListViewEvent):Void
 	{
-		var container:IValEditorContainer = evt.state.data;
-		if (container != ValEditor.currentContainer)
+		var container:ValEditorObject = evt.state.data;
+		if (container.object != ValEditor.currentContainer)
 		{
 			var action:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 			action.setup(container);
@@ -499,10 +503,10 @@ class EditorView extends LayoutGroup
 				}
 			
 			case "open_container" :
-				var container:IValEditorContainer = cast(ValEditor.selection.object, ValEditorObject).object;
-				if (container.isOpen)
+				var container:ValEditorObject = cast ValEditor.selection.object;
+				if (cast(container.object, IValEditorContainer).isOpen)
 				{
-					if (ValEditor.currentContainer != container)
+					if (ValEditor.currentContainer != container.object)
 					{
 						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 						containerMakeCurrent.setup(container);

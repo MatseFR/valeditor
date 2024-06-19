@@ -317,7 +317,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		var count:Int = this._layers.length;
 		for (i in index+1...count)
 		{
-			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);// this._layers[i].index++);
+			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);
 		}
 		
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_ADDED, layer);
@@ -645,16 +645,6 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_VISIBILITY_CHANGE, evt.layer);
 	}
 	
-	//private function onTimeLineFrameIndexChange(evt:TimeLineEvent):Void
-	//{
-		//ContainerEvent.dispatch(this, ContainerEvent.FRAME_INDEX_CHANGE, this);
-	//}
-	
-	//private function onTimeLineSelectedFrameIndexChange(evt:TimeLineEvent):Void
-	//{
-		//ContainerEvent.dispatch(this, ContainerEvent.SELECTED_FRAME_INDEX_CHANGE, this);
-	//}
-	
 	public function cloneTo(container:ValEditorContainer):Void
 	{
 		container.alpha = this.alpha;
@@ -668,22 +658,14 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		cast(this.timeLine, ValEditorTimeLine).cloneTo(cast container.timeLine);
 		
 		var layerCount:Int = this.numLayers;
-		var containerLayerCount:Int = container.numLayers;
 		var layer:ValEditorLayer;
 		var cloneLayer:ValEditorLayer;
 		for (i in 0...layerCount)
 		{
 			layer = cast this.getLayerAt(i);
-			//if (i < containerLayerCount)
-			//{
-				//cloneLayer = cast container.getLayerAt(i);
-			//}
-			//else
-			//{
-				cloneLayer = ValEditorLayer.fromPool();
-				layer.cloneTo(cloneLayer);
-				container.addLayer(cloneLayer);
-			//}
+			cloneLayer = ValEditorLayer.fromPool();
+			layer.cloneTo(cloneLayer);
+			container.addLayer(cloneLayer);
 		}
 		
 		container.frameIndex = this.frameIndex;

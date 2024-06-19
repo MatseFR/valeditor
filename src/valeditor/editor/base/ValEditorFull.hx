@@ -539,6 +539,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
 		settings.creationFunction = ValEditor.createContainer;
+		settings.creationFunctionForLoading = ValEditorContainer.fromPool;
+		settings.creationFunctionForTemplateInstance = ValEditorContainer.fromPool;
 		settings.disposeFunctionName = "pool";
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -553,6 +555,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		// ValEditorContainerRoot
 		settings.canBeCreated = false;
+		settings.creationFunction = ValEditor.createContainerRoot;
+		settings.creationFunctionForLoading = ValEditorContainerRoot.fromPool;
 		settings.disposeFunctionName = "pool";
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.MIXED;

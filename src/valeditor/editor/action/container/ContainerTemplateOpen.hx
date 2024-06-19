@@ -2,6 +2,7 @@ package valeditor.editor.action.container;
 
 import openfl.errors.Error;
 import valeditor.IValEditorContainer;
+import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -18,8 +19,8 @@ class ContainerTemplateOpen extends ValEditorAction
 		return new ContainerTemplateOpen();
 	}
 	
-	public var container:IValEditorContainer;
-	private var _restoreOpenContainers:Array<IValEditorContainer> = new Array<IValEditorContainer>();
+	public var container:ValEditorObject;
+	private var _restoreOpenContainers:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
 	public function new() 
 	{
@@ -40,7 +41,7 @@ class ContainerTemplateOpen extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorContainer):Void
+	public function setup(container:ValEditorObject):Void
 	{
 		this.container = container;
 		var count:Int = ValEditor.openedContainers.length;

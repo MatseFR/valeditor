@@ -2,6 +2,7 @@ package valeditor.editor.action.container;
 
 import openfl.errors.Error;
 import valeditor.IValEditorContainer;
+import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
 import valeditor.editor.action.selection.SelectionClear;
 
@@ -19,9 +20,9 @@ class ContainerMakeCurrent extends ValEditorAction
 		return new ContainerMakeCurrent();
 	}
 	
-	public var container:IValEditorContainer;
+	public var container:ValEditorObject;
 	
-	private var _restoreContainers:Array<IValEditorContainer> = new Array<IValEditorContainer>();
+	private var _restoreContainers:Array<ValEditorObject> = new Array<ValEditorObject>();
 	private var _selectionClear:SelectionClear = SelectionClear.fromPool();
 	private var _isFirstApply:Bool = true;
 	
@@ -46,7 +47,7 @@ class ContainerMakeCurrent extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorContainer):Void
+	public function setup(container:ValEditorObject):Void
 	{
 		this.container = container;
 		this._selectionClear.setup(ValEditor.selection);

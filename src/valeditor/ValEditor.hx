@@ -52,6 +52,7 @@ import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.EditorEvent;
+import valeditor.events.ObjectEvent;
 import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
@@ -92,10 +93,11 @@ class ValEditor
 	static public var fileExtension:String = "ves";
 	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
+	static public var isLoadingFile(get, set):Bool;
 	static public var isNewFile(default, null):Bool = false;
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
-	static public var openedContainers(default, null):Array<IValEditorContainer> = new Array<IValEditorContainer>();
+	static public var openedContainers(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
 	static public var rootContainer(get, set):IValEditorContainer;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
@@ -112,7 +114,7 @@ class ValEditor
 	static public var categoryCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
 	static public var classCollection(default, null):ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	static public var classNameCollection(default, null):ArrayCollection<StringData> = new ArrayCollection<StringData>();
-	static public var openedContainerCollection(default, null):ArrayCollection<IValEditorContainer> = new ArrayCollection<IValEditorContainer>();
+	static public var openedContainerCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
 	
 	static public var classVisibilities(default, null):ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
@@ -170,6 +172,12 @@ class ValEditor
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 	static private function get_eventDispatcher():EventDispatcher { return _eventDispatcher; }
 	
+	static private function get_isLoadingFile():Bool { return ValEdit.isLoadingFile; }
+	static private function set_isLoadingFile(value:Bool):Bool
+	{
+		return ValEdit.isLoadingFile = value;
+	}
+	
 	static private var _rootContainer:IValEditorContainer;
 	static private function get_rootContainer():IValEditorContainer { return _rootContainer; }
 	static private function set_rootContainer(value:IValEditorContainer):IValEditorContainer
@@ -187,23 +195,24 @@ class ValEditor
 		return _rootContainer;
 	}
 	
-	static public function openContainer(container:IValEditorContainer):Void
+	static public function openContainer(container:ValEditorObject):Void
 	{
 		openedContainers[openedContainers.length] = container;
 		openedContainerCollection.add(container);
+		container.addEventListener(ObjectEvent.RENAMED, onOpenContainerObjectRenamed);
 		
 		if (_rootContainer == null)
 		{
-			rootContainer = container;
+			rootContainer = container.object;
 		}
 		
-		currentContainer = container;
+		currentContainer = container.object;
 		currentContainer.open();
-		edit(container);
-		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, container);
+		edit(currentContainer);
+		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, currentContainer);
 	}
 	
-	static public function openContainerTemplate(container:IValEditorContainer):Void
+	static public function openContainerTemplate(container:ValEditorObject):Void
 	{
 		while (openedContainers.length != 1)
 		{
@@ -213,9 +222,9 @@ class ValEditor
 		openContainer(container);
 	}
 	
-	static public function makeContainerCurrent(container:IValEditorContainer):Void
+	static public function makeContainerCurrent(container:ValEditorObject):Void
 	{
-		while (currentContainer != container)
+		while (currentContainer != container.object)
 		{
 			closeContainer();
 		}
@@ -223,12 +232,15 @@ class ValEditor
 	
 	static public function closeContainer():Void
 	{
-		var container:IValEditorContainer = openedContainers.pop();
-		openedContainerCollection.remove(container);
+		var object:ValEditorObject = openedContainers.pop();
+		var container:IValEditorContainer = object.object;
+		openedContainerCollection.remove(object);
+		
+		object.removeEventListener(ObjectEvent.RENAMED, onOpenContainerObjectRenamed);
 		
 		if (openedContainers.length != 0)
 		{
-			currentContainer = openedContainers[openedContainers.length - 1];
+			currentContainer = openedContainers[openedContainers.length - 1].object;
 		}
 		else
 		{
@@ -354,7 +366,8 @@ class ValEditor
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		openContainer(createContainerRoot());
+		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
+		openContainer(rootObject);
 	}
 	
 	static public function fileSaved():Void
@@ -822,21 +835,20 @@ class ValEditor
 		var className:String = Type.getClassName(clss);
 		var control:IValueUI = _uiClassMap[className]();
 		control.exposedValue = cast exposedValue;
-		//cast(exposedValue, ExposedValue).uiControl = control;
 		return control;
 	}
 	
-	static public function createObjectWithClass(clss:Class<Dynamic>, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection):ValEditorObject
+	static public function createObjectWithClass(clss:Class<Dynamic>, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null):ValEditorObject
 	{
-		return createObjectWithClassName(Type.getClassName(clss), id, params, collection);
+		return createObjectWithClassName(Type.getClassName(clss), id, params, collection, objectID, object);
 	}
 	
-	static public function createObjectWithClassName(className:String, ?id:String, ?params:Array<Dynamic>, ?collection:ExposedCollection, ?objectID:String):ValEditorObject
+	static public function createObjectWithClassName(className:String, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null):ValEditorObject
 	{
 		var valClass:ValEditorClass = _classMap.get(className);
 		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
-		ValEdit.createObjectWithClassName(className, id, params, valObject, collection, objectID);
+		ValEdit.createObjectWithClassName(className, id, params, valObject, collection, objectID, object);
 		
 		valObject.applyClassVisibility(valClass.visibilityCollectionCurrent);
 		
@@ -1413,6 +1425,11 @@ class ValEditor
 		}
 	}
 	
+	static private function onOpenContainerObjectRenamed(evt:ObjectEvent):Void
+	{
+		openedContainerCollection.updateAt(openedContainerCollection.indexOf(cast evt.object));
+	}
+	
 	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
 	{
 		var index:Int = templateCollection.indexOf(evt.template);
@@ -1525,7 +1542,9 @@ class ValEditor
 	
 	static public function fromJSONSave(json:Dynamic):Void
 	{
-		var container:ValEditorContainerRoot = ValEditorContainerRoot.fromPool();
+		isLoadingFile = true;
+		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
+		var container:ValEditorContainerRoot = rootObject.object;
 		
 		var clss:ValEditorClass;
 		var classList:Array<Dynamic> = json.classes;
@@ -1540,8 +1559,9 @@ class ValEditor
 		}
 		
 		container.fromJSONSave(json.root);
+		isLoadingFile = false;
 		
-		openContainer(container);
+		openContainer(rootObject);
 	}
 	
 	static public function toJSONSave(json:Dynamic = null):Dynamic
