@@ -26,6 +26,7 @@ import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.events.ContainerEvent;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.IInteractiveObject;
+import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
 
@@ -221,6 +222,7 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function onObjectMouseDown(evt:MouseEvent):Void
 	{
+		if (FeathersWindows.isWindowOpen) return;
 		if (this._mouseDownOnObject) return;
 		var selectionClear:SelectionClear;
 		
@@ -507,6 +509,8 @@ class ValEditorContainerController implements IAnimatable
 	#if starling
 	private function onObjectTouch(evt:TouchEvent):Void
 	{
+		if (FeathersWindows.isWindowOpen) return;
+		
 		var touch:Touch = evt.touches[0];
 		var object:ValEditorObject = this._interactiveObjectToValEditObject.get(evt.target);
 		if (object == null) object = this._interactiveObjectToValEditObject.get(evt.currentTarget);
