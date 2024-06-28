@@ -694,13 +694,6 @@ class ValEditor
 			throw new Error("ValEditor.edit ::: null container");
 		}
 		
-		// DEBUG
-		if (Std.isOfType(object, ValEditorKeyFrame))
-		{
-			trace("debug");
-		}
-		//\DEBUG
-		
 		clearUIContainer(container);
 		
 		if (object == null) return null;
