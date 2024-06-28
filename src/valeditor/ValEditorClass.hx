@@ -29,6 +29,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 	public var canBeCreated:Bool;
 	public var categories(default, null):Array<String> = new Array<String>();
 	public var classNameShort:String;
+	public var exportClassName:String;
 	public var hasPivotProperties:Bool;
 	public var hasScaleProperties:Bool;
 	public var hasTransformationMatrixProperty:Bool;
@@ -37,6 +38,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 	public var hasRadianRotation:Bool;
 	public var iconBitmapData:BitmapData;
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
+	public var templates(default, null):Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
 	public var usePivotScaling:Bool;
@@ -102,6 +104,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 		this.canBeCreated = false;
 		this.categories.resize(0);
 		this.classNameShort = null;
+		this.exportClassName = null;
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
 		this.hasTransformationMatrixProperty = false;
@@ -112,6 +115,8 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 		this.interactiveFactory = null;
 		this.useBounds = false;
 		this.usePivotScaling = false;
+		
+		this.templates.resize(0);
 		
 		this.visibilityCollectionCurrent = null;
 		if (this._visibilityCollectionDefault != null)
@@ -217,6 +222,17 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 		return templateID;
 	}
 	
+	public function prepareForReset():Void
+	{
+		var object:ValEditorObject;
+		for (template in this._IDToTemplate)
+		{
+			object = cast template.object;
+			template.object = null;
+			ValEditor.destroyObject(object);
+		}
+	}
+	
 	public function reset():Void
 	{
 		var containers:Array<DisplayObjectContainer> = [];
@@ -285,12 +301,16 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 	{
 		super.addTemplate(template);
 		
+		this.templates.push(cast template);
+		
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 	}
 	
 	override public function removeTemplate(template:ValEditTemplate):Void 
 	{
 		super.removeTemplate(template);
+		
+		this.templates.remove(cast template);
 		
 		if (cast(template, ValEditorTemplate).isSuspended)
 		{
@@ -433,10 +453,13 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 		var templates:Array<Dynamic> = json.templates;
 		for (node in templates)
 		{
-			if (this.constructorCollection != null && node.constructorCollection != null)
+			if (this.constructorCollection != null)
 			{
-				constructorCollection = this.constructorCollection.clone();
-				constructorCollection.fromJSONSave(node.constructorCollection);
+				constructorCollection = this.constructorCollection.clone(true);
+				if (node.constructorCollection != null)
+				{
+					constructorCollection.fromJSONSave(node.constructorCollection);
+				}
 			}
 			template = ValEditor.createTemplateWithClassName(this.className, node.id, constructorCollection);
 			template.fromJSONSave(node);

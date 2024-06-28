@@ -4,6 +4,7 @@ import openfl.display.BlendMode;
 import openfl.display.DisplayObjectContainer;
 import openfl.events.EventType;
 import valedit.ValEditObject;
+import valeditor.editor.data.ContainerSaveData;
 
 /**
  * @author Matse
@@ -44,9 +45,11 @@ interface IValEditorContainer
 	function adjustView():Void;
 	function canAddObject():Bool;
 	function close():Void;
+	function fromJSONSave(json:Dynamic):Void;
 	function getActiveObject(objectID:String):ValEditObject;
 	function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>;
 	function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>;
+	function getContainerDependencies(data:ContainerSaveData):Void;
 	function getObject(objectID:String):ValEditObject;
 	function hasActiveObject(objectID:String):Bool;
 	function hasObject(objectID:String):Bool;

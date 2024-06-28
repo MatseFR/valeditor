@@ -43,6 +43,7 @@ import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.change.ChangeUpdateQueue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.clipboard.ValEditorClipboard;
+import valeditor.editor.data.ContainerSaveData;
 import valeditor.editor.drag.LibraryDragManager;
 import valeditor.editor.file.ZipSaveLoader;
 import valeditor.editor.settings.EditorSettings;
@@ -384,14 +385,29 @@ class ValEditor
 		assetFileLoader.clear();
 		selection.clear();
 		
+		closeAllContainers();
+		
+		for (clss in _classMap)
+		{
+			clss.prepareForReset();
+		}
+		
 		for (clss in _classMap)
 		{
 			clss.reset();
 		}
 		
-		closeAllContainers();
-		
 		ValEdit.assetLib.reset();
+	}
+	
+	static public function getClassByName(className:String):ValEditorClass
+	{
+		return _classMap.get(className);
+	}
+	
+	static public function getClassByType(type:Class<Dynamic>):ValEditorClass
+	{
+		return getClassByName(Type.getClassName(type));
 	}
 	
 	static public function getClassSettings(type:Class<Dynamic>, settings:ValEditorClassSettings = null):ValEditorClassSettings
@@ -477,6 +493,7 @@ class ValEditor
 		
 		classVisibilities.add(v.visibilityCollectionDefault);
 		
+		v.exportClassName = settings.exportClassName;
 		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
@@ -861,6 +878,7 @@ class ValEditor
 			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 			valObject.hasRadianRotation = valClass.hasRadianRotation;
+			valObject.useBounds = valClass.useBounds;
 			valObject.usePivotScaling = valClass.usePivotScaling;
 		}
 		
@@ -1068,8 +1086,11 @@ class ValEditor
 	
 	static private function destroyTemplateInternal(template:ValEditorTemplate):Void
 	{
-		destroyObject(cast template.object);
-		template.object = null;
+		if (template.object != null)
+		{
+			destroyObject(cast template.object);
+			template.object = null;
+		}
 		
 		unregisterTemplateInternal(template);
 		
@@ -1412,7 +1433,7 @@ class ValEditor
 	{
 		if (!currentTimeLineContainer.isPlaying)
 		{
-			currentTimeLineContainer.timeLine.updateLastFrameIndex();
+			//currentTimeLineContainer.timeLine.updateLastFrameIndex();
 			if (currentTimeLineContainer.frameIndex >= currentTimeLineContainer.lastFrameIndex)
 			{
 				currentTimeLineContainer.frameIndex = 0;
@@ -1558,6 +1579,33 @@ class ValEditor
 			clss.fromJSONSave(node);
 		}
 		
+		var clss:ValEditorClass;
+		var constructorCollection:ExposedCollection;
+		var template:ValEditorTemplate;
+		var containerData:Array<Dynamic> = json.containerTemplates;
+		if (containerData != null)
+		{
+			for (data in containerData)
+			{
+				clss = getClassByName(data.clss);
+				if (clss.constructorCollection != null)
+				{
+					constructorCollection = clss.constructorCollection.clone(true);
+					if (data.constructorCollection != null)
+					{
+						constructorCollection.fromJSONSave(data.constructorCollection);
+					}
+				}
+				else
+				{
+					constructorCollection = null;
+				}
+				template = ValEditor.createTemplateWithClassName(clss.className, data.id, constructorCollection);
+				//template.applyVisibility();
+				template.fromJSONSave(data);
+			}
+		}
+		
 		container.fromJSONSave(json.root);
 		isLoadingFile = false;
 		
@@ -1575,15 +1623,83 @@ class ValEditor
 		json.flash = true;
 		#end
 		
+		var containerTemplates:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 		var classList:Array<Dynamic> = [];
 		for (clss in _classMap)
 		{
 			if (clss.numTemplates != 0)
 			{
-				classList.push(clss.toJSONSave());
+				if (!clss.isContainer)
+				{
+					classList.push(clss.toJSONSave());
+				}
+				else
+				{
+					for (template in clss.templates)
+					{
+						containerTemplates.push(template);
+					}
+				}
 			}
 		}
 		json.classes = classList;
+		
+		var templateDependencies:Map<ValEditorTemplate, ContainerSaveData> = new Map<ValEditorTemplate, ContainerSaveData>();
+		var templateSave:Map<ValEditorTemplate, Bool> = new Map<ValEditorTemplate, Bool>();
+		var containerData:Array<Dynamic> = [];
+		var saveData:ContainerSaveData;
+		
+		for (template in containerTemplates)
+		{
+			saveData = ContainerSaveData.fromPool(template);
+			cast(template.object.object, IValEditorContainer).getContainerDependencies(saveData);
+			templateDependencies.set(template, saveData);
+			templateSave.set(template, false);
+		}
+		
+		var template:ValEditorTemplate;
+		var templateIndex:Int = -1;
+		var templateCount:Int = containerTemplates.length;
+		var ok:Bool;
+		var data:Dynamic;
+		while (true)
+		{
+			if (templateCount == 0) break;
+			templateIndex ++;
+			if (templateIndex == templateCount) templateIndex = 0;
+			template = containerTemplates[templateIndex];
+			saveData = templateDependencies.get(template);
+			ok = true;
+			for (tpl in saveData.dependencies)
+			{
+				if (!templateSave.get(tpl))
+				{
+					ok = false;
+					break;
+				}
+			}
+			
+			if (ok)
+			{
+				data = template.toJSONContainerSave();
+				containerData.push(data);
+				templateSave.set(template, true);
+				containerTemplates.remove(template);
+				templateIndex--;
+				templateCount--;
+			}
+		}
+		
+		json.containerTemplates = containerData;
+		
+		for (sData in templateDependencies)
+		{
+			sData.pool();
+		}
+		templateDependencies.clear();
+		templateDependencies = null;
+		templateSave.clear();
+		templateSave = null;
 		
 		json.root = _rootContainer.toJSONSave();
 		

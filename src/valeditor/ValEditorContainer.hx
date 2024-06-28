@@ -6,6 +6,7 @@ import openfl.display.Sprite;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
+import valeditor.editor.data.ContainerSaveData;
 import valeditor.events.ContainerEvent;
 import valeditor.events.KeyFrameEvent;
 import valeditor.events.LayerEvent;
@@ -489,6 +490,17 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		layer.timeLine.removeEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, timeLine_removeKeyFrame);
 		layer.timeLine.removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, keyFrame_transitionChange);
 		layer.timeLine.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, keyFrame_tweenChange);
+	}
+	
+	public function getContainerDependencies(data:ContainerSaveData):Void
+	{
+		for (object in this.allObjectsCollection)
+		{
+			if (object.template != null && object.clss.isContainer && !data.hasDependency(cast object.template))
+			{
+				data.addDependency(cast object.template);
+			}
+		}
 	}
 	
 	private function keyFrame_transitionChange(evt:KeyFrameEvent):Void

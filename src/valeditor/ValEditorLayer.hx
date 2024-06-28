@@ -12,7 +12,6 @@ import valedit.utils.StringIndexedMap;
 import valeditor.events.KeyFrameEvent;
 import valeditor.events.LayerEvent;
 import valeditor.events.RenameEvent;
-import valeditor.events.TimeLineActionEvent;
 import valeditor.events.TimeLineEvent;
 
 /**
@@ -165,6 +164,12 @@ class ValEditorLayer extends ValEditLayer
 	{
 		clear();
 		_POOL[_POOL.length] = this;
+	}
+	
+	override function setTo(timeLine:ValEditTimeLine):ValEditLayer 
+	{
+		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(0);
+		return super.setTo(timeLine);
 	}
 	
 	override public function remove(object:ValEditObject):Void 
@@ -324,26 +329,6 @@ class ValEditorLayer extends ValEditLayer
 	{
 		LayerEvent.dispatch(this, LayerEvent.OBJECT_REMOVED, this, evt.object);
 	}
-	
-	//private function onTimeLineInsertFrame(evt:TimeLineActionEvent):Void
-	//{
-		//dispatchEvent(evt);
-	//}
-	
-	//private function onTimeLineInsertKeyFrame(evt:TimeLineActionEvent):Void
-	//{
-		//dispatchEvent(evt);
-	//}
-	
-	//private function onTimeLineRemoveFrame(evt:TimeLineActionEvent):Void
-	//{
-		//dispatchEvent(evt);
-	//}
-	
-	//private function onTimeLineRemoveKeyFrame(evt:TimeLineActionEvent):Void
-	//{
-		//dispatchEvent(evt);
-	//}
 	
 	private function onTimeLineSelectedFrameIndexChange(evt:TimeLineEvent):Void
 	{

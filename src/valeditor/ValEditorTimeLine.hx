@@ -1,12 +1,12 @@
 package valeditor;
 
 import feathers.data.ArrayCollection;
-import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.ValEditKeyFrame;
 import valedit.ValEditObject;
 import valedit.ValEditTemplate;
 import valedit.ValEditTimeLine;
+import valedit.utils.ReverseIterator;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
 import valeditor.editor.action.keyframe.KeyFrameCreate;
@@ -23,7 +23,6 @@ import valeditor.events.KeyFrameEvent;
 import valeditor.events.TimeLineActionEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.data.FrameData;
-import valedit.utils.ReverseIterator;
 
 /**
  * ...

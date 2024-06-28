@@ -32,6 +32,7 @@ import valeditor.ValEditorObject;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
 import valeditor.editor.action.container.ContainerOpen;
+import valeditor.editor.action.selection.SelectionClear;
 import valeditor.events.EditorEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
@@ -504,20 +505,44 @@ class EditorView extends LayoutGroup
 			
 			case "open_container" :
 				var container:ValEditorObject = cast ValEditor.selection.object;
+				if (container.template != null)
+				{
+					container = cast container.template.object;
+				}
+				var selectionClear:SelectionClear;
+				action = MultiAction.fromPool();
 				if (cast(container.object, IValEditorContainer).isOpen)
 				{
 					if (ValEditor.currentContainer != container.object)
 					{
+						selectionClear = SelectionClear.fromPool();
+						selectionClear.setup(ValEditor.selection);
+						action.add(selectionClear);
+						
 						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 						containerMakeCurrent.setup(container);
-						ValEditor.actionStack.add(containerMakeCurrent);
+						//ValEditor.actionStack.add(containerMakeCurrent);
+						action.add(containerMakeCurrent);
 					}
 				}
 				else
 				{
+					selectionClear = SelectionClear.fromPool();
+					selectionClear.setup(ValEditor.selection);
+					action.add(selectionClear);
+					
 					var containerOpen:ContainerOpen = ContainerOpen.fromPool();
 					containerOpen.setup(container);
-					ValEditor.actionStack.add(containerOpen);
+					//ValEditor.actionStack.add(containerOpen);
+					action.add(containerOpen);
+				}
+				if (action.numActions != 0)
+				{
+					ValEditor.actionStack.add(action);
+				}
+				else
+				{
+					action.pool();
 				}
 			
 			case "select all" :

@@ -10,7 +10,6 @@ import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
 import valeditor.editor.action.object.ObjectAddKeyFrame;
 import valeditor.editor.action.object.ObjectCreate;
 import valeditor.editor.change.IChangeUpdate;
-import valeditor.events.DefaultEvent;
 import valeditor.events.KeyFrameEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;

@@ -24,6 +24,7 @@ import openfl.ui.Keyboard;
 import openfl.utils.Assets;
 import valedit.DisplayObjectType;
 import valedit.ValEdit;
+import valedit.ValEditContainer;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
 import valedit.data.openfl.display.DisplayData;
@@ -542,10 +543,12 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForLoading = ValEditorContainer.fromPool;
 		settings.creationFunctionForTemplateInstance = ValEditorContainer.fromPool;
 		settings.disposeFunctionName = "pool";
+		settings.exportClassName = Type.getClassName(ValEditContainer);
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.isContainer = true;
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.MIXED;
 		settings.collection = ContainerData.exposeValEditorContainer();
@@ -558,6 +561,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunction = ValEditor.createContainerRoot;
 		settings.creationFunctionForLoading = ValEditorContainerRoot.fromPool;
 		settings.disposeFunctionName = "pool";
+		settings.exportClassName = Type.getClassName(ValEditContainer);
+		settings.isContainer = true;
 		settings.isDisplayObject = true;
 		settings.displayObjectType = DisplayObjectType.MIXED;
 		settings.collection = ContainerData.exposeValEditorContainerRoot();
@@ -567,7 +572,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		settings.pool();
 		
-		//ValEditor.registerClassSimple(ValEditorContainer, false, ContainerData.exposeValEditorContainer());
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
 		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
 		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());

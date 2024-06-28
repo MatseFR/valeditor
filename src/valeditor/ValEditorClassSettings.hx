@@ -25,6 +25,9 @@ class ValEditorClassSettings extends ValEditClassSettings
 	/** @default null **/
 	public var categories:Array<String> = new Array<String>();
 	
+	/** @default null **/
+	public var exportClassName:String;
+	
 	/** tells if object uses radian rotation
 	 *  @default false */
 	public var hasRadianRotation:Bool;

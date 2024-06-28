@@ -212,7 +212,8 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		
 		this.visibilityCollectionCurrent = newVisibility;
 		// register for change update to avoid applying visibility multiple times
-		ValEditor.registerForChangeUpdate(this);
+		//ValEditor.registerForChangeUpdate(this);
+		applyVisibility();
 	}
 	
 	public function changeUpdate():Void
@@ -297,7 +298,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerKeyFrameTransitionChange(evt:KeyFrameEvent):Void
 	{
-		trace("onTemplateContainerKeyFrameTransitionChange");
+		//trace("onTemplateContainerKeyFrameTransitionChange");
 		
 		var currentFrame:ValEditorKeyFrame = cast cast(this.object.object, IValEditorTimeLineContainer).currentLayer.timeLine.frameCurrent;
 		var instanceContainer:IValEditorTimeLineContainer;
@@ -315,7 +316,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerKeyFrameTweenChange(evt:KeyFrameEvent):Void
 	{
-		trace("onTemplateContainerKeyFrameTweenChange");
+		//trace("onTemplateContainerKeyFrameTweenChange");
 		
 		var currentFrame:ValEditorKeyFrame = cast cast(this.object.object, IValEditorTimeLineContainer).currentLayer.timeLine.frameCurrent;
 		var instanceContainer:IValEditorTimeLineContainer;
@@ -333,7 +334,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerAdded(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerAdded");
+		//trace("onTemplateContainerLayerAdded");
 		
 		var layer:ValEditorLayer = evt.object;
 		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
@@ -348,7 +349,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerIndexDown(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerIndexDown");
+		//trace("onTemplateContainerLayerIndexDown");
 		
 		var layer:ValEditorLayer = evt.object;
 		var objectLayer:ValEditLayer;
@@ -361,7 +362,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerIndexUp(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerIndexUp");
+		//trace("onTemplateContainerLayerIndexUp");
 		
 		var layer:ValEditorLayer = evt.object;
 		var objectLayer:ValEditLayer;
@@ -374,7 +375,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerRemoved(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerRemoved");
+		//trace("onTemplateContainerLayerRemoved");
 		
 		var layer:ValEditorLayer = evt.object;
 		var objectLayer:ValEditLayer;
@@ -388,7 +389,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerRenamed(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerRenamed");
+		//trace("onTemplateContainerLayerRenamed");
 		
 		var layer:ValEditorLayer = evt.object;
 		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
@@ -402,7 +403,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerSelected(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerSelected");
+		//trace("onTemplateContainerLayerSelected");
 		
 		var layer:ValEditorLayer = evt.object;
 		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
@@ -416,7 +417,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerLayerVisibilityChange(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerLayerVisibilityChange");
+		//trace("onTemplateContainerLayerVisibilityChange");
 		
 		var layer:ValEditorLayer = evt.object;
 		var index:Int = cast(this.object.object, IValEditorTimeLineContainer).getLayerIndex(layer);
@@ -430,7 +431,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerObjectAdded(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerObjectAdded");
+		//trace("onTemplateContainerObjectAdded");
 		
 		var object:ValEditorObject = evt.object;
 		var instanceObject:ValEditorObject;
@@ -468,7 +469,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerObjectRemoved(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerObjectRemoved");
+		//trace("onTemplateContainerObjectRemoved");
 		
 		var object:ValEditorObject = evt.object;
 		var instanceObject:ValEditObject;
@@ -514,7 +515,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerObjectFunctionCalled(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerObjectFunctionCalled");
+		//trace("onTemplateContainerObjectFunctionCalled");
 		
 		var functionEvent:ObjectFunctionEvent = cast evt.subEvent;
 		var object:ValEditorObject = functionEvent.object;
@@ -530,7 +531,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerObjectPropertyChange(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerObjectPropertyChange");
+		//trace("onTemplateContainerObjectPropertyChange");
 		
 		var propertyEvent:ObjectPropertyEvent = cast evt.subEvent;
 		var object:ValEditorObject = propertyEvent.object;
@@ -547,7 +548,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerSelectedFrameIndexChange(evt:ContainerEvent):Void
 	{
-		trace("onTemplateContainerSelectedFrameIndexChange");
+		//trace("onTemplateContainerSelectedFrameIndexChange");
 		
 		var index:Int = cast(cast(cast(this.object.object, IValEditorTimeLineContainer).currentLayer, ValEditorLayer).timeLine, ValEditorTimeLine).selectedFrameIndex;
 		for (instance in this._instances)
@@ -558,7 +559,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerInsertFrame(evt:TimeLineActionEvent):Void
 	{
-		trace("onTemplateContainerInsertFrame");
+		//trace("onTemplateContainerInsertFrame");
 		
 		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
 		var prevFrameIndex:Int;
@@ -576,7 +577,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerInsertKeyFrame(evt:TimeLineActionEvent):Void
 	{
-		trace("onTemplateContainerInsertKeyFrame");
+		//trace("onTemplateContainerInsertKeyFrame");
 		
 		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
 		var prevFrameIndex:Int;
@@ -594,7 +595,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerRemoveFrame(evt:TimeLineActionEvent):Void
 	{
-		trace("onTemplateContainerRemoveFrame");
+		//trace("onTemplateContainerRemoveFrame");
 		
 		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
 		var prevFrameIndex:Int;
@@ -612,7 +613,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	
 	private function onTemplateContainerRemoveKeyFrame(evt:TimeLineActionEvent):Void
 	{
-		trace("onTemplateContainerRemoveKeyFrame");
+		//trace("onTemplateContainerRemoveKeyFrame");
 		
 		var frameIndex:Int = cast(this.object.object, IValEditorTimeLineContainer).frameIndex;
 		var prevFrameIndex:Int;
@@ -673,7 +674,10 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		this.id = json.id;
 		this.collection.fromJSONSave(json.collection);
 		this.collection.apply();
-		this.constructorCollection.fromJSONSave(json.constructorCollection);
+		if (this.constructorCollection != null && json.constructorCollection != null)
+		{
+			this.constructorCollection.fromJSONSave(json.constructorCollection);
+		}
 		if (json.visibilityCollection != null)
 		{
 			if (this._visibilityCollectionFile == null)
@@ -684,6 +688,11 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 			updateVisibilityCollection();
 		}
 		
+		if (this.clss.isContainer)
+		{
+			cast(this.object.object, IValEditorContainer).fromJSONSave(json.containerData);
+		}
+		
 		var instance:ValEditorObject;
 		var instances:Array<Dynamic> = json.instances;
 		for (node in instances)
@@ -692,16 +701,31 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		}
 	}
 	
+	public function toJSONContainerSave(json:Dynamic = null):Dynamic
+	{
+		if (json == null) json = {};
+		json.clss = this.clss.className;
+		return toJSONSave(json);
+	}
+	
 	public function toJSONSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};
 		json.id = this.id;
 		json.collection = this.collection.toJSONSave();
-		json.constructorCollection = this.constructorCollection.toJSONSave();
+		if (this.constructorCollection != null)
+		{
+			json.constructorCollection = this.constructorCollection.toJSONSave();
+		}
 		
 		if (this._visibilityCollectionFile != null)
 		{
 			json.visibilityCollection = this._visibilityCollectionFile.toJSON();
+		}
+		
+		if (this.clss.isContainer)
+		{
+			json.containerData = cast(this.object.object, IValEditorContainer).toJSONSave();
 		}
 		
 		var instances:Array<Dynamic> = [];
