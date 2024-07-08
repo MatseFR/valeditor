@@ -3,6 +3,7 @@ package valeditor;
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
+import openfl.geom.Rectangle;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
@@ -235,6 +236,40 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		this.viewCenterY = this._viewCenterY;
 	}
 	
+	public function getBounds(targetSpace:Dynamic):Rectangle
+	{
+		var rect:Rectangle = null;
+		#if starling
+		var rectStarling:Rectangle = null;
+		#end
+		if (this._container != null)
+		{
+			rect = this._container.getBounds(this._container);
+		}
+		#if starling
+		if (this._containerStarling != null)
+		{
+			rectStarling = this._containerStarling.getBounds(this._containerStarling);
+		}
+		
+		if (rect != null && rectStarling != null)
+		{
+			return rect.union(rectStarling);
+		}
+		else if (rectStarling != null)
+		{
+			return rectStarling;
+		}
+		#end
+		
+		if (rect != null)
+		{
+			return rect;
+		}
+		
+		return new Rectangle();
+	}
+	
 	public function layerNameExists(name:String):Bool
 	{
 		return this._layerMap.exists(name);
@@ -384,24 +419,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	override public function removeLayer(layer:ValEditLayer):Void
 	{
 		var index:Int = this.layerCollection.indexOf(cast layer);
-		this.layerCollection.remove(cast layer);
-		super.removeLayer(layer);
-		
-		var count:Int = this._layers.length;
-		for (i in index...count)
-		{
-			cast(this._layers[i], ValEditorLayer).indexUpdate(count - 1 - i);
-		}
-		
-		ContainerEvent.dispatch(this, ContainerEvent.LAYER_REMOVED, layer);
-		if (this._currentLayer == layer)
-		{
-			if (index != 0)
-			{
-				index --;
-			}
-			this.currentLayer = this.layerCollection.get(index);
-		}
+		removeLayerAt(index);
 	}
 	
 	override public function removeLayerAt(index:Int):Void
@@ -460,6 +478,11 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		
 		super.layerRegister(layer, index);
 		
+		for (object in layer.allObjects)
+		{
+			objectRegister(object, layer);
+		}
+		
 		layer.addEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
 		layer.addEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
 		layer.addEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
@@ -478,6 +501,11 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	{
 		super.layerUnregister(layer);
 		
+		for (object in layer.allObjects)
+		{
+			objectUnregister(object);
+		}
+		
 		layer.removeEventListener(LayerEvent.OBJECT_ADDED, layer_objectAdded);
 		layer.removeEventListener(LayerEvent.OBJECT_REMOVED, layer_objectRemoved);
 		layer.removeEventListener(LayerEvent.LOCK_CHANGE, onLayerLockChange);
@@ -490,6 +518,28 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		layer.timeLine.removeEventListener(TimeLineActionEvent.REMOVE_KEYFRAME, timeLine_removeKeyFrame);
 		layer.timeLine.removeEventListener(KeyFrameEvent.TRANSITION_CHANGE, keyFrame_transitionChange);
 		layer.timeLine.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, keyFrame_tweenChange);
+	}
+	
+	private function objectRegister(object:ValEditObject, layer:ValEditLayer):Void 
+	{
+		this._allObjects.set(object.objectID, object);
+		this._objectToLayer.set(object, layer);
+		this.allObjectsCollection.add(cast object);
+		
+		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
+		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		object.addEventListener(RenameEvent.RENAMED, object_renamed);
+	}
+	
+	private function objectUnregister(object:ValEditObject):Void 
+	{
+		this._allObjects.remove(object.objectID);
+		this._objectToLayer.remove(object);
+		this.allObjectsCollection.remove(cast object);
+		
+		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
+		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
 	}
 	
 	public function getContainerDependencies(data:ContainerSaveData):Void
@@ -515,24 +565,20 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	
 	private function layer_objectAdded(evt:LayerEvent):Void
 	{
-		this._allObjects.set(evt.object.objectID, evt.object);
-		this._objectToLayer.set(evt.object, evt.layer);
-		this.allObjectsCollection.add(cast evt.object);
-		
-		evt.object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
-		evt.object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		if (evt.object.numKeyFrames == 1)
+		{
+			objectRegister(evt.object, evt.layer);
+		}
 		
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, evt.object);
 	}
 	
 	private function layer_objectRemoved(evt:LayerEvent):Void
 	{
-		this._allObjects.remove(evt.object.objectID);
-		this._objectToLayer.remove(evt.object);
-		this.allObjectsCollection.remove(cast evt.object);
-		
-		evt.object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
-		evt.object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
+		if (evt.object.numKeyFrames == 0)
+		{
+			objectUnregister(evt.object);
+		}
 		
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, evt.object);
 	}
@@ -575,6 +621,23 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	private function object_functionCalled(evt:ObjectPropertyEvent):Void
 	{
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_FUNCTION_CALLED, evt.object, evt);
+	}
+	
+	private function object_renamed(evt:RenameEvent):Void
+	{
+		if (this._allObjects.exists(evt.previousNameOrID))
+		{
+			this._allObjects.remove(evt.previousNameOrID);
+			var object:ValEditorObject = cast evt.target;
+			this._allObjects.set(object.objectID, object);
+		}
+		
+		if (this._activeObjects.exists(evt.previousNameOrID))
+		{
+			this._activeObjects.remove(evt.previousNameOrID);
+			var object:ValEditorObject = cast evt.target;
+			this._activeObjects.set(object.objectID, object);
+		}
 	}
 	
 	private function object_propertyChange(evt:ObjectPropertyEvent):Void
