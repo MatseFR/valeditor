@@ -165,8 +165,9 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		
 		if (this.object != null)
 		{
-			ValEditor.destroyObject(cast this.object);
+			var obj:ValEditorObject = cast this.object;
 			this.object = null;
+			ValEditor.destroyObject(obj);
 		}
 		
 		for (i in new ReverseIterator(this._instances.length - 1, 0))
@@ -238,6 +239,13 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 	override public function addInstance(instance:ValEditObject):Void 
 	{
 		super.addInstance(instance);
+		if (this.clss.isContainer)
+		{
+			for (object in cast(instance.object, IValEditorContainer).allObjectsCollection)
+			{
+				object.save = false;
+			}
+		}
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_ADDED, this);
 	}
 	
@@ -343,6 +351,10 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		{
 			objectLayer = ValEditorLayer.fromPool();
 			layer.cloneTo(objectLayer);
+			for (object in objectLayer.allObjects)
+			{
+				cast(object, ValEditorObject).save = false;
+			}
 			cast(instance.object, IValEditorTimeLineContainer).addLayerAt(objectLayer, index);
 		}
 	}
@@ -452,6 +464,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 				if (instanceObject == null)
 				{
 					instanceObject = ValEditor.cloneObject(object);
+					instanceObject.save = false;
 				}
 				instanceContainer.addObject(instanceObject);
 				instanceContainer.frameIndex = prevFrameIndex;
@@ -731,7 +744,10 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		var instances:Array<Dynamic> = [];
 		for (instance in this._instances)
 		{
-			instances.push(cast(instance, ValEditorObject).toJSONSave());
+			if (cast(instance, ValEditorObject).save)
+			{
+				instances.push(cast(instance, ValEditorObject).toJSONSave());
+			}
 		}
 		json.instances = instances;
 		
