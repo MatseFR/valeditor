@@ -534,7 +534,7 @@ class FeathersWindows
 		}
 	}
 	
-	static public function showTemplateCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Template"):Void
+	static public function showTemplateCreationWindow(?confirmCallback:ValEditorTemplate->Void, ?cancelCallback:Void->Void, title:String = "Create Template"):Void
 	{
 		if (_templateCreate == null)
 		{
