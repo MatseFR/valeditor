@@ -255,24 +255,11 @@ class ValEditorContainerController implements IAnimatable
 		this._mouseObject.isMouseDown = true;
 		this.selection.isMouseDown = true;
 		
-		//if (this._mouseObject.hasPivotProperties)
-		//{
-			//if (this._mouseObject.usePivotScaling)
-			//{
-				//this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
-				//this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
-			//}
-			//else
-			//{
-				//this._mouseObjectOffsetX = evt.localX - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
-				//this._mouseObjectOffsetY = evt.localY - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
-			//}
-		//}
-		//else
-		//{
-			this._mouseObjectOffsetX = evt.localX;
-			this._mouseObjectOffsetY = evt.localY;
-		//}
+		this._pt.x = evt.stageX;
+		this._pt.y = evt.stageY;
+		this._pt = this._container.container.globalToLocal(this._pt);
+		this._mouseObjectOffsetX = this._pt.x - this._mouseObject.getProperty(RegularPropertyName.X);
+		this._mouseObjectOffsetY = this._pt.y - this._mouseObject.getProperty(RegularPropertyName.Y);
 		
 		if (this.selection.hasObject(this._mouseObject))
 		{
@@ -525,8 +512,8 @@ class ValEditorContainerController implements IAnimatable
 			{
 				throw new Error("ValEditorContainerController : this._actionCurrent should be null");
 			}
-			this._actionCurrent = MultiAction.fromPool();
 			//\DEBUG
+			this._actionCurrent = MultiAction.fromPool();
 			
 			this._mouseDownOnObject = true;
 			
@@ -547,37 +534,26 @@ class ValEditorContainerController implements IAnimatable
 			this.selection.isMouseDown = true;
 			if (object.interactiveObject != null)
 			{
-				touch.getLocation(cast object.interactiveObject, _pt);
+				touch.getLocation(this._container.containerStarling, this._pt);
+				this._pt.x -= this._mouseObject.getProperty(RegularPropertyName.X);
+				this._pt.y -= this._mouseObject.getProperty(RegularPropertyName.Y);
 			}
 			else
 			{
 				if (Std.isOfType(object.object, IValEditorContainer))
 				{
-					touch.getLocation(cast(object.object, IValEditorContainer).containerStarling, _pt);
+					touch.getLocation(this._container.containerStarling, this._pt);
+					this._pt.x -= this._mouseObject.getProperty(RegularPropertyName.X);
+					this._pt.y -= this._mouseObject.getProperty(RegularPropertyName.Y);
 				}
 				else
 				{
 					throw new Error("ValEditorContainerController : object has no interactive object and is not a container");
 				}
 			}
-			if (this._mouseObject.hasPivotProperties)
-			{
-				if (this._mouseObject.usePivotScaling)
-				{
-					this._mouseObjectOffsetX = this._pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X) * this._mouseObject.getProperty(RegularPropertyName.SCALE_X);
-					this._mouseObjectOffsetY = this._pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y) * this._mouseObject.getProperty(RegularPropertyName.SCALE_Y);
-				}
-				else
-				{
-					this._mouseObjectOffsetX = this._pt.x - this._mouseObject.getProperty(RegularPropertyName.PIVOT_X);
-					this._mouseObjectOffsetY = this._pt.y - this._mouseObject.getProperty(RegularPropertyName.PIVOT_Y);
-				}
-			}
-			else
-			{
-				this._mouseObjectOffsetX = this._pt.x;
-				this._mouseObjectOffsetY = this._pt.y;
-			}
+			
+			this._mouseObjectOffsetX = this._pt.x;
+			this._mouseObjectOffsetY = this._pt.y;
 			
 			if (this.selection.hasObject(this._mouseObject))
 			{
