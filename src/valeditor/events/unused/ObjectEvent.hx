@@ -1,4 +1,4 @@
-package valeditor.events;
+package valeditor.events.unused;
 
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
