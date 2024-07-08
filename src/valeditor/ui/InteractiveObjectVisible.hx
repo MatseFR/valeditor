@@ -4,6 +4,7 @@ import openfl.display.BitmapData;
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Matrix;
+import openfl.geom.Rectangle;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -159,62 +160,158 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		this.x = object.getProperty(RegularPropertyName.X);
-		this.y = object.getProperty(RegularPropertyName.Y);
-		if (object.hasPivotProperties)
+		if (object.useBounds)
 		{
-			this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-			this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+			var scaleX:Float = 1.0;
+			var scaleY:Float = 1.0;
+			var width:Float;
+			var height:Float;
+			var bounds:Rectangle = object.getBounds(object.object);
+			
+			if (object.hasScaleProperties)
+			{
+				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				width = bounds.width * Math.abs(scaleX);
+				height = bounds.height * Math.abs(scaleY);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+			}
+			else
+			{
+				width = bounds.width;
+				height = bounds.height;
+			}
+			
+			if (object.hasPivotProperties)
+			{
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+				
+				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+			}
+			else
+			{
+				this.pivotX = -bounds.x * Math.abs(scaleX);
+				this.pivotY = -bounds.y * Math.abs(scaleY);
+				
+				this.x = object.getProperty(RegularPropertyName.X);
+				this.y = object.getProperty(RegularPropertyName.Y);
+			}
+			
+			if (width < this._minWidth) width = this._minWidth;
+			if (height < this._minHeight) height = this._minHeight;
+			
+			refreshShape(width, height);
+			
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			if (object.hasRadianRotation)
+			{
+				this.rotation = MathUtil.rad2deg(rotation);
+			}
+			else
+			{
+				this.rotation = rotation;
+			}
 		}
 		else
 		{
-			this.pivotX = 0;
-			this.pivotY = 0;
-		}
-		
-		if (object.hasScaleProperties)
-		{
-			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
-			
-			if (scaleX < 0)
+			this.x = object.getProperty(RegularPropertyName.X);
+			this.y = object.getProperty(RegularPropertyName.Y);
+			if (object.hasPivotProperties)
 			{
-				this.scaleX = -1;
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(object.getProperty(RegularPropertyName.SCALE_X));
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(object.getProperty(RegularPropertyName.SCALE_Y));
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+			}
+			else
+			{
+				this.pivotX = 0;
+				this.pivotY = 0;
+			}
+			
+			if (object.hasScaleProperties)
+			{
+				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
 			}
 			else
 			{
 				this.scaleX = 1;
+				this.scaleY = 1;
 			}
 			
-			if (scaleY < 0)
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			this.rotation = 0;
+			
+			var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+			if (width < this._minWidth) width = this._minWidth;
+			var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+			if (height < this._minHeight) height = this._minHeight;
+			
+			refreshShape(width, height);
+			
+			object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+			if (object.hasRadianRotation)
 			{
-				this.scaleY = -1;
+				this.rotation = MathUtil.rad2deg(rotation);
 			}
 			else
 			{
-				this.scaleY = 1;
+				this.rotation = rotation;
 			}
-		}
-		else
-		{
-			this.scaleX = 1;
-			this.scaleY = 1;
-		}
-		
-		var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-		object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
-		this.rotation = 0;
-		
-		refreshShape(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
-		
-		object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-		if (object.hasRadianRotation)
-		{
-			this.rotation = MathUtil.rad2deg(rotation);
-		}
-		else
-		{
-			this.rotation = rotation;
 		}
 		
 		if (!this.visibilityLocked && object.hasVisibleProperty)

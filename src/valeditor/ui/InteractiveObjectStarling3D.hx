@@ -1,5 +1,6 @@
 package valeditor.ui;
 
+import openfl.geom.Rectangle;
 import starling.display.Quad;
 import starling.display.Sprite3D;
 import valedit.utils.RegularPropertyName;
@@ -120,98 +121,211 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		this.x = object.getProperty(RegularPropertyName.X);
-		this.y = object.getProperty(RegularPropertyName.Y);
-		this.z = object.getProperty(RegularPropertyName.Z);
-		if (object.hasPivotProperties)
+		if (object.useBounds)
 		{
-			this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
-			this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
-			this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);// * object.getProperty(RegularPropertyName.SCALE_Z);
+			var scaleX:Float = 1.0;
+			var scaleY:Float = 1.0;
+			var scaleZ:Float = 1.0;
+			var width:Float;
+			var height:Float;
+			var bounds:Rectangle = object.getBounds(object.object);
+			
+			if (object.hasScaleProperties)
+			{
+				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
+				scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
+				
+				width = bounds.width * Math.abs(scaleX);
+				height = bounds.height * Math.abs(scaleY);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+				
+				if (scaleZ < 0)
+				{
+					this.scaleZ = -1;
+				}
+				else
+				{
+					this.scaleZ = 1;
+				}
+			}
+			else
+			{
+				width = bounds.width;
+				height = bounds.height;
+			}
+			
+			if (object.hasPivotProperties)
+			{
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z) * Math.abs(scaleZ);
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+				}
+				
+				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+				this.z = object.getProperty(RegularPropertyName.Z);
+			}
+			else
+			{
+				this.pivotX = -bounds.x * Math.abs(scaleX);
+				this.pivotY = -bounds.y * Math.abs(scaleY);
+				
+				this.x = object.getProperty(RegularPropertyName.X);
+				this.y = object.getProperty(RegularPropertyName.Y);
+				this.z = object.getProperty(RegularPropertyName.Z);
+			}
+			
+			if (width < this._minWidth) width = this._minWidth;
+			if (height < this._minHeight) height = this._minHeight;
+			
+			this._quad.readjustSize(width, height);
+			
+			var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
+			var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
+			var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);
+			if (object.hasRadianRotation)
+			{
+				this.rotationX = rotationX;
+				this.rotationY = rotationY;
+				this.rotationZ = rotationZ;
+			}
+			else
+			{
+				this.rotationX = MathUtil.deg2rad(rotationX);
+				this.rotationY = MathUtil.deg2rad(rotationY);
+				this.rotationZ = MathUtil.deg2rad(rotationZ);
+			}
 		}
 		else
 		{
-			this.pivotX = 0;
-			this.pivotY = 0;
-			this.pivotZ = 0;
-		}
-		
-		if (object.hasScaleProperties)
-		{
-			var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-			var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
-			var scaleZ:Float = object.getProperty(RegularPropertyName.SCALE_Z);
-			
-			if (scaleX < 0)
+			this.x = object.getProperty(RegularPropertyName.X);
+			this.y = object.getProperty(RegularPropertyName.Y);
+			this.z = object.getProperty(RegularPropertyName.Z);
+			if (object.hasPivotProperties)
 			{
-				this.scaleX = -1;
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(object.getProperty(RegularPropertyName.SCALE_X));
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(object.getProperty(RegularPropertyName.SCALE_Y));
+					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);// * Math.abs(object.getProperty(RegularPropertyName.SCALE_Z));
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+				}
 			}
 			else
 			{
-				this.scaleX = 1;
+				this.pivotX = 0;
+				this.pivotY = 0;
+				this.pivotZ = 0;
 			}
 			
-			if (scaleY < 0)
+			if (object.hasScaleProperties)
 			{
-				this.scaleY = -1;
+				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				var scaleZ:Float = object.getProperty(RegularPropertyName.SCALE_Z);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+				
+				if (scaleZ < 0)
+				{
+					this.scaleZ = -1;
+				}
+				else
+				{
+					this.scaleZ = 1;
+				}
 			}
 			else
 			{
-				this.scaleY = 1;
-			}
-			
-			if (scaleZ < 0)
-			{
-				this.scaleZ = -1;
-			}
-			else
-			{
+				this.scale = 1;
 				this.scaleZ = 1;
 			}
+			
+			var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
+			var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
+			var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);
+			
+			object.setProperty(RegularPropertyName.ROTATION_X, 0.0, true, false);
+			object.setProperty(RegularPropertyName.ROTATION_Y, 0.0, true, false);
+			object.setProperty(RegularPropertyName.ROTATION_Z, 0.0, true, false);
+			
+			this.rotationX = 0;
+			this.rotationY = 0;
+			this.rotationZ = 0;
+			
+			var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+			if (width < this._minWidth) width = this._minWidth;
+			var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+			if (height < this._minHeight) height = this._minHeight;
+			
+			this._quad.readjustSize(width, height);
+			
+			object.setProperty(RegularPropertyName.ROTATION_X, rotationX, true, false);
+			object.setProperty(RegularPropertyName.ROTATION_Y, rotationY, true, false);
+			object.setProperty(RegularPropertyName.ROTATION_Z, rotationZ, true, false);
+			
+			if (object.hasRadianRotation)
+			{
+				this.rotationX = rotationX;
+				this.rotationY = rotationY;
+				this.rotationZ = rotationZ;
+			}
+			else
+			{
+				this.rotationX = MathUtil.deg2rad(rotationX);
+				this.rotationY = MathUtil.deg2rad(rotationY);
+				this.rotationZ = MathUtil.deg2rad(rotationZ);
+			}
+			
+			this.scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
 		}
-		else
-		{
-			this.scale = 1;
-			this.scaleZ = 1;
-		}
-		
-		var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
-		var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
-		var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);
-		
-		object.setProperty(RegularPropertyName.ROTATION_X, 0.0, true, false);
-		object.setProperty(RegularPropertyName.ROTATION_Y, 0.0, true, false);
-		object.setProperty(RegularPropertyName.ROTATION_Z, 0.0, true, false);
-		
-		this.rotationX = 0;
-		this.rotationY = 0;
-		this.rotationZ = 0;
-		
-		var width:Float = object.getProperty(RegularPropertyName.WIDTH);
-		if (width < this._minWidth) width = this._minWidth;
-		var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
-		if (height < this._minHeight) height = this._minHeight;
-		
-		this._quad.readjustSize(width, height);
-		
-		object.setProperty(RegularPropertyName.ROTATION_X, rotationX, true, false);
-		object.setProperty(RegularPropertyName.ROTATION_Y, rotationY, true, false);
-		object.setProperty(RegularPropertyName.ROTATION_Z, rotationZ, true, false);
-		
-		if (object.hasRadianRotation)
-		{
-			this.rotationX = rotationX;
-			this.rotationY = rotationY;
-			this.rotationZ = rotationZ;
-		}
-		else
-		{
-			this.rotationX = MathUtil.deg2rad(rotationX);
-			this.rotationY = MathUtil.deg2rad(rotationY);
-			this.rotationZ = MathUtil.deg2rad(rotationZ);
-		}
-		
-		this.scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
 		
 		if (!this.visibilityLocked && object.hasVisibleProperty)
 		{

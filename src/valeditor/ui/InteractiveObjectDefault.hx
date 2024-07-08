@@ -138,25 +138,83 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	{
 		if (object.useBounds)
 		{
-			var bounds:Rectangle = object.getBounds(object.object.parent);
-			this.x = bounds.x;
-			this.y = bounds.y;
+			var scaleX:Float = 1.0;
+			var scaleY:Float = 1.0;
+			var width:Float;
+			var height:Float;
+			var bounds:Rectangle = object.getBounds(object.object);
 			
-			//var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-			//object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
-			//this.rotation = 0;
+			if (object.hasScaleProperties)
+			{
+				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				width = bounds.width * Math.abs(scaleX);
+				height = bounds.height * Math.abs(scaleY);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+			}
+			else
+			{
+				width = bounds.width;
+				height = bounds.height;
+			}
 			
-			refreshShape(bounds.width, bounds.height);
+			if (object.hasPivotProperties)
+			{
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+				
+				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+			}
+			else
+			{
+				this.pivotX = -bounds.x * Math.abs(scaleX);
+				this.pivotY = -bounds.y * Math.abs(scaleY);
+				
+				this.x = object.getProperty(RegularPropertyName.X);
+				this.y = object.getProperty(RegularPropertyName.Y);
+			}
 			
-			//object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-			//if (object.hasRadianRotation)
-			//{
-				//this.rotation = MathUtil.rad2deg(rotation);
-			//}
-			//else
-			//{
-				//this.rotation = rotation;
-			//}
+			if (width < this._minWidth) width = this._minWidth;
+			if (height < this._minHeight) height = this._minHeight;
+			
+			refreshShape(width, height);
+			
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			if (object.hasRadianRotation)
+			{
+				this.rotation = MathUtil.rad2deg(rotation);
+			}
+			else
+			{
+				this.rotation = rotation;
+			}
 		}
 		else
 		{
@@ -164,8 +222,16 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			this.y = object.getProperty(RegularPropertyName.Y);
 			if (object.hasPivotProperties)
 			{
-				this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
-				this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(object.getProperty(RegularPropertyName.SCALE_X));
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(object.getProperty(RegularPropertyName.SCALE_Y));
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
 			}
 			else
 			{
@@ -206,7 +272,12 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
 			this.rotation = 0;
 			
-			refreshShape(object.getProperty(RegularPropertyName.WIDTH), object.getProperty(RegularPropertyName.HEIGHT));
+			var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+			if (width < this._minWidth) width = this._minWidth;
+			var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+			if (height < this._minHeight) height = this._minHeight;
+			
+			refreshShape(width, height);
 			
 			object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
 			if (object.hasRadianRotation)
