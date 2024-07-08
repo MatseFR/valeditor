@@ -90,29 +90,76 @@ class SelectionBox extends Sprite
 	{
 		if (object.useBounds)
 		{
-			var bounds:Rectangle = object.getBounds(object.object.parent);
-			this.x = bounds.x;
-			this.y = bounds.y;
+			var scaleX:Float = 1.0;
+			var scaleY:Float = 1.0;
+			var bounds:Rectangle = object.getBounds(object.object);
 			
-			//var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-			//object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
-			//this.rotation = 0;
+			if (object.hasScaleProperties)
+			{
+				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
+				
+				this.realWidth = bounds.width * Math.abs(scaleX);
+				this.realHeight = bounds.height * Math.abs(scaleY);
+				
+				if (scaleX < 0)
+				{
+					this.scaleX = -1;
+				}
+				else
+				{
+					this.scaleX = 1;
+				}
+				
+				if (scaleY < 0)
+				{
+					this.scaleY = -1;
+				}
+				else
+				{
+					this.scaleY = 1;
+				}
+			}
+			else
+			{
+				this.realWidth = bounds.width;
+				this.realHeight = bounds.height;
+			}
 			
-			//refreshShape(bounds.width, bounds.height);
-			this.realWidth = bounds.width;
-			this.realHeight = bounds.height;
+			if (object.hasPivotProperties)
+			{
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+				
+				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+			}
+			else
+			{
+				this.pivotX = -bounds.x * Math.abs(scaleX);
+				this.pivotY = -bounds.y * Math.abs(scaleY);
+				
+				this.x = object.getProperty(RegularPropertyName.X);
+				this.y = object.getProperty(RegularPropertyName.Y);
+			}
 			
-			//object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-			//if (object.hasRadianRotation)
-			//{
-				//this.rotation = MathUtil.rad2deg(rotation);
-			//}
-			//else
-			//{
-				//this.rotation = rotation;
-			//}
-			
-			//this.transform.matrix = object.object.transform.matrix;
+			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
+			if (object.hasRadianRotation)
+			{
+				this.rotation = MathUtil.rad2deg(rotation);
+			}
+			else
+			{
+				this.rotation = rotation;
+			}
 		}
 		else
 		{
@@ -129,7 +176,7 @@ class SelectionBox extends Sprite
 				this.pivotY = 0;
 			}
 			
-			if (object.hasPivotProperties)
+			if (object.hasScaleProperties)
 			{
 				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
 				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
