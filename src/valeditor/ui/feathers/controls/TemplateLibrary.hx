@@ -262,7 +262,7 @@ class TemplateLibrary extends LayoutGroup
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "add" :
-				FeathersWindows.showTemplateCreationWindow();
+				FeathersWindows.showTemplateCreationWindow(onTemplateCreated);
 			
 			case "editVisibility" :
 				var title:String = template.id + " properties visibility";
@@ -390,7 +390,17 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateAddButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showTemplateCreationWindow();
+		FeathersWindows.showTemplateCreationWindow(onTemplateCreated);
+	}
+	
+	private function onTemplateCreated(template:ValEditorTemplate):Void
+	{
+		if (Std.isOfType(template.object.object, IValEditorContainer))
+		{
+			var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
+			containerOpen.setup(cast template.object);
+			ValEditor.actionStack.add(containerOpen);
+		}
 	}
 	
 	private function onTemplateOpenButton(evt:TriggerEvent):Void
