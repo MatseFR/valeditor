@@ -48,27 +48,11 @@ class ValEditorTimeLine extends ValEditTimeLine
 	override function set_frameIndex(value:Int):Int 
 	{
 		if (this._frameIndex == value) return value;
-		//if (value >= this._numFrames)
-		//{
-			//value = this._numFrames -1;
-		//}
-		//if (!this._isPlaying)
-		//{
-			//var time:Float = (value - this._frameIndex) * this._frameTime;
-			//for (child in this._children)
-			//{
-				//child.advanceTime(time);
-			//}
-		//}
+		
 		super.set_frameIndex(value);
 		
 		if (!this._isPlaying && this._frameCurrent != null)
 		{
-			//var diff:Int = this._frameIndex - this._frameCurrent.indexStart;
-			//for (child in this._children)
-			//{
-				//child.frameIndex = diff;
-			//}
 			var diff:Float = (this._frameIndex - this._frameCurrent.indexStart) * this._frameTime;
 			for (child in this._children)
 			{
@@ -1020,18 +1004,15 @@ class ValEditorTimeLine extends ValEditTimeLine
 			timeLine.addKeyFrame(cloneFrame);
 		}
 		
-		//timeLine.updateLastFrameIndex();
 		timeLine._lastFrameIndex = this._lastFrameIndex;
 		
 		var objects:Array<ValEditorObject> = getAllObjects();
 		var cloneObject:ValEditorObject;
-		//var cloneObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
 		var cloneObjectMap:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 		var collection:ExposedCollection;
 		for (object in objects)
 		{
 			cloneObject = ValEditor.cloneObject(object);
-			//cloneObjects.push(cloneObject);
 			cloneObjectMap.set(cloneObject.objectID, cloneObject);
 		}
 		
@@ -1046,9 +1027,14 @@ class ValEditorTimeLine extends ValEditTimeLine
 			}
 		}
 		
+		cloneObjectMap.clear();
+		
 		for (keyFrame in timeLine.keyFrames)
 		{
-			keyFrame.buildTweens();
+			if (keyFrame.tween)
+			{
+				keyFrame.buildTweens();
+			}
 		}
 	}
 	
@@ -1073,7 +1059,10 @@ class ValEditorTimeLine extends ValEditTimeLine
 		
 		for (keyFrame in this._keyFrames)
 		{
-			keyFrame.buildTweens();
+			if (keyFrame.tween)
+			{
+				keyFrame.buildTweens();
+			}
 		}
 	}
 	
