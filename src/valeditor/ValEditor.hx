@@ -53,7 +53,6 @@ import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.EditorEvent;
-import valeditor.events.ObjectEvent;
 import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
@@ -200,7 +199,7 @@ class ValEditor
 	{
 		openedContainers[openedContainers.length] = container;
 		openedContainerCollection.add(container);
-		container.addEventListener(ObjectEvent.RENAMED, onOpenContainerObjectRenamed);
+		container.addEventListener(RenameEvent.RENAMED, onOpenContainerObjectRenamed);
 		
 		if (_rootContainer == null)
 		{
@@ -237,7 +236,7 @@ class ValEditor
 		var container:IValEditorContainer = object.object;
 		openedContainerCollection.remove(object);
 		
-		object.removeEventListener(ObjectEvent.RENAMED, onOpenContainerObjectRenamed);
+		object.removeEventListener(RenameEvent.RENAMED, onOpenContainerObjectRenamed);
 		
 		if (openedContainers.length != 0)
 		{
@@ -1439,9 +1438,9 @@ class ValEditor
 		}
 	}
 	
-	static private function onOpenContainerObjectRenamed(evt:ObjectEvent):Void
+	static private function onOpenContainerObjectRenamed(evt:RenameEvent):Void
 	{
-		openedContainerCollection.updateAt(openedContainerCollection.indexOf(cast evt.object));
+		openedContainerCollection.updateAt(openedContainerCollection.indexOf(cast evt.target));
 	}
 	
 	static private function onTemplateInstanceAdded(evt:TemplateEvent):Void
@@ -1572,7 +1571,6 @@ class ValEditor
 			clss.fromJSONSave(node);
 		}
 		
-		var clss:ValEditorClass;
 		var constructorCollection:ExposedCollection;
 		var template:ValEditorTemplate;
 		var containerData:Array<Dynamic> = json.containerTemplates;
@@ -1594,7 +1592,6 @@ class ValEditor
 					constructorCollection = null;
 				}
 				template = ValEditor.createTemplateWithClassName(clss.className, data.id, constructorCollection);
-				//template.applyVisibility();
 				template.fromJSONSave(data);
 			}
 		}
