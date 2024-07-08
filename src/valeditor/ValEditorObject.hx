@@ -13,9 +13,9 @@ import valedit.value.base.ExposedValue;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
-import valeditor.events.ObjectEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
+import valeditor.events.RenameEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
@@ -51,6 +51,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var mouseRestoreX:Float;
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
+	public var save:Bool = true;
 	public var selectionBox(get, set):SelectionBox;
 	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
@@ -100,8 +101,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	
 	override function set_id(value:String):String 
 	{
+		if (this._id == value) return value;
+		var oldID:String = this._id;
 		super.set_id(value);
-		ObjectEvent.dispatch(this, ObjectEvent.RENAMED, this);
+		RenameEvent.dispatch(this, RenameEvent.RENAMED, oldID);
 		return this._id;
 	}
 	
@@ -143,8 +146,9 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	override function set_objectID(value:String):String 
 	{
 		if (this._objectID == value) return value;
+		var oldObjectID:String = this._objectID;
 		super.set_objectID(value);
-		ObjectEvent.dispatch(this, ObjectEvent.RENAMED, this);
+		RenameEvent.dispatch(this, RenameEvent.RENAMED, oldObjectID);
 		return this._objectID;
 	}
 	
@@ -202,7 +206,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		}
 		
 		this.container = null;
-		this.getBoundsFunctionName = null;
+		this.getBoundsFunctionName = "getBounds";
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
 		this.hasTransformProperty = false;
@@ -213,6 +217,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.isMouseDown = false;
 		this.isSelectable = true;
 		this.isSuspended = false;
+		this.save = true;
 		this.usePivotScaling = false;
 		
 		this._restoreKeyFrames.resize(0);
