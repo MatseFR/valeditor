@@ -1,6 +1,5 @@
 package valeditor;
 
-import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
 import valedit.DisplayObjectType;
@@ -29,7 +28,6 @@ class ValEditorLayer extends ValEditLayer
 	}
 	
 	public var index(get, set):Int;
-	public var objectCollection(default, null):ArrayCollection<ValEditObject> = new ArrayCollection<ValEditObject>();
 	public var selected(get, set):Bool;
 	
 	private var _index:Int = -1;
@@ -154,7 +152,6 @@ class ValEditorLayer extends ValEditLayer
 	
 	override public function clear():Void 
 	{
-		this.objectCollection.removeAll();
 		this._displayObjects.clear();
 		this._selected = false;
 		super.clear();
@@ -170,11 +167,6 @@ class ValEditorLayer extends ValEditLayer
 	{
 		if (timeLine == null) timeLine = ValEditorTimeLine.fromPool(0);
 		return super.setTo(timeLine);
-	}
-	
-	override public function remove(object:ValEditObject):Void 
-	{
-		super.remove(object);
 	}
 	
 	/**
@@ -269,8 +261,6 @@ class ValEditorLayer extends ValEditLayer
 					throw new Error("ValEditorLayer.add ::: unknown display object type " + object.displayObjectType);
 			}
 		}
-		
-		this.objectCollection.add(editorObject);
 	}
 	
 	override public function deactivate(object:ValEditObject):Void 
@@ -300,8 +290,6 @@ class ValEditorLayer extends ValEditLayer
 					throw new Error("ValEditorContainer.remove ::: unknown display object type " + object.displayObjectType);
 			}
 		}
-		
-		this.objectCollection.remove(editorObject);
 	}
 	
 	override function addDisplayContainer():Void 
@@ -322,11 +310,19 @@ class ValEditorLayer extends ValEditLayer
 	
 	override function onKeyFrameObjectAdded(evt:KeyFrameEvent):Void 
 	{
+		if (evt.object.numKeyFrames == 1)
+		{
+			this.allObjects[this.allObjects.length] = evt.object;
+		}
 		LayerEvent.dispatch(this, LayerEvent.OBJECT_ADDED, this, evt.object);
 	}
 	
 	override function onKeyFrameObjectRemoved(evt:KeyFrameEvent):Void 
 	{
+		if (evt.object.numKeyFrames == 0)
+		{
+			this.allObjects.remove(evt.object);
+		}
 		LayerEvent.dispatch(this, LayerEvent.OBJECT_REMOVED, this, evt.object);
 	}
 	
@@ -355,6 +351,21 @@ class ValEditorLayer extends ValEditLayer
 		this.y = json.y;
 		
 		cast(this.timeLine, ValEditorTimeLine).fromJSONSave(json.timeLine);
+		
+		for (keyFrame in this.timeLine.keyFrames)
+		{
+			for (object in keyFrame.objects)
+			{
+				if (object.numKeyFrames == 1)
+				{
+					this.allObjects[this.allObjects.length] = object;
+				}
+				else if (this.allObjects.indexOf(object) == -1)
+				{
+					this.allObjects[this.allObjects.length] = object;
+				}
+			}
+		}
 	}
 	
 	public function toJSONSave(json:Dynamic = null):Dynamic
