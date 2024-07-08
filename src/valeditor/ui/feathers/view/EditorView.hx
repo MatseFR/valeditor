@@ -408,9 +408,15 @@ class EditorView extends LayoutGroup
 		this.addEventListener(Event.RESIZE, onResize);
 		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_OPEN, onContainerOpen);
+		ValEditor.addEventListener(EditorEvent.CONTAINER_CLOSE, onContainerClose);
 	}
 	
 	private function onContainerOpen(evt:EditorEvent):Void
+	{
+		this._containerList.selectedIndex = this._containerList.dataProvider.length - 1;
+	}
+	
+	private function onContainerClose(evt:EditorEvent):Void
 	{
 		this._containerList.selectedIndex = this._containerList.dataProvider.length - 1;
 	}
@@ -521,7 +527,6 @@ class EditorView extends LayoutGroup
 						
 						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 						containerMakeCurrent.setup(container);
-						//ValEditor.actionStack.add(containerMakeCurrent);
 						action.add(containerMakeCurrent);
 					}
 				}
@@ -533,7 +538,6 @@ class EditorView extends LayoutGroup
 					
 					var containerOpen:ContainerOpen = ContainerOpen.fromPool();
 					containerOpen.setup(container);
-					//ValEditor.actionStack.add(containerOpen);
 					action.add(containerOpen);
 				}
 				if (action.numActions != 0)
