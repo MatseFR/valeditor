@@ -16,8 +16,8 @@ class UIConfig
 	static public var CONTAINER_PIVOT_OUTLINE_ALPHA:Float = 1;
 	static public var CONTAINER_PIVOT_SIZE:Float = 10;
 	
-	static public var INTERACTIVE_OBJECT_MIN_HEIGHT:Float = 1;
-	static public var INTERACTIVE_OBJECT_MIN_WIDTH:Float = 1;
+	static public var INTERACTIVE_OBJECT_MIN_HEIGHT:Float = 4;
+	static public var INTERACTIVE_OBJECT_MIN_WIDTH:Float = 4;
 	
 	static public var POPUP_STAGE_PADDING:Float = 32;
 	
