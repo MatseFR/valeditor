@@ -697,9 +697,9 @@ class ValEditor
 		
 		if (object == null) return null;
 		
-		var clss:Class<Dynamic> = Type.getClass(object);
-		var className:String = Type.getClassName(clss);
-		var valClass:ValEditorClass = _classMap[className];
+		var clss:Class<Dynamic> = null;
+		var className:String;
+		var valClass:ValEditorClass;
 		
 		if (Std.isOfType(object, ValEditorObject))
 		{
@@ -723,6 +723,10 @@ class ValEditor
 		}
 		else
 		{
+			if (clss == null)
+			{
+				clss = Type.getClass(object);
+			}
 			while (true)
 			{
 				clss = Type.getSuperClass(clss);
