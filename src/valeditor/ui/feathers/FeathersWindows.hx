@@ -17,6 +17,7 @@ import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.window.ClassVisibilitiesWindow;
 import valeditor.ui.feathers.window.ClassVisibilityWindow;
+import valeditor.ui.feathers.window.CreditsWindow;
 import valeditor.ui.feathers.window.EditorSettingsWindow;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.FileSettingsWindow;
@@ -72,6 +73,7 @@ class FeathersWindows
 	static private var _starlingTextureAssets:StarlingTextureAssetsWindow;
 	#end
 	
+	static private var _credits:CreditsWindow;
 	static private var _editorSettings:EditorSettingsWindow;
 	static private var _themeEdit:ThemeEditWindow;
 	static private var _exportSettings:ExportSettingsWindow;
@@ -287,6 +289,19 @@ class FeathersWindows
 		openWindow(_starlingTextureAssets);
 	}
 	#end
+	
+	static public function showCreditsWindow():Void
+	{
+		if (_credits == null)
+		{
+			_credits = new CreditsWindow();
+		}
+		
+		_credits.width = Lib.current.stage.stageWidth / 2.0;
+		_credits.height = Lib.current.stage.stageHeight / 2.0;
+		
+		openWindow(_credits);
+	}
 	
 	static public function showEditorSettingsWindow(settings:EditorSettings, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
 	{
