@@ -48,6 +48,7 @@ import valedit.object.openfl.display.RectangleShape;
 import valedit.object.openfl.display.RoundRectangleShape;
 import valedit.object.openfl.display.StarShape;
 import valedit.object.openfl.display.WedgeShape;
+import valeditor.ValEditorClassSettings;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
 import valeditor.editor.UIAssets;
@@ -118,6 +119,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private var _assetMenuCollection:ArrayCollection<MenuItem>;
 	private var _assetBrowserItem:MenuItem;
 	
+	// help menu
+	private var _helpMenuCollection:ArrayCollection<MenuItem>;
+	private var _creditsItem:MenuItem;
+	
 	public function new() 
 	{
 		super();
@@ -126,9 +131,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	override function initialize():Void 
 	{
 		ValEdit.assetLib = new AssetLib();
-		ValEdit.assetLib.excludePath("icon");
-		ValEdit.assetLib.excludePath("ui/dark");
-		ValEdit.assetLib.excludePath("ui/light");
+		ValEdit.assetLib.excludePath("valeditor/credits");
+		ValEdit.assetLib.excludePath("valeditor/icon");
+		ValEdit.assetLib.excludePath("valeditor/ui/dark");
+		ValEdit.assetLib.excludePath("valeditor/ui/light");
 		ValEdit.assetLib.init(true);
 		
 		super.initialize();
@@ -138,10 +144,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.editorSetup();
 		
-		UIAssets.lightMode.lockIcon = Assets.getBitmapData("ui/light/lock.png");
-		UIAssets.darkMode.lockIcon = Assets.getBitmapData("ui/dark/lock.png");
-		UIAssets.lightMode.visibleIcon = Assets.getBitmapData("ui/light/eye.png");
-		UIAssets.darkMode.visibleIcon = Assets.getBitmapData("ui/dark/eye.png");
+		UIAssets.lightMode.lockIcon = Assets.getBitmapData("valeditor/ui/light/lock.png");
+		UIAssets.darkMode.lockIcon = Assets.getBitmapData("valeditor/ui/dark/lock.png");
+		UIAssets.lightMode.visibleIcon = Assets.getBitmapData("valeditor/ui/light/eye.png");
+		UIAssets.darkMode.visibleIcon = Assets.getBitmapData("valeditor/ui/dark/eye.png");
 		
 		// register assets file extensions
 		ValEdit.assetLib.registerExtension("bmp", AssetType.BITMAP);
@@ -224,357 +230,25 @@ class ValEditorFull extends ValEditorBaseFeathers
 			this._assetBrowserItem
 		]);
 		this.editView.addMenu("asset", "Asset", onAssetMenuCallback, onAssetMenuOpen, this._assetMenuCollection);
+		
+		// Help menu
+		this._creditsItem = new MenuItem("credits", "Credits", true);
+		
+		this._helpMenuCollection = new ArrayCollection<MenuItem>([
+			this._creditsItem
+		]);
+		this.editView.addMenu("help", "Help", onHelpMenuCallback, null, this._helpMenuCollection);
 	}
 	
 	override function exposeData():Void 
 	{
 		super.exposeData();
 		
-		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
-		
-		// OpenFL Display
-		// Sprite
-		settings.canBeCreated = false;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = DisplayData.exposeSprite();
-		settings.visibilityCollection = DisplayData.getSpriteVisibility();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(Sprite, settings);
-		settings.clear();
-		
-		// Bitmap
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = DisplayData.exposeBitmap();
-		settings.visibilityCollection = DisplayData.getBitmapVisibility();
-		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(Bitmap, settings);
-		settings.clear();
-		
-		// ArcShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeArcShape();
-		settings.visibilityCollection = ShapeData.getArcShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeArcShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(ArcShape, settings);
-		settings.clear();
-		
-		// ArrowShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeArrowShape();
-		settings.visibilityCollection = ShapeData.getArrowShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(ArrowShape, settings);
-		settings.clear();
-		
-		// BurstShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeBurstShape();
-		settings.visibilityCollection = ShapeData.getBurstShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeBurstShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(BurstShape, settings);
-		settings.clear();
-		
-		// CircleShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeCircleShape();
-		settings.visibilityCollection = ShapeData.getCircleShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeCircleShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(CircleShape, settings);
-		settings.clear();
-		
-		// DonutShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeDonutShape();
-		settings.visibilityCollection = ShapeData.getDonutShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(DonutShape, settings);
-		settings.clear();
-		
-		// EllipseShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeEllipseShape();
-		settings.visibilityCollection = ShapeData.getEllipseShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeEllipseShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(EllipseShape, settings);
-		settings.clear();
-		
-		// FlowerShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeFlowerShape();
-		settings.visibilityCollection = ShapeData.getFlowerShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeFlowerShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(FlowerShape, settings);
-		settings.clear();
-		
-		// GearShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeGearShape();
-		settings.visibilityCollection = ShapeData.getGearShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeGearShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(GearShape, settings);
-		settings.clear();
-		
-		// PolygonShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposePolygonShape();
-		settings.visibilityCollection = ShapeData.getPolygonShapeVisibility();
-		settings.constructorCollection = ShapeData.exposePolygonShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(PolygonShape, settings);
-		settings.clear();
-		
-		// RectangleShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeRectangleShape();
-		settings.visibilityCollection = ShapeData.getRectangleShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeRectangleShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(RectangleShape, settings);
-		settings.clear();
-		
-		// RoundRectangleShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeRoundRectangleShape();
-		settings.visibilityCollection = ShapeData.getRoundRectangleShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeRoundRectangleShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(RoundRectangleShape, settings);
-		settings.clear();
-		
-		// StarShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeStarShape();
-		settings.visibilityCollection = ShapeData.getStarShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeStarShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(StarShape, settings);
-		settings.clear();
-		
-		// WedgeShape
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = ShapeData.exposeWedgeShape();
-		settings.visibilityCollection = ShapeData.getWedgeShapeVisibility();
-		settings.constructorCollection = ShapeData.exposeWedgeShapeConstructor();
-		settings.interactiveFactory = InteractiveFactories.openFL_default;
-		ValEditor.registerClass(WedgeShape, settings);
-		settings.clear();
-		
-		// OpenFL Filters
-		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		
-		// OpenFL Geom
-		ValEditor.registerClassSimple(ColorTransform, false, GeomData.exposeColorTransform());
-		ValEditor.registerClassSimple(Matrix, false, GeomData.exposeMatrix());
-		ValEditor.registerClassSimple(Transform, false, GeomData.exposeTransform());
-		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), GeomData.exposePointConstructor());
-		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), GeomData.exposeRectangleConstructor());
-		
-		// OpenFL Text
-		// TextField
-		settings.canBeCreated = true;
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_TEXT);
-		settings.iconBitmapData = Assets.getBitmapData("icon/openfl.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
-		settings.collection = TextData.exposeTextField();
-		settings.visibilityCollection = TextData.getTextFieldVisibility();
-		settings.interactiveFactory = InteractiveFactories.openFL_visible;
-		ValEditor.registerClass(TextField, settings);
-		settings.clear();
-		
-		ValEditor.registerClassSimple(Font, false, TextData.exposeFont());
-		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
-		
+		exposeOpenFL();
 		#if starling
-		// Starling Texture Creation
-		ValEditor.registerClassSimple(TextureCreationParameters, false, StarlingTextureData.exposeTextureCreationParameters());
-		
-		// Starling Display
-		// Quad
-		settings.canBeCreated = true;
-		settings.disposeFunctionName = "dispose";
-		settings.addCategory(CategoryID.STARLING);
-		settings.addCategory(CategoryID.STARLING_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.collection = StarlingDisplayData.exposeQuad();
-		settings.visibilityCollection = StarlingDisplayData.getQuadVisibility();
-		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
-		settings.interactiveFactory = InteractiveFactories.starling_default;
-		settings.hasRadianRotation = true;
-		settings.usePivotScaling = true;
-		ValEditor.registerClass(Quad, settings);
-		settings.clear();
-		
-		// Image
-		settings.canBeCreated = true;
-		settings.disposeFunctionName = "dispose";
-		settings.addCategory(CategoryID.STARLING);
-		settings.addCategory(CategoryID.STARLING_DISPLAY);
-		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.collection = StarlingDisplayData.exposeImage();
-		settings.visibilityCollection = StarlingDisplayData.getImageVisibility();
-		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
-		settings.interactiveFactory = InteractiveFactories.starling_default;
-		settings.hasRadianRotation = true;
-		settings.usePivotScaling = true;
-		ValEditor.registerClass(Image, settings);
-		settings.clear();
-		
-		// Starling Filters
-		
-		// Starling Text
-		// TextField
-		settings.canBeCreated = true;
-		settings.disposeFunctionName = "dispose";
-		settings.addCategory(CategoryID.STARLING);
-		settings.addCategory(CategoryID.STARLING_TEXT);
-		settings.iconBitmapData = Assets.getBitmapData("icon/starling.png");
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
-		settings.collection = StarlingTextData.exposeTextField();
-		settings.visibilityCollection = StarlingTextData.getTextFieldVisibility();
-		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();
-		settings.interactiveFactory = InteractiveFactories.starling_visible;
-		settings.hasRadianRotation = true;
-		settings.usePivotScaling = true;
-		ValEditor.registerClass(starling.text.TextField, settings);
-		settings.clear();
+		exposeStarling();
 		#end
-		
-		#if massive_starling
-		//ValEditor.registerClass(FrameProxy, MassiveData.exposeFrameProxy());
-		//ValEditor.registerClass(ImageDataProxy, MassiveData.exposeImageDataProxy(), true, true, DisplayObjectType.STARLING);
-		//ValEditor.registerClass(QuadDataProxy, MassiveData.exposeQuadDataProxy(), true, true, DisplayObjectType.STARLING);
-		#end
-		
-		// ValEditorContainer
-		settings.canBeCreated = true;
-		settings.cloneToFunctionName = "cloneTo";
-		settings.creationFunction = ValEditor.createContainer;
-		settings.creationFunctionForLoading = ValEditorContainer.fromPool;
-		settings.creationFunctionForTemplateInstance = ValEditorContainer.fromPool;
-		settings.disposeFunctionName = "pool";
-		settings.exportClassName = Type.getClassName(ValEditContainer);
-		settings.addCategory(CategoryID.OPENFL);
-		settings.addCategory(CategoryID.OPENFL_DISPLAY);
-		settings.addCategory(CategoryID.STARLING);
-		settings.addCategory(CategoryID.STARLING_DISPLAY);
-		settings.isContainer = true;
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.MIXED;
-		settings.collection = ContainerData.exposeValEditorContainer();
-		settings.visibilityCollection = ContainerData.getValEditorContainerVisibility();
-		ValEditor.registerClass(ValEditorContainer, settings);
-		settings.clear();
-		
-		// ValEditorContainerRoot
-		settings.canBeCreated = false;
-		settings.creationFunction = ValEditor.createContainerRoot;
-		settings.creationFunctionForLoading = ValEditorContainerRoot.fromPool;
-		settings.disposeFunctionName = "pool";
-		settings.exportClassName = Type.getClassName(ValEditContainer);
-		settings.isContainer = true;
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.MIXED;
-		settings.collection = ContainerData.exposeValEditorContainerRoot();
-		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
-		ValEditor.registerClass(ValEditorContainerRoot, settings);
-		settings.clear();
-		
-		settings.pool();
-		
-		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
-		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
-		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
+		exposeValEditor();
 	}
 	
 	override function ready():Void 
@@ -642,7 +316,6 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private function onNewFileSettingsConfirm():Void
 	{
 		ValEditor.reset();
-		//this._fileSettings.clone(ValEditor.fileSettings);
 		ValEditor.newFile();
 		ValEditor.fileSettings.apply();
 		this._isStartUp = false;
@@ -780,10 +453,17 @@ class ValEditorFull extends ValEditorBaseFeathers
 		Lib.current.stage.focus = null;
 	}
 	
+	private function onHelpMenuCallback(item:MenuItem):Void
+	{
+		switch (item.id)
+		{
+			case "credits" :
+				FeathersWindows.showCreditsWindow();
+		}
+	}
+	
 	private function onInputActionBegin(evt:InputActionEvent):Void
 	{
-		//if (this._isStartUp) return;
-		
 		var action:MultiAction;
 		var inputAction:InputAction = evt.action;
 		
@@ -1145,18 +825,366 @@ class ValEditorFull extends ValEditorBaseFeathers
 		#if starling
 		exposeStarling();
 		#end
+		exposeValEditor();
 	}
 	
 	public function exposeOpenFL():Void
 	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
+		// OpenFL Display
+		// Sprite
+		settings.canBeCreated = false;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = DisplayData.exposeSprite();
+		settings.visibilityCollection = DisplayData.getSpriteVisibility();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(Sprite, settings);
+		settings.clear();
+		
+		// Bitmap
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = DisplayData.exposeBitmap();
+		settings.visibilityCollection = DisplayData.getBitmapVisibility();
+		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(Bitmap, settings);
+		settings.clear();
+		
+		// ArcShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeArcShape();
+		settings.visibilityCollection = ShapeData.getArcShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeArcShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(ArcShape, settings);
+		settings.clear();
+		
+		// ArrowShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeArrowShape();
+		settings.visibilityCollection = ShapeData.getArrowShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(ArrowShape, settings);
+		settings.clear();
+		
+		// BurstShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeBurstShape();
+		settings.visibilityCollection = ShapeData.getBurstShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeBurstShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(BurstShape, settings);
+		settings.clear();
+		
+		// CircleShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeCircleShape();
+		settings.visibilityCollection = ShapeData.getCircleShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeCircleShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(CircleShape, settings);
+		settings.clear();
+		
+		// DonutShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeDonutShape();
+		settings.visibilityCollection = ShapeData.getDonutShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(DonutShape, settings);
+		settings.clear();
+		
+		// EllipseShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeEllipseShape();
+		settings.visibilityCollection = ShapeData.getEllipseShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeEllipseShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(EllipseShape, settings);
+		settings.clear();
+		
+		// FlowerShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeFlowerShape();
+		settings.visibilityCollection = ShapeData.getFlowerShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeFlowerShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(FlowerShape, settings);
+		settings.clear();
+		
+		// GearShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeGearShape();
+		settings.visibilityCollection = ShapeData.getGearShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeGearShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(GearShape, settings);
+		settings.clear();
+		
+		// PolygonShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposePolygonShape();
+		settings.visibilityCollection = ShapeData.getPolygonShapeVisibility();
+		settings.constructorCollection = ShapeData.exposePolygonShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(PolygonShape, settings);
+		settings.clear();
+		
+		// RectangleShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeRectangleShape();
+		settings.visibilityCollection = ShapeData.getRectangleShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeRectangleShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(RectangleShape, settings);
+		settings.clear();
+		
+		// RoundRectangleShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeRoundRectangleShape();
+		settings.visibilityCollection = ShapeData.getRoundRectangleShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeRoundRectangleShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(RoundRectangleShape, settings);
+		settings.clear();
+		
+		// StarShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeStarShape();
+		settings.visibilityCollection = ShapeData.getStarShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeStarShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(StarShape, settings);
+		settings.clear();
+		
+		// WedgeShape
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = ShapeData.exposeWedgeShape();
+		settings.visibilityCollection = ShapeData.getWedgeShapeVisibility();
+		settings.constructorCollection = ShapeData.exposeWedgeShapeConstructor();
+		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		ValEditor.registerClass(WedgeShape, settings);
+		settings.clear();
+		
+		// OpenFL Filters
+		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		
+		// OpenFL Geom
+		ValEditor.registerClassSimple(ColorTransform, false, GeomData.exposeColorTransform());
+		ValEditor.registerClassSimple(Matrix, false, GeomData.exposeMatrix());
+		ValEditor.registerClassSimple(Transform, false, GeomData.exposeTransform());
+		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), GeomData.exposePointConstructor());
+		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), GeomData.exposeRectangleConstructor());
+		
+		// OpenFL Text
+		// TextField
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_TEXT);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.collection = TextData.exposeTextField();
+		settings.visibilityCollection = TextData.getTextFieldVisibility();
+		settings.interactiveFactory = InteractiveFactories.openFL_visible;
+		ValEditor.registerClass(TextField, settings);
+		settings.clear();
+		
+		ValEditor.registerClassSimple(Font, false, TextData.exposeFont());
+		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
+		
+		settings.pool();
 	}
 	
 	#if starling
 	public function exposeStarling():Void
 	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
+		// Starling Texture Creation
+		ValEditor.registerClassSimple(TextureCreationParameters, false, StarlingTextureData.exposeTextureCreationParameters());
+		
+		// Starling Display
+		// Quad
+		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.collection = StarlingDisplayData.exposeQuad();
+		settings.visibilityCollection = StarlingDisplayData.getQuadVisibility();
+		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_default;
+		settings.hasRadianRotation = true;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
+		ValEditor.registerClass(Quad, settings);
+		settings.clear();
+		
+		// Image
+		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.collection = StarlingDisplayData.exposeImage();
+		settings.visibilityCollection = StarlingDisplayData.getImageVisibility();
+		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_default;
+		settings.hasRadianRotation = true;
+		settings.usePivotScaling = true;
+		ValEditor.registerClass(Image, settings);
+		settings.clear();
+		
+		// Starling Filters
+		
+		// Starling Text
+		// TextField
+		settings.canBeCreated = true;
+		settings.disposeFunctionName = "dispose";
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_TEXT);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.collection = StarlingTextData.exposeTextField();
+		settings.visibilityCollection = StarlingTextData.getTextFieldVisibility();
+		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();
+		settings.interactiveFactory = InteractiveFactories.starling_visible;
+		settings.hasRadianRotation = true;
+		settings.usePivotScaling = true;
+		ValEditor.registerClass(starling.text.TextField, settings);
+		settings.clear();
+		
+		settings.pool();
 	}
 	#end
+	
+	public function exposeValEditor():Void
+	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		
+		// ValEditorContainer
+		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = ValEditor.createContainer;
+		settings.creationFunctionForLoading = ValEditorContainer.fromPool;
+		settings.creationFunctionForTemplateInstance = ValEditorContainer.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.exportClassName = Type.getClassName(ValEditContainer);
+		settings.addCategory(CategoryID.OPENFL);
+		settings.addCategory(CategoryID.OPENFL_DISPLAY);
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_DISPLAY);
+		settings.isContainer = true;
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.collection = ContainerData.exposeValEditorContainer();
+		settings.visibilityCollection = ContainerData.getValEditorContainerVisibility();
+		settings.useBounds = true;
+		ValEditor.registerClass(ValEditorContainer, settings);
+		settings.clear();
+		
+		// ValEditorContainerRoot
+		settings.canBeCreated = false;
+		settings.creationFunction = ValEditor.createContainerRoot;
+		settings.creationFunctionForLoading = ValEditorContainerRoot.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.exportClassName = Type.getClassName(ValEditContainer);
+		settings.isContainer = true;
+		settings.isDisplayObject = true;
+		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.collection = ContainerData.exposeValEditorContainerRoot();
+		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
+		ValEditor.registerClass(ValEditorContainerRoot, settings);
+		settings.clear();
+		
+		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
+		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
+		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
+		
+		settings.pool();
+	}
 	
 }
