@@ -35,6 +35,7 @@ class CreditsWindow extends Panel
 	private var _container:ScrollContainer;
 	
 	private var _authorGroup:LayoutGroup;
+	private var _authorLogo:Bitmap;
 	private var _authorText:Label;
 	private var _authorButtonsGroup:LayoutGroup;
 	private var _authorWebsiteButton:Button;
@@ -107,9 +108,9 @@ class CreditsWindow extends Panel
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
-		vLayout.setPadding(Padding.DEFAULT);
+		vLayout.setPadding(Padding.DEFAULT * 4);
 		vLayout.paddingTop = Padding.DEFAULT * 4;
-		vLayout.paddingBottom = Padding.DEFAULT * 4;
+		vLayout.paddingBottom = Padding.DEFAULT * 8;
 		vLayout.gap = Spacing.BIG * 2;
 		this._container.layout = vLayout;
 		addChild(this._container);
@@ -123,8 +124,13 @@ class CreditsWindow extends Panel
 		this._authorGroup.layout = vLayout;
 		this._container.addChild(this._authorGroup);
 		
-		this._authorText = new Label();
-		this._authorText.text = "created by Mathieu Sénidre aka Matse";
+		this._authorLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/matse_logo.png"));
+		this._authorLogo.smoothing = true;
+		this._authorGroup.addChild(this._authorLogo);
+		
+		this._authorText = new Label("created by Mathieu Sénidre aka Matse");
+		this._authorText.layoutData = new VerticalLayoutData(100);
+		this._authorText.wordWrap = true;
 		this._authorGroup.addChild(this._authorText);
 		
 		this._authorButtonsGroup = new LayoutGroup();
@@ -158,6 +164,7 @@ class CreditsWindow extends Panel
 		this._haxeGroup.addChild(this._haxeLogo);
 		
 		this._haxeText = new Label("Open source high-level strictly-typed programming language with a fast optimizing cross-compiler.");
+		this._haxeText.layoutData = new VerticalLayoutData(100);
 		this._haxeText.wordWrap = true;
 		this._haxeGroup.addChild(this._haxeText);
 		
@@ -191,6 +198,7 @@ class CreditsWindow extends Panel
 		this._openflGroup.addChild(this._openflLogo);
 		
 		this._openflText = new Label("The Open Flash Library for creative expression on the web, desktop, mobile and consoles.");
+		this._openflText.layoutData = new VerticalLayoutData(100);
 		this._openflText.wordWrap = true;
 		this._openflGroup.addChild(this._openflText);
 		
@@ -225,6 +233,7 @@ class CreditsWindow extends Panel
 		this._starlingGroup.addChild(this._starlingLogo);
 		
 		this._starlingText = new Label("Display list on the GPU.");
+		this._starlingText.layoutData = new VerticalLayoutData(100);
 		this._starlingText.wordWrap = true;
 		this._starlingGroup.addChild(this._starlingText);
 		
@@ -259,6 +268,7 @@ class CreditsWindow extends Panel
 		this._feathersGroup.addChild(this._feathersLogo);
 		
 		this._feathersText = new Label("Cross-platform user interface components for creative frontend projects.");
+		this._feathersText.layoutData = new VerticalLayoutData(100);
 		this._feathersText.wordWrap = true;
 		this._feathersGroup.addChild(this._feathersText);
 		
