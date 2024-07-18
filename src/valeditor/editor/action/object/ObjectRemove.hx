@@ -39,6 +39,11 @@ class ObjectRemove extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
+	public function setup(object:ValEditorObject):Void
+	{
+		this.object = object;
+	}
+	
 	public function apply():Void
 	{
 		if (this.status == ValEditorActionStatus.DONE)
@@ -46,7 +51,7 @@ class ObjectRemove extends ValEditorAction
 			throw new Error("ObjectRemove already applied");
 		}
 		
-		ValEditor.currentContainer.remove(this.object);
+		ValEditor.currentContainer.removeObject(this.object);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -57,7 +62,7 @@ class ObjectRemove extends ValEditorAction
 			throw new Error("ObjectRemove already cancelled");
 		}
 		
-		ValEditor.currentContainer.add(this.object);
+		ValEditor.currentContainer.addObject(this.object);
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
