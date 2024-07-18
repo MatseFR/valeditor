@@ -186,8 +186,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 			}
 			else
 			{
@@ -217,8 +215,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 1.0);
 				}
 			}
 			
@@ -247,8 +243,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 			}
 			else
 			{
@@ -278,8 +272,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, 10.0);
 				}
 			}
 			
@@ -309,8 +301,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 			}
 			else
 			{
@@ -340,8 +330,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -1.0);
 				}
 			}
 			
@@ -370,8 +358,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 			}
 			else
 			{
@@ -401,8 +387,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, -10.0);
 				}
 			}
 			
@@ -432,8 +416,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 			}
 			else
 			{
@@ -463,8 +445,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 1.0);
 				}
 			}
 			
@@ -493,8 +473,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 			}
 			else
 			{
@@ -524,8 +502,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.X, 10.0);
 				}
 			}
 			
@@ -555,8 +531,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 			}
 			else
 			{
@@ -586,8 +560,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -1.0);
 				}
 			}
 			
@@ -616,8 +588,6 @@ class LiveInputActionManager implements IAnimatable
 				{
 					action.pool();
 				}
-				
-				//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 			}
 			else
 			{
@@ -647,8 +617,6 @@ class LiveInputActionManager implements IAnimatable
 					{
 						action.pool();
 					}
-					
-					//ValEditor.currentContainer.selection.modifyDisplayProperty(RegularPropertyName.Y, -10.0);
 				}
 			}
 		}
