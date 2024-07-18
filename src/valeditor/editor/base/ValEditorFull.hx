@@ -122,6 +122,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	// help menu
 	private var _helpMenuCollection:ArrayCollection<MenuItem>;
 	private var _creditsItem:MenuItem;
+	private var _versionsItem:MenuItem;
 	
 	public function new() 
 	{
@@ -233,9 +234,11 @@ class ValEditorFull extends ValEditorBaseFeathers
 		
 		// Help menu
 		this._creditsItem = new MenuItem("credits", "Credits", true);
+		this._versionsItem = new MenuItem("versions", "Versions", true);
 		
 		this._helpMenuCollection = new ArrayCollection<MenuItem>([
-			this._creditsItem
+			this._creditsItem,
+			this._versionsItem
 		]);
 		this.editView.addMenu("help", "Help", onHelpMenuCallback, null, this._helpMenuCollection);
 	}
@@ -459,6 +462,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		{
 			case "credits" :
 				FeathersWindows.showCreditsWindow();
+			
+			case "versions" :
+				FeathersWindows.showVersionsWindow();
 		}
 	}
 	
@@ -870,6 +876,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getArcShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArcShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(ArcShape, settings);
 		settings.clear();
 		
@@ -884,6 +892,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getArrowShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(ArrowShape, settings);
 		settings.clear();
 		
@@ -898,6 +908,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getBurstShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeBurstShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(BurstShape, settings);
 		settings.clear();
 		
@@ -912,6 +924,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getCircleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeCircleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(CircleShape, settings);
 		settings.clear();
 		
@@ -926,6 +940,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getDonutShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(DonutShape, settings);
 		settings.clear();
 		
@@ -940,6 +956,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getEllipseShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeEllipseShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(EllipseShape, settings);
 		settings.clear();
 		
@@ -954,6 +972,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getFlowerShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeFlowerShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(FlowerShape, settings);
 		settings.clear();
 		
@@ -968,6 +988,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getGearShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeGearShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(GearShape, settings);
 		settings.clear();
 		
@@ -982,6 +1004,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getPolygonShapeVisibility();
 		settings.constructorCollection = ShapeData.exposePolygonShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(PolygonShape, settings);
 		settings.clear();
 		
@@ -996,6 +1020,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRectangleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(RectangleShape, settings);
 		settings.clear();
 		
@@ -1010,6 +1036,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getRoundRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRoundRectangleShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(RoundRectangleShape, settings);
 		settings.clear();
 		
@@ -1024,6 +1052,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getStarShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeStarShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(StarShape, settings);
 		settings.clear();
 		
@@ -1038,6 +1068,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.visibilityCollection = ShapeData.getWedgeShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeWedgeShapeConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
+		settings.useBounds = true;
+		settings.usePivotScaling = true;
 		ValEditor.registerClass(WedgeShape, settings);
 		settings.clear();
 		
@@ -1064,6 +1096,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.collection = TextData.exposeTextField();
 		settings.visibilityCollection = TextData.getTextFieldVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_visible;
+		settings.useBounds = true;
 		ValEditor.registerClass(TextField, settings);
 		settings.clear();
 		
@@ -1113,6 +1146,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_default;
 		settings.hasRadianRotation = true;
+		settings.useBounds = true;
 		settings.usePivotScaling = true;
 		ValEditor.registerClass(Image, settings);
 		settings.clear();
@@ -1133,6 +1167,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();
 		settings.interactiveFactory = InteractiveFactories.starling_visible;
 		settings.hasRadianRotation = true;
+		settings.useBounds = true;
 		settings.usePivotScaling = true;
 		ValEditor.registerClass(starling.text.TextField, settings);
 		settings.clear();
@@ -1177,6 +1212,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.displayObjectType = DisplayObjectType.MIXED;
 		settings.collection = ContainerData.exposeValEditorContainerRoot();
 		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
+		settings.useBounds = true;
 		ValEditor.registerClass(ValEditorContainerRoot, settings);
 		settings.clear();
 		
