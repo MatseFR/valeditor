@@ -1,6 +1,7 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.object.ObjectRemove;
 import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 
 /**
@@ -52,26 +53,53 @@ class ValEditorObjectGroup
 		var objectsToDelete:Array<ValEditorObject> = this._objects.copy();
 		if (action == null)
 		{
-			for (object in objectsToDelete)
+			if (Std.isOfType(ValEditor.currentContainer, IValEditorTimeLineContainer))
 			{
-				if (object.currentKeyFrame != null)
+				for (object in objectsToDelete)
 				{
-					object.currentKeyFrame.remove(object);
+					if (object.currentKeyFrame != null)
+					{
+						object.currentKeyFrame.remove(object);
+					}
+					if (object.canBeDestroyed())
+					{
+						ValEditor.destroyObject(object);
+					}
 				}
-				if (object.canBeDestroyed())
+			}
+			else
+			{
+				for (object in objectsToDelete)
 				{
-					ValEditor.destroyObject(object);
+					ValEditor.currentContainer.removeObject(object);
+					if (object.canBeDestroyed())
+					{
+						ValEditor.destroyObject(object);
+					}
 				}
 			}
 		}
 		else
 		{
-			var objectRemove:ObjectRemoveKeyFrame;
-			for (object in objectsToDelete)
+			if (Std.isOfType(ValEditor.currentContainer, IValEditorTimeLineContainer))
 			{
-				objectRemove = ObjectRemoveKeyFrame.fromPool();
-				objectRemove.setup(object, cast object.currentKeyFrame);
-				action.add(objectRemove);
+				var objectRemoveKeyFrame:ObjectRemoveKeyFrame;
+				for (object in objectsToDelete)
+				{
+					objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
+					objectRemoveKeyFrame.setup(object, cast object.currentKeyFrame);
+					action.add(objectRemoveKeyFrame);
+				}
+			}
+			else
+			{
+				var objectRemove:ObjectRemove;
+				for (object in objectsToDelete)
+				{
+					objectRemove = ObjectRemove.fromPool();
+					objectRemove.setup(object);
+					action.add(objectRemove);
+				}
 			}
 		}
 		clear();
