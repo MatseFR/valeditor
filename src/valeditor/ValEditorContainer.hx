@@ -163,7 +163,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	private function get_viewCenterX():Float { return this._viewCenterX; }//this.cameraX + this._viewWidth / 2; }
 	private function set_viewCenterX(value:Float):Float
 	{
-		this.cameraX = value - this._viewWidth / 2;
+		this.cameraX = Math.fround(value - this._viewWidth / 2);
 		return this._viewCenterX = value;
 	}
 	
@@ -171,7 +171,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	private function get_viewCenterY():Float { return this._viewCenterY; }//this.cameraY + this._viewHeight / 2; }
 	private function set_viewCenterY(value:Float):Float
 	{
-		this.cameraY = value - this._viewHeight / 2;
+		this.cameraY = Math.fround(value - this._viewHeight / 2);
 		return this._viewCenterY = value;
 	}
 	
@@ -618,25 +618,27 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		this.layerCollection.updateAt(this.layerCollection.indexOf(cast evt.target));
 	}
 	
-	private function object_functionCalled(evt:ObjectPropertyEvent):Void
+	private function object_functionCalled(evt:ObjectFunctionEvent):Void
 	{
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_FUNCTION_CALLED, evt.object, evt);
 	}
 	
 	private function object_renamed(evt:RenameEvent):Void
 	{
+		var object:ValEditorObject = cast evt.target;
+		
 		if (this._allObjects.exists(evt.previousNameOrID))
 		{
 			this._allObjects.remove(evt.previousNameOrID);
-			var object:ValEditorObject = cast evt.target;
 			this._allObjects.set(object.objectID, object);
+			this.allObjectsCollection.updateAt(this.allObjectsCollection.indexOf(object));
 		}
 		
 		if (this._activeObjects.exists(evt.previousNameOrID))
 		{
 			this._activeObjects.remove(evt.previousNameOrID);
-			var object:ValEditorObject = cast evt.target;
 			this._activeObjects.set(object.objectID, object);
+			this.activeObjectsCollection.updateAt(this.activeObjectsCollection.indexOf(object));
 		}
 	}
 	
