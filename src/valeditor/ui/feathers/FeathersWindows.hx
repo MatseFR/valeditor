@@ -33,6 +33,7 @@ import valeditor.ui.feathers.window.TemplateCreationWindow;
 import valeditor.ui.feathers.window.TemplateRenameWindow;
 import valeditor.ui.feathers.window.TemplateVisibilityWindow;
 import valeditor.ui.feathers.window.ThemeEditWindow;
+import valeditor.ui.feathers.window.VersionsWindow;
 import valeditor.ui.feathers.window.asset.AssetBrowser;
 import valeditor.ui.feathers.window.asset.BinaryAssetsWindow;
 import valeditor.ui.feathers.window.asset.BitmapAssetsWindow;
@@ -74,6 +75,8 @@ class FeathersWindows
 	#end
 	
 	static private var _credits:CreditsWindow;
+	static private var _versions:VersionsWindow;
+	
 	static private var _editorSettings:EditorSettingsWindow;
 	static private var _themeEdit:ThemeEditWindow;
 	static private var _exportSettings:ExportSettingsWindow;
@@ -301,6 +304,16 @@ class FeathersWindows
 		_credits.height = Lib.current.stage.stageHeight / 2.0;
 		
 		openWindow(_credits);
+	}
+	
+	static public function showVersionsWindow():Void
+	{
+		if (_versions == null)
+		{
+			_versions = new VersionsWindow();
+		}
+		
+		openWindow(_versions);
 	}
 	
 	static public function showEditorSettingsWindow(settings:EditorSettings, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
