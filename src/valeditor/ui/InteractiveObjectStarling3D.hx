@@ -3,6 +3,7 @@ package valeditor.ui;
 import openfl.geom.Rectangle;
 import starling.display.Quad;
 import starling.display.Sprite3D;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -174,27 +175,41 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 			
 			if (object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
-					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z) * Math.abs(scaleZ);
+					if (object.usePivotScaling)
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+						this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z) * Math.abs(scaleZ);
+					}
+					else
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+						this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+					}
+					
+					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+					this.z = object.getProperty(RegularPropertyName.Z);
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
-					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+					this.pivotX = -bounds.x * Math.abs(scaleX);
+					this.pivotY = -bounds.y * Math.abs(scaleY);
+					this.pivotZ = 0;
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
+					this.z = object.getProperty(RegularPropertyName.Z);
 				}
-				
-				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
-				this.z = object.getProperty(RegularPropertyName.Z);
 			}
 			else
 			{
 				this.pivotX = -bounds.x * Math.abs(scaleX);
 				this.pivotY = -bounds.y * Math.abs(scaleY);
+				this.pivotZ = 0;
 				
 				this.x = object.getProperty(RegularPropertyName.X);
 				this.y = object.getProperty(RegularPropertyName.Y);

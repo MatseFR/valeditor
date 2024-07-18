@@ -3,6 +3,7 @@ package valeditor.ui;
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -59,7 +60,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	private function set_pivotX(value:Float):Float
 	{
 		this._shape.x = -value;
-		return this._pivotX;
+		return this._pivotX = value;
 	}
 	
 	private var _pivotY:Float = 0;
@@ -67,7 +68,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	private function set_pivotY(value:Float):Float
 	{
 		this._shape.y = -value;
-		return this._pivotY;
+		return this._pivotY = value;
 	}
 	
 	private function get_realHeight():Float { return this._shape.height; }
@@ -178,19 +179,37 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			
 			if (object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					if (object.usePivotScaling)
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					}
+					else
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					}
+					
+					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotX = -bounds.x * Math.abs(scaleX);
+					this.pivotY = -bounds.y * Math.abs(scaleY);
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
+					
+					// this is ok for regular shapes
+					//this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					//this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					//
+					//this.x = object.getProperty(RegularPropertyName.X) + ((bounds.x * scaleX) + (this.pivotX * this.scaleX));// * scaleX);
+					//this.y = object.getProperty(RegularPropertyName.Y) + ((bounds.y * scaleY) + (this.pivotY * this.scaleY));// * scaleY);
 				}
-				
-				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 			}
 			else
 			{
@@ -301,7 +320,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		if (width < this._minWidth) width = this._minWidth;
 		if (height < this._minHeight) height = this._minHeight;
 		this._shape.graphics.clear();
-		this._shape.graphics.beginFill(0xff0000, 0.0);
+		this._shape.graphics.beginFill(0xff0000, 0.25);
 		this._shape.graphics.drawRect(0, 0, width, height);
 		this._shape.graphics.endFill();
 	}

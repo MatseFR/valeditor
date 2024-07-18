@@ -5,6 +5,7 @@ import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Matrix;
 import openfl.geom.Rectangle;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -202,19 +203,30 @@ class InteractiveObjectVisible extends Sprite implements IInteractiveObject
 			
 			if (object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					if (object.usePivotScaling)
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					}
+					else
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					}
+					
+					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotX = -bounds.x * Math.abs(scaleX);
+					this.pivotY = -bounds.y * Math.abs(scaleY);
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
 				}
-				
-				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 			}
 			else
 			{

@@ -2,6 +2,7 @@ package valeditor.ui.feathers.controls;
 
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -88,10 +89,11 @@ class SelectionBox extends Sprite
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
+		var scaleX:Float = 1.0;
+		var scaleY:Float = 1.0;
+		
 		if (object.useBounds)
 		{
-			var scaleX:Float = 1.0;
-			var scaleY:Float = 1.0;
 			var bounds:Rectangle = object.getBounds(object.object);
 			
 			if (object.hasScaleProperties)
@@ -128,19 +130,30 @@ class SelectionBox extends Sprite
 			
 			if (object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					if (object.usePivotScaling)
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					}
+					else
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					}
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotX = -bounds.x * Math.abs(scaleX);
+					this.pivotY = -bounds.y * Math.abs(scaleY);
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
 				}
-				
-				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 			}
 			else
 			{
@@ -165,21 +178,11 @@ class SelectionBox extends Sprite
 		{
 			this.x = object.getProperty(RegularPropertyName.X);
 			this.y = object.getProperty(RegularPropertyName.Y);
-			if (object.hasPivotProperties)
-			{
-				this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * object.getProperty(RegularPropertyName.SCALE_X);
-				this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * object.getProperty(RegularPropertyName.SCALE_Y);
-			}
-			else
-			{
-				this.pivotX = 0;
-				this.pivotY = 0;
-			}
 			
 			if (object.hasScaleProperties)
 			{
-				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
 				
 				if (scaleX < 0)
 				{
@@ -198,6 +201,25 @@ class SelectionBox extends Sprite
 				{
 					this.scaleY = 1;
 				}
+			}
+			
+			if (object.hasPivotProperties)
+			{
+				if (object.usePivotScaling)
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+				}
+				else
+				{
+					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+				}
+			}
+			else
+			{
+				this.pivotX = 0;
+				this.pivotY = 0;
 			}
 			
 			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);

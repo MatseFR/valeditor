@@ -2,6 +2,7 @@ package valeditor.ui;
 
 import openfl.geom.Rectangle;
 import starling.display.Quad;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.utils.MathUtil;
 
@@ -68,7 +69,7 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 	public function new(?minWidth:Float, ?minHeight:Float) 
 	{
 		super(1, 1, 0xff0000);
-		this.alpha = 0.25;
+		this.alpha = 0.0;
 		
 		this._interestMap = new Map<String, Bool>();
 		this._interestMap.set(RegularPropertyName.X, true);
@@ -152,19 +153,30 @@ class InteractiveObjectStarlingDefault extends Quad implements IInteractiveObjec
 			
 			if (object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					if (object.usePivotScaling)
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+					}
+					else
+					{
+						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					}
+					
+					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotX = -bounds.x * Math.abs(scaleX);
+					this.pivotY = -bounds.y * Math.abs(scaleY);
+					
+					this.x = object.getProperty(RegularPropertyName.X);
+					this.y = object.getProperty(RegularPropertyName.Y);
 				}
-				
-				this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-				this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
 			}
 			else
 			{
