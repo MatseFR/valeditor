@@ -268,7 +268,6 @@ class ValEditorClipboard
 		{
 			if (this._pasteAction != null)
 			{
-				//ValEditor.actionStack.add(this._pasteAction);
 				this._pasteAction = null;
 			}
 			return;
