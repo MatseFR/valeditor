@@ -48,6 +48,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var isMouseDown:Bool;
 	public var isSelectable(get, set):Bool;
 	public var isSuspended:Bool;
+	public var keyFrames(get, never):Array<ValEditKeyFrame>;
 	public var mouseRestoreX:Float;
 	public var mouseRestoreY:Float;
 	public var pivotIndicator(get, set):PivotIndicator;
@@ -143,10 +144,12 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		return this._isSelectable = value;
 	}
 	
+	private function get_keyFrames():Array<ValEditKeyFrame> { return this._keyFrames.copy(); }
+	
 	override function set_objectID(value:String):String 
 	{
 		if (this._objectID == value) return value;
-		var oldObjectID:String = this._objectID;
+		var oldObjectID:String = this.objectID;
 		super.set_objectID(value);
 		RenameEvent.dispatch(this, RenameEvent.RENAMED, oldObjectID);
 		return this._objectID;
