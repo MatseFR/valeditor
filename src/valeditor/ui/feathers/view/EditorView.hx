@@ -36,9 +36,8 @@ import valeditor.editor.action.selection.SelectionClear;
 import valeditor.events.EditorEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.controls.ObjectLibrary;
+import valeditor.ui.feathers.controls.Library;
 import valeditor.ui.feathers.controls.SelectionInfo;
-import valeditor.ui.feathers.controls.TemplateLibrary;
 import valeditor.ui.feathers.controls.ToggleLayoutGroup;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
@@ -66,10 +65,7 @@ class EditorView extends LayoutGroup
 	private var _rightBox:LayoutGroup;
 	
 	// left content
-	private var _templateLibGroup:ToggleLayoutGroup;
-	private var _templateLib:TemplateLibrary;
-	private var _objectGroup:ToggleLayoutGroup;
-	private var _objectLib:ObjectLibrary;
+	private var _library:Library;
 	
 	// center content
 	private var _sceneGroup:LayoutGroup;
@@ -264,33 +260,9 @@ class EditorView extends LayoutGroup
 		this._rightBox.addEventListener(MouseEvent.MOUSE_OUT, onMouseOutUI);
 		
 		// left content
-		this._templateLibGroup = new ToggleLayoutGroup();
-		this._templateLibGroup.contentVariant = LayoutGroupVariant.CONTENT;
-		this._templateLibGroup.toggleVariant = ToggleButtonVariant.PANEL;
-		this._templateLibGroup.text = "Library";
-		this._templateLibGroup.isOpen = true;
-		this._templateLibGroup.layoutData = new AnchorLayoutData(0, 0, new Anchor(0, this._objectGroup), 0);
-		this._templateLibGroup.contentLayout = new AnchorLayout();
-		this._leftBox.addChild(this._templateLibGroup);
-		
-		//this._objectLib = new ObjectLibrary();
-		this._templateLib = new TemplateLibrary();
-		this._templateLib.layoutData = new AnchorLayoutData(0, 0, 0, 0);
-		this._templateLibGroup.addContent(this._templateLib);
-		//var views:ArrayCollection<TabItem> = new ArrayCollection<TabItem>([
-			//TabItem.withDisplayObject("Objects", this._objectLib),
-			//TabItem.withDisplayObject("Templates", this._templateLib)
-		//]);
-		//
-		//this._libNavigator = new TabNavigator(views);
-		//this._libNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
-		//this._objectLibGroup.addContent(this._libNavigator);
-		
-		//this._objectGroup = new ToggleLayoutGroup();
-		//this._objectGroup.contentVariant = LayoutGroupVariant.CONTENT;
-		//this._objectGroup.toggleVariant = ToggleButtonVariant.PANEL;
-		//this._objectGroup.text = "Objects";
-		//this._objectGroup.isOpen = true;
+		this._library = new Library();
+		this._library.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		this._leftBox.addChild(this._library);
 		
 		// center content
 		this._sceneGroup = new LayoutGroup();
