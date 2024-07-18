@@ -42,36 +42,22 @@ class PivotIndicator extends Shape
 	private function setTo(size:Float, color:Int, alpha:Float, outlineColor:Int, outlineAlpha:Float):PivotIndicator
 	{
 		var left:Float = -(size-1);
-		var right:Float = size;
 		var top:Float = -(size-1);
-		var bottom:Float = size;
 		
-		this.graphics.beginFill(0xffffff, 0);
-		// white lines
-		this.graphics.lineStyle(1, outlineColor, outlineAlpha);
-		this.graphics.moveTo( left, -0.5);
-		this.graphics.lineTo( -0.5, -0.5);
-		this.graphics.moveTo( -0.5, -0.5);
-		this.graphics.lineTo( -0.5, top);
-		this.graphics.moveTo( left, 1.5);
-		this.graphics.lineTo( -0.5, 1.5);
-		this.graphics.moveTo( -0.5, 1.5);
-		this.graphics.lineTo( -0.5, bottom);
-		this.graphics.moveTo( right, -0.5);
-		this.graphics.lineTo(1.5, -0.5);
-		this.graphics.moveTo(1.5, -0.5);
-		this.graphics.lineTo(1.5, top);
-		this.graphics.moveTo( right, 1.5);
-		this.graphics.lineTo(1.5, 1.5);
-		this.graphics.moveTo(1.5, 1.5);
-		this.graphics.lineTo(1.5, bottom);
-		this.graphics.moveTo(1.5, bottom);
-		// black lines
-		this.graphics.lineStyle(1, color, alpha);
-		this.graphics.moveTo(left, 0.5);
-		this.graphics.lineTo(right, 0.5);
-		this.graphics.moveTo(0.5, top);
-		this.graphics.lineTo(0.5, bottom);
+		this.graphics.beginFill(color, alpha);
+		this.graphics.drawRect(left, 0, size * 2 - 1, 1);
+		this.graphics.drawRect(0, top, 1, size - 1);
+		this.graphics.drawRect(0, 1, 1, size - 1);
+		
+		this.graphics.beginFill(outlineColor, outlineAlpha);
+		this.graphics.drawRect(left, -1, size - 1, 1);
+		this.graphics.drawRect(left, 1, size -1, 1);
+		this.graphics.drawRect(1, -1, size - 1, 1);
+		this.graphics.drawRect(1, 1, size - 1, 1);
+		this.graphics.drawRect(-1, top, 1, size - 1);
+		this.graphics.drawRect(1, top, 1, size - 1);
+		this.graphics.drawRect(-1, 1, 1, size - 1);
+		this.graphics.drawRect(1, 1, 1, size - 1);
 		this.graphics.endFill();
 		
 		return this;
