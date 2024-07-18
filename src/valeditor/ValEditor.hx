@@ -74,6 +74,8 @@ import valeditor.utils.file.asset.AssetFilesLoader;
 @:access(valedit.ValEdit)
 class ValEditor
 {
+	static public var FEATHERS_VERSION:String = Compiler.getDefine("feathersui");
+	static public var INPUT_ACTION_VERSION:String = Compiler.getDefine("inputAction");
 	static public var VERSION:String = Compiler.getDefine("valeditor");
 	
 	static public var actionStack:ValEditorActionStack;
@@ -1429,7 +1431,6 @@ class ValEditor
 	{
 		if (!currentTimeLineContainer.isPlaying)
 		{
-			//currentTimeLineContainer.timeLine.updateLastFrameIndex();
 			if (currentTimeLineContainer.frameIndex >= currentTimeLineContainer.lastFrameIndex)
 			{
 				currentTimeLineContainer.frameIndex = 0;
