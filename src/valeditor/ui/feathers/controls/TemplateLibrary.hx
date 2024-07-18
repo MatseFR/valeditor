@@ -34,7 +34,6 @@ import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
-import valeditor.editor.action.container.ContainerOpen;
 import valeditor.editor.action.container.ContainerTemplateOpen;
 import valeditor.editor.action.selection.SelectionClear;
 import valeditor.editor.action.template.TemplateRemove;
@@ -240,6 +239,8 @@ class TemplateLibrary extends LayoutGroup
 		//Lib.current.stage.addChild(this._contextMenuSprite);
 		
 		ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
+		
+		updateSelection(ValEditor.selection.object);
 	}
 	
 	private function closeContextMenu():Void
@@ -256,15 +257,13 @@ class TemplateLibrary extends LayoutGroup
 		
 		if (!this._contextMenu.selectedItem.enabled) return;
 		
-		var action:MultiAction;
-		var template:ValEditorTemplate = this._grid.selectedItem;
-		
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "add" :
-				FeathersWindows.showTemplateCreationWindow(onTemplateCreated);
+				onTemplateAddButton(null);
 			
 			case "editVisibility" :
+				var template:ValEditorTemplate = this._grid.selectedItem;
 				var title:String = template.id + " properties visibility";
 				if (template.visibilityCollectionFile != null)
 				{
@@ -278,34 +277,10 @@ class TemplateLibrary extends LayoutGroup
 				}
 			
 			case "open" :
-				var container:ValEditorObject = cast template.object;
-				if (cast(container.object, IValEditorContainer).isOpen)
-				{
-					if (ValEditor.currentContainer != container.object)
-					{
-						var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
-						containerMakeCurrent.setup(container);
-						ValEditor.actionStack.add(containerMakeCurrent);
-					}
-				}
-				else
-				{
-					var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
-					containerOpen.setup(container);
-					ValEditor.actionStack.add(containerOpen);
-				}
+				onTemplateOpenButton(null);
 			
 			case "remove" :
-				action = MultiAction.fromPool();
-				var templateRemove:TemplateRemove;
-				
-				for (tpl in this._grid.selectedItems)
-				{
-					templateRemove = TemplateRemove.fromPool();
-					templateRemove.setup(tpl);
-					action.add(templateRemove);
-				}
-				ValEditor.actionStack.add(action);
+				onTemplateRemoveButton(null);
 			
 			case "rename" :
 				onTemplateRenameButton(null);
@@ -349,7 +324,7 @@ class TemplateLibrary extends LayoutGroup
 			templateSelect.addTemplate(template);
 			action.add(templateSelect);
 			
-			ValEditor.actionStack.add(templateSelect);
+			ValEditor.actionStack.add(action);
 		}
 		
 		this._contextMenuPt.x = evt.stageX;
@@ -557,56 +532,44 @@ class TemplateLibrary extends LayoutGroup
 			case Keyboard.DELETE, Keyboard.BACKSPACE :
 				if (this._grid.selectedItems.length != 0)
 				{
-					var action:MultiAction = MultiAction.fromPool();
-					var templateRemove:TemplateRemove;
-					
-					for (template in this._grid.selectedItems)
-					{
-						templateRemove = TemplateRemove.fromPool();
-						templateRemove.setup(template);
-						action.add(templateRemove);
-					}
-					
-					ValEditor.actionStack.add(action);
+					onTemplateRemoveButton(null);
 				}
 			
 			case Keyboard.ENTER, Keyboard.NUMPAD_ENTER :
-				if (this._grid.selectedItems.length == 1)
+				if (this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IValEditorContainer))
 				{
-					var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
-					containerOpen.setup(cast cast(this._grid.selectedItem, ValEditorTemplate).object.object);
-					ValEditor.actionStack.add(containerOpen);
+					onTemplateOpenButton(null);
 				}
 			
-			case Keyboard.UP:
+			case Keyboard.UP :
 				result = result - 1;
 				selectionChanged = true;
 			
-			case Keyboard.DOWN:
+			case Keyboard.DOWN :
 				result = result + 1;
 				selectionChanged = true;
 			
-			case Keyboard.LEFT:
+			case Keyboard.LEFT :
 				result = result - 1;
 				selectionChanged = true;
 			
-			case Keyboard.RIGHT:
+			case Keyboard.RIGHT :
 				result = result + 1;
 				selectionChanged = true;
 			
-			case Keyboard.PAGE_UP:
+			case Keyboard.PAGE_UP :
 				result = result - 1;
 				selectionChanged = true;
 			
-			case Keyboard.PAGE_DOWN:
+			case Keyboard.PAGE_DOWN :
 				result = result + 1;
 				selectionChanged = true;
 			
-			case Keyboard.HOME:
+			case Keyboard.HOME :
 				result = 0;
 				selectionChanged = true;
 			
-			case Keyboard.END:
+			case Keyboard.END :
 				result = this._grid.dataProvider.length - 1;
 				selectionChanged = true;
 			
@@ -745,15 +708,20 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onSelectionChange(evt:SelectionEvent):Void
 	{
-		if (evt.object != null)
+		updateSelection(evt.object);
+	}
+	
+	private function updateSelection(object:Dynamic):Void
+	{
+		if (object != null)
 		{
-			if (Std.isOfType(evt.object, ValEditorTemplate))
+			if (Std.isOfType(object, ValEditorTemplate))
 			{
-				this._grid.selectedIndex = this._grid.dataProvider.indexOf(evt.object);
+				this._grid.selectedIndex = this._grid.dataProvider.indexOf(object);
 			}
-			else if (Std.isOfType(evt.object, ValEditorTemplateGroup))
+			else if (Std.isOfType(object, ValEditorTemplateGroup))
 			{
-				var group:ValEditorTemplateGroup = cast evt.object;
+				var group:ValEditorTemplateGroup = cast object;
 				var selectedItems:Array<Dynamic> = [];
 				for (template in group)
 				{
