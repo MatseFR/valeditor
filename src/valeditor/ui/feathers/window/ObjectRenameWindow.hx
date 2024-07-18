@@ -12,7 +12,10 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.ValEditorObject;
+import valeditor.editor.action.object.ObjectRename;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
 /**
@@ -111,6 +114,7 @@ class ObjectRenameWindow extends Panel
 		
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
+		this._nameInput.addEventListener(KeyboardEvent.KEY_DOWN, onNameInputKeyDown);
 		if (this._object != null)
 		{
 			this._nameInput.text = this._object.id;
@@ -130,8 +134,7 @@ class ObjectRenameWindow extends Panel
 		}
 		else
 		{
-			if (this._nameInput.text == this._object.id || (this._object.template == null && !this._object.clss.objectIDExists(this._nameInput.text))
-				|| (this._object.template != null && !cast(this._object.template, ValEditorTemplate).objectIDExists(this._nameInput.text)))
+			if (this._nameInput.text == this._object.objectID || !ValEditor.currentContainer.hasObject(this._nameInput.text))
 			{
 				this._nameInput.errorString = null;
 			}
@@ -152,7 +155,10 @@ class ObjectRenameWindow extends Panel
 	
 	private function onConfirmButton(evt:TriggerEvent):Void
 	{
-		this._object.id = this._nameInput.text;
+		var action:ObjectRename = ObjectRename.fromPool();
+		action.setup(this._object, this._nameInput.text);
+		ValEditor.actionStack.add(action);
+		
 		FeathersWindows.closeWindow(this);
 		if (this._confirmCallback != null) this._confirmCallback();
 	}
@@ -160,6 +166,17 @@ class ObjectRenameWindow extends Panel
 	private function onNameInputChange(evt:Event):Void
 	{
 		checkValid();
+	}
+	
+	private function onNameInputKeyDown(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this._confirmButton.enabled)
+			{
+				onConfirmButton(null);
+			}
+		}
 	}
 	
 }

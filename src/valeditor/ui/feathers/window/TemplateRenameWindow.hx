@@ -12,6 +12,8 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valeditor.ValEditorTemplate;
 import valeditor.editor.action.template.TemplateRename;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -112,6 +114,7 @@ class TemplateRenameWindow extends Panel
 		
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
+		this._nameInput.addEventListener(KeyboardEvent.KEY_DOWN, onNameInputKeyDown);
 		if (this._template != null)
 		{
 			this._nameInput.text = this._template.id;
@@ -163,6 +166,17 @@ class TemplateRenameWindow extends Panel
 	private function onNameInputChange(evt:Event):Void
 	{
 		checkValid();
+	}
+	
+	private function onNameInputKeyDown(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this._confirmButton.enabled)
+			{
+				onConfirmButton(null);
+			}
+		}
 	}
 	
 }
