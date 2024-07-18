@@ -3,6 +3,8 @@ package valeditor.ui.feathers.controls.value;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ToggleButton;
 import feathers.layout.HorizontalAlign;
+import feathers.layout.HorizontalLayout;
+import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
@@ -48,6 +50,9 @@ class GroupUI extends ValueUI implements IGroupUI
 	private var _topButton:ToggleButton;
 	private var _arrowDown:LayoutGroup;
 	private var _arrowRight:LayoutGroup;
+	
+	private var _bottomGroup:LayoutGroup;
+	private var _trailGroup:LayoutGroup;
 	private var _valueGroup:LayoutGroup;
 	
 	/**
@@ -70,6 +75,12 @@ class GroupUI extends ValueUI implements IGroupUI
 		}
 		this._controls.resize(0);
 		this._group = null;
+		
+		this._topButton.selected = false;
+		if (this._bottomGroup.parent != null)
+		{
+			removeChild(this._bottomGroup);
+		}
 	}
 	
 	public function pool():Void
@@ -82,12 +93,12 @@ class GroupUI extends ValueUI implements IGroupUI
 	{
 		super.initialize();
 		
+		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
 		
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
-		vLayout.gap = Spacing.VERTICAL_GAP;
 		this.layout = vLayout;
 		
 		this._topButton = new ToggleButton();
@@ -96,16 +107,38 @@ class GroupUI extends ValueUI implements IGroupUI
 		
 		this._arrowDown = new LayoutGroup();
 		this._arrowDown.variant = LayoutGroupVariant.ARROW_DOWN_GROUP;
+		this._topButton.selectedIcon = this._arrowDown;
 		
 		this._arrowRight = new LayoutGroup();
 		this._arrowRight.variant = LayoutGroupVariant.ARROW_RIGHT_GROUP;
+		this._topButton.icon = this._arrowRight;
+		
+		this._bottomGroup = new LayoutGroup();
+		hLayout = new HorizontalLayout();
+		hLayout.horizontalAlign = HorizontalAlign.LEFT;
+		hLayout.verticalAlign = VerticalAlign.TOP;
+		this._bottomGroup.layout = hLayout;
+		
+		this._trailGroup = new LayoutGroup();
+		this._trailGroup.variant = LayoutGroupVariant.OBJECT_TRAIL;
+		this._bottomGroup.addChild(this._trailGroup);
 		
 		this._valueGroup = new LayoutGroup();
+		this._valueGroup.layoutData = new HorizontalLayoutData(100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
+		vLayout.paddingTop = Padding.SMALL;
 		this._valueGroup.layout = vLayout;
+		this._bottomGroup.addChild(this._valueGroup);
+		
+		this._valueGroup.addEventListener(Event.RESIZE, onContentResize);
+	}
+	
+	private function onContentResize(evt:Event):Void
+	{
+		this._trailGroup.height = this._valueGroup.height;
 	}
 	
 	public function addExposedControl(control:IValueUI):Void
@@ -165,38 +198,23 @@ class GroupUI extends ValueUI implements IGroupUI
 		super.initExposedValue();
 		
 		this._topButton.text = this._group.name;
+		this._topButton.toolTip = this._group.toolTip;
 		
-		if (this._group.isCollapsable)
+		if (this._group.isUIOpen)
 		{
-			this._topButton.icon = this._arrowRight;
-			this._topButton.selectedIcon = this._arrowDown;
-			
-			if (this._group.isCollapsedDefault)
+			if (this._bottomGroup.parent == null)
 			{
-				this._topButton.selected = false;
-				if (this._valueGroup.parent != null)
-				{
-					removeChild(this._valueGroup);
-				}
-			}
-			else
-			{
-				this._topButton.selected = true;
-				if (this._valueGroup.parent == null)
-				{
-					addChild(this._valueGroup);
-				}
+				addChild(this._bottomGroup);
 			}
 		}
 		else
 		{
-			this._topButton.icon = null;
-			this._topButton.selectedIcon = null;
-			if (this._valueGroup.parent == null)
+			if (this._bottomGroup.parent != null)
 			{
-				addChild(this._valueGroup);
+				removeChild(this._bottomGroup);
 			}
 		}
+		
 		updateEditable();
 	}
 	
@@ -244,15 +262,15 @@ class GroupUI extends ValueUI implements IGroupUI
 	
 	private function onTopButtonChange(evt:Event):Void
 	{
-		if (this._group != null && !this._group.isCollapsable) return;
-		
 		if (this._topButton.selected)
 		{
-			addChild(this._valueGroup);
+			addChild(this._bottomGroup);
+			this._group.isUIOpen = true;
 		}
 		else
 		{
-			removeChild(this._valueGroup);
+			removeChild(this._bottomGroup);
+			this._group.isUIOpen = false;
 		}
 	}
 	

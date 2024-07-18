@@ -138,7 +138,7 @@ class ObjectUI extends ValueUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingTop = Spacing.VERTICAL_GAP;
+		vLayout.paddingTop = Padding.SMALL;
 		this._valueGroup.layout = vLayout;
 		this._bottomGroup.addChild(this._valueGroup);
 		
@@ -158,9 +158,8 @@ class ObjectUI extends ValueUI
 	{
 		super.initExposedValue();
 		
-		this._topButton.toolTip = this._exposedValue.toolTip;
-		
 		this._topButton.text = this._exposedValue.name;
+		this._topButton.toolTip = this._exposedValue.toolTip;
 		
 		if (this._exposedObject.isUIOpen)
 		{
