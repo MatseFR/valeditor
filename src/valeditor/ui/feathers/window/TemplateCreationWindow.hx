@@ -31,6 +31,7 @@ import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
+import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
 /**
@@ -92,6 +93,7 @@ class TemplateCreationWindow extends Panel
 	
 	private var _constructorGroup:LayoutGroup;
 	private var _constructorLabel:Label;
+	private var _constructorContainerGroup:LayoutGroup;
 	private var _constructorContainer:ScrollContainer;
 	private var _constructorButtonGroup:LayoutGroup;
 	private var _constructorDefaultsButton:Button;
@@ -242,16 +244,26 @@ class TemplateCreationWindow extends Panel
 		this._constructorLabel = new Label("Constructor values");
 		this._constructorGroup.addChild(this._constructorLabel);
 		
+		this._constructorContainerGroup = new LayoutGroup();
+		this._constructorContainerGroup.variant = LayoutGroupVariant.WITH_BORDER;
+		this._constructorContainerGroup.layoutData = new VerticalLayoutData(100, 100);
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.setPadding(1);
+		this._constructorContainerGroup.layout = vLayout;
+		this._constructorGroup.addChild(this._constructorContainerGroup);
+		
 		this._constructorContainer = new ScrollContainer();
-		this._constructorContainer.variant = ScrollContainerVariant.WITH_BORDER;
-		this._constructorContainer.layoutData = new VerticalLayoutData(100, 100);
+		this._constructorContainer.layoutData = new VerticalLayoutData(null, 100);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.VERTICAL_GAP;
-		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
+		vLayout.paddingBottom = vLayout.paddingTop = Padding.DEFAULT;
+		vLayout.paddingLeft = vLayout.paddingRight = Padding.MINIMAL;
 		this._constructorContainer.layout = vLayout;
-		this._constructorGroup.addChild(this._constructorContainer);
+		this._constructorContainerGroup.addChild(this._constructorContainer);
 		
 		this._constructorButtonGroup = new LayoutGroup();
 		vLayout = new VerticalLayout();
