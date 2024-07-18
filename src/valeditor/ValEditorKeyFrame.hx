@@ -36,8 +36,11 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 	{
 		if (this._indexCurrent == value) return value;
 		this._indexCurrent = value;
-		updateTweens();
-		updateObjectsSelectable();
+		if (this._indexCurrent != -1)
+		{
+			updateTweens();
+			updateObjectsSelectable();
+		}
 		return this._indexCurrent;
 	}
 	
@@ -55,7 +58,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 				cast(object, ValEditorObject).isSelectable = false;
 			}
 		}
-		else
+		else if (this._indexCurrent != -1)
 		{
 			updateObjectsSelectable();
 		}
