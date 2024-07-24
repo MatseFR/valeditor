@@ -75,7 +75,7 @@ class LibraryDragManager
 	{
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY))
 		{
-			if (ValEditor.currentContainer.canAddObject())
+			if (ValEditor.currentContainer.canAddObject(cast this.template.object))
 			{
 				if (this.objectIndicator.parent == null)
 				{
@@ -100,7 +100,7 @@ class LibraryDragManager
 	
 	private function onMouseUp(evt:MouseEvent):Void
 	{
-		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject())
+		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject(cast this.template.object))
 		{
 			this._mouseX = evt.stageX;
 			this._mouseY = evt.stageY;

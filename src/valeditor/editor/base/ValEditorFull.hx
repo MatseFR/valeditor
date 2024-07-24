@@ -48,6 +48,7 @@ import valedit.object.openfl.display.RectangleShape;
 import valedit.object.openfl.display.RoundRectangleShape;
 import valedit.object.openfl.display.StarShape;
 import valedit.object.openfl.display.WedgeShape;
+import valeditor.SpriteContainer;
 import valeditor.ValEditorClassSettings;
 import valeditor.ValEditorContainer;
 import valeditor.ValEditorKeyFrame;
@@ -1180,6 +1181,22 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
+		// SpriteContainer
+		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = SpriteContainer.fromPool;
+		settings.creationFunctionForLoading = SpriteContainer.fromPool;
+		settings.creationFunctionForTemplateInstance = SpriteContainer.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.exportClassName = Type.getClassName(SpriteContainer);
+		settings.isContainer = true;
+		settings.isContainerOpenFL = true;
+		settings.collection = ContainerData.exposeSpriteContainer();
+		settings.visibilityCollection = ContainerData.getSpriteContainerVisibility();
+		settings.useBounds = true;
+		ValEditor.registerClass(SpriteContainer, settings);
+		settings.clear();
+		
 		// ValEditorContainer
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1193,8 +1210,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.isContainer = true;
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.isContainerOpenFL = true;
+		settings.isContainerStarling = true;
 		settings.collection = ContainerData.exposeValEditorContainer();
 		settings.visibilityCollection = ContainerData.getValEditorContainerVisibility();
 		settings.useBounds = true;
@@ -1208,8 +1225,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.disposeFunctionName = "pool";
 		settings.exportClassName = Type.getClassName(ValEditContainer);
 		settings.isContainer = true;
-		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.MIXED;
+		settings.isContainerOpenFL = true;
+		settings.isContainerStarling = true;
 		settings.collection = ContainerData.exposeValEditorContainerRoot();
 		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
 		settings.useBounds = true;

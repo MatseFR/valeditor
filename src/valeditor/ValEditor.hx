@@ -22,6 +22,8 @@ import openfl.events.EventType;
 import openfl.utils.ByteArray;
 import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
+import valedit.IValEditOpenFLContainer;
+import valedit.IValEditStarlingContainer;
 import valedit.ValEdit;
 import valedit.ValEditClass;
 import valedit.ValEditObject;
@@ -86,7 +88,8 @@ class ValEditor
 	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
-	static public var currentContainer(get, set):IValEditorContainer;
+	static public var currentContainer(get, never):IValEditorContainer;
+	static public var currentContainerObject(get, set):ValEditorObject;
 	static public var currentTimeLineContainer(get, never):IValEditorTimeLineContainer;
 	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
@@ -100,7 +103,8 @@ class ValEditor
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
 	static public var openedContainers(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
-	static public var rootContainer(get, set):IValEditorContainer;
+	static public var rootContainer(get, never):IValEditorContainer;
+	static public var rootContainerObject(get, set):ValEditorObject;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
@@ -129,43 +133,104 @@ class ValEditor
 	{
 		return _currentContainer;
 	}
-	static private function set_currentContainer(value:IValEditorContainer):IValEditorContainer
+	//static private function set_currentContainer(value:IValEditorContainer):IValEditorContainer
+	//{
+		//if (value == _currentContainer) return value;
+		//
+		//if (_currentContainer != null)
+		//{
+			//if (_currentTimeLineContainer != null)
+			//{
+				//_currentTimeLineContainer.juggler = null;
+				//_currentTimeLineContainer = null;
+			//}
+			//_currentContainer.rootContainer = null;
+			//#if starling
+			//_currentContainer.rootContainerStarling = null;
+			//#end
+		//}
+		//_currentContainer = value;
+		//containerController.container = value;
+		//if (_currentContainer != null)
+		//{
+			//if (Std.isOfType(_currentContainer, IValEditorTimeLineContainer))
+			//{
+				//_currentTimeLineContainer = cast _currentContainer;
+				//_currentTimeLineContainer.juggler = juggler;
+			//}
+			//_currentContainer.rootContainer = _rootScene;
+			//#if starling
+			//_currentContainer.rootContainerStarling = _rootSceneStarling;
+			//#end
+			//_currentContainer.x = viewPort.x;
+			//_currentContainer.y = viewPort.y;
+			//_currentContainer.viewWidth = viewPort.width;
+			//_currentContainer.viewHeight = viewPort.height;
+			//_currentContainer.adjustView();
+		//}
+		//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CURRENT, _currentContainer);
+		//return _currentContainer;
+	//}
+	
+	static private var _currentContainerObject:ValEditorObject;
+	static private function get_currentContainerObject():ValEditorObject { return _currentContainerObject; }
+	static private function set_currentContainerObject(value:ValEditorObject):ValEditorObject
 	{
-		if (value == _currentContainer) return value;
+		if (value == _currentContainerObject) return value;
 		
-		if (_currentContainer != null)
+		if (_currentContainerObject != null)
 		{
 			if (_currentTimeLineContainer != null)
 			{
 				_currentTimeLineContainer.juggler = null;
 				_currentTimeLineContainer = null;
 			}
-			_currentContainer.rootContainer = null;
+			
+			if (_currentContainerObject.isContainerOpenFL)
+			{
+				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = null;
+			}
 			#if starling
-			_currentContainer.rootContainerStarling = null;
+			if (_currentContainerObject.isContainerStarling)
+			{
+				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = null;
+			}
 			#end
+			
+			_currentContainer = null;
+			containerController.containerObject = null;
 		}
-		_currentContainer = value;
-		containerController.container = value;
-		if (_currentContainer != null)
+		_currentContainerObject = value;
+		if (_currentContainerObject != null)
 		{
+			_currentContainer = _currentContainerObject.object;
 			if (Std.isOfType(_currentContainer, IValEditorTimeLineContainer))
 			{
 				_currentTimeLineContainer = cast _currentContainer;
 				_currentTimeLineContainer.juggler = juggler;
 			}
-			_currentContainer.rootContainer = _rootScene;
+			
+			if (_currentContainerObject.isContainerOpenFL)
+			{
+				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = _rootScene;
+			}
 			#if starling
-			_currentContainer.rootContainerStarling = _rootSceneStarling;
+			if (_currentContainerObject.isContainerStarling)
+			{
+				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = _rootSceneStarling;
+			}
 			#end
-			_currentContainer.x = viewPort.x;
-			_currentContainer.y = viewPort.y;
+			
+			_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
+			_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
 			_currentContainer.viewWidth = viewPort.width;
 			_currentContainer.viewHeight = viewPort.height;
 			_currentContainer.adjustView();
+			
+			containerController.containerObject = _currentContainerObject;
 		}
 		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CURRENT, _currentContainer);
-		return _currentContainer;
+		return _currentContainerObject;
 	}
 	
 	static private var _currentTimeLineContainer:IValEditorTimeLineContainer;
@@ -182,19 +247,39 @@ class ValEditor
 	
 	static private var _rootContainer:IValEditorContainer;
 	static private function get_rootContainer():IValEditorContainer { return _rootContainer; }
-	static private function set_rootContainer(value:IValEditorContainer):IValEditorContainer
+	//static private function set_rootContainer(value:IValEditorContainer):IValEditorContainer
+	//{
+		//if (value == _rootContainer) return value;
+		//if (_rootContainer != null)
+		//{
+			//viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
+		//}
+		//_rootContainer = value;
+		//if (_rootContainer != null)
+		//{
+			//viewPort.addEventListener(Event.CHANGE, onViewPortChange);
+		//}
+		//return _rootContainer;
+	//}
+	
+	static private var _rootContainerObject:ValEditorObject;
+	static private function get_rootContainerObject():ValEditorObject { return _rootContainerObject; }
+	static private function set_rootContainerObject(value:ValEditorObject):ValEditorObject
 	{
-		if (value == _rootContainer) return value;
-		if (_rootContainer != null)
+		if (value == _rootContainerObject) return value;
+		
+		if (_rootContainerObject != null)
 		{
+			_rootContainer = null;
 			viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
 		}
-		_rootContainer = value;
-		if (_rootContainer != null)
+		_rootContainerObject = value;
+		if (_rootContainerObject != null)
 		{
+			_rootContainer = _rootContainerObject.object;
 			viewPort.addEventListener(Event.CHANGE, onViewPortChange);
 		}
-		return _rootContainer;
+		return _rootContainerObject;
 	}
 	
 	static public function openContainer(container:ValEditorObject):Void
@@ -203,13 +288,13 @@ class ValEditor
 		openedContainerCollection.add(container);
 		container.addEventListener(RenameEvent.RENAMED, onOpenContainerObjectRenamed);
 		
-		if (_rootContainer == null)
+		if (_rootContainerObject == null)
 		{
-			rootContainer = container.object;
+			rootContainerObject = container;
 		}
 		
-		currentContainer = container.object;
-		currentContainer.open();
+		currentContainerObject = container;
+		_currentContainer.open();
 		edit(currentContainer);
 		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_OPEN, currentContainer);
 	}
@@ -226,7 +311,7 @@ class ValEditor
 	
 	static public function makeContainerCurrent(container:ValEditorObject):Void
 	{
-		while (currentContainer != container.object)
+		while (_currentContainerObject != container)
 		{
 			closeContainer();
 		}
@@ -242,20 +327,21 @@ class ValEditor
 		
 		if (openedContainers.length != 0)
 		{
-			currentContainer = openedContainers[openedContainers.length - 1].object;
+			currentContainerObject = openedContainers[openedContainers.length - 1];
 		}
 		else
 		{
-			currentContainer = null;
-			rootContainer = null;
+			currentContainerObject = null;
+			rootContainerObject = null;
 		}
 		
 		container.close();
 		EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CLOSE, container);
 		
-		if (_rootContainer == null)
+		if (_rootContainerObject == null)
 		{
-			container.pool();
+			destroyObject(object);
+			//container.pool();
 		}
 	}
 	
@@ -271,9 +357,12 @@ class ValEditor
 	static private function get_rootScene():DisplayObjectContainer { return _rootScene; }
 	static private function set_rootScene(value:DisplayObjectContainer):DisplayObjectContainer
 	{
-		if (_currentContainer != null)
+		if (_currentContainerObject != null)
 		{
-			_currentContainer.rootContainer = value;
+			if (_currentContainerObject.isContainerOpenFL)
+			{
+				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = value;
+			}
 		}
 		return _rootScene = value;
 	}
@@ -283,9 +372,12 @@ class ValEditor
 	static private function get_rootSceneStarling():starling.display.DisplayObjectContainer { return _rootSceneStarling; }
 	static private function set_rootSceneStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer
 	{
-		if (_currentContainer != null)
+		if (_currentContainerObject != null)
 		{
-			_currentContainer.rootContainerStarling = value;
+			if (_currentContainerObject.isContainerStarling)
+			{
+				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = value;
+			}
 		}
 		return _rootSceneStarling = value;
 	}
@@ -300,11 +392,14 @@ class ValEditor
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
-		_currentContainer.x = viewPort.x;
-		_currentContainer.y = viewPort.y;
-		_currentContainer.viewWidth = viewPort.width;
-		_currentContainer.viewHeight = viewPort.height;
-		_currentContainer.adjustView();
+		if (_currentContainerObject != null)
+		{
+			_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
+			_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
+			_currentContainer.viewWidth = viewPort.width;
+			_currentContainer.viewHeight = viewPort.height;
+			_currentContainer.adjustView();
+		}
 	}
 	
 	static private var _categoryToClassCollection:Map<String, ArrayCollection<ValEditorClass>> = new Map<String, ArrayCollection<ValEditorClass>>();

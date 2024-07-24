@@ -4,6 +4,8 @@ import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
+import valedit.IValEditOpenFLContainer;
+import valedit.IValEditStarlingContainer;
 import valedit.ValEditContainer;
 import valedit.ValEditLayer;
 import valedit.ValEditObject;
@@ -22,7 +24,7 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorContainer extends ValEditContainer implements IValEditorContainer implements IValEditorTimeLineContainer
+class ValEditorContainer extends ValEditContainer implements IValEditorContainer implements IValEditOpenFLContainer implements IValEditStarlingContainer implements IValEditorTimeLineContainer
 {
 	static private var _POOL:Array<ValEditorContainer> = new Array<ValEditorContainer>();
 	
@@ -287,7 +289,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		return name;
 	}
 	
-	public function canAddObject():Bool
+	public function canAddObject(object:ValEditorObject):Bool
 	{
 		return cast(this._currentLayer, ValEditorLayer).canAddObject();
 	}
@@ -623,6 +625,11 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_FUNCTION_CALLED, evt.object, evt);
 	}
 	
+	private function object_propertyChange(evt:ObjectPropertyEvent):Void
+	{
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_PROPERTY_CHANGE, evt.object, evt);
+	}
+	
 	private function object_renamed(evt:RenameEvent):Void
 	{
 		var object:ValEditorObject = cast evt.target;
@@ -640,11 +647,6 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 			this._activeObjects.set(object.objectID, object);
 			this.activeObjectsCollection.updateAt(this.activeObjectsCollection.indexOf(object));
 		}
-	}
-	
-	private function object_propertyChange(evt:ObjectPropertyEvent):Void
-	{
-		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_PROPERTY_CHANGE, evt.object, evt);
 	}
 	
 	private function timeLine_insertFrame(evt:TimeLineActionEvent):Void

@@ -210,7 +210,7 @@ class ValEditorLayer extends ValEditLayer
 		{
 			if (object.getProperty(RegularPropertyName.VISIBLE) == true)
 			{
-				visibleObjects.push(object);
+				visibleObjects[visibleObjects.length] = object;
 			}
 		}
 		
@@ -254,12 +254,13 @@ class ValEditorLayer extends ValEditLayer
 					this._displayContainerStarling.addChild(cast editorObject.interactiveObject);
 				#end
 				
-				case DisplayObjectType.MIXED :
-					// nothing ?
-				
 				default :
 					throw new Error("ValEditorLayer.add ::: unknown display object type " + object.displayObjectType);
 			}
+		}
+		else if (object.isContainer)
+		{
+			this._displayObjects.set(editorObject.id, editorObject);
 		}
 	}
 	
@@ -283,12 +284,13 @@ class ValEditorLayer extends ValEditLayer
 					this._displayContainerStarling.removeChild(cast editorObject.interactiveObject);
 				#end
 				
-				case DisplayObjectType.MIXED :
-					// nothing ?
-				
 				default :
 					throw new Error("ValEditorContainer.remove ::: unknown display object type " + object.displayObjectType);
 			}
+		}
+		else if (object.isContainer)
+		{
+			this._displayObjects.remove(editorObject.id);
 		}
 	}
 	

@@ -409,8 +409,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
 		}
-		
-		//TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_FRAME, action);
 	}
 	
 	public function insertKeyFrame(?action:MultiAction):Void 
@@ -723,8 +721,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
 		}
-		
-		//TimeLineActionEvent.dispatch(this, TimeLineActionEvent.INSERT_KEYFRAME, action);
 	}
 	
 	public function removeFrame(?action:MultiAction):Void
@@ -789,14 +785,6 @@ class ValEditorTimeLine extends ValEditTimeLine
 					}
 					
 					timeLineSetFrameCurrent = TimeLineSetFrameCurrent.fromPool();
-					//if (this._frameCurrent.indexEnd > this._frameIndex)
-					//{
-						//timeLineSetFrameCurrent.setup(this, cast this._frameCurrent);
-					//}
-					//else
-					//{
-						//timeLineSetFrameCurrent.setup(this, cast getNextKeyFrame(this._frameCurrent));
-					//}
 					timeLineSetFrameCurrent.setup(this, cast this._frames[this._frameIndex]);
 					action.add(timeLineSetFrameCurrent);
 					
