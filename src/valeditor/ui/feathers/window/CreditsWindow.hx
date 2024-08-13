@@ -20,6 +20,7 @@ import openfl.display.Bitmap;
 import openfl.net.URLRequest;
 import openfl.utils.Assets;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
+import valeditor.ui.feathers.variant.LabelVariant;
 
 /**
  * ...
@@ -72,6 +73,8 @@ class CreditsWindow extends Panel
 	private var _feathersGithubButton:Button;
 	
 	private var _thanksGroup:LayoutGroup;
+	private var _thanksTitle:Label;
+	private var _thanksText:Label;
 	
 	public function new() 
 	{
@@ -287,6 +290,22 @@ class CreditsWindow extends Panel
 		this._feathersGithubButton = new Button("Github", onFeathersGithubButton);
 		this._feathersGithubButton.layoutData = new HorizontalLayoutData(50);
 		this._feathersButtonsGroup.addChild(this._feathersGithubButton);
+		
+		// Thanks
+		this._thanksGroup = new LayoutGroup();
+		vLayout = new VerticalLayout();
+		vLayout.horizontalAlign = HorizontalAlign.LEFT;
+		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.gap = Spacing.DEFAULT;
+		this._thanksGroup.layout = vLayout;
+		this._container.addChild(this._thanksGroup);
+		
+		this._thanksTitle = new Label("Special Thanks");
+		this._thanksTitle.variant = Label.VARIANT_HEADING;
+		this._thanksGroup.addChild(this._thanksTitle);
+		
+		this._thanksText = new Label("Josh Tynjala\nChris Speciale\nmy brothers Tom, Bat and Jet");
+		this._thanksGroup.addChild(this._thanksText);
 	}
 	
 	private function onCloseButton(evt:TriggerEvent):Void

@@ -8,6 +8,7 @@ import feathers.layout.RelativePosition;
 import feathers.skins.BaseGraphicsPathSkin;
 import feathers.skins.RectangleSkin;
 import feathers.skins.TabSkin;
+import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
 import valeditor.ui.feathers.theme.simple.SimpleTheme;
@@ -33,6 +34,10 @@ class TabBarStyles
 					//skin.fill = theme.getLightFill();
 					//skin.disabledFill = theme.getLightFillDark();
 					//tabBar.backgroundSkin = skin;
+					var skin = new UnderlineSkin();
+					skin.fill = theme.getLightFill();
+					skin.border = theme.getContrastBorderLight();
+					tabBar.backgroundSkin = skin;
 				}
 				
 				if (tabBar.focusRectSkin == null)
@@ -69,6 +74,33 @@ class TabBarStyles
 						var desktopSkin = new TabSkin();
 						desktopSkin.cornerRadius = 3.0;
 						desktopSkin.cornerRadiusPosition = RelativePosition.TOP;
+						desktopSkin.drawBaseBorder = true;
+						desktopSkin.maxWidth = 100.0;
+						desktopSkin.minWidth = 20.0;
+						skin = desktopSkin;
+					}
+					else
+					{
+						var mobileSkin = new RectangleSkin();
+						mobileSkin.minWidth = 44.0;
+						mobileSkin.minHeight = 44.0;
+						skin = mobileSkin;
+					}
+					//skin.fill = theme.getLightFill();
+					skin.fill = theme.getLightFillDark();
+					//skin.disabledFill = theme.getLightFillDark();
+					skin.disabledFill = theme.getLightFillDarker();
+					skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+					skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+					skin.border = theme.getContrastBorderLight();
+					skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorderDark());
+					button.backgroundSkin = skin;
+					
+					if (isDesktop)
+					{
+						var desktopSkin = new TabSkin();
+						desktopSkin.cornerRadius = 3.0;
+						desktopSkin.cornerRadiusPosition = RelativePosition.TOP;
 						desktopSkin.drawBaseBorder = false;
 						desktopSkin.maxWidth = 100.0;
 						desktopSkin.minWidth = 20.0;
@@ -81,16 +113,12 @@ class TabBarStyles
 						mobileSkin.minHeight = 44.0;
 						skin = mobileSkin;
 					}
+					
+					//skin.fill = theme.getThemeFill();
 					skin.fill = theme.getLightFill();
-					skin.disabledFill = theme.getLightFillDark();
-					skin.selectedFill = theme.getThemeFill();
-					skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
-					skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+					skin.disabledFill = theme.getThemeFillDark();
 					skin.border = theme.getContrastBorderLight();
-					skin.selectedBorder = theme.getContrastBorderLight();
-					//skin.setBorderForState(ToggleButtonState.HOVER(false), theme.getThemeBorderLight());
-					skin.setBorderForState(ToggleButtonState.DOWN(false), theme.getThemeBorderDark());
-					button.backgroundSkin = skin;
+					button.selectedBackgroundSkin = skin;
 				}
 				
 				if (button.textFormat == null)

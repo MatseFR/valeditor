@@ -1,7 +1,6 @@
 package valeditor.editor.action.layer;
 
 import openfl.errors.Error;
-import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.editor.action.ValEditorAction;
 
@@ -19,7 +18,7 @@ class LayerIndexDown extends ValEditorAction
 		return new LayerIndexDown();
 	}
 	
-	public var container:ValEditorContainer;
+	public var container:IValEditorTimeLineContainer;
 	public var layers:Array<ValEditorLayer>;
 	
 	public function new() 
@@ -41,7 +40,7 @@ class LayerIndexDown extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:ValEditorContainer, layers:Array<ValEditorLayer>):Void
+	public function setup(container:IValEditorTimeLineContainer, layers:Array<ValEditorLayer>):Void
 	{
 		this.container = container;
 		this.layers = layers;
@@ -54,12 +53,8 @@ class LayerIndexDown extends ValEditorAction
 			throw new Error("LayerIndexDown already applied");
 		}
 		
-		//var index:Int;
 		for (layer in this.layers)
 		{
-			//index = this.container.getLayerIndex(layer);
-			//this.container.removeLayerAt(index);
-			//this.container.addLayerAt(layer, index + 1);
 			this.container.layerIndexDown(layer);
 		}
 		this.status = ValEditorActionStatus.DONE;
@@ -72,12 +67,8 @@ class LayerIndexDown extends ValEditorAction
 			throw new Error("LayerIndexDown already cancelled");
 		}
 		
-		//var index:Int;
 		for (layer in this.layers)
 		{
-			//index = this.container.getLayerIndex(layer);
-			//this.container.removeLayerAt(index);
-			//this.container.addLayerAt(layer, index - 1);
 			this.container.layerIndexUp(layer);
 		}
 		this.status = ValEditorActionStatus.UNDONE;

@@ -60,6 +60,8 @@ class LayoutGroupStyles
 		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.TOOL_BAR, tool_bar);
 		
+		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.UNDERLINED, underlined);
+		
 		styleProvider.setStyleFunction(LayoutGroup, LayoutGroupVariant.VIEWPORT_DEBUG, viewport_debug);
 	}
 	
@@ -142,7 +144,8 @@ class LayoutGroupStyles
 	{
 		if (group.backgroundSkin == null)
 		{
-			var backgroundSkin = new UnderlineSkin(theme.getLightFill(), theme.getLightBorderDark());
+			//var backgroundSkin = new UnderlineSkin(theme.getLightFill(), theme.getLightBorderDark());
+			var backgroundSkin = new UnderlineSkin(theme.getLightFill(), theme.getContrastBorderLight());
 			group.backgroundSkin = backgroundSkin;
 		}
 	}
@@ -188,6 +191,15 @@ class LayoutGroupStyles
 		var backgroundSkin = new RectangleSkin();
 		backgroundSkin.fill = theme.getLightFillDark();
 		group.backgroundSkin = backgroundSkin;
+	}
+	
+	static private function underlined(group:LayoutGroup):Void
+	{
+		if (group.backgroundSkin == null)
+		{
+			var backgroundSkin = new UnderlineSkin(theme.getLightFill(), theme.getContrastBorderLight());
+			group.backgroundSkin = backgroundSkin;
+		}
 	}
 	
 	static private function viewport_debug(group:LayoutGroup):Void

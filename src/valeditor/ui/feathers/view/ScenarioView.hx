@@ -38,8 +38,8 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import valedit.events.PlayEvent;
 import valedit.utils.ReverseIterator;
+import valeditor.IValEditorTimeLineContainer;
 import valeditor.ValEditor;
-import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
 import valeditor.editor.Selection;
@@ -127,6 +127,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _timeLineList:ScrollContainer;
 	private var _timeLineBottomGroup:LayoutGroup;
 	private var _timeLineControlsGroup:LayoutGroup;
+	private var _dummyFrameCollection:ArrayCollection<FrameData>;
 	
 	private var _frameFirstButton:Button;
 	private var _framePreviousButton:Button;
@@ -140,7 +141,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _hScrollBar:HScrollBar;
 	private var _vScrollBar:VScrollBar;
 	
-	private var _container:ValEditorContainer;
+	private var _container:IValEditorTimeLineContainer;
 	private var _currentTimeLineItem:TimeLineItem;
 	
 	private var _cursor:LayoutGroup;
@@ -179,6 +180,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private var _lastFrameIndex:Int;
 	private var _selection:Selection = new Selection();
+	
+	private var _controlsEnabled:Bool = false;
 	
 	public function new() 
 	{
@@ -256,27 +259,31 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		this._layerAddButton = new Button(null, onLayerAddButton);
 		this._layerAddButton.variant = ButtonVariant.ADD;
+		this._layerAddButton.enabled = false;
 		this._layerAddButton.toolTip = "add new layer";
 		this._layerBottomGroup.addChild(this._layerAddButton);
 		
 		this._layerRemoveButton = new Button(null, onLayerRemoveButton);
 		this._layerRemoveButton.variant = ButtonVariant.REMOVE;
-		this._layerRemoveButton.toolTip = "remove selected layer(s)";
 		this._layerRemoveButton.enabled = false;
+		this._layerRemoveButton.toolTip = "remove selected layer(s)";
 		this._layerBottomGroup.addChild(this._layerRemoveButton);
 		
 		this._layerRenameButton = new Button(null, onLayerRenameButton);
 		this._layerRenameButton.variant = ButtonVariant.RENAME;
+		this._layerRenameButton.enabled = false;
 		this._layerRenameButton.toolTip = "rename selected layer";
 		this._layerBottomGroup.addChild(this._layerRenameButton);
 		
 		this._layerUpButton = new Button(null, onLayerUpButton);
 		this._layerUpButton.variant = ButtonVariant.UP;
+		this._layerUpButton.enabled = false;
 		this._layerUpButton.toolTip = "move selected layer(s) up";
 		this._layerBottomGroup.addChild(this._layerUpButton);
 		
 		this._layerDownButton = new Button(null, onLayerDownButton);
 		this._layerDownButton.variant = ButtonVariant.DOWN;
+		this._layerDownButton.enabled = false;
 		this._layerDownButton.toolTip = "move selected layer(s) down";
 		this._layerBottomGroup.addChild(this._layerDownButton);
 		
@@ -294,7 +301,6 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		hLayout.paddingBottom = 1;
 		hLayout.paddingTop = 2;
 		this._timeLineTopGroup.layout = hLayout;
-		this._timeLineTopGroup.addEventListener(MouseEvent.MOUSE_DOWN, onRulerMouseDown);
 		this._timeLineMainGroup.addChild(this._timeLineTopGroup);
 		
 		this._timeLineTopControlsGroup = new LayoutGroup();
@@ -303,12 +309,19 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._timeLineTopControlsGroup.mouseChildren = false;
 		this._timeLineTopGroup.addChild(this._timeLineTopControlsGroup);
 		
-		this._timeLineRulerList = new ListView();
+		var dummyFrames:Array<FrameData> = new Array<FrameData>();
+		for (i in 0...300)
+		{
+			dummyFrames[i] = FrameData.fromPool();
+		}
+		this._dummyFrameCollection = new ArrayCollection<FrameData>(dummyFrames);
+		
+		this._timeLineRulerList = new ListView(this._dummyFrameCollection);
 		this._timeLineRulerList.variant = ListViewVariant.TIMELINE_RULER;
 		this._timeLineRulerList.layoutData = new AnchorLayoutData(null, 0, null, 0);
 		this._timeLineTopControlsGroup.addChild(this._timeLineRulerList);
 		
-		this._timeLineNumberList = new ListView();
+		this._timeLineNumberList = new ListView(this._dummyFrameCollection);
 		this._timeLineNumberList.variant = ListViewVariant.TIMELINE_NUMBERS;
 		this._timeLineNumberList.layoutData = new AnchorLayoutData(null, 0, 0, 0);
 		this._timeLineTopControlsGroup.addChild(this._timeLineNumberList);
@@ -371,26 +384,31 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		
 		this._frameFirstButton = new Button(null, onFrameFirstButton);
 		this._frameFirstButton.variant = ButtonVariant.FRAME_FIRST;
+		this._frameFirstButton.enabled = false;
 		this._frameFirstButton.toolTip = "first frame";
 		this._timeLineControlsGroup.addChild(this._frameFirstButton);
 		
 		this._framePreviousButton = new Button(null, onFramePreviousButton);
 		this._framePreviousButton.variant = ButtonVariant.FRAME_PREVIOUS;
+		this._framePreviousButton.enabled = false;
 		this._framePreviousButton.toolTip = "previous frame";
 		this._timeLineControlsGroup.addChild(this._framePreviousButton);
 		
 		this._playStopButton = new ToggleButton(null, false, onPlayStopButton);
 		this._playStopButton.variant = ToggleButtonVariant.PLAY_STOP;
+		this._playStopButton.enabled = false;
 		this._playStopButton.toolTip = "play/stop";
 		this._timeLineControlsGroup.addChild(this._playStopButton);
 		
 		this._frameNextButton = new Button(null, onFrameNextButton);
 		this._frameNextButton.variant = ButtonVariant.FRAME_NEXT;
+		this._frameNextButton.enabled = false;
 		this._frameNextButton.toolTip = "next frame";
 		this._timeLineControlsGroup.addChild(this._frameNextButton);
 		
 		this._frameLastButton = new Button(null, onFrameLastButton);
 		this._frameLastButton.variant = ButtonVariant.FRAME_LAST;
+		this._frameLastButton.enabled = false;
 		this._frameLastButton.toolTip = "last frame";
 		this._timeLineControlsGroup.addChild(this._frameLastButton);
 		
@@ -399,6 +417,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._indicator = new LayoutGroup();
 		this._indicator.variant = LayoutGroupVariant.TIMELINE_INDICATOR;
 		this._indicator.layoutData = new AnchorLayoutData(0, null, 0);
+		this._indicator.visible = false;
 		this._indicatorContainer.addChild(this._indicator);
 		
 		this._insertFrameItem = new MenuItem("insert frame", "Insert frame", true, "F5");
@@ -497,6 +516,59 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CURRENT, onContainerCurrent);
 		
 		this._layerList.addEventListener(Event.CHANGE, onLayerListChange);
+	}
+	
+	private function controlsDisable():Void
+	{
+		if (!this._controlsEnabled) return;
+		
+		closeFrameContextMenu();
+		closeLayerContextMenu();
+		
+		this._layerAddButton.enabled = false;
+		this._layerDownButton.enabled = false;
+		this._layerRemoveButton.enabled = false;
+		this._layerRenameButton.enabled = false;
+		this._layerUpButton.enabled = false;
+		
+		this._frameFirstButton.enabled = false;
+		this._frameLastButton.enabled = false;
+		this._frameNextButton.enabled = false;
+		this._framePreviousButton.enabled = false;
+		this._playStopButton.enabled = false;
+		
+		this._indicator.visible = false;
+		this._timeLineTopGroup.removeEventListener(MouseEvent.MOUSE_DOWN, onRulerMouseDown);
+		
+		this._hScrollBar.enabled = false;
+		this._vScrollBar.enabled = false;
+		
+		this._controlsEnabled = false;
+	}
+	
+	private function controlsEnable():Void
+	{
+		if (this._controlsEnabled) return;
+		
+		this._layerAddButton.enabled = true;
+		this._layerDownButton.enabled = true;
+		this._layerRemoveButton.enabled = true;
+		this._layerRenameButton.enabled = true;
+		this._layerUpButton.enabled = true;
+		
+		this._frameFirstButton.enabled = true;
+		this._frameLastButton.enabled = true;
+		this._frameNextButton.enabled = true;
+		this._framePreviousButton.enabled = true;
+		this._playStopButton.enabled = true;
+		
+		this._indicator.visible = true;
+		this._timeLineTopGroup.addEventListener(MouseEvent.MOUSE_DOWN, onRulerMouseDown);
+		
+		this._hScrollBar.enabled = true;
+		this._vScrollBar.enabled = true;
+		
+		this._controlsEnabled = true;
 	}
 	
 	private function onFrameContextMenuChange(evt:Event):Void
@@ -804,10 +876,10 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function updateLayerControls():Void
 	{
-		this._layerRemoveButton.enabled = this._layerList.selectedIndex != -1 && this._container.numLayers > 1;
-		this._layerRenameButton.enabled = this._layerList.selectedIndices.length == 1;
-		this._layerUpButton.enabled = this._layerList.selectedIndices.indexOf(0) == -1;
-		this._layerDownButton.enabled = this._layerList.selectedIndices.indexOf(this._container.numLayers - 1) == -1;
+		this._layerRemoveButton.enabled = this._controlsEnabled && (this._layerList.selectedIndex != -1 && this._container.numLayers > 1);
+		this._layerRenameButton.enabled = this._controlsEnabled && this._layerList.selectedIndices.length == 1;
+		this._layerUpButton.enabled = this._controlsEnabled && this._layerList.selectedIndices.indexOf(0) == -1;
+		this._layerDownButton.enabled = this._controlsEnabled && this._layerList.selectedIndices.indexOf(this._container.numLayers - 1) == -1;
 	}
 	
 	private function updateVScrollBar():Void
@@ -892,7 +964,14 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._currentTimeLineItem = null;
 		}
 		
-		this._container = cast evt.object;
+		if (Std.isOfType(evt.object, IValEditorTimeLineContainer))
+		{
+			this._container = cast evt.object;
+		}
+		else
+		{
+			this._container = null;
+		}
 		
 		if (this._container != null)
 		{
@@ -906,6 +985,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._layerList.dataProvider = this._container.layerCollection;
 			this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
 			this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+			
+			controlsEnable();
 			
 			setPlayHeadIndex(this._container.frameIndex);
 			
@@ -925,6 +1006,16 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			
 			updateHScrollBar();
 			updateVScrollBar();
+		}
+		else
+		{
+			controlsDisable();
+			
+			this._hScrollBar.value = this._hScrollBar.minimum;
+			this._vScrollBar.value = this._vScrollBar.minimum;
+			
+			this._timeLineRulerList.dataProvider = this._dummyFrameCollection;
+			this._timeLineNumberList.dataProvider = this._dummyFrameCollection;
 		}
 	}
 	

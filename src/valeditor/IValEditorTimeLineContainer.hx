@@ -1,4 +1,5 @@
 package valeditor;
+import feathers.data.ArrayCollection;
 import juggler.animation.Juggler;
 import valedit.ValEditLayer;
 import valedit.ValEditTimeLine;
@@ -11,9 +12,13 @@ interface IValEditorTimeLineContainer extends IValEditorContainer
 	public var currentLayer(get, set):ValEditLayer;
 	public var frameIndex(get, set):Int;
 	public var frameRate(get, set):Float;
+	public var hasInvisibleLayer(get, never):Bool;
+	public var hasLockedLayer(get, never):Bool;
 	public var isPlaying(get, never):Bool;
 	public var juggler(get, set):Juggler;
 	public var lastFrameIndex(get, never):Int;
+	public var layerCollection(default, null):ArrayCollection<ValEditorLayer>;
+	public var numLayers(get, never):Int;
 	public var timeLine(default, null):ValEditTimeLine;
 	
 	function addLayer(layer:ValEditLayer):Void;

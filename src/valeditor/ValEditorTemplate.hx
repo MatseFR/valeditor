@@ -711,6 +711,7 @@ class ValEditorTemplate extends ValEditTemplate implements IChangeUpdate
 		for (node in instances)
 		{
 			instance = ValEditor.createObjectWithTemplate(this, node.id);
+			instance.fromJSONSave(node);
 		}
 	}
 	

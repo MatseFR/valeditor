@@ -28,6 +28,9 @@ class ValEditorClassSettings extends ValEditClassSettings
 	/** @default null **/
 	public var exportClassName:String;
 	
+	/** @default "getBounds" **/
+	public var getBoundsFunctionName:String = "getBounds";
+	
 	/** tells if object uses radian rotation
 	 *  @default false */
 	public var hasRadianRotation:Bool;
@@ -60,6 +63,7 @@ class ValEditorClassSettings extends ValEditClassSettings
 		
 		this.canBeCreated = true;
 		this.categories.resize(0);
+		this.getBoundsFunctionName = "getBounds";
 		this.hasRadianRotation = false;
 		this.iconBitmapData = null;
 		this.interactiveFactory = null;

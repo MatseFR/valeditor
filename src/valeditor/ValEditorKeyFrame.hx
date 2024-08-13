@@ -96,9 +96,15 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		for (object in this.objects)
 		{
 			unregisterObject(object);
-			ValEditor.destroyObject(cast object);
+			object.removeKeyFrame(this);
+			if (this.isActive)
+			{
+				deactivateFunction(object);
+			}
+			if (object.canBeDestroyed()) ValEditor.destroyObject(cast object);
 		}
 		this.objects.resize(0);
+		
 		super.clear();
 	}
 	
@@ -381,7 +387,7 @@ class ValEditorKeyFrame extends ValEditKeyFrame implements IChangeUpdate
 		var objects:Array<Dynamic> = [];
 		for (object in this.objects)
 		{
-			objects.push(cast(object, ValEditorObject).toJSONSaveKeyFrame(this));
+			objects[objects.length] = cast(object, ValEditorObject).toJSONSaveKeyFrame(this);
 		}
 		json.objects = objects;
 		

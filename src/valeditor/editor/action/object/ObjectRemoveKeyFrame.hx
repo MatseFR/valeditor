@@ -31,12 +31,13 @@ class ObjectRemoveKeyFrame extends ValEditorAction
 	
 	override public function clear():Void 
 	{
+		this.object.unregisterAction(this);
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			//if (this.object.canBeDestroyed())
-			//{
-				//ValEditor.destroyObject(this.object);
-			//}
+			if (this.object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(this.object);
+			}
 			if (this.collection != null)
 			{
 				this.collection.pool();
@@ -59,6 +60,9 @@ class ObjectRemoveKeyFrame extends ValEditorAction
 	{
 		this.object = object;
 		this.keyFrame = keyFrame;
+		
+		this.object.registerAction(this);
+		
 		if (collection == null)
 		{
 			this.collection = this.object.getCollectionForKeyFrame(this.keyFrame);

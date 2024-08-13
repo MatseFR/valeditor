@@ -598,21 +598,40 @@ class ObjectList extends LayoutGroup
 	
 	private function onObjectOpenButton(evt:TriggerEvent):Void
 	{
+		var action:MultiAction;
+		var selectionClear:SelectionClear;
 		var container:ValEditorObject = cast cast(this._grid.selectedItem, ValEditorObject).template.object;
+		
 		if (cast(container.object, IValEditorContainer).isOpen)
 		{
 			if (ValEditor.currentContainer != container.object)
 			{
+				action = MultiAction.fromPool();
+				
+				selectionClear = SelectionClear.fromPool();
+				selectionClear.setup(ValEditor.selection);
+				action.add(selectionClear);
+				
 				var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 				containerMakeCurrent.setup(container);
-				ValEditor.actionStack.add(containerMakeCurrent);
+				action.add(containerMakeCurrent);
+				
+				ValEditor.actionStack.add(action);
 			}
 		}
 		else
 		{
+			action = MultiAction.fromPool();
+			
+			selectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
 			var containerOpen:ContainerOpen = ContainerOpen.fromPool();
 			containerOpen.setup(container);
-			ValEditor.actionStack.add(containerOpen);
+			action.add(containerOpen);
+			
+			ValEditor.actionStack.add(action);
 		}
 	}
 	

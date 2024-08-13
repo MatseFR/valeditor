@@ -189,12 +189,15 @@ class ObjectSelectWindow extends Panel
 			for (allowedName in allowedClassNames)
 			{
 				classNames = ValEdit.getClassListForBaseClass(allowedName);
-				for (className in classNames)
+				if (classNames != null)
 				{
-					stringData = ValEditor.getClassStringData(className);
-					if (this._classList.indexOf(stringData) == -1)
+					for (className in classNames)
 					{
-						this._classList.push(stringData);
+						stringData = ValEditor.getClassStringData(className);
+						if (this._classList.indexOf(stringData) == -1)
+						{
+							this._classList.push(stringData);
+						}
 					}
 				}
 			}

@@ -139,7 +139,7 @@ class LibraryDragManager
 		objectCreate.setup(this.object);
 		action.add(objectCreate);
 		
-		if (this.object.isDisplayObject)
+		if (this.object.isDisplayObject || this.object.isContainer)
 		{
 			this.object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
 			this.object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);
@@ -177,7 +177,7 @@ class LibraryDragManager
 		objectAddKeyFrame.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 		action.add(objectAddKeyFrame);
 		
-		if (object.isDisplayObject)
+		if (object.isDisplayObject || object.isContainer)
 		{
 			object.setProperty(RegularPropertyName.X, this._mouseX - ValEditor.viewPort.x + ValEditor.currentContainer.cameraX);
 			object.setProperty(RegularPropertyName.Y, this._mouseY - ValEditor.viewPort.y + ValEditor.currentContainer.cameraY);

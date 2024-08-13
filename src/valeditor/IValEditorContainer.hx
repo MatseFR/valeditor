@@ -20,6 +20,8 @@ interface IValEditorContainer
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
 	public var viewWidth(get, set):Float;
+	public var x(get, set):Float;
+	public var y(get, set):Float;
 	
 	function addObject(object:ValEditObject):Void;
 	function adjustView():Void;
@@ -37,6 +39,7 @@ interface IValEditorContainer
 	function open():Void;
 	function pool():Void;
 	function removeObject(object:ValEditObject):Void;
+	function removeObjectCompletely(object:ValEditObject):Void;
 	function toJSONSave(json:Dynamic = null):Dynamic;
 	
 	function addEventListener<T>(type:EventType<T>, listener:T->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void;

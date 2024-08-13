@@ -29,7 +29,6 @@ class TemplateAdd extends ValEditorAction
 	{
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			//this.template.pool();
 			ValEditor.destroyTemplate(this.template);
 		}
 		this.template = null;

@@ -1,7 +1,6 @@
 package valeditor.editor.settings;
 import haxe.io.Path;
 import juggler.animation.Transitions;
-import valeditor.ValEditorClass;
 import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 
@@ -28,6 +27,9 @@ class FileSettings
 	public var numFramesAutoIncrease:Bool = true;
 	public var numFramesDefault:Int = 120;
 	public var tweenTransitionDefault:String = Transitions.LINEAR;
+	#if starling
+	public var starlingSettings:StarlingSettings = new StarlingSettings();
+	#end
 	
 	private function get_fullPath():String 
 	{
@@ -67,10 +69,14 @@ class FileSettings
 		this.numFramesAutoIncrease = true;
 		this.numFramesDefault = 120;
 		this.tweenTransitionDefault = Transitions.LINEAR;
+		#if starling
+		this.starlingSettings.clear();
+		#end
 	}
 	
 	public function reset():Void
 	{
+		this.fileName = "untitled." + ValEditor.fileExtension;
 		this.customClassVisibilities.clear();
 	}
 	
@@ -82,19 +88,14 @@ class FileSettings
 	
 	public function apply():Void
 	{
-		//var clss:ValEditorClass;
-		//for (collection in this.customClassVisibilities)
-		//{
-			//clss = ValEditor.getValEditorClassByClassName(collection.classID);
-			//clss.visibilityCollectionFile = collection;
-		//}
-		
 		var collection:ClassVisibilityCollection;
 		for (clss in ValEditor.classCollection)
 		{
 			collection = this.customClassVisibilities.get(clss.className);
 			clss.visibilityCollectionFile = collection;
 		}
+		
+		this.starlingSettings.apply();
 	}
 	
 	public function clone(toSettings:FileSettings = null):FileSettings
@@ -112,6 +113,10 @@ class FileSettings
 		toSettings.numFramesDefault = this.numFramesDefault;
 		toSettings.tweenTransitionDefault = this.tweenTransitionDefault;
 		
+		#if starling
+		this.starlingSettings.clone(toSettings.starlingSettings);
+		#end
+		
 		return toSettings;
 	}
 	
@@ -128,6 +133,13 @@ class FileSettings
 		this.numFramesAutoIncrease = json.numFramesAutoIncrease;
 		this.numFramesDefault = json.numFramesDefault;
 		this.tweenTransitionDefault = json.tweenTransitionDefault;
+		
+		#if starling
+		if (json.starlingSettings != null)
+		{
+			this.starlingSettings.fromJSON(json.starlingSettings);
+		}
+		#end
 	}
 	
 	public function toJSON(json:Dynamic = null):Dynamic
@@ -145,6 +157,10 @@ class FileSettings
 		json.numFramesAutoIncrease = this.numFramesAutoIncrease;
 		json.numFramesDefault = this.numFramesDefault;
 		json.tweenTransitionDefault = this.tweenTransitionDefault;
+		
+		#if starling
+		json.starlingSettings = this.starlingSettings.toJSON();
+		#end
 		
 		return json;
 	}

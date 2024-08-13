@@ -27,9 +27,13 @@ class ObjectCreate extends ValEditorAction
 	
 	override public function clear():Void 
 	{
+		this.object.unregisterAction(this);
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
-			this.object.pool();
+			if (this.object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(this.object);
+			}
 		}
 		this.object = null;
 		
@@ -45,6 +49,7 @@ class ObjectCreate extends ValEditorAction
 	public function setup(object:ValEditorObject):Void
 	{
 		this.object = object;
+		this.object.registerAction(this);
 	}
 	
 	public function apply():Void

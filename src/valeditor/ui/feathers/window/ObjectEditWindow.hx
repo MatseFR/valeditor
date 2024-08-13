@@ -130,6 +130,7 @@ class ObjectEditWindow extends Panel
 	private function onCancelButton(evt:TriggerEvent):Void
 	{
 		FeathersWindows.closeWindow(this);
+		this._editObject = null;
 		if (this._cancelCallback != null) this._cancelCallback();
 	}
 	

@@ -28,6 +28,14 @@ class ObjectRemove extends ValEditorAction
 	
 	override public function clear():Void 
 	{
+		this.object.unregisterAction(this);
+		if (this.status == ValEditorActionStatus.DONE)
+		{
+			if (this.object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(this.object);
+			}
+		}
 		this.object = null;
 		
 		super.clear();
@@ -42,6 +50,7 @@ class ObjectRemove extends ValEditorAction
 	public function setup(object:ValEditorObject):Void
 	{
 		this.object = object;
+		this.object.registerAction(this);
 	}
 	
 	public function apply():Void

@@ -222,6 +222,7 @@ class EditorView extends LayoutGroup
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
+		hLayout.paddingBottom = 1;
 		this._menuBar.layout = hLayout;
 		addChild(this._menuBar);
 		
@@ -273,7 +274,7 @@ class EditorView extends LayoutGroup
 		this._centerBox.addChild(this._sceneGroup);
 		
 		this._containerList = new ListView(ValEditor.openedContainerCollection);
-		this._containerList.layout = new HorizontalListLayout();
+		this._containerList.variant = ListViewVariant.OPEN_CONTAINERS;
 		this._containerList.addEventListener(ListViewEvent.ITEM_TRIGGER, onContainerListItemTrigger);
 		this._containerList.itemToText = function(item:Dynamic):String {
 			return cast(item, ValEditorObject).objectID;
@@ -398,8 +399,16 @@ class EditorView extends LayoutGroup
 		var container:ValEditorObject = evt.state.data;
 		if (container.object != ValEditor.currentContainer)
 		{
-			var action:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
-			action.setup(container);
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var selectionClear:SelectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
+			var makeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
+			makeCurrent.setup(container);
+			action.add(makeCurrent);
+			
 			ValEditor.actionStack.add(action);
 		}
 	}
@@ -606,11 +615,13 @@ class EditorView extends LayoutGroup
 	
 	private function onDisplayAreaResize(evt:Event):Void
 	{
-		this._pt.setTo(this._displayArea.x, this._displayArea.y);
-		var loc:Point = this._displayArea.localToGlobal(this._pt);
-		this._displayRect.setTo(loc.x, loc.y, this._displayArea.width, this._displayArea.height);
-		ValEditor.viewPort.update(loc.x, loc.y, this._displayRect.width, this._displayRect.height);
+		//this._pt.setTo(this._displayArea.x, this._displayArea.y);
+		//var loc:Point = this._displayArea.localToGlobal(this._pt);
+		//this._displayRect.setTo(loc.x, loc.y, this._displayArea.width, this._displayArea.height);
+		//ValEditor.viewPort.update(loc.x, loc.y, this._displayRect.width, this._displayRect.height);
 		
+		// when we receive the event, _displayArea has been resized but not re-positionned by the layout so we have to work around this
+		ValEditor.viewPort.update(this._centerBox.x, this._mainBox.y + this._containerList.height, this._displayArea.width, this._displayArea.height);
 	}
 	
 	private function onMenuChange(evt:Event):Void
@@ -637,6 +648,11 @@ class EditorView extends LayoutGroup
 	private function onResize(evt:Event):Void
 	{
 		// TODO : not needed ?
+		trace("EditorView.onResize");
+		
+		this._leftBox.maxWidth = this.width * 0.4;
+		this._rightBox.maxWidth = this.width * 0.4;
+		this._scenario.maxHeight = this.height * 0.75;
 	}
 	
 }

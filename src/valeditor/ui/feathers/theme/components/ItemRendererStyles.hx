@@ -5,10 +5,10 @@ import feathers.layout.HorizontalAlign;
 import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
-import openfl.text.TextFormatAlign;
 import valeditor.ui.feathers.renderers.CheckItemRenderer;
 import valeditor.ui.feathers.renderers.FontDataItemRenderer;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
+import valeditor.ui.feathers.skins.RightSkin;
 import valeditor.ui.feathers.variant.ItemRendererVariant;
 
 /**
@@ -26,6 +26,11 @@ class ItemRendererStyles
 		if (styleProvider.getStyleFunction(ItemRenderer, ItemRendererVariant.CRAMPED) == null)
 		{
 			styleProvider.setStyleFunction(ItemRenderer, ItemRendererVariant.CRAMPED, cramped);
+		}
+		
+		if (styleProvider.getStyleFunction(ItemRenderer, ItemRendererVariant.OPEN_CONTAINER) == null)
+		{
+			styleProvider.setStyleFunction(ItemRenderer, ItemRendererVariant.OPEN_CONTAINER, openContainer);
 		}
 		
 		if (styleProvider.getStyleFunction(ItemRenderer, ItemRendererVariant.RIGHT_ALIGNED) == null)
@@ -161,6 +166,53 @@ class ItemRendererStyles
 			}
 			itemRenderer.backgroundSkin = skin;
 		}
+	}
+	
+	static private function openContainer(itemRenderer:ItemRenderer):Void
+	{
+		var isDesktop = DeviceUtil.isDesktop();
+		
+		if (itemRenderer.backgroundSkin == null) {
+			var skin = new RightSkin();
+			skin.fill = theme.getLightFillLight();
+			skin.border = theme.getLightBorderDark();
+			skin.selectedFill = theme.getThemeFill();
+			skin.setFillForState(ToggleButtonState.HOVER(false), theme.getThemeFillLight());
+			skin.setFillForState(ToggleButtonState.DOWN(false), theme.getThemeFill());
+			if (isDesktop) {
+				skin.width = 24.0;
+				skin.height = 24.0;
+				skin.minWidth = 24.0;
+				skin.minHeight = 24.0;
+			} else {
+				skin.width = 44.0;
+				skin.height = 44.0;
+				skin.minWidth = 44.0;
+				skin.minHeight = 44.0;
+			}
+			itemRenderer.backgroundSkin = skin;
+		}
+		
+		if (itemRenderer.textFormat == null) {
+			itemRenderer.textFormat = theme.getTextFormat();
+		}
+		if (itemRenderer.disabledTextFormat == null) {
+			itemRenderer.disabledTextFormat = theme.getTextFormat_disabled();
+		}
+		if (itemRenderer.secondaryTextFormat == null) {
+			itemRenderer.secondaryTextFormat = theme.getTextFormat_small();
+		}
+		if (itemRenderer.disabledSecondaryTextFormat == null) {
+			itemRenderer.disabledSecondaryTextFormat = theme.getTextFormat_small_disabled();
+		}
+		
+		itemRenderer.paddingTop = 4.0;
+		itemRenderer.paddingRight = 10.0;
+		itemRenderer.paddingBottom = 4.0;
+		itemRenderer.paddingLeft = 10.0;
+		itemRenderer.gap = 4.0;
+		
+		itemRenderer.horizontalAlign = LEFT;
 	}
 	
 	static private function rightAligned(itemRenderer:ItemRenderer):Void

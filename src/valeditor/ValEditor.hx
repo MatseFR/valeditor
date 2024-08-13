@@ -20,6 +20,9 @@ import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
 import openfl.utils.ByteArray;
+#if starling
+import starling.core.Starling;
+#end
 import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
 import valedit.IValEditOpenFLContainer;
@@ -59,6 +62,7 @@ import valeditor.events.RenameEvent;
 import valeditor.events.TemplateEvent;
 import valeditor.input.LiveInputActionManager;
 import valeditor.ui.InteractiveFactories;
+import valeditor.ui.InteractiveObjectController;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.ValEditorTheme;
@@ -98,6 +102,7 @@ class ValEditor
 	static public var fileExtension:String = "ves";
 	static public var fileSettings(default, null):FileSettings = new FileSettings();
 	static public var input(default, null):Input = new Input();
+	static public var interactiveObjectController(default, null):InteractiveObjectController = new InteractiveObjectController();
 	static public var isLoadingFile(get, set):Bool;
 	static public var isNewFile(default, null):Bool = false;
 	static public var keyboardController(default, null):KeyboardController;
@@ -133,44 +138,6 @@ class ValEditor
 	{
 		return _currentContainer;
 	}
-	//static private function set_currentContainer(value:IValEditorContainer):IValEditorContainer
-	//{
-		//if (value == _currentContainer) return value;
-		//
-		//if (_currentContainer != null)
-		//{
-			//if (_currentTimeLineContainer != null)
-			//{
-				//_currentTimeLineContainer.juggler = null;
-				//_currentTimeLineContainer = null;
-			//}
-			//_currentContainer.rootContainer = null;
-			//#if starling
-			//_currentContainer.rootContainerStarling = null;
-			//#end
-		//}
-		//_currentContainer = value;
-		//containerController.container = value;
-		//if (_currentContainer != null)
-		//{
-			//if (Std.isOfType(_currentContainer, IValEditorTimeLineContainer))
-			//{
-				//_currentTimeLineContainer = cast _currentContainer;
-				//_currentTimeLineContainer.juggler = juggler;
-			//}
-			//_currentContainer.rootContainer = _rootScene;
-			//#if starling
-			//_currentContainer.rootContainerStarling = _rootSceneStarling;
-			//#end
-			//_currentContainer.x = viewPort.x;
-			//_currentContainer.y = viewPort.y;
-			//_currentContainer.viewWidth = viewPort.width;
-			//_currentContainer.viewHeight = viewPort.height;
-			//_currentContainer.adjustView();
-		//}
-		//EditorEvent.dispatch(_eventDispatcher, EditorEvent.CONTAINER_CURRENT, _currentContainer);
-		//return _currentContainer;
-	//}
 	
 	static private var _currentContainerObject:ValEditorObject;
 	static private function get_currentContainerObject():ValEditorObject { return _currentContainerObject; }
@@ -193,7 +160,8 @@ class ValEditor
 			#if starling
 			if (_currentContainerObject.isContainerStarling)
 			{
-				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = null;
+				cast(_currentContainer, IValEditorStarlingContainer).rootContainer = null;
+				cast(_currentContainer, IValEditorStarlingContainer).rootContainerStarling = null;
 			}
 			#end
 			
@@ -217,7 +185,8 @@ class ValEditor
 			#if starling
 			if (_currentContainerObject.isContainerStarling)
 			{
-				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = _rootSceneStarling;
+				cast(_currentContainer, IValEditorStarlingContainer).rootContainer = _rootScene;
+				cast(_currentContainer, IValEditorStarlingContainer).rootContainerStarling = _rootSceneStarling;
 			}
 			#end
 			
@@ -247,20 +216,6 @@ class ValEditor
 	
 	static private var _rootContainer:IValEditorContainer;
 	static private function get_rootContainer():IValEditorContainer { return _rootContainer; }
-	//static private function set_rootContainer(value:IValEditorContainer):IValEditorContainer
-	//{
-		//if (value == _rootContainer) return value;
-		//if (_rootContainer != null)
-		//{
-			//viewPort.removeEventListener(Event.CHANGE, onViewPortChange);
-		//}
-		//_rootContainer = value;
-		//if (_rootContainer != null)
-		//{
-			//viewPort.addEventListener(Event.CHANGE, onViewPortChange);
-		//}
-		//return _rootContainer;
-	//}
 	
 	static private var _rootContainerObject:ValEditorObject;
 	static private function get_rootContainerObject():ValEditorObject { return _rootContainerObject; }
@@ -392,6 +347,13 @@ class ValEditor
 	
 	static private function onViewPortChange(evt:Event):Void
 	{
+		#if starling
+		var centerX:Float = viewPort.x + (viewPort.width / 2.0);
+		var centerY:Float = viewPort.y + (viewPort.height / 2.0);
+		Starling.current.stage.projectionOffset.x = centerX - Starling.current.stage.stageWidth / 2.0;
+		Starling.current.stage.projectionOffset.y = centerY - Starling.current.stage.stageHeight / 2.0;
+		Starling.current.stage.projectionOffset = Starling.current.stage.projectionOffset;
+		#end
 		if (_currentContainerObject != null)
 		{
 			_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
@@ -590,6 +552,7 @@ class ValEditor
 		classVisibilities.add(v.visibilityCollectionDefault);
 		
 		v.exportClassName = settings.exportClassName;
+		v.getBoundsFunctionName = settings.getBoundsFunctionName;
 		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
 		v.interactiveFactory = settings.interactiveFactory;
@@ -962,17 +925,20 @@ class ValEditor
 		
 		valObject.applyClassVisibility(valClass.visibilityCollectionCurrent);
 		
+		valObject.getBoundsFunctionName = valClass.getBoundsFunctionName;
+		valObject.hasPivotProperties = valClass.hasPivotProperties;
+		valObject.hasScaleProperties = valClass.hasScaleProperties;
+		valObject.hasTransformProperty = valClass.hasTransformProperty;
+		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
+		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
+		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.useBounds = valClass.useBounds;
+		valObject.usePivotScaling = valClass.usePivotScaling;
+		
 		if (valClass.interactiveFactory != null)
 		{
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
-			valObject.hasPivotProperties = valClass.hasPivotProperties;
-			valObject.hasScaleProperties = valClass.hasScaleProperties;
-			valObject.hasTransformProperty = valClass.hasTransformProperty;
-			valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
-			valObject.hasVisibleProperty = valClass.hasVisibleProperty;
-			valObject.hasRadianRotation = valClass.hasRadianRotation;
-			valObject.useBounds = valClass.useBounds;
-			valObject.usePivotScaling = valClass.usePivotScaling;
+			interactiveObjectController.register(valObject.interactiveObject);
 		}
 		
 		registerObjectInternal(valObject);
@@ -1015,6 +981,7 @@ class ValEditor
 		
 		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
+		valObject.getBoundsFunctionName = valClass.getBoundsFunctionName;
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
 		valObject.hasScaleProperties = valClass.hasScaleProperties;
 		valObject.hasTransformProperty = valClass.hasTransformProperty;
@@ -1034,6 +1001,7 @@ class ValEditor
 		if (valClass.interactiveFactory != null)
 		{
 			valObject.interactiveObject = valClass.interactiveFactory(valObject);
+			interactiveObjectController.register(valObject.interactiveObject);
 		}
 		
 		if (registerToTemplate)

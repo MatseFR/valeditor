@@ -22,7 +22,9 @@ class ContainerEvent extends Event
 	inline static public var LAYER_VISIBILITY_CHANGE:String = "layer_visibility_change";
 	
 	inline static public var OBJECT_ADDED:String = "object_added";
+	inline static public var OBJECT_ADDED_TO_CONTAINER:String = "object_added_to_container";
 	inline static public var OBJECT_REMOVED:String = "object_removed";
+	inline static public var OBJECT_REMOVED_FROM_CONTAINER:String = "object_removed_from_container";
 	inline static public var OBJECT_ACTIVATED:String = "object_activated";
 	inline static public var OBJECT_DEACTIVATED:String = "object_deactivated";
 	inline static public var OBJECT_FUNCTION_CALLED:String = "object_function_called";

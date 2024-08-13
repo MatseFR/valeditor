@@ -1,6 +1,7 @@
 package valeditor;
 
 import haxe.Constraints.Function;
+import openfl.errors.Error;
 import openfl.geom.Rectangle;
 import valedit.ExposedCollection;
 import valedit.IValEditContainer;
@@ -10,6 +11,7 @@ import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.value.ExposedFunction;
 import valedit.value.base.ExposedValue;
+import valeditor.editor.action.ValEditorAction;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
@@ -34,7 +36,6 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		return new ValEditorObject(clss, id);
 	}
 	
-	public var container(get, set):IValEditContainer;
 	public var getBoundsFunctionName(get, set):String;
 	public var hasBoundsFunction(get, never):Bool;
 	public var hasPivotProperties:Bool;
@@ -58,13 +59,23 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	public var useBounds:Bool;
 	public var usePivotScaling:Bool;
 	
-	private var _container:IValEditContainer;
-	private function get_container():IValEditContainer { return this._container; }
-	private function set_container(value:IValEditContainer):IValEditContainer
+	override function set_container(value:IValEditContainer):IValEditContainer 
 	{
-		if (value == this._container) return value;
+		if (this._container == value) return value;
 		
-		return this._container = value;
+		if (this.template != null)
+		{
+			if (value == null)
+			{
+				cast(this.template, ValEditorTemplate).suspendInstance(this);
+			}
+			else if (this.isSuspended)
+			{
+				cast(this.template, ValEditorTemplate).unsuspendInstance(this);
+			}
+		}
+		
+		return super.set_container(value);
 	}
 	
 	override function set_defaultCollection(value:ExposedCollection):ExposedCollection 
@@ -82,7 +93,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		return super.set_defaultCollection(value);
 	}
 	
-	private var _getBoundsFunctionName:String = "getBounds";
+	private var _getBoundsFunctionName:String;
 	private function get_getBoundsFunctionName():String { return this._getBoundsFunctionName; }
 	private function set_getBoundsFunctionName(value:String):String
 	{
@@ -183,6 +194,8 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	private var _restoreKeyFrames:Array<ValEditorKeyFrame> = new Array<ValEditorKeyFrame>();
 	private var _restoreKeyFramesCollections:Array<ExposedCollection> = new Array<ExposedCollection>();
 	
+	private var _registeredActions:Array<ValEditorAction> = new Array<ValEditorAction>();
+	
 	public function new(clss:ValEditClass, ?id:String) 
 	{
 		super(clss, id);
@@ -208,6 +221,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 			this._selectionBox = null;
 		}
 		
+		this._boundsFunction = null;
 		this.container = null;
 		this.getBoundsFunctionName = "getBounds";
 		this.hasPivotProperties = false;
@@ -221,6 +235,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		this.isSelectable = true;
 		this.isSuspended = false;
 		this.save = true;
+		this.useBounds = false;
 		this.usePivotScaling = false;
 		
 		this._restoreKeyFrames.resize(0);
@@ -234,18 +249,39 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	override public function pool():Void 
 	{
 		clear();
+		// DEBUG
+		// TODO : remove when no longer useful
+		if (_POOL.indexOf(this) != -1)
+		{
+			throw new Error("ValEditorObject.pool ::: object already in pool");
+		}
+		//\DEBUG
 		_POOL[_POOL.length] = this;
+		this._isInPool = true;
+	}
+	
+	public function registerAction(action:ValEditorAction):Void
+	{
+		this._registeredActions[this._registeredActions.length] = action;
+	}
+	
+	public function unregisterAction(action:ValEditorAction):Void
+	{
+		this._registeredActions.remove(action);
 	}
 	
 	override public function canBeDestroyed():Bool 
 	{
-		return this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended;
+		return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended && this._registeredActions.length == 0;
 	}
 	
 	override public function ready():Void 
 	{
 		super.ready();
-		this._boundsFunction = Reflect.field(this.object, this.getBoundsFunctionName);
+		if (this.getBoundsFunctionName != null)
+		{
+			this._boundsFunction = Reflect.field(this.object, this.getBoundsFunctionName);
+		}
 	}
 	
 	public function applyClassVisibility(visibility:ClassVisibilityCollection):Void
@@ -333,10 +369,10 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 	{
 		super.addKeyFrame(keyFrame, collection);
 		this._keyFrameToCollection.get(keyFrame).valEditorObject = this;
-		if (this.isSuspended && this.template != null)
-		{
-			cast(this.template, ValEditorTemplate).unsuspendInstance(this);
-		}
+		//if (this.isSuspended && this.template != null)
+		//{
+			//cast(this.template, ValEditorTemplate).unsuspendInstance(this);
+		//}
 	}
 	
 	override public function removeKeyFrame(keyFrame:ValEditKeyFrame, poolCollection:Bool = true):Void 
@@ -345,11 +381,13 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		{
 			this._keyFrameToCollection.get(keyFrame).valEditorObject = null;
 		}
+		
 		super.removeKeyFrame(keyFrame, poolCollection);
-		if (this.numKeyFrames == 0 && this.template != null)
-		{
-			cast(this.template, ValEditorTemplate).suspendInstance(this);
-		}
+		
+		//if (this.numKeyFrames == 0 && this.template != null)
+		//{
+			//cast(this.template, ValEditorTemplate).suspendInstance(this);
+		//}
 	}
 	
 	override public function setKeyFrame(keyFrame:ValEditKeyFrame):Void 
@@ -359,18 +397,21 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		{
 			this.currentCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 		}
+		
 		super.setKeyFrame(keyFrame);
+		
 		if (this.currentCollection != null)
 		{
 			this.currentCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
-		}
-		if (this._interactiveObject != null)
-		{
-			this._interactiveObject.objectUpdate(this);
-		}
-		if (this._selectionBox != null)
-		{
-			this._selectionBox.objectUpdate(this);
+			
+			if (this._interactiveObject != null)
+			{
+				this._interactiveObject.objectUpdate(this);
+			}
+			if (this._selectionBox != null)
+			{
+				this._selectionBox.objectUpdate(this);
+			}
 		}
 	}
 	
@@ -542,6 +583,7 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		{
 			if (this.template != null)
 			{
+				json.templateID = this.template.id;
 				json.defaultCollection = this._defaultCollection.toJSONSave(null, false, this.template.collection);
 			}
 			else
@@ -558,15 +600,15 @@ class ValEditorObject extends ValEditObject implements IChangeUpdate
 		if (json == null) json = {};
 		
 		json.id = this.id;
-		if (this._objectID != null)
-		{
-			json.objectID = this._objectID;
-		}
-		json.templateID = this.template.id;
+		//if (this._objectID != null)
+		//{
+			//json.objectID = this._objectID;
+		//}
 		var collection:ExposedCollection = this._keyFrameToCollection.get(keyFrame);
 		
 		if (this.template != null)
 		{
+			json.templateID = this.template.id;
 			json.collection = collection.toJSONSave(null, false, this.template.collection);
 		}
 		else

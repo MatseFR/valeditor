@@ -1,7 +1,6 @@
 package valeditor.editor.action.container;
 
 import openfl.errors.Error;
-import valeditor.IValEditorContainer;
 import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
 import valeditor.editor.action.selection.SelectionClear;

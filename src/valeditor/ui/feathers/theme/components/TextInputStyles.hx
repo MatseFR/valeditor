@@ -42,14 +42,14 @@ class TextInputStyles
 	
 	static private function textInput_full_width(input:TextInput):Void
 	{
-		valeditor.ui.feathers.theme.simple.components.TextInputStyles.textInput(input);
+		valeditor.ui.feathers.theme.simple.components.TextInputStyles.Default(input);
 		
 		input.layoutData = new HorizontalLayoutData(100);
 	}
 	
 	static private function textInput_numeric_small(input:TextInput):Void
 	{
-		valeditor.ui.feathers.theme.simple.components.TextInputStyles.textInput(input);
+		valeditor.ui.feathers.theme.simple.components.TextInputStyles.Default(input);
 		
 		if (input.layoutData != null && Std.isOfType(input.layoutData, HorizontalLayoutData))
 		{
@@ -61,7 +61,7 @@ class TextInputStyles
 	
 	static private function textInput_numeric_medium(input:TextInput):Void
 	{
-		valeditor.ui.feathers.theme.simple.components.TextInputStyles.textInput(input);
+		valeditor.ui.feathers.theme.simple.components.TextInputStyles.Default(input);
 		
 		if (input.layoutData != null && Std.isOfType(input.layoutData, HorizontalLayoutData))
 		{
@@ -73,7 +73,7 @@ class TextInputStyles
 	
 	static private function textInput_numeric_large(input:TextInput):Void
 	{
-		valeditor.ui.feathers.theme.simple.components.TextInputStyles.textInput(input);
+		valeditor.ui.feathers.theme.simple.components.TextInputStyles.Default(input);
 		
 		if (input.layoutData != null && Std.isOfType(input.layoutData, HorizontalLayoutData))
 		{

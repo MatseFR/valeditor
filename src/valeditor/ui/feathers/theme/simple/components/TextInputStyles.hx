@@ -21,7 +21,7 @@ class TextInputStyles
 		TextInputStyles.theme = theme;
 		
 		if (styleProvider.getStyleFunction(TextInput, null) == null) {
-			styleProvider.setStyleFunction(TextInput, null, textInput);
+			styleProvider.setStyleFunction(TextInput, null, Default);
 		}
 		if (styleProvider.getStyleFunction(TextInput, TextInput.VARIANT_SEARCH) == null) {
 			styleProvider.setStyleFunction(TextInput, TextInput.VARIANT_SEARCH, function(input:TextInput):Void {
@@ -60,8 +60,7 @@ class TextInputStyles
 		//}
 	}
 	
-	
-	static public function textInput(input:TextInput):Void
+	static public function Default(input:TextInput):Void
 	{
 		if (input.backgroundSkin == null) {
 			var inputSkin = new RectangleSkin();

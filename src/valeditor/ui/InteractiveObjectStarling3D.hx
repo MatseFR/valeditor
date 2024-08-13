@@ -5,6 +5,7 @@ import starling.display.Quad;
 import starling.display.Sprite3D;
 import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
+import valeditor.ValEditorObject;
 import valeditor.utils.MathUtil;
 
 /**
@@ -21,9 +22,54 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		return new InteractiveObjectStarling3D(minWidth, minHeight);
 	}
 	
+	public var debug(get, set):Bool;
+	public var debugAlpha(get, set):Float;
+	public var debugColor(get, set):Int;
 	public var minHeight(get, set):Float;
 	public var minWidth(get, set):Float;
 	public var visibilityLocked:Bool;
+	
+	private var _debug:Bool = false;
+	private function get_debug():Bool { return this._debug; }
+	private function set_debug(value:Bool):Bool
+	{
+		if (this._debug == value) return value;
+		this._debug = value;
+		if (this._debug)
+		{
+			this._quad.alpha = this._debugAlpha;
+			this._quad.color = this._debugColor;
+		}
+		else
+		{
+			this._quad.alpha = 0.0;
+			this._quad.color = this._debugColor;
+		}
+		return this._debug;
+	}
+	
+	private var _debugAlpha:Float = 0.25;
+	private function get_debugAlpha():Float { return this._debugAlpha; }
+	private function set_debugAlpha(value:Float):Float
+	{
+		if (this._debugAlpha == value) return value;
+		this._debugAlpha = value;
+		if (this._debug)
+		{
+			this._quad.alpha = this._debugAlpha;
+		}
+		return this._debugAlpha;
+	}
+	
+	private var _debugColor:Int = 0xff0000;
+	private function get_debugColor():Int { return this._debugColor; }
+	private function set_debugColor(value:Int):Int
+	{
+		if (this._debugColor == value) return value;
+		this._debugColor = value;
+		this._quad.color = this._debugColor;
+		return this._debugColor;
+	}
 	
 	private var _minHeight:Float;
 	private function get_minHeight():Float { return this._minHeight; }
@@ -66,6 +112,7 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	}
 	
 	private var _interestMap:Map<String, Bool>;
+	private var _object:ValEditorObject;
 	private var _quad:Quad;
 	
 	public function new(?minWidth:Float, ?minHeight:Float) 
@@ -90,17 +137,24 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		this._interestMap.set(RegularPropertyName.HEIGHT, true);
 		this._interestMap.set(RegularPropertyName.VISIBLE, true);
 		
-		this._quad = new Quad(1, 1, 0xff0000);
-		this._quad.alpha = 0.25;
+		this._quad = new Quad(1, 1, this._debugColor);
+		this._quad.alpha = 0.0;
 		addChild(this._quad);
 		
 		setTo(minWidth, minHeight);
 	}
 	
+	private function clear():Void
+	{
+		this._object = null;
+		this.visible = true;
+		this.visibilityLocked = false;
+	}
+	
 	public function pool():Void
 	{
 		this.removeFromParent();
-		this.visibilityLocked = false;
+		clear();
 		_POOL[_POOL.length] = this;
 	}
 	
@@ -122,20 +176,21 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		if (object.useBounds)
+		this._object = object;
+		if (this._object.useBounds)
 		{
 			var scaleX:Float = 1.0;
 			var scaleY:Float = 1.0;
 			var scaleZ:Float = 1.0;
 			var width:Float;
 			var height:Float;
-			var bounds:Rectangle = object.getBounds(object.object);
+			var bounds:Rectangle = this._object.getBounds(this._object.object);
 			
-			if (object.hasScaleProperties)
+			if (this._object.hasScaleProperties)
 			{
-				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
-				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
-				scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
+				scaleX = this._object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = this._object.getProperty(RegularPropertyName.SCALE_Y);
+				scaleZ = this._object.getProperty(RegularPropertyName.SCALE_Z);
 				
 				width = bounds.width * Math.abs(scaleX);
 				height = bounds.height * Math.abs(scaleY);
@@ -173,26 +228,26 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 				height = bounds.height;
 			}
 			
-			if (object.hasPivotProperties)
+			if (this._object.hasPivotProperties)
 			{
-				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
+				if (this._object.isDisplayObject && this._object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					if (object.usePivotScaling)
+					if (this._object.usePivotScaling)
 					{
-						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
-						this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z) * Math.abs(scaleZ);
+						this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+						this.pivotZ = this._object.getProperty(RegularPropertyName.PIVOT_Z) * Math.abs(scaleZ);
 					}
 					else
 					{
-						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
-						this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+						this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y);
+						this.pivotZ = this._object.getProperty(RegularPropertyName.PIVOT_Z);
 					}
 					
-					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
-					this.z = object.getProperty(RegularPropertyName.Z);
+					this.x = this._object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = this._object.getProperty(RegularPropertyName.Y) + bounds.y;
+					this.z = this._object.getProperty(RegularPropertyName.Z);
 				}
 				else
 				{
@@ -200,9 +255,9 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 					this.pivotY = -bounds.y * Math.abs(scaleY);
 					this.pivotZ = 0;
 					
-					this.x = object.getProperty(RegularPropertyName.X);
-					this.y = object.getProperty(RegularPropertyName.Y);
-					this.z = object.getProperty(RegularPropertyName.Z);
+					this.x = this._object.getProperty(RegularPropertyName.X);
+					this.y = this._object.getProperty(RegularPropertyName.Y);
+					this.z = this._object.getProperty(RegularPropertyName.Z);
 				}
 			}
 			else
@@ -211,9 +266,9 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 				this.pivotY = -bounds.y * Math.abs(scaleY);
 				this.pivotZ = 0;
 				
-				this.x = object.getProperty(RegularPropertyName.X);
-				this.y = object.getProperty(RegularPropertyName.Y);
-				this.z = object.getProperty(RegularPropertyName.Z);
+				this.x = this._object.getProperty(RegularPropertyName.X);
+				this.y = this._object.getProperty(RegularPropertyName.Y);
+				this.z = this._object.getProperty(RegularPropertyName.Z);
 			}
 			
 			if (width < this._minWidth) width = this._minWidth;
@@ -221,10 +276,16 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 			
 			this._quad.readjustSize(width, height);
 			
-			var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
-			var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
-			var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);
-			if (object.hasRadianRotation)
+			if (this._object.hasProperty(RegularPropertyName.SKEW_X))
+			{
+				this._quad.skewX = this._object.getProperty(RegularPropertyName.SKEW_X);
+				this._quad.skewY = this._object.getProperty(RegularPropertyName.SKEW_Y);
+			}
+			
+			var rotationX:Float = this._object.getProperty(RegularPropertyName.ROTATION_X);
+			var rotationY:Float = this._object.getProperty(RegularPropertyName.ROTATION_Y);
+			var rotationZ:Float = this._object.getProperty(RegularPropertyName.ROTATION_Z);
+			if (this._object.hasRadianRotation)
 			{
 				this.rotationX = rotationX;
 				this.rotationY = rotationY;
@@ -239,22 +300,22 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 		}
 		else
 		{
-			this.x = object.getProperty(RegularPropertyName.X);
-			this.y = object.getProperty(RegularPropertyName.Y);
-			this.z = object.getProperty(RegularPropertyName.Z);
-			if (object.hasPivotProperties)
+			this.x = this._object.getProperty(RegularPropertyName.X);
+			this.y = this._object.getProperty(RegularPropertyName.Y);
+			this.z = this._object.getProperty(RegularPropertyName.Z);
+			if (this._object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (this._object.usePivotScaling)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(object.getProperty(RegularPropertyName.SCALE_X));
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(object.getProperty(RegularPropertyName.SCALE_Y));
-					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);// * Math.abs(object.getProperty(RegularPropertyName.SCALE_Z));
+					this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(this._object.getProperty(RegularPropertyName.SCALE_X));
+					this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(this._object.getProperty(RegularPropertyName.SCALE_Y));
+					this.pivotZ = this._object.getProperty(RegularPropertyName.PIVOT_Z);// * Math.abs(this._object.getProperty(RegularPropertyName.SCALE_Z));
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
-					this.pivotZ = object.getProperty(RegularPropertyName.PIVOT_Z);
+					this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotZ = this._object.getProperty(RegularPropertyName.PIVOT_Z);
 				}
 			}
 			else
@@ -264,11 +325,11 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 				this.pivotZ = 0;
 			}
 			
-			if (object.hasScaleProperties)
+			if (this._object.hasScaleProperties)
 			{
-				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
-				var scaleZ:Float = object.getProperty(RegularPropertyName.SCALE_Z);
+				var scaleX:Float = this._object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = this._object.getProperty(RegularPropertyName.SCALE_Y);
+				var scaleZ:Float = this._object.getProperty(RegularPropertyName.SCALE_Z);
 				
 				if (scaleX < 0)
 				{
@@ -303,30 +364,41 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 				this.scaleZ = 1;
 			}
 			
-			var rotationX:Float = object.getProperty(RegularPropertyName.ROTATION_X);
-			var rotationY:Float = object.getProperty(RegularPropertyName.ROTATION_Y);
-			var rotationZ:Float = object.getProperty(RegularPropertyName.ROTATION_Z);
+			var rotationX:Float = this._object.getProperty(RegularPropertyName.ROTATION_X);
+			var rotationY:Float = this._object.getProperty(RegularPropertyName.ROTATION_Y);
+			var rotationZ:Float = this._object.getProperty(RegularPropertyName.ROTATION_Z);
 			
-			object.setProperty(RegularPropertyName.ROTATION_X, 0.0, true, false);
-			object.setProperty(RegularPropertyName.ROTATION_Y, 0.0, true, false);
-			object.setProperty(RegularPropertyName.ROTATION_Z, 0.0, true, false);
+			this._object.setProperty(RegularPropertyName.ROTATION_X, 0.0, true, false);
+			this._object.setProperty(RegularPropertyName.ROTATION_Y, 0.0, true, false);
+			this._object.setProperty(RegularPropertyName.ROTATION_Z, 0.0, true, false);
 			
 			this.rotationX = 0;
 			this.rotationY = 0;
 			this.rotationZ = 0;
 			
-			var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+			var width:Float = this._object.getProperty(RegularPropertyName.WIDTH);
 			if (width < this._minWidth) width = this._minWidth;
-			var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+			var height:Float = this._object.getProperty(RegularPropertyName.HEIGHT);
 			if (height < this._minHeight) height = this._minHeight;
 			
 			this._quad.readjustSize(width, height);
 			
-			object.setProperty(RegularPropertyName.ROTATION_X, rotationX, true, false);
-			object.setProperty(RegularPropertyName.ROTATION_Y, rotationY, true, false);
-			object.setProperty(RegularPropertyName.ROTATION_Z, rotationZ, true, false);
+			if (this._object.hasProperty(RegularPropertyName.SKEW_X))
+			{
+				this._quad.skewX = this._object.getProperty(RegularPropertyName.SKEW_X);
+				this._quad.skewY = this._object.getProperty(RegularPropertyName.SKEW_Y);
+			}
+			else
+			{
+				this._quad.skewX = 0;
+				this._quad.skewY = 0;
+			}
 			
-			if (object.hasRadianRotation)
+			this._object.setProperty(RegularPropertyName.ROTATION_X, rotationX, true, false);
+			this._object.setProperty(RegularPropertyName.ROTATION_Y, rotationY, true, false);
+			this._object.setProperty(RegularPropertyName.ROTATION_Z, rotationZ, true, false);
+			
+			if (this._object.hasRadianRotation)
 			{
 				this.rotationX = rotationX;
 				this.rotationY = rotationY;
@@ -339,12 +411,12 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 				this.rotationZ = MathUtil.deg2rad(rotationZ);
 			}
 			
-			this.scaleZ = object.getProperty(RegularPropertyName.SCALE_Z);
+			this.scaleZ = this._object.getProperty(RegularPropertyName.SCALE_Z);
 		}
 		
-		if (!this.visibilityLocked && object.hasVisibleProperty)
+		if (!this.visibilityLocked && this._object.hasVisibleProperty)
 		{
-			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
+			this.visible = this._object.getProperty(RegularPropertyName.VISIBLE);
 		}
 	}
 	

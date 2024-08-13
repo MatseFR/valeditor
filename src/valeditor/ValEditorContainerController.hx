@@ -57,8 +57,8 @@ class ValEditorContainerController implements IAnimatable
 		
 		if (this._containerObject != null)
 		{
-			this._container.removeEventListener(ContainerEvent.OBJECT_ADDED, onObjectAdded);
-			this._container.removeEventListener(ContainerEvent.OBJECT_REMOVED, onObjectRemoved);
+			this._container.removeEventListener(ContainerEvent.OBJECT_ADDED_TO_CONTAINER, onObjectAdded);
+			this._container.removeEventListener(ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, onObjectRemoved);
 			
 			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageMouseClick);
@@ -85,8 +85,8 @@ class ValEditorContainerController implements IAnimatable
 		{
 			this._container = value.object;
 			
-			this._container.addEventListener(ContainerEvent.OBJECT_ADDED, onObjectAdded);
-			this._container.addEventListener(ContainerEvent.OBJECT_REMOVED, onObjectRemoved);
+			this._container.addEventListener(ContainerEvent.OBJECT_ADDED_TO_CONTAINER, onObjectAdded);
+			this._container.addEventListener(ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, onObjectRemoved);
 			
 			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			
@@ -172,6 +172,8 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function registerObject(object:ValEditorObject):Void
 	{
+		trace("ValEditorContainerController.registerObject");
+		
 		if (object.isDisplayObject)
 		{
 			switch (object.displayObjectType)
@@ -216,6 +218,8 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function unregisterObject(object:ValEditorObject):Void
 	{
+		trace("ValEditorContainerController.unregisterObject");
+		
 		if (object.isDisplayObject)
 		{
 			switch (object.displayObjectType)
@@ -313,7 +317,7 @@ class ValEditorContainerController implements IAnimatable
 		{
 			for (object in this.selection)
 			{
-				if (object.isDisplayObject)
+				if (object.isDisplayObject || object.isContainer)
 				{
 					object.mouseRestoreX = object.getProperty(RegularPropertyName.X);
 					object.mouseRestoreY = object.getProperty(RegularPropertyName.Y);
@@ -375,7 +379,7 @@ class ValEditorContainerController implements IAnimatable
 			{
 				for (obj in this.selection)
 				{
-					if (obj.isDisplayObject)
+					if (obj.isDisplayObject || obj.isContainer)
 					{
 						obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
 						obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
@@ -494,7 +498,7 @@ class ValEditorContainerController implements IAnimatable
 		{
 			for (obj in this.selection)
 			{
-				if (obj.isDisplayObject)
+				if (obj.isDisplayObject || obj.isContainer)
 				{
 					obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
 					obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
@@ -525,8 +529,8 @@ class ValEditorContainerController implements IAnimatable
 		this._mouseDownWithCtrl = false;
 		this._mouseDownWithShift = false;
 		
-		var moveX:Float = Lib.current.stage.mouseX - this._containerObject.getProperty(RegularPropertyName.X) - this._mouseObjectOffsetX + this._container.cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
-		var moveY:Float = Lib.current.stage.mouseY - this._containerObject.getProperty(RegularPropertyName.Y) - this._mouseObjectOffsetY + this._container.cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
+		var moveX:Float = Lib.current.stage.mouseX - this._container.x - this._mouseObjectOffsetX + this._container.cameraX - this._mouseObject.getProperty(RegularPropertyName.X);
+		var moveY:Float = Lib.current.stage.mouseY - this._container.y - this._mouseObjectOffsetY + this._container.cameraY - this._mouseObject.getProperty(RegularPropertyName.Y);
 		
 		if (!this.selection.hasObject(this._mouseObject))
 		{
@@ -607,7 +611,7 @@ class ValEditorContainerController implements IAnimatable
 			{
 				for (obj in this.selection)
 				{
-					if (obj.isDisplayObject)
+					if (obj.isDisplayObject || obj.isContainer)
 					{
 						obj.mouseRestoreX = obj.getProperty(RegularPropertyName.X);
 						obj.mouseRestoreY = obj.getProperty(RegularPropertyName.Y);
@@ -667,7 +671,7 @@ class ValEditorContainerController implements IAnimatable
 				{
 					for (obj in this.selection)
 					{
-						if (obj.isDisplayObject)
+						if (obj.isDisplayObject || obj.isContainer)
 						{
 							obj.setProperty(RegularPropertyName.X, obj.mouseRestoreX);
 							obj.setProperty(RegularPropertyName.Y, obj.mouseRestoreY);
@@ -800,7 +804,7 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function select(object:ValEditorObject):Void
 	{
-		if (object.isDisplayObject)
+		if (object.isDisplayObject || object.isContainer)
 		{
 			var box:SelectionBox = SelectionBox.fromPool();
 			this._container.containerUI.addChild(box);
@@ -816,7 +820,7 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function unselect(object:ValEditorObject):Void
 	{
-		if (object.isDisplayObject)
+		if (object.isDisplayObject || object.isContainer)
 		{
 			var box:SelectionBox = object.selectionBox;
 			if (box != null)

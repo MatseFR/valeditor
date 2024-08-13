@@ -57,9 +57,11 @@ import valeditor.editor.action.MultiAction;
 import valeditor.editor.file.FileController;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
+import valeditor.editor.settings.StarlingSettings;
 import valeditor.events.SelectionEvent;
 import valeditor.input.InputActionID;
 import valeditor.ui.InteractiveFactories;
+import valeditor.ui.InteractiveObjectController;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.view.EditorView;
@@ -124,6 +126,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private var _helpMenuCollection:ArrayCollection<MenuItem>;
 	private var _creditsItem:MenuItem;
 	private var _versionsItem:MenuItem;
+	
+	// debug menu
+	private var _debugMenuCollection:ArrayCollection<MenuItem>;
+	private var _interactiveObjectsItem:MenuItem;
 	
 	public function new() 
 	{
@@ -242,6 +248,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 			this._versionsItem
 		]);
 		this.editView.addMenu("help", "Help", onHelpMenuCallback, null, this._helpMenuCollection);
+		
+		// Debug menu
+		this._interactiveObjectsItem = new MenuItem("debug-interactiveObjects", "Interactive Objects");
+		
+		this._debugMenuCollection = new ArrayCollection<MenuItem>([
+			this._interactiveObjectsItem
+		]);
+		this.editView.addMenu("debug", "Debug", onDebugMenuCallback, null, this._debugMenuCollection);
 	}
 	
 	override function exposeData():Void 
@@ -258,6 +272,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 	override function ready():Void 
 	{
 		super.ready();
+		
+		trace(Starling.current.stage.focalLength);
+		trace(Starling.current.stage.projectionOffset);
 		
 		//Reflect.callMethod(FeathersWindows, FeathersWindows.showAssetBrowser, []);
 		//Reflect.callMethod(null, FeathersWindows.showAssetBrowser, []);
@@ -466,6 +483,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 			
 			case "versions" :
 				FeathersWindows.showVersionsWindow();
+		}
+	}
+	
+	private function onDebugMenuCallback(item:MenuItem):Void
+	{
+		switch (item.id)
+		{
+			case "debug-interactiveObjects" :
+				FeathersWindows.showInteractiveObjectDebugWindow(ValEditor.interactiveObjectController);
 		}
 	}
 	
@@ -1173,6 +1199,20 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(starling.text.TextField, settings);
 		settings.clear();
 		
+		// TextFormat
+		settings.canBeCreated = true;
+		settings.addCategory(CategoryID.STARLING);
+		settings.addCategory(CategoryID.STARLING_TEXT);
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.collection = StarlingTextData.exposeTextFormat();
+		//settings.visibilityCollection = StarlingTextData
+		settings.constructorCollection = StarlingTextData.exposeTextFormatConstructor();
+		ValEditor.registerClass(starling.text.TextFormat, settings);
+		settings.clear();
+		
+		// StarlingSettings
+		ValEditor.registerClassSimple(StarlingSettings, false, SettingsData.exposeStarlingSettings());
+		
 		settings.pool();
 	}
 	#end
@@ -1188,6 +1228,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForLoading = SpriteContainer.fromPool;
 		settings.creationFunctionForTemplateInstance = SpriteContainer.fromPool;
 		settings.disposeFunctionName = "pool";
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.exportClassName = Type.getClassName(SpriteContainer);
 		settings.isContainer = true;
 		settings.isContainerOpenFL = true;
@@ -1197,6 +1238,42 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(SpriteContainer, settings);
 		settings.clear();
 		
+		// SpriteContainerStarling
+		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = SpriteContainerStarling.fromPool;
+		settings.creationFunctionForLoading = SpriteContainerStarling.fromPool;
+		settings.creationFunctionForTemplateInstance = SpriteContainerStarling.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.exportClassName = Type.getClassName(SpriteContainerStarling);
+		settings.isContainer = true;
+		settings.isContainerStarling = true;
+		settings.collection = ContainerData.exposeSpriteContainerStarling();
+		settings.visibilityCollection = ContainerData.getSpriteContainerStarlingVisibility();
+		settings.hasRadianRotation = true;
+		settings.useBounds = true;
+		ValEditor.registerClass(SpriteContainerStarling, settings);
+		settings.clear();
+		
+		// SpriteContainerStarling3D
+		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = SpriteContainerStarling3D.fromPool;
+		settings.creationFunctionForLoading = SpriteContainerStarling3D.fromPool;
+		settings.creationFunctionForTemplateInstance = SpriteContainerStarling3D.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
+		settings.exportClassName = Type.getClassName(SpriteContainerStarling3D);
+		settings.isContainer = true;
+		settings.isContainerStarling = true;
+		settings.collection = ContainerData.exposeSpriteContainerStarling3D();
+		settings.visibilityCollection = ContainerData.getSpriteContainerStarling3DVisibility();
+		settings.useBounds = true;
+		settings.hasRadianRotation = true;
+		ValEditor.registerClass(SpriteContainerStarling3D, settings);
+		settings.clear();
+		
 		// ValEditorContainer
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1204,6 +1281,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForLoading = ValEditorContainer.fromPool;
 		settings.creationFunctionForTemplateInstance = ValEditorContainer.fromPool;
 		settings.disposeFunctionName = "pool";
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl_starling.png");
 		settings.exportClassName = Type.getClassName(ValEditContainer);
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
@@ -1233,9 +1311,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(ValEditorContainerRoot, settings);
 		settings.clear();
 		
+		// ValEditorKeyFrame
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
+		// ExportSettings
 		ValEditor.registerClassSimple(ExportSettings, false, SettingsData.exposeExportSettings());
+		// FileSettings
 		ValEditor.registerClassSimple(FileSettings, false, SettingsData.exposeFileSettings());
+		// InteractiveObjectController
+		ValEditor.registerClassSimple(InteractiveObjectController, false, SettingsData.exposeInteractiveObjectController());
 		
 		settings.pool();
 	}

@@ -40,7 +40,7 @@ class Library extends LayoutGroup
 		]);
 		
 		this._tabNavigator = new TabNavigator(views);
-		this._tabNavigator.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		this._tabNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
 		addChild(this._tabNavigator);
 	}
 	

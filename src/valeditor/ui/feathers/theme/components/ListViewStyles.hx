@@ -5,6 +5,7 @@ import feathers.data.ListViewItemState;
 import feathers.layout.HorizontalListLayout;
 import feathers.layout.VerticalListLayout;
 import feathers.skins.RectangleSkin;
+import feathers.skins.UnderlineSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
 import feathers.utils.DisplayObjectRecycler;
@@ -20,6 +21,7 @@ import valeditor.ui.feathers.renderers.RulerItemRenderer;
 import valeditor.ui.feathers.renderers.SpriteTextRenderer;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.theme.simple.SimpleTheme;
+import valeditor.ui.feathers.variant.ItemRendererVariant;
 import valeditor.ui.feathers.variant.ListViewVariant;
 
 /**
@@ -48,6 +50,11 @@ class ListViewStyles
 		if (styleProvider.getStyleFunction(ListView, ListViewVariant.CONTEXT_MENU) == null)
 		{
 			styleProvider.setStyleFunction(ListView, ListViewVariant.CONTEXT_MENU, contextMenu);
+		}
+		
+		if (styleProvider.getStyleFunction(ListView, ListViewVariant.OPEN_CONTAINERS) == null)
+		{
+			styleProvider.setStyleFunction(ListView, ListViewVariant.OPEN_CONTAINERS, openContainers);
 		}
 		
 		if (styleProvider.getStyleFunction(ListView, ListViewVariant.TIMELINE) == null)
@@ -99,6 +106,94 @@ class ListViewStyles
 		listView.paddingRight = 1.0;
 		listView.paddingBottom = 1.0;
 		listView.paddingLeft = 1.0;
+	}
+	
+	static private function openContainers(listView:ListView):Void
+	{
+		var isDesktop = DeviceUtil.isDesktop();
+		
+		listView.autoHideScrollBars = !isDesktop;
+		listView.fixedScrollBars = isDesktop;
+		
+		if (listView.layout == null) {
+			var layout = new HorizontalListLayout();
+			//layout.requestedRowCount = 5.0;
+			listView.layout = layout;
+		}
+		
+		if (listView.backgroundSkin == null) {
+			var backgroundSkin = new UnderlineSkin();
+			backgroundSkin.fill = theme.getLightFill();
+			backgroundSkin.border = theme.getContrastBorderLight();
+			backgroundSkin.width = 10.0;
+			backgroundSkin.height = 10.0;
+			listView.backgroundSkin = backgroundSkin;
+		}
+		
+		if (listView.focusRectSkin == null) {
+			var focusRectSkin = new RectangleSkin();
+			focusRectSkin.fill = null;
+			focusRectSkin.border = theme.getFocusBorder();
+			listView.focusRectSkin = focusRectSkin;
+		}
+		
+		listView.customItemRendererVariant = ItemRendererVariant.OPEN_CONTAINER;
+	}
+	
+	static private function timeLine(list:ListView):Void
+	{
+		list.scrollPolicyX = ScrollPolicy.OFF;
+		list.scrollPolicyY = ScrollPolicy.OFF;
+		list.layout = new HorizontalListLayout();
+		
+		if (list.backgroundSkin == null) {
+			var backgroundSkin = new RectangleSkin();
+			backgroundSkin.fill = theme.getLightFill();
+			backgroundSkin.width = 10.0;
+			backgroundSkin.height = 10.0;
+			list.backgroundSkin = backgroundSkin;
+		}
+		
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
+			return BitmapScrollRenderer.fromPool(BMD_FRAMES, frameRectMap);
+		});
+		recycler.update = timeLine_itemUpdate;
+		recycler.destroy = timeLine_itemDestroy;
+		list.itemRendererRecycler = recycler;
+	}
+	
+	static private function timeLine_numbers(list:ListView):Void
+	{
+		list.scrollPolicyX = ScrollPolicy.OFF;
+		list.scrollPolicyY = ScrollPolicy.OFF;
+		list.selectable = false;
+		list.mouseEnabled = false;
+		list.mouseChildren = false;
+		list.layout = new HorizontalListLayout();
+		
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
+			return SpriteTextRenderer.fromPool(itemWidth, itemHeight);
+		});
+		recycler.update = timeLine_numbers_itemUpdate;
+		recycler.destroy = timeLine_numbers_itemDestroy;
+		list.itemRendererRecycler = recycler;
+	}
+	
+	static private function timeLine_ruler(list:ListView):Void
+	{
+		list.scrollPolicyX = ScrollPolicy.OFF;
+		list.scrollPolicyY = ScrollPolicy.OFF;
+		//list.selectable = false;
+		list.mouseEnabled = false;
+		list.mouseChildren = false;
+		list.layout = new HorizontalListLayout();
+		
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
+			return RulerItemRenderer.fromPool(BMD_RULER, rulerRectDefault, rulerRectSelected);
+		});
+		recycler.update = timeLine_ruler_itemUpdate;
+		recycler.destroy = timeLine_ruler_itemDestroy;
+		list.itemRendererRecycler = recycler;
 	}
 	
 	static private function colorUpdate(theme:SimpleTheme):Void
@@ -586,28 +681,6 @@ class ListViewStyles
 		graphics.endFill();
 	}
 	
-	static private function timeLine(list:ListView):Void
-	{
-		list.scrollPolicyX = ScrollPolicy.OFF;
-		list.scrollPolicyY = ScrollPolicy.OFF;
-		list.layout = new HorizontalListLayout();
-		
-		if (list.backgroundSkin == null) {
-			var backgroundSkin = new RectangleSkin();
-			backgroundSkin.fill = theme.getLightFill();
-			backgroundSkin.width = 10.0;
-			backgroundSkin.height = 10.0;
-			list.backgroundSkin = backgroundSkin;
-		}
-		
-		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			return BitmapScrollRenderer.fromPool(BMD_FRAMES, frameRectMap);
-		});
-		recycler.update = timeLine_itemUpdate;
-		recycler.destroy = timeLine_itemDestroy;
-		list.itemRendererRecycler = recycler;
-	}
-	
 	static private function timeLine_itemDestroy(itemRenderer:BitmapScrollRenderer):Void
 	{
 		itemRenderer.pool();
@@ -742,50 +815,6 @@ class ListViewStyles
 		}
 	}
 	
-	static private function timeLine_ruler(list:ListView):Void
-	{
-		list.scrollPolicyX = ScrollPolicy.OFF;
-		list.scrollPolicyY = ScrollPolicy.OFF;
-		//list.selectable = false;
-		list.mouseEnabled = false;
-		list.mouseChildren = false;
-		list.layout = new HorizontalListLayout();
-		
-		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			return RulerItemRenderer.fromPool(BMD_RULER, rulerRectDefault, rulerRectSelected);
-		});
-		recycler.update = timeLine_ruler_itemUpdate;
-		recycler.destroy = timeLine_ruler_itemDestroy;
-		list.itemRendererRecycler = recycler;
-	}
-	
-	static private function timeLine_ruler_itemDestroy(item:RulerItemRenderer):Void
-	{
-		item.pool();
-	}
-	
-	static private function timeLine_ruler_itemUpdate(item:RulerItemRenderer, state:ListViewItemState):Void
-	{
-		item.selected = state.selected;
-	}
-	
-	static private function timeLine_numbers(list:ListView):Void
-	{
-		list.scrollPolicyX = ScrollPolicy.OFF;
-		list.scrollPolicyY = ScrollPolicy.OFF;
-		list.selectable = false;
-		list.mouseEnabled = false;
-		list.mouseChildren = false;
-		list.layout = new HorizontalListLayout();
-		
-		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			return SpriteTextRenderer.fromPool(itemWidth, itemHeight);
-		});
-		recycler.update = timeLine_numbers_itemUpdate;
-		recycler.destroy = timeLine_numbers_itemDestroy;
-		list.itemRendererRecycler = recycler;
-	}
-	
 	static private function timeLine_numbers_itemDestroy(item:SpriteTextRenderer):Void
 	{
 		item.pool();
@@ -801,6 +830,16 @@ class ListViewStyles
 		{
 			item.text = "";
 		}
+	}
+	
+	static private function timeLine_ruler_itemDestroy(item:RulerItemRenderer):Void
+	{
+		item.pool();
+	}
+	
+	static private function timeLine_ruler_itemUpdate(item:RulerItemRenderer, state:ListViewItemState):Void
+	{
+		item.selected = state.selected;
 	}
 	
 }

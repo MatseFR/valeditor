@@ -175,8 +175,8 @@ class TemplateLibrary extends LayoutGroup
 		this._grid.customHeaderRendererVariant = SortOrderHeaderRendererVariant.CRAMPED;
 		this._grid.addEventListener(KeyboardEvent.KEY_DOWN, onGridKeyDown, false, 500);
 		this._grid.addEventListener(KeyboardEvent.KEY_UP, onGridKeyUp);
-		this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
-		this._grid.addEventListener(FocusEvent.FOCUS_OUT, onGridFocusOut);
+		//this._grid.addEventListener(FocusEvent.FOCUS_IN, onGridFocusIn);
+		//this._grid.addEventListener(FocusEvent.FOCUS_OUT, onGridFocusOut);
 		this._grid.variant = GridView.VARIANT_BORDERLESS;
 		this._grid.allowMultipleSelection = true;
 		this._grid.resizableColumns = true;
@@ -372,29 +372,55 @@ class TemplateLibrary extends LayoutGroup
 	{
 		if (Std.isOfType(template.object.object, IValEditorContainer))
 		{
+			var action:MultiAction = MultiAction.fromPool();
+			
+			var selectionClear:SelectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
 			var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
 			containerOpen.setup(cast template.object);
-			ValEditor.actionStack.add(containerOpen);
+			action.add(containerOpen);
+			
+			ValEditor.actionStack.add(action);
 		}
 	}
 	
 	private function onTemplateOpenButton(evt:TriggerEvent):Void
 	{
+		var action:MultiAction;
+		var selectionClear:SelectionClear;
 		var container:ValEditorObject = cast cast(this._grid.selectedItem, ValEditorTemplate).object;
 		if (cast(container.object, IValEditorContainer).isOpen)
 		{
 			if (ValEditor.currentContainer != container.object)
 			{
+				action = MultiAction.fromPool();
+				
+				selectionClear = SelectionClear.fromPool();
+				selectionClear.setup(ValEditor.selection);
+				action.add(selectionClear);
+				
 				var containerMakeCurrent:ContainerMakeCurrent = ContainerMakeCurrent.fromPool();
 				containerMakeCurrent.setup(container);
-				ValEditor.actionStack.add(containerMakeCurrent);
+				action.add(containerMakeCurrent);
+				
+				ValEditor.actionStack.add(action);
 			}
 		}
 		else
 		{
+			action = MultiAction.fromPool();
+			
+			selectionClear = SelectionClear.fromPool();
+			selectionClear.setup(ValEditor.selection);
+			action.add(selectionClear);
+			
 			var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
 			containerOpen.setup(container);
-			ValEditor.actionStack.add(containerOpen);
+			action.add(containerOpen);
+			
+			ValEditor.actionStack.add(action);
 		}
 	}
 	
@@ -472,15 +498,15 @@ class TemplateLibrary extends LayoutGroup
 		}
 	}
 	
-	private function onGridFocusIn(evt:FocusEvent):Void
-	{
-		this._grid.showFocus(true);
-	}
+	//private function onGridFocusIn(evt:FocusEvent):Void
+	//{
+		//this._grid.showFocus(true);
+	//}
 	
-	private function onGridFocusOut(evt:FocusEvent):Void
-	{
-		this._grid.showFocus(false);
-	}
+	//private function onGridFocusOut(evt:FocusEvent):Void
+	//{
+		//this._grid.showFocus(false);
+	//}
 	
 	private function onGridKeyDown(evt:KeyboardEvent):Void
 	{

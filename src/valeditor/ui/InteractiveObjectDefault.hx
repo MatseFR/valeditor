@@ -5,6 +5,7 @@ import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
+import valeditor.ValEditorObject;
 import valeditor.utils.MathUtil;
 
 /**
@@ -21,6 +22,9 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		return new InteractiveObjectDefault(minWidth, minHeight);
 	}
 	
+	public var debug(get, set):Bool;
+	public var debugAlpha(get, set):Float;
+	public var debugColor(get, set):Int;
 	public var minHeight(get, set):Float;
 	public var minWidth(get, set):Float;
 	public var pivotX(get, set):Float;
@@ -28,6 +32,45 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	public var realHeight(get, set):Float;
 	public var realWidth(get, set):Float;
 	public var visibilityLocked:Bool;
+	
+	private var _debug:Bool = false;
+	private function get_debug():Bool { return this._debug; }
+	private function set_debug(value:Bool):Bool
+	{
+		if (this._debug == value) return value;
+		this._debug = value;
+		if (this._object != null)
+		{
+			objectUpdate(this._object);
+		}
+		return this._debug;
+	}
+	
+	private var _debugAlpha:Float = 0.25;
+	private function get_debugAlpha():Float { return this._debugAlpha; }
+	private function set_debugAlpha(value:Float):Float
+	{
+		if (this._debugAlpha == value) return value;
+		this._debugAlpha = value;
+		if (this._object != null)
+		{
+			objectUpdate(this._object);
+		}
+		return this._debugAlpha;
+	}
+	
+	private var _debugColor:Int = 0xff0000;
+	private function get_debugColor():Int { return this._debugColor; }
+	private function set_debugColor(value:Int):Int
+	{
+		if (this._debugColor == value) return value;
+		this._debugColor = value;
+		if (this._object != null)
+		{
+			objectUpdate(this._object);
+		}
+		return this._debugColor;
+	}
 	
 	private var _minHeight:Float;
 	private function get_minHeight():Float { return this._minHeight; }
@@ -86,6 +129,7 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	}
 	
 	private var _interestMap:Map<String, Bool>;
+	private var _object:ValEditorObject;
 	private var _shape:Shape;
 	
 	public function new(?minWidth:Float, ?minHeight:Float) 
@@ -112,10 +156,17 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		setTo(minWidth, minHeight);
 	}
 	
+	private function clear():Void
+	{
+		this._object = null;
+		this.visible = true;
+		this.visibilityLocked = false;
+	}
+	
 	public function pool():Void
 	{
 		if (this.parent != null) this.parent.removeChild(this);
-		this.visibilityLocked = false;
+		clear();
 		_POOL[_POOL.length] = this;
 	}
 	
@@ -137,18 +188,20 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 	
 	public function objectUpdate(object:ValEditorObject):Void
 	{
-		if (object.useBounds)
+		this._object = object;
+		
+		if (this._object.useBounds)
 		{
 			var scaleX:Float = 1.0;
 			var scaleY:Float = 1.0;
 			var width:Float;
 			var height:Float;
-			var bounds:Rectangle = object.getBounds(object.object);
+			var bounds:Rectangle = this._object.getBounds(object.object);
 			
-			if (object.hasScaleProperties)
+			if (this._object.hasScaleProperties)
 			{
-				scaleX = object.getProperty(RegularPropertyName.SCALE_X);
-				scaleY = object.getProperty(RegularPropertyName.SCALE_Y);
+				scaleX = this._object.getProperty(RegularPropertyName.SCALE_X);
+				scaleY = this._object.getProperty(RegularPropertyName.SCALE_Y);
 				
 				width = bounds.width * Math.abs(scaleX);
 				height = bounds.height * Math.abs(scaleY);
@@ -177,38 +230,31 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 				height = bounds.height;
 			}
 			
-			if (object.hasPivotProperties)
+			if (this._object.hasPivotProperties)
 			{
-				if (object.isDisplayObject && object.displayObjectType == DisplayObjectType.STARLING)
+				if (this._object.isDisplayObject && this._object.displayObjectType == DisplayObjectType.STARLING)
 				{
-					if (object.usePivotScaling)
+					if (this._object.usePivotScaling)
 					{
-						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
+						this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
+						this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
 					}
 					else
 					{
-						this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-						this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+						this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X);
+						this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y);
 					}
 					
-					this.x = object.getProperty(RegularPropertyName.X) + bounds.x;
-					this.y = object.getProperty(RegularPropertyName.Y) + bounds.y;
+					this.x = this._object.getProperty(RegularPropertyName.X) + bounds.x;
+					this.y = this._object.getProperty(RegularPropertyName.Y) + bounds.y;
 				}
 				else
 				{
 					this.pivotX = -bounds.x * Math.abs(scaleX);
 					this.pivotY = -bounds.y * Math.abs(scaleY);
 					
-					this.x = object.getProperty(RegularPropertyName.X);
-					this.y = object.getProperty(RegularPropertyName.Y);
-					
-					// this is ok for regular shapes
-					//this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(scaleX);
-					//this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(scaleY);
-					//
-					//this.x = object.getProperty(RegularPropertyName.X) + ((bounds.x * scaleX) + (this.pivotX * this.scaleX));// * scaleX);
-					//this.y = object.getProperty(RegularPropertyName.Y) + ((bounds.y * scaleY) + (this.pivotY * this.scaleY));// * scaleY);
+					this.x = this._object.getProperty(RegularPropertyName.X);
+					this.y = this._object.getProperty(RegularPropertyName.Y);
 				}
 			}
 			else
@@ -216,8 +262,8 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 				this.pivotX = -bounds.x * Math.abs(scaleX);
 				this.pivotY = -bounds.y * Math.abs(scaleY);
 				
-				this.x = object.getProperty(RegularPropertyName.X);
-				this.y = object.getProperty(RegularPropertyName.Y);
+				this.x = this._object.getProperty(RegularPropertyName.X);
+				this.y = this._object.getProperty(RegularPropertyName.Y);
 			}
 			
 			if (width < this._minWidth) width = this._minWidth;
@@ -225,31 +271,38 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			
 			refreshShape(width, height);
 			
-			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-			if (object.hasRadianRotation)
+			if (this._object.hasProperty(RegularPropertyName.ROTATION))
 			{
-				this.rotation = MathUtil.rad2deg(rotation);
+				var rotation:Float = this._object.getProperty(RegularPropertyName.ROTATION);
+				if (this._object.hasRadianRotation)
+				{
+					this.rotation = MathUtil.rad2deg(rotation);
+				}
+				else
+				{
+					this.rotation = rotation;
+				}
 			}
 			else
 			{
-				this.rotation = rotation;
+				this.rotation = 0;
 			}
 		}
 		else
 		{
-			this.x = object.getProperty(RegularPropertyName.X);
-			this.y = object.getProperty(RegularPropertyName.Y);
-			if (object.hasPivotProperties)
+			this.x = this._object.getProperty(RegularPropertyName.X);
+			this.y = this._object.getProperty(RegularPropertyName.Y);
+			if (this._object.hasPivotProperties)
 			{
-				if (object.usePivotScaling)
+				if (this._object.usePivotScaling)
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(object.getProperty(RegularPropertyName.SCALE_X));
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(object.getProperty(RegularPropertyName.SCALE_Y));
+					this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X) * Math.abs(this._object.getProperty(RegularPropertyName.SCALE_X));
+					this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y) * Math.abs(this._object.getProperty(RegularPropertyName.SCALE_Y));
 				}
 				else
 				{
-					this.pivotX = object.getProperty(RegularPropertyName.PIVOT_X);
-					this.pivotY = object.getProperty(RegularPropertyName.PIVOT_Y);
+					this.pivotX = this._object.getProperty(RegularPropertyName.PIVOT_X);
+					this.pivotY = this._object.getProperty(RegularPropertyName.PIVOT_Y);
 				}
 			}
 			else
@@ -258,10 +311,10 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 				this.pivotY = 0;
 			}
 			
-			if (object.hasScaleProperties)
+			if (this._object.hasScaleProperties)
 			{
-				var scaleX:Float = object.getProperty(RegularPropertyName.SCALE_X);
-				var scaleY:Float = object.getProperty(RegularPropertyName.SCALE_Y);
+				var scaleX:Float = this._object.getProperty(RegularPropertyName.SCALE_X);
+				var scaleY:Float = this._object.getProperty(RegularPropertyName.SCALE_Y);
 				
 				if (scaleX < 0)
 				{
@@ -287,31 +340,38 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 				this.scaleY = 1;
 			}
 			
-			var rotation:Float = object.getProperty(RegularPropertyName.ROTATION);
-			object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			var rotation:Float = 0;
+			if (this._object.hasProperty(RegularPropertyName.ROTATION))
+			{
+				rotation = this._object.getProperty(RegularPropertyName.ROTATION);
+				this._object.setProperty(RegularPropertyName.ROTATION, 0.0, true, false);
+			}
 			this.rotation = 0;
 			
-			var width:Float = object.getProperty(RegularPropertyName.WIDTH);
+			var width:Float = this._object.getProperty(RegularPropertyName.WIDTH);
 			if (width < this._minWidth) width = this._minWidth;
-			var height:Float = object.getProperty(RegularPropertyName.HEIGHT);
+			var height:Float = this._object.getProperty(RegularPropertyName.HEIGHT);
 			if (height < this._minHeight) height = this._minHeight;
 			
 			refreshShape(width, height);
 			
-			object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
-			if (object.hasRadianRotation)
+			if (this._object.hasProperty(RegularPropertyName.ROTATION))
 			{
-				this.rotation = MathUtil.rad2deg(rotation);
-			}
-			else
-			{
-				this.rotation = rotation;
+				this._object.setProperty(RegularPropertyName.ROTATION, rotation, true, false);
+				if (object.hasRadianRotation)
+				{
+					this.rotation = MathUtil.rad2deg(rotation);
+				}
+				else
+				{
+					this.rotation = rotation;
+				}
 			}
 		}
 		
-		if (!this.visibilityLocked && object.hasVisibleProperty)
+		if (!this.visibilityLocked && this._object.hasVisibleProperty)
 		{
-			this.visible = object.getProperty(RegularPropertyName.VISIBLE);
+			this.visible = this._object.getProperty(RegularPropertyName.VISIBLE);
 		}
 	}
 	
@@ -320,7 +380,14 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 		if (width < this._minWidth) width = this._minWidth;
 		if (height < this._minHeight) height = this._minHeight;
 		this._shape.graphics.clear();
-		this._shape.graphics.beginFill(0xff0000, 0.25);
+		if (this._debug)
+		{
+			this._shape.graphics.beginFill(this._debugColor, this._debugAlpha);
+		}
+		else
+		{
+			this._shape.graphics.beginFill(this._debugColor, 0.0);
+		}
 		this._shape.graphics.drawRect(0, 0, width, height);
 		this._shape.graphics.endFill();
 	}

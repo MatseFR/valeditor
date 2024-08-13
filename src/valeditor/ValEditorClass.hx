@@ -30,6 +30,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 	public var categories(default, null):Array<String> = new Array<String>();
 	public var classNameShort:String;
 	public var exportClassName:String;
+	public var getBoundsFunctionName:String;
 	public var hasPivotProperties:Bool;
 	public var hasScaleProperties:Bool;
 	public var hasTransformationMatrixProperty:Bool;
@@ -41,6 +42,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 	public var templates(default, null):Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
+	//public var useBoundsForPosition:Bool;
 	public var usePivotScaling:Bool;
 	public var visibilityCollectionCurrent(default, null):ClassVisibilityCollection;
 	public var visibilityCollectionDefault(get, set):ClassVisibilityCollection;
@@ -114,6 +116,7 @@ class ValEditorClass extends ValEditClass implements IChangeUpdate
 		this.iconBitmapData = null;
 		this.interactiveFactory = null;
 		this.useBounds = false;
+		//this.useBoundsForPosition = false;
 		this.usePivotScaling = false;
 		
 		this.templates.resize(0);

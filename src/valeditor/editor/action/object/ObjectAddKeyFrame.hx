@@ -2,7 +2,6 @@ package valeditor.editor.action.object;
 
 import openfl.errors.Error;
 import valedit.ExposedCollection;
-import valeditor.IValEditorTimeLineContainer;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
 import valeditor.editor.action.ValEditorAction;
@@ -32,8 +31,13 @@ class ObjectAddKeyFrame extends ValEditorAction
 	
 	override public function clear():Void 
 	{
+		this.object.unregisterAction(this);
 		if (this.status == ValEditorActionStatus.UNDONE)
 		{
+			if (this.object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(this.object);
+			}
 			if (this.collection != null)
 			{
 				this.collection.pool();
@@ -57,6 +61,8 @@ class ObjectAddKeyFrame extends ValEditorAction
 		this.object = object;
 		this.keyFrame = keyFrame;
 		this.collection = collection;
+		
+		this.object.registerAction(this);
 	}
 	
 	public function apply():Void

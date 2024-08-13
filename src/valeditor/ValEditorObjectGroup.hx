@@ -138,7 +138,7 @@ class ValEditorObjectGroup
 	{
 		for (object in this._objects)
 		{
-			if (object.isDisplayObject)
+			if (object.isDisplayObject || object.isContainer)
 			{
 				object.modifyProperty(regularPropertyName, value, objectOnly, dispatchValueChange);
 			}
@@ -157,7 +157,7 @@ class ValEditorObjectGroup
 	{
 		for (object in this._objects)
 		{
-			if (object.isDisplayObject)
+			if (object.isDisplayObject || object.isContainer)
 			{
 				object.setProperty(regularPropertyName, value, objectOnly, dispatchValueChange);
 			}

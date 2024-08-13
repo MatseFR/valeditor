@@ -27,6 +27,14 @@ class ObjectAdd extends ValEditorAction
 	
 	override public function clear():Void 
 	{
+		this.object.unregisterAction(this);
+		if (this.status == ValEditorActionStatus.UNDONE)
+		{
+			if (this.object.canBeDestroyed())
+			{
+				ValEditor.destroyObject(this.object);
+			}
+		}
 		this.object = null;
 		
 		super.clear();
@@ -41,6 +49,7 @@ class ObjectAdd extends ValEditorAction
 	public function setup(object:ValEditorObject):Void
 	{
 		this.object = object;
+		this.object.registerAction(this);
 	}
 	
 	public function apply():Void

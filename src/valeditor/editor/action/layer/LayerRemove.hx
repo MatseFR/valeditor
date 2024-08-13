@@ -1,8 +1,6 @@
 package valeditor.editor.action.layer;
 import openfl.errors.Error;
-import valeditor.ValEditorContainer;
 import valeditor.ValEditorLayer;
-import valeditor.ValEditorTimeLine;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 import valeditor.editor.action.object.ObjectUnselect;
@@ -22,7 +20,7 @@ class LayerRemove extends ValEditorAction
 		return new LayerRemove();
 	}
 	
-	public var container:ValEditorContainer;
+	public var container:IValEditorTimeLineContainer;
 	public var layers:Array<ValEditorLayer>;
 	public var layerIndices:Array<Int> = new Array<Int>();
 	
@@ -59,7 +57,7 @@ class LayerRemove extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:ValEditorContainer, layers:Array<ValEditorLayer>):Void
+	public function setup(container:IValEditorTimeLineContainer, layers:Array<ValEditorLayer>):Void
 	{
 		this.container = container;
 		this.layers = layers;

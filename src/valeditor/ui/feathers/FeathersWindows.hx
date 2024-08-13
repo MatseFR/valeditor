@@ -14,6 +14,7 @@ import valeditor.editor.settings.FileSettings;
 import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
+import valeditor.ui.InteractiveObjectController;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.window.ClassVisibilitiesWindow;
 import valeditor.ui.feathers.window.ClassVisibilityWindow;
@@ -21,6 +22,7 @@ import valeditor.ui.feathers.window.CreditsWindow;
 import valeditor.ui.feathers.window.EditorSettingsWindow;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
 import valeditor.ui.feathers.window.FileSettingsWindow;
+import valeditor.ui.feathers.window.InteractiveObjectDebugWindow;
 import valeditor.ui.feathers.window.LayerRenameWindow;
 import valeditor.ui.feathers.window.MessageConfirmWindow;
 import valeditor.ui.feathers.window.MessageWindow;
@@ -102,6 +104,8 @@ class FeathersWindows
 	static private var _classVisibility:ClassVisibilityWindow;
 	static private var _templateVisibility:TemplateVisibilityWindow;
 	
+	static private var _interactiveObjectsDebug:InteractiveObjectDebugWindow;
+	
 	static private var _windowList:Array<DisplayObject> = new Array<DisplayObject>();
 	
 	static public function closeAll():Void
@@ -139,6 +143,40 @@ class FeathersWindows
 		PopUpManager.removePopUp(window);
 	}
 	
+	static private function getLargeWindowWidth():Float
+	{
+		// was Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		return Lib.current.stage.stageWidth * 0.8;
+	}
+	
+	static private function getLargeWindowHeight():Float
+	{
+		// was Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		return Lib.current.stage.stageHeight * 0.8;
+	}
+	
+	static private function getMediumWindowWidth():Float
+	{
+		// was Lib.current.stage.stageWidth / 2.0;
+		return Lib.current.stage.stageWidth * 0.5;
+	}
+	
+	static private function getMediumWindowHeight():Float
+	{
+		// was Lib.current.stage.stageHeight / 2.0;
+		return Lib.current.stage.stageHeight * 0.5;
+	}
+	
+	static private function getSmallWindowWidth():Float
+	{
+		return Lib.current.stage.stageWidth * 0.33;
+	}
+	
+	static private function getSmallWindowHeight():Float
+	{
+		return Lib.current.stage.stageHeight * 0.33;
+	}
+	
 	static public function showAssetBrowser():Void
 	{
 		if (_assetBrowser == null)
@@ -146,8 +184,8 @@ class FeathersWindows
 			_assetBrowser = new AssetBrowser();
 		}
 		
-		_assetBrowser.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_assetBrowser.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_assetBrowser.width = getLargeWindowWidth();
+		_assetBrowser.height = getLargeWindowHeight();
 		
 		openWindow(_assetBrowser);
 	}
@@ -185,8 +223,8 @@ class FeathersWindows
 		_binaryAssets.cancelCallback = cancelCallback;
 		_binaryAssets.selectionCallback = selectionCallback;
 		
-		_binaryAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_binaryAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_binaryAssets.width = getLargeWindowWidth();
+		_binaryAssets.height = getLargeWindowHeight();
 		
 		openWindow(_binaryAssets);
 	}
@@ -205,8 +243,8 @@ class FeathersWindows
 		_bitmapAssets.cancelCallback = cancelCallback;
 		_bitmapAssets.selectionCallback = selectionCallback;
 		
-		_bitmapAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_bitmapAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_bitmapAssets.width = getLargeWindowWidth();
+		_bitmapAssets.height = getLargeWindowHeight();
 		
 		openWindow(_bitmapAssets);
 	}
@@ -225,8 +263,8 @@ class FeathersWindows
 		_soundAssets.cancelCallback = cancelCallback;
 		_soundAssets.selectionCallback = selectionCallback;
 		
-		_soundAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_soundAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_soundAssets.width = getLargeWindowWidth();
+		_soundAssets.height = getLargeWindowHeight();
 		
 		openWindow(_soundAssets);
 	}
@@ -245,8 +283,8 @@ class FeathersWindows
 		_textAssets.cancelCallback = cancelCallback;
 		_textAssets.selectionCallback = selectionCallback;
 		
-		_textAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_textAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_textAssets.width = getLargeWindowWidth();
+		_textAssets.height = getLargeWindowHeight();
 		
 		openWindow(_textAssets);
 	}
@@ -266,8 +304,8 @@ class FeathersWindows
 		_starlingAtlasAssets.cancelCallback = cancelCallback;
 		_starlingAtlasAssets.selectionCallback = selectionCallback;
 		
-		_starlingAtlasAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_starlingAtlasAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_starlingAtlasAssets.width = getLargeWindowWidth();
+		_starlingAtlasAssets.height = getLargeWindowHeight();
 		
 		openWindow(_starlingAtlasAssets);
 	}
@@ -286,8 +324,8 @@ class FeathersWindows
 		_starlingTextureAssets.cancelCallback = cancelCallback;
 		_starlingTextureAssets.selectionCallback = selectionCallback;
 		
-		_starlingTextureAssets.width = Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
-		_starlingTextureAssets.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_starlingTextureAssets.width = getLargeWindowWidth();
+		_starlingTextureAssets.height = getLargeWindowHeight();
 		
 		openWindow(_starlingTextureAssets);
 	}
@@ -300,8 +338,8 @@ class FeathersWindows
 			_credits = new CreditsWindow();
 		}
 		
-		_credits.width = Lib.current.stage.stageWidth / 2.0;
-		_credits.height = Lib.current.stage.stageHeight / 2.0;
+		_credits.width = getMediumWindowWidth();
+		_credits.height = getMediumWindowHeight();
 		
 		openWindow(_credits);
 	}
@@ -328,8 +366,8 @@ class FeathersWindows
 		_editorSettings.cancelCallback = cancelCallback;
 		_editorSettings.confirmCallback = confirmCallback;
 		
-		_editorSettings.width = Lib.current.stage.stageWidth / 2.0;
-		_editorSettings.height = Lib.current.stage.stageHeight / 2.0;
+		_editorSettings.width = getMediumWindowWidth();
+		_editorSettings.height = getMediumWindowHeight();
 		
 		openWindow(_editorSettings);
 	}
@@ -346,8 +384,8 @@ class FeathersWindows
 		_themeEdit.confirmCallback = confirmCallback;
 		_themeEdit.cancelCallback = cancelCallback;
 		
-		_themeEdit.width = Lib.current.stage.stageWidth / 2.0;
-		_themeEdit.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_themeEdit.width = getMediumWindowWidth();
+		_themeEdit.height = getLargeWindowHeight();
 		
 		openWindow(_themeEdit);
 	}
@@ -363,8 +401,8 @@ class FeathersWindows
 		_exportSettings.cancelCallback = cancelCallback;
 		_exportSettings.confirmCallback = confirmCallback;
 		
-		_exportSettings.width = Lib.current.stage.stageWidth / 2.0;
-		_exportSettings.height = Lib.current.stage.stageHeight / 2.0;
+		_exportSettings.width = getMediumWindowWidth();
+		_exportSettings.height = getMediumWindowHeight();
 		
 		openWindow(_exportSettings);
 	}
@@ -381,8 +419,8 @@ class FeathersWindows
 		_fileSettings.cancelCallback = cancelCallback;
 		_fileSettings.confirmCallback = confirmCallback;
 		
-		_fileSettings.width = Lib.current.stage.stageWidth / 2.0;
-		_fileSettings.height = Lib.current.stage.stageHeight / 2.0;
+		_fileSettings.width = getMediumWindowWidth();
+		_fileSettings.height = getMediumWindowHeight();
 		
 		openWindow(_fileSettings);
 	}
@@ -398,7 +436,7 @@ class FeathersWindows
 		_layerRename.confirmCallback = confirmCallback;
 		_layerRename.cancelCallback = cancelCallback;
 		
-		_layerRename.width = Lib.current.stage.stageWidth / 2.0;
+		_layerRename.width = getMediumWindowWidth();
 		
 		openWindow(_layerRename);
 	}
@@ -413,7 +451,7 @@ class FeathersWindows
 		_messageWindow.title = title;
 		_messageWindow.message = message;
 		
-		_messageWindow.width = Lib.current.stage.stageWidth / 3.0;
+		_messageWindow.width = getSmallWindowWidth();
 		_messageWindow.validateNow();
 		
 		openWindow(_messageWindow);
@@ -437,7 +475,7 @@ class FeathersWindows
 		_messageConfirmWindow.message = message;
 		_messageConfirmWindow.confirmCallback = confirmCallback;
 		
-		_messageConfirmWindow.width = Lib.current.stage.stageWidth / 3.0;
+		_messageConfirmWindow.width = getSmallWindowWidth();
 		_messageConfirmWindow.validateNow();
 		
 		openWindow(_messageConfirmWindow);
@@ -457,8 +495,8 @@ class FeathersWindows
 		_objectAdd.cancelCallback = cancelCallback;
 		_objectAdd.reset();
 		
-		_objectAdd.width = Lib.current.stage.stageWidth / 2.0;
-		_objectAdd.height = Lib.current.stage.stageHeight / 2.0;
+		_objectAdd.width = getMediumWindowWidth();
+		_objectAdd.height = getMediumWindowHeight();
 		
 		openWindow(_objectAdd);
 	}
@@ -475,8 +513,8 @@ class FeathersWindows
 		_objectCreate.cancelCallback = cancelCallback;
 		_objectCreate.reset();
 		
-		_objectCreate.width = Lib.current.stage.stageWidth / 2.0;
-		_objectCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_objectCreate.width = getMediumWindowWidth();
+		_objectCreate.height = getLargeWindowHeight();
 		
 		openWindow(_objectCreate);
 	}
@@ -493,8 +531,8 @@ class FeathersWindows
 		_objectEdit.cancelCallback = cancelCallback;
 		_objectEdit.confirmCallback = confirmCallback;
 		
-		_objectEdit.width = Lib.current.stage.stageWidth / 2.0;
-		_objectEdit.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_objectEdit.width = getMediumWindowWidth();
+		_objectEdit.height = getLargeWindowHeight();
 		
 		openWindow(_objectEdit);
 	}
@@ -510,7 +548,7 @@ class FeathersWindows
 		_objectRename.confirmCallback = confirmCallback;
 		_objectRename.cancelCallback = cancelCallback;
 		
-		_objectRename.width = Lib.current.stage.stageWidth / 2.0;
+		_objectRename.width = getMediumWindowWidth();
 		
 		openWindow(_objectRename);
 	}
@@ -527,8 +565,8 @@ class FeathersWindows
 		_objectSelect.confirmCallback = confirmCallback;
 		_objectSelect.reset(allowedClassNames, excludeObjects);
 		
-		_objectSelect.width = Lib.current.stage.stageWidth / 2.0;
-		_objectSelect.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_objectSelect.width = getMediumWindowWidth();
+		_objectSelect.height = getLargeWindowHeight();
 		
 		openWindow(_objectSelect);
 	}
@@ -543,8 +581,7 @@ class FeathersWindows
 		_startMenu.newFileCallback = newFileCallback;
 		_startMenu.loadFileCallback = loadFileCallback;
 		
-		_startMenu.width = Lib.current.stage.stageWidth / 2.0;
-		_startMenu.height = Lib.current.stage.stageHeight / 2.0;
+		_startMenu.width = getMediumWindowWidth();
 		
 		openWindow(_startMenu);
 	}
@@ -574,8 +611,8 @@ class FeathersWindows
 		_templateCreate.cancelCallback = cancelCallback;
 		_templateCreate.reset();
 		
-		_templateCreate.width = Lib.current.stage.stageWidth / 2.0;
-		_templateCreate.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_templateCreate.width = getMediumWindowWidth();
+		_templateCreate.height = getLargeWindowHeight();
 		
 		openWindow(_templateCreate);
 	}
@@ -591,7 +628,7 @@ class FeathersWindows
 		_templateRename.confirmCallback = confirmCallback;
 		_templateRename.cancelCallback = cancelCallback;
 		
-		_templateRename.width = Lib.current.stage.stageWidth / 2.0;
+		_templateRename.width = getMediumWindowWidth();
 		
 		openWindow(_templateRename);
 	}
@@ -609,8 +646,8 @@ class FeathersWindows
 		_classVisibilities.confirmCallback = confirmCallback;
 		_classVisibilities.cancelCallback = cancelCallback;
 		
-		_classVisibilities.width = Lib.current.stage.stageWidth / 2.0;
-		_classVisibilities.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_classVisibilities.width = getMediumWindowWidth();
+		_classVisibilities.height = getLargeWindowHeight();
 		
 		openWindow(_classVisibilities);
 	}
@@ -628,8 +665,8 @@ class FeathersWindows
 		_classVisibility.confirmCallback = confirmCallback;
 		_classVisibility.cancelCallback = cancelCallback;
 		
-		_classVisibility.width = Lib.current.stage.stageWidth / 2.0;
-		_classVisibility.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_classVisibility.width = getMediumWindowWidth();
+		_classVisibility.height = getLargeWindowHeight();
 		
 		openWindow(_classVisibility);
 	}
@@ -647,10 +684,24 @@ class FeathersWindows
 		_templateVisibility.confirmCallback = confirmCallback;
 		_templateVisibility.cancelCallback = cancelCallback;
 		
-		_templateVisibility.width = Lib.current.stage.stageWidth / 2.0;
-		_templateVisibility.height = Lib.current.stage.stageHeight - UIConfig.POPUP_STAGE_PADDING * 2.0;
+		_templateVisibility.width = getMediumWindowWidth();
+		_templateVisibility.height = getLargeWindowHeight();
 		
 		openWindow(_templateVisibility);
+	}
+	
+	static public function showInteractiveObjectDebugWindow(controller:InteractiveObjectController):Void
+	{
+		if (_interactiveObjectsDebug == null)
+		{
+			_interactiveObjectsDebug = new InteractiveObjectDebugWindow();
+		}
+		
+		_interactiveObjectsDebug.controller = controller;
+		
+		_interactiveObjectsDebug.width = getMediumWindowWidth();
+		
+		openWindow(_interactiveObjectsDebug);
 	}
 	
 	static private function onMouseClick(evt:MouseEvent):Void

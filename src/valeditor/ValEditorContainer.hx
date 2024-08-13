@@ -24,7 +24,7 @@ import valeditor.ui.shape.PivotIndicator;
  * ...
  * @author Matse
  */
-class ValEditorContainer extends ValEditContainer implements IValEditorContainer implements IValEditOpenFLContainer implements IValEditStarlingContainer implements IValEditorTimeLineContainer
+class ValEditorContainer extends ValEditContainer implements IValEditorContainer implements IValEditorStarlingContainer implements IValEditorTimeLineContainer
 {
 	static private var _POOL:Array<ValEditorContainer> = new Array<ValEditorContainer>();
 	
@@ -42,6 +42,7 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	public var hasLockedLayer(get, never):Bool;
 	public var isOpen(get, never):Bool;
 	public var layerCollection(default, null):ArrayCollection<ValEditorLayer> = new ArrayCollection<ValEditorLayer>();
+	public var parent(get, never):DisplayObjectContainer;
 	public var selectedLayers(default, null):Array<ValEditorLayer> = new Array<ValEditorLayer>();
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
@@ -74,6 +75,11 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
+	
+	private function get_parent():Dynamic
+	{
+		return this._rootContainer;
+	}
 	
 	override function set_rotation(value:Float):Float 
 	{
@@ -243,15 +249,31 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		var rect:Rectangle = null;
 		#if starling
 		var rectStarling:Rectangle = null;
+		var targetSpaceStarling:Dynamic = null;
 		#end
+		
+		if (targetSpace == this #if starling || targetSpace == this._container #end)
+		{
+			targetSpace = this._container;
+			#if starling
+			targetSpaceStarling = this._containerStarling;
+			#end
+		}
+		#if starling
+		else if (targetSpace == this._rootContainer)
+		{
+			targetSpaceStarling = this._rootContainerStarling;
+		}
+		#end
+		
 		if (this._container != null)
 		{
-			rect = this._container.getBounds(this._container);
+			rect = this._container.getBounds(targetSpace);
 		}
 		#if starling
 		if (this._containerStarling != null)
 		{
-			rectStarling = this._containerStarling.getBounds(this._containerStarling);
+			rectStarling = this._containerStarling.getBounds(targetSpaceStarling);
 		}
 		
 		if (rect != null && rectStarling != null)
@@ -316,19 +338,19 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		return false;
 	}
 	
-	override public function addObject(object:ValEditObject):Void 
-	{
-		super.addObject(object);
-		
-		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, cast object);
-	}
+	//override public function addObject(object:ValEditObject):Void 
+	//{
+		//super.addObject(object);
+		//
+		//ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED, cast object);
+	//}
 	
-	override public function removeObject(object:ValEditObject):Void 
-	{
-		super.removeObject(object);
-		
-		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, cast object);
-	}
+	//override public function removeObject(object:ValEditObject):Void 
+	//{
+		//super.removeObject(object);
+		//
+		//ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED, cast object);
+	//}
 	
 	override public function addLayer(layer:ValEditLayer):Void 
 	{
@@ -524,6 +546,8 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 	
 	private function objectRegister(object:ValEditObject, layer:ValEditLayer):Void 
 	{
+		trace("ValEditorContainer.objectRegister");
+		
 		this._allObjects.set(object.objectID, object);
 		this._objectToLayer.set(object, layer);
 		this.allObjectsCollection.add(cast object);
@@ -531,10 +555,16 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
 		object.addEventListener(RenameEvent.RENAMED, object_renamed);
+		
+		object.container = this;
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED_TO_CONTAINER, object);
 	}
 	
 	private function objectUnregister(object:ValEditObject):Void 
 	{
+		trace("ValEditorContainer.objectUnregister");
+		
 		this._allObjects.remove(object.objectID);
 		this._objectToLayer.remove(object);
 		this.allObjectsCollection.remove(cast object);
@@ -542,6 +572,10 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
 		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
+		
+		object.container = null;
+		
+		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, object);
 	}
 	
 	public function getContainerDependencies(data:ContainerSaveData):Void
@@ -591,8 +625,6 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		
 		var editorObject:ValEditorObject = cast evt.object;
 		
-		editorObject.container = this;
-		
 		this.activeObjectsCollection.add(editorObject);
 		
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ACTIVATED, editorObject);
@@ -603,8 +635,6 @@ class ValEditorContainer extends ValEditContainer implements IValEditorContainer
 		super.layer_objectDeactivated(evt);
 		
 		var editorObject:ValEditorObject = cast evt.object;
-		
-		editorObject.container = null;
 		
 		this.activeObjectsCollection.remove(editorObject);
 		
