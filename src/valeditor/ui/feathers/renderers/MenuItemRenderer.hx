@@ -10,7 +10,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.PixelSnapping;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

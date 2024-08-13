@@ -13,7 +13,7 @@ import valeditor.ValEditorLayer;
 import valeditor.editor.action.layer.LayerLock;
 import valeditor.editor.action.layer.LayerVisible;
 import valeditor.events.LayerEvent;
-import valeditor.ui.feathers.variant.CheckVariant;
+import valeditor.ui.feathers.theme.variant.CheckVariant;
 
 /**
  * ...

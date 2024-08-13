@@ -61,11 +61,11 @@ import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.BitmapScrollRenderer;
 import valeditor.ui.feathers.renderers.LayerItemRenderer;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
-import valeditor.ui.feathers.variant.ButtonVariant;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valeditor.ui.feathers.variant.ListViewVariant;
-import valeditor.ui.feathers.variant.ScrollContainerVariant;
-import valeditor.ui.feathers.variant.ToggleButtonVariant;
+import valeditor.ui.feathers.theme.variant.ButtonVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.ScrollContainerVariant;
+import valeditor.ui.feathers.theme.variant.ToggleButtonVariant;
 
 /**
  * ...

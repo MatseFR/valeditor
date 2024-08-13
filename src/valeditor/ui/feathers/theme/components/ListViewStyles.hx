@@ -21,8 +21,8 @@ import valeditor.ui.feathers.renderers.RulerItemRenderer;
 import valeditor.ui.feathers.renderers.SpriteTextRenderer;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.theme.simple.SimpleTheme;
-import valeditor.ui.feathers.variant.ItemRendererVariant;
-import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.ItemRendererVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
 
 /**
  * ...

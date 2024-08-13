@@ -9,7 +9,7 @@ import valeditor.ui.feathers.renderers.CheckItemRenderer;
 import valeditor.ui.feathers.renderers.FontDataItemRenderer;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.skins.RightSkin;
-import valeditor.ui.feathers.variant.ItemRendererVariant;
+import valeditor.ui.feathers.theme.variant.ItemRendererVariant;
 
 /**
  * ...

@@ -4,7 +4,7 @@ import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.ScrollContainerVariant;
+import valeditor.ui.feathers.theme.variant.ScrollContainerVariant;
 
 /**
  * ...

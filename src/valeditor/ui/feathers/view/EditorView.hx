@@ -41,10 +41,10 @@ import valeditor.ui.feathers.controls.SelectionInfo;
 import valeditor.ui.feathers.controls.ToggleLayoutGroup;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valeditor.ui.feathers.variant.ListViewVariant;
-import valeditor.ui.feathers.variant.PopUpListViewVariant;
-import valeditor.ui.feathers.variant.ToggleButtonVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
+import valeditor.ui.feathers.theme.variant.ToggleButtonVariant;
 
 /**
  * ...

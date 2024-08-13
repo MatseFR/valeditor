@@ -20,7 +20,7 @@ import openfl.display.Bitmap;
 import openfl.net.URLRequest;
 import openfl.utils.Assets;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

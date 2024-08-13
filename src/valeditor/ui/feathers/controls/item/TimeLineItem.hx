@@ -18,7 +18,7 @@ import valeditor.editor.action.timeline.TimeLineSetSelectedFrameIndex;
 import valeditor.events.DefaultEvent;
 import valeditor.events.TimeLineEvent;
 import valeditor.ui.feathers.data.FrameData;
-import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
 
 /**
  * ...

@@ -8,7 +8,7 @@ import feathers.layout.VerticalLayout;
 import openfl.display.Bitmap;
 import valedit.asset.starling.StarlingTextureAsset;
 import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 
 /**
  * ...

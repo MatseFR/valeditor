@@ -7,7 +7,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.display.Bitmap;
 import valeditor.ui.feathers.renderers.asset.AssetItemRenderer;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 import valedit.asset.BitmapAsset;
 
 /**

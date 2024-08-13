@@ -16,7 +16,7 @@ import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.Padding;

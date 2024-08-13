@@ -6,7 +6,7 @@ import feathers.controls.navigators.TabNavigator;
 import feathers.data.ArrayCollection;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 
 /**
  * ...

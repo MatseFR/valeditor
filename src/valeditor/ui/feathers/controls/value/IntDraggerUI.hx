@@ -22,7 +22,7 @@ import valeditor.events.ValueUIEvent;
 import valeditor.ui.feathers.controls.NumericDragger;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

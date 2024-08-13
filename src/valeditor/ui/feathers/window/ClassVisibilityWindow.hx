@@ -21,8 +21,8 @@ import valeditor.editor.visibility.ClassValueVisibility;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.ui.feathers.renderers.CheckItemRenderer;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
-import valeditor.ui.feathers.variant.ItemRendererVariant;
-import valeditor.ui.feathers.variant.SortOrderHeaderRendererVariant;
+import valeditor.ui.feathers.theme.variant.ItemRendererVariant;
+import valeditor.ui.feathers.theme.variant.SortOrderHeaderRendererVariant;
 
 /**
  * ...

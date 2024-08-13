@@ -4,8 +4,8 @@ import feathers.controls.popups.DropDownPopUpAdapter;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.ButtonVariant;
-import valeditor.ui.feathers.variant.PopUpListViewVariant;
+import valeditor.ui.feathers.theme.variant.ButtonVariant;
+import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
 
 /**
  * ...

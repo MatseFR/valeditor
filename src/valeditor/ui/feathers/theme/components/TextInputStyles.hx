@@ -4,7 +4,7 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.style.ClassVariantStyleProvider;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.theme.simple.SimpleTheme;
-import valeditor.ui.feathers.variant.TextInputVariant;
+import valeditor.ui.feathers.theme.variant.TextInputVariant;
 import valeditor.ui.feathers.theme.simple.components.TextInputStyles;
 
 /**

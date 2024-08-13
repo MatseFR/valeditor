@@ -17,7 +17,7 @@ import valeditor.ui.feathers.controls.value.SeparatorUI;
 import valeditor.ui.feathers.controls.value.SpacingUI;
 import valeditor.ui.feathers.skins.VerticalLineSkinWithOffset;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 
 /**
  * ...

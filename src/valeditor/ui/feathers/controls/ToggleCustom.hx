@@ -25,7 +25,7 @@ import flash.events.Event;
 import openfl.display.DisplayObject;
 import openfl.events.MouseEvent;
 import openfl.events.TouchEvent;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.Spacing;
 
 /**

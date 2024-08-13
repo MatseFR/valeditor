@@ -46,11 +46,11 @@ import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
-import valeditor.ui.feathers.variant.ButtonVariant;
-import valeditor.ui.feathers.variant.ItemRendererVariant;
-import valeditor.ui.feathers.variant.LayoutGroupVariant;
-import valeditor.ui.feathers.variant.ListViewVariant;
-import valeditor.ui.feathers.variant.SortOrderHeaderRendererVariant;
+import valeditor.ui.feathers.theme.variant.ButtonVariant;
+import valeditor.ui.feathers.theme.variant.ItemRendererVariant;
+import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.SortOrderHeaderRendererVariant;
 
 /**
  * ...

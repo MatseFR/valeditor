@@ -13,7 +13,7 @@ import valeditor.ValEditorTemplateGroup;
 import valeditor.events.SelectionEvent;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

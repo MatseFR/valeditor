@@ -17,7 +17,7 @@ import valedit.ValEdit;
 import valedit.asset.TextAsset;
 import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.TextAssetItemRenderer;
-import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 #if desktop
 import openfl.filesystem.File;

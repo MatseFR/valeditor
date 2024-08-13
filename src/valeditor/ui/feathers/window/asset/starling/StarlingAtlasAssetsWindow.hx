@@ -21,7 +21,7 @@ import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingAtlasAsset;
 import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.starling.StarlingAtlasAssetItemRenderer;
-import valeditor.ui.feathers.variant.ListViewVariant;
+import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
 import valeditor.utils.starling.AtlasLoader;
 import valeditor.utils.starling.AtlasSourceUpdater;

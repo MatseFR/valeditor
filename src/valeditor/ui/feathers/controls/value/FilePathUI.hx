@@ -25,7 +25,7 @@ import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFilePath;
 import valeditor.ui.feathers.controls.ValueWedge;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 import valeditor.utils.file.FileSelectorDesktop;
 
 /**

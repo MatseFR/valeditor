@@ -5,7 +5,7 @@ import feathers.skins.RectangleSkin;
 import feathers.skins.TriangleSkin;
 import feathers.style.ClassVariantStyleProvider;
 import feathers.utils.DeviceUtil;
-import valeditor.ui.feathers.variant.SortOrderHeaderRendererVariant;
+import valeditor.ui.feathers.theme.variant.SortOrderHeaderRendererVariant;
 
 /**
  * ...

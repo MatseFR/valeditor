@@ -2,7 +2,7 @@ package valeditor.ui.feathers.renderers;
 
 import feathers.controls.Label;
 import openfl.display.Sprite;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

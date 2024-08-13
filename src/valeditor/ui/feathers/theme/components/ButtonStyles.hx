@@ -6,7 +6,7 @@ import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
 import valeditor.ui.feathers.theme.IconGraphics;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.ButtonVariant;
+import valeditor.ui.feathers.theme.variant.ButtonVariant;
 
 /**
  * ...

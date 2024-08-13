@@ -1,4 +1,4 @@
-package valeditor.ui.feathers.variant;
+package valeditor.ui.feathers.theme.variant;
 
 /**
  * ...

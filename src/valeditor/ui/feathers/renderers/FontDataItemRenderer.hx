@@ -9,7 +9,7 @@ import feathers.layout.VerticalAlign;
 import openfl.text.FontType;
 import openfl.text.TextFormatAlign;
 import valeditor.ui.feathers.data.FontData;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

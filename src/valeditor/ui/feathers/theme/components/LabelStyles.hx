@@ -3,7 +3,7 @@ import feathers.controls.Label;
 import feathers.style.ClassVariantStyleProvider;
 import openfl.text.TextFormatAlign;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 import valeditor.ui.UIConfig;
 
 /**

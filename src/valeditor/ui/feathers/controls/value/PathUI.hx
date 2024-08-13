@@ -26,7 +26,7 @@ import feathers.layout.VerticalLayout;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.controls.ValueWedge;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * Desktop targets only (Neko, CPP, Air...)

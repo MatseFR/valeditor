@@ -8,7 +8,7 @@ import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
 import valeditor.ui.feathers.theme.IconGraphics;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.ToggleButtonVariant;
+import valeditor.ui.feathers.theme.variant.ToggleButtonVariant;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 

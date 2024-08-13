@@ -34,7 +34,7 @@ import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.data.FontData;
 import valeditor.ui.feathers.renderers.FontDataItemRenderer;
-import valeditor.ui.feathers.variant.LabelVariant;
+import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...

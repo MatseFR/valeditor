@@ -7,7 +7,7 @@ import feathers.skins.RectangleSkin;
 import feathers.style.ClassVariantStyleProvider;
 import openfl.display.Shape;
 import valeditor.ui.feathers.theme.ValEditorTheme;
-import valeditor.ui.feathers.variant.CheckVariant;
+import valeditor.ui.feathers.theme.variant.CheckVariant;
 
 /**
  * ...
