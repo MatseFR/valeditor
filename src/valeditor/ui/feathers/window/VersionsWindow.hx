@@ -25,14 +25,14 @@ class VersionsWindow extends Panel
 	private var _closeButton:Button;
 	
 	private var _haxeVersion:Label;
-	private var _valEditorVersion:Label;
-	private var _valEditVersion:Label;
 	private var _limeVersion:Label;
 	private var _openflVersion:Label;
 	#if starling
 	private var _starlingVersion:Label;
 	#end
 	private var _feathersVersion:Label;
+	private var _valEditorVersion:Label;
+	private var _valEditVersion:Label;
 	private var _openflJugglerVersion:Label;
 	private var _inputActionVersion:Label;
 
@@ -74,12 +74,6 @@ class VersionsWindow extends Panel
 		this._haxeVersion = new Label("haxe " + ValEdit.HAXE_VERSION);
 		addChild(this._haxeVersion);
 		
-		this._valEditorVersion = new Label("valeditor " + ValEditor.VERSION);
-		addChild(this._valEditorVersion);
-		
-		this._valEditVersion = new Label("valedit " + ValEdit.VERSION);
-		addChild(this._valEditVersion);
-		
 		this._limeVersion = new Label("lime " + ValEdit.LIME_VERSION);
 		addChild(this._limeVersion);
 		
@@ -93,6 +87,12 @@ class VersionsWindow extends Panel
 		
 		this._feathersVersion = new Label("feathersui " + ValEditor.FEATHERS_VERSION);
 		addChild(this._feathersVersion);
+		
+		this._valEditorVersion = new Label("valeditor " + ValEditor.VERSION);
+		addChild(this._valEditorVersion);
+		
+		this._valEditVersion = new Label("valedit " + ValEdit.VERSION);
+		addChild(this._valEditVersion);
 		
 		this._openflJugglerVersion = new Label("openfl-juggler " + ValEdit.OPENFL_JUGGLER_VERSION);
 		addChild(this._openflJugglerVersion);
