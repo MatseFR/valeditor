@@ -21,6 +21,8 @@ class UIConfig
 	
 	static public var POPUP_STAGE_PADDING:Float = 32;
 	
+	static public var SCENARIO_MIN_HEIGHT:Float = 68;
+	
 	static public var VALUE_NAME_MIN_WIDTH:Float = 150;
 	static public var VALUE_NAME_MAX_WIDTH:Float = 150;
 	
