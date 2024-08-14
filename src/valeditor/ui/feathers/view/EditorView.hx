@@ -288,6 +288,7 @@ class EditorView extends LayoutGroup
 		this._sceneGroup.addChild(this._displayArea);
 		
 		this._scenario = new ScenarioView();
+		this._scenario.minHeight = UIConfig.SCENARIO_MIN_HEIGHT;
 		startHeight = Lib.current.stage.stageHeight / 4;
 		this._scenario.height = startHeight >= this._scenario.minHeight ? startHeight : this._scenario.minHeight;
 		this._centerBox.addChild(this._scenario);
@@ -621,7 +622,8 @@ class EditorView extends LayoutGroup
 		//ValEditor.viewPort.update(loc.x, loc.y, this._displayRect.width, this._displayRect.height);
 		
 		// when we receive the event, _displayArea has been resized but not re-positionned by the layout so we have to work around this
-		ValEditor.viewPort.update(this._centerBox.x, this._mainBox.y + this._containerList.height, this._displayArea.width, this._displayArea.height);
+		this._displayRect.setTo(this._centerBox.x, this._mainBox.y + this._containerList.height, this._displayArea.width, this._displayArea.height);
+		ValEditor.viewPort.update(this._displayRect.x, this._displayRect.y, this._displayRect.width, this._displayRect.height);
 	}
 	
 	private function onMenuChange(evt:Event):Void
@@ -647,9 +649,6 @@ class EditorView extends LayoutGroup
 	
 	private function onResize(evt:Event):Void
 	{
-		// TODO : not needed ?
-		trace("EditorView.onResize");
-		
 		this._leftBox.maxWidth = this.width * 0.4;
 		this._rightBox.maxWidth = this.width * 0.4;
 		this._scenario.maxHeight = this.height * 0.75;
