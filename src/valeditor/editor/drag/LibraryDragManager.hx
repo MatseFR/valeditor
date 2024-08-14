@@ -1,7 +1,9 @@
 package valeditor.editor.drag;
 import openfl.Lib;
+import openfl.display.Bitmap;
 import openfl.errors.Error;
 import openfl.events.MouseEvent;
+import openfl.utils.Assets;
 import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
@@ -21,6 +23,7 @@ import valeditor.ui.feathers.FeathersWindows;
  */
 class LibraryDragManager 
 {
+	public var forbiddenIndicator(default, null):Bitmap;
 	public var isDragging(default, null):Bool;
 	public var object(default, null):ValEditorObject;
 	public var objectIndicator(default, null):InteractiveObjectVisible = new InteractiveObjectVisible();
@@ -31,7 +34,8 @@ class LibraryDragManager
 
 	public function new() 
 	{
-		
+		this.forbiddenIndicator = new Bitmap(Assets.getBitmapData("valeditor/ui/red_cross.png"));
+		this.forbiddenIndicator.smoothing = true;
 	}
 	
 	public function startDrag(template:ValEditorTemplate):Void
@@ -64,6 +68,11 @@ class LibraryDragManager
 			ValEditor.rootScene.removeChild(this.objectIndicator);
 		}
 		
+		if (this.forbiddenIndicator.parent != null)
+		{
+			ValEditor.rootScene.removeChild(this.forbiddenIndicator);
+		}
+		
 		if (this.object != null)
 		{
 			ValEditor.destroyObject(this.object);
@@ -77,6 +86,7 @@ class LibraryDragManager
 		{
 			if (ValEditor.currentContainer.canAddObject(cast this.template.object))
 			{
+				// show object's bounding box
 				if (this.objectIndicator.parent == null)
 				{
 					ValEditor.rootScene.addChild(this.objectIndicator);
@@ -86,7 +96,13 @@ class LibraryDragManager
 			}
 			else
 			{
-				// TODO : show some "forbidden" icon, message or something
+				// show forbidden icon
+				if (this.forbiddenIndicator.parent == null)
+				{
+					ValEditor.rootScene.addChild(this.forbiddenIndicator);
+				}
+				this.forbiddenIndicator.x = evt.stageX;
+				this.forbiddenIndicator.y = evt.stageY;
 			}
 		}
 		else
@@ -94,6 +110,11 @@ class LibraryDragManager
 			if (this.objectIndicator.parent != null)
 			{
 				ValEditor.rootScene.removeChild(this.objectIndicator);
+			}
+			
+			if (this.forbiddenIndicator.parent != null)
+			{
+				ValEditor.rootScene.removeChild(this.forbiddenIndicator);
 			}
 		}
 	}
