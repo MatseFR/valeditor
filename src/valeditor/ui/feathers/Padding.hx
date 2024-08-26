@@ -7,10 +7,10 @@ package valeditor.ui.feathers;
 class Padding 
 {
 	
-	static public var DEFAULT:Float = 8;
-	static public var MINIMAL:Float = 2;
-	static public var SMALL:Float = 4;
-	static public var TOGGLE:Float = 2;
-	static public var VALUE:Float = 4;
+	static public var DEFAULT:Float = 8.0;
+	static public var MINIMAL:Float = 2.0;
+	static public var SMALL:Float = 4.0;
+	static public var TOGGLE:Float = 2.0;
+	static public var VALUE:Float = 4.0;
 	
 }

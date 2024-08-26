@@ -1,6 +1,7 @@
 package valeditor.editor.action.layer;
 import openfl.errors.Error;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectRemoveKeyFrame;
 import valeditor.editor.action.object.ObjectUnselect;
@@ -20,8 +21,8 @@ class LayerRemove extends ValEditorAction
 		return new LayerRemove();
 	}
 	
-	public var container:IValEditorTimeLineContainer;
-	public var layers:Array<ValEditorLayer>;
+	public var container:ITimeLineContainerEditable;
+	public var layers:Array<ITimeLineLayerEditable>;
 	public var layerIndices:Array<Int> = new Array<Int>();
 	
 	private var _action:MultiAction = MultiAction.fromPool();
@@ -57,7 +58,7 @@ class LayerRemove extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorTimeLineContainer, layers:Array<ValEditorLayer>):Void
+	public function setup(container:ITimeLineContainerEditable, layers:Array<ITimeLineLayerEditable>):Void
 	{
 		this.container = container;
 		this.layers = layers;
@@ -66,11 +67,12 @@ class LayerRemove extends ValEditorAction
 		this._objectUnselect.setup();
 		for (layer in this.layers)
 		{
+			if (layer.timeLine.frameCurrent == null) continue;
 			for (object in layer.timeLine.frameCurrent.objects)
 			{
-				if (ValEditor.selection.hasObject(cast object))
+				if (ValEditor.selection.hasObject(object))
 				{
-					this._objectUnselect.addObject(cast object);
+					this._objectUnselect.addObject(object);
 				}
 			}
 		}
@@ -85,7 +87,7 @@ class LayerRemove extends ValEditorAction
 				for (object in keyFrame.objects)
 				{
 					objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
-					objectRemoveKeyFrame.setup(cast object, cast keyFrame);
+					objectRemoveKeyFrame.setup(object, keyFrame);
 					this._action.add(objectRemoveKeyFrame);
 				}
 			}
@@ -109,7 +111,7 @@ class LayerRemove extends ValEditorAction
 			this.layers.resize(0);
 			for (index in this.layerIndices)
 			{
-				this.layers[this.layers.length] = cast this.container.getLayerAt(index);
+				this.layers[this.layers.length] = this.container.getLayerAt(index);
 			}
 		}
 		for (index in this.layerIndices)

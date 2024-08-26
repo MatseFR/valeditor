@@ -4,11 +4,9 @@ import openfl.display.Bitmap;
 import openfl.errors.Error;
 import openfl.events.MouseEvent;
 import openfl.utils.Assets;
-import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
-import valeditor.ValEditorTimeLine;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectAdd;
 import valeditor.editor.action.object.ObjectAddKeyFrame;
@@ -48,7 +46,7 @@ class LibraryDragManager
 		this.template = template;
 		var wasUpdateLocked:Bool = template.lockInstanceUpdates;
 		if (!wasUpdateLocked) template.lockInstanceUpdates = true;
-		this.objectIndicator.objectUpdate(cast this.template.object);
+		this.objectIndicator.objectUpdate(this.template.object);
 		template.lockInstanceUpdates = wasUpdateLocked;
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -84,7 +82,7 @@ class LibraryDragManager
 	{
 		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY))
 		{
-			if (ValEditor.currentContainer.canAddObject(cast this.template.object))
+			if (ValEditor.currentContainer.canAddObject(this.template.object))
 			{
 				// show object's bounding box
 				if (this.objectIndicator.parent == null)
@@ -121,7 +119,7 @@ class LibraryDragManager
 	
 	private function onMouseUp(evt:MouseEvent):Void
 	{
-		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject(cast this.template.object))
+		if (ValEditor.viewPort.rect.contains(evt.stageX, evt.stageY) && ValEditor.currentContainer.canAddObject(this.template.object))
 		{
 			this._mouseX = evt.stageX;
 			this._mouseY = evt.stageY;
@@ -129,7 +127,7 @@ class LibraryDragManager
 			if (ValEditor.currentTimeLineContainer != null)
 			{
 				// look for reusable objects
-				var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(this.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+				var reusableObjects:Array<ValEditorObject> = ValEditor.currentTimeLineContainer.currentLayer.timeLine.getReusableObjectsWithTemplateForKeyFrame(this.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 				
 				if (reusableObjects.length != 0)
 				{
@@ -169,7 +167,7 @@ class LibraryDragManager
 		if (ValEditor.currentTimeLineContainer != null)
 		{
 			var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-			objectAddKeyFrame.setup(this.object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+			objectAddKeyFrame.setup(this.object, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 			action.add(objectAddKeyFrame);
 		}
 		else
@@ -195,7 +193,7 @@ class LibraryDragManager
 		var selectionSetObject:SelectionSetObject;
 		
 		var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-		objectAddKeyFrame.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+		objectAddKeyFrame.setup(object, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 		action.add(objectAddKeyFrame);
 		
 		if (object.isDisplayObject || object.isContainer)

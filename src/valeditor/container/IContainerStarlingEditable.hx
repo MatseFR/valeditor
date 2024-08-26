@@ -1,12 +1,14 @@
-package valeditor;
+#if starling
+package valeditor.container;
 import starling.display.DisplayObjectContainer;
 
 /**
  * @author Matse
  */
-interface IValEditorStarlingContainer 
+interface IContainerStarlingEditable 
 {
 	public var containerStarling(get, never):DisplayObjectContainer;
 	public var rootContainer(get, set):openfl.display.DisplayObjectContainer;
 	public var rootContainerStarling(get, set):DisplayObjectContainer;
 }
+#end

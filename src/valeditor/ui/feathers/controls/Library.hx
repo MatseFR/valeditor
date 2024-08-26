@@ -6,7 +6,7 @@ import feathers.controls.navigators.TabNavigator;
 import feathers.data.ArrayCollection;
 import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
-import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
+import valeditor.ui.feathers.theme.variant.TabBarVariant;
 
 /**
  * ...
@@ -22,7 +22,6 @@ class Library extends LayoutGroup
 	public function new() 
 	{
 		super();
-		this.variant = LayoutGroupVariant.CONTENT;
 	}
 	
 	override function initialize():Void 
@@ -40,7 +39,8 @@ class Library extends LayoutGroup
 		]);
 		
 		this._tabNavigator = new TabNavigator(views);
-		this._tabNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
+		this._tabNavigator.customTabBarVariant = TabBarVariant.TOP_SPACING;
+		this._tabNavigator.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		addChild(this._tabNavigator);
 	}
 	

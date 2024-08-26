@@ -1,14 +1,13 @@
-package valeditor;
+package valeditor.container;
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.events.EventType;
-import valedit.ValEditObject;
 import valeditor.editor.data.ContainerSaveData;
 
 /**
  * @author Matse
  */
-interface IValEditorContainer
+interface IContainerEditable
 {
 	public var activeObjectsCollection(default, null):ArrayCollection<ValEditorObject>;
 	public var allObjectsCollection(default, null):ArrayCollection<ValEditorObject>;
@@ -23,23 +22,23 @@ interface IValEditorContainer
 	public var x(get, set):Float;
 	public var y(get, set):Float;
 	
-	function addObject(object:ValEditObject):Void;
+	function addObject(object:ValEditorObject):Void;
 	function adjustView():Void;
 	function canAddObject(object:ValEditorObject):Bool;
 	function close():Void;
 	function fromJSONSave(json:Dynamic):Void;
-	function getActiveObject(objectID:String):ValEditObject;
+	function getActiveObject(objectID:String):ValEditorObject;
 	function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>;
 	function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>;
 	function getContainerDependencies(data:ContainerSaveData):Void;
-	function getObject(objectID:String):ValEditObject;
+	function getObject(objectID:String):ValEditorObject;
 	function hasActiveObject(objectID:String):Bool;
 	function hasObject(objectID:String):Bool;
 	function hasVisibleObject():Bool;
 	function open():Void;
 	function pool():Void;
-	function removeObject(object:ValEditObject):Void;
-	function removeObjectCompletely(object:ValEditObject):Void;
+	function removeObject(object:ValEditorObject):Void;
+	function removeObjectCompletely(object:ValEditorObject):Void;
 	function toJSONSave(json:Dynamic = null):Dynamic;
 	
 	function addEventListener<T>(type:EventType<T>, listener:T->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void;

@@ -686,7 +686,7 @@ class ListViewStyles
 		itemRenderer.pool();
 	}
 	
-	static private var _frame:ValEditKeyFrame;
+	static private var _frame:ValEditorKeyFrame;
 	static private function timeLine_itemUpdate(itemRenderer:BitmapScrollRenderer, state:ListViewItemState):Void
 	{
 		itemRenderer.frameData = state.data;

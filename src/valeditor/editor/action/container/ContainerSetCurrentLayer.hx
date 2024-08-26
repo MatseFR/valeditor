@@ -1,8 +1,8 @@
 package valeditor.editor.action.container;
 
 import openfl.errors.Error;
-import valeditor.ValEditorContainer;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -19,9 +19,9 @@ class ContainerSetCurrentLayer extends ValEditorAction
 		return new ContainerSetCurrentLayer();
 	}
 	
-	public var container:ValEditorContainer;
-	public var layer:ValEditorLayer;
-	public var previousLayer:ValEditorLayer;
+	public var container:ITimeLineContainerEditable;
+	public var layer:ITimeLineLayerEditable;
+	public var previousLayer:ITimeLineLayerEditable;
 	
 	public function new() 
 	{
@@ -43,11 +43,11 @@ class ContainerSetCurrentLayer extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:ValEditorContainer, layer:ValEditorLayer):Void
+	public function setup(container:ITimeLineContainerEditable, layer:ITimeLineLayerEditable):Void
 	{
 		this.container = container;
 		this.layer = layer;
-		this.previousLayer = cast this.container.currentLayer;
+		this.previousLayer = this.container.currentLayer;
 	}
 	
 	public function apply():Void

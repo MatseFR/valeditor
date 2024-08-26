@@ -9,7 +9,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import openfl.events.Event;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.layer.LayerLock;
 import valeditor.editor.action.layer.LayerVisible;
 import valeditor.events.LayerEvent;
@@ -24,17 +24,17 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 {
 	static private var _POOL:Array<LayerItemRenderer> = new Array<LayerItemRenderer>();
 	
-	static public function fromPool(layer:ValEditorLayer = null):LayerItemRenderer
+	static public function fromPool(layer:ITimeLineLayerEditable = null):LayerItemRenderer
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(layer);
 		return new LayerItemRenderer(layer);
 	}
 	
-	public var layer(get, set):ValEditorLayer;
+	public var layer(get, set):ITimeLineLayerEditable;
 	
-	private var _layer:ValEditorLayer;
-	private function get_layer():ValEditorLayer { return this._layer; }
-	private function set_layer(value:ValEditorLayer):ValEditorLayer
+	private var _layer:ITimeLineLayerEditable;
+	private function get_layer():ITimeLineLayerEditable { return this._layer; }
+	private function set_layer(value:ITimeLineLayerEditable):ITimeLineLayerEditable
 	{
 		if (this._layer != value)
 		{
@@ -63,7 +63,7 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 	private var _visibleToggle:Check;
 	private var _lockToggle:Check;
 	
-	public function new(layer:ValEditorLayer) 
+	public function new(layer:ITimeLineLayerEditable) 
 	{
 		super();
 		this.layer = layer;
@@ -113,7 +113,7 @@ class LayerItemRenderer extends LayoutGroupItemRenderer
 		addChild(this._lockToggle);
 	}
 	
-	private function setTo(layer:ValEditorLayer):LayerItemRenderer
+	private function setTo(layer:ITimeLineLayerEditable):LayerItemRenderer
 	{
 		this.layer = layer;
 		return this;

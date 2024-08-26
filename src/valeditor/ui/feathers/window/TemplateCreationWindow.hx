@@ -30,6 +30,7 @@ import valeditor.editor.action.template.TemplateAdd;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.data.StringData;
+import valeditor.ui.feathers.renderers.ClassItemRenderer;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
@@ -192,15 +193,27 @@ class TemplateCreationWindow extends Panel
 		this._classLabel = new Label("Template Class");
 		this._classGroup.addChild(this._classLabel);
 		
+		//var recycler = DisplayObjectRecycler.withFunction(() -> {
+			//var renderer:ItemRenderer = new ItemRenderer();
+			//renderer.icon = new Bitmap();
+			//return renderer;
+		//});
+		//
+		//recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
+			//cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
+			//renderer.text = cast(state.data, ValEditorClass).exportClassName;
+		//};
+		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
-			var renderer:ItemRenderer = new ItemRenderer();
-			renderer.icon = new Bitmap();
-			return renderer;
+			return ClassItemRenderer.fromPool();
 		});
 		
-		recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
-			cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
-			renderer.text = state.data.className;
+		recycler.update = (renderer:ClassItemRenderer, state:ListViewItemState) -> {
+			renderer.clss = state.data;
+		};
+		
+		recycler.destroy = (renderer:ClassItemRenderer) -> {
+			renderer.pool();
 		};
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
@@ -213,7 +226,7 @@ class TemplateCreationWindow extends Panel
 			return listView;
 		};
 		this._classPicker.itemToText = function(item:Dynamic):String {
-			return item.className;
+			return cast(item, ValEditorClass).exportClassName;
 		};
 		this._classPicker.itemRendererRecycler = recycler;
 		this._classGroup.addChild(this._classPicker);

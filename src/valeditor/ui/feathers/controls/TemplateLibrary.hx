@@ -23,15 +23,14 @@ import openfl.display.Bitmap;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import openfl.events.Event;
-import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.ui.Keyboard;
-import valeditor.IValEditorContainer;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
 import valeditor.ValEditorTemplateGroup;
+import valeditor.container.IContainerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
 import valeditor.editor.action.container.ContainerTemplateOpen;
@@ -341,7 +340,7 @@ class TemplateLibrary extends LayoutGroup
 		var singleTemplateSelected:Bool = this._grid.selectedItems.length == 1;
 		var templateSelected:Bool = this._grid.selectedItems.length != 0;
 		
-		this._openTemplateContainerMenuItem.enabled = template != null && Std.isOfType(template.object.object, IValEditorContainer);
+		this._openTemplateContainerMenuItem.enabled = template != null && Std.isOfType(template.object.object, IContainerEditable);
 		this._removeTemplateMenuItem.enabled = templateSelected;
 		this._renameTemplateMenuItem.enabled = singleTemplateSelected;
 		this._editTemplateVisibilityMenuItem.enabled = singleTemplateSelected;
@@ -370,7 +369,7 @@ class TemplateLibrary extends LayoutGroup
 	
 	private function onTemplateCreated(template:ValEditorTemplate):Void
 	{
-		if (Std.isOfType(template.object.object, IValEditorContainer))
+		if (Std.isOfType(template.object.object, IContainerEditable))
 		{
 			var action:MultiAction = MultiAction.fromPool();
 			
@@ -379,7 +378,7 @@ class TemplateLibrary extends LayoutGroup
 			action.add(selectionClear);
 			
 			var containerOpen:ContainerTemplateOpen = ContainerTemplateOpen.fromPool();
-			containerOpen.setup(cast template.object);
+			containerOpen.setup(template.object);
 			action.add(containerOpen);
 			
 			ValEditor.actionStack.add(action);
@@ -390,8 +389,8 @@ class TemplateLibrary extends LayoutGroup
 	{
 		var action:MultiAction;
 		var selectionClear:SelectionClear;
-		var container:ValEditorObject = cast cast(this._grid.selectedItem, ValEditorTemplate).object;
-		if (cast(container.object, IValEditorContainer).isOpen)
+		var container:ValEditorObject = cast(this._grid.selectedItem, ValEditorTemplate).object;
+		if (cast(container.object, IContainerEditable).isOpen)
 		{
 			if (ValEditor.currentContainer != container.object)
 			{
@@ -488,7 +487,7 @@ class TemplateLibrary extends LayoutGroup
 		{
 			this._templateRemoveButton.enabled = true;
 			this._templateRenameButton.enabled = this._grid.selectedItems.length == 1;
-			this._templateOpenButton.enabled = this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IValEditorContainer);
+			this._templateOpenButton.enabled = this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IContainerEditable);
 		}
 		else
 		{
@@ -562,7 +561,7 @@ class TemplateLibrary extends LayoutGroup
 				}
 			
 			case Keyboard.ENTER, Keyboard.NUMPAD_ENTER :
-				if (this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IValEditorContainer))
+				if (this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorTemplate).object.object, IContainerEditable))
 				{
 					onTemplateOpenButton(null);
 				}

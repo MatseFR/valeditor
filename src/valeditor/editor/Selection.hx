@@ -276,7 +276,7 @@ class Selection extends EventDispatcher
 				objectAdd.addObject(object);
 				action.add(objectAdd);
 				objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
-				objectRemoveKeyFrame.setup(object, cast object.currentKeyFrame);
+				objectRemoveKeyFrame.setup(object, object.currentKeyFrame);
 				action.add(objectRemoveKeyFrame);
 			}
 			

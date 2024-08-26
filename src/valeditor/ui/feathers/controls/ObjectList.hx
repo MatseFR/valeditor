@@ -29,6 +29,8 @@ import openfl.geom.Point;
 import openfl.ui.Keyboard;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorObjectGroup;
+import valeditor.container.IContainerEditable;
+import valeditor.container.ITimeLineContainerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
 import valeditor.editor.action.container.ContainerOpen;
@@ -340,7 +342,7 @@ class ObjectList extends LayoutGroup
 		var singleObjectSelected:Bool = this._grid.selectedItems.length == 1;
 		var objectSelected:Bool = this._grid.selectedItems.length != 0;
 		
-		this._openObjectMenuItem.enabled = object != null && Std.isOfType(object.object, IValEditorContainer);
+		this._openObjectMenuItem.enabled = object != null && Std.isOfType(object.object, IContainerEditable);
 		this._removeObjectMenuItem.enabled = objectSelected;
 		this._renameObjectMenuItem.enabled = singleObjectSelected;
 		this._contextMenuCollection.updateAll();
@@ -367,7 +369,7 @@ class ObjectList extends LayoutGroup
 		{
 			this._objectRemoveButton.enabled = true;
 			this._objectRenameButton.enabled = this._grid.selectedItems.length == 1;
-			this._objectOpenButton.enabled = this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorObject).object, IValEditorContainer);
+			this._objectOpenButton.enabled = this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorObject).object, IContainerEditable);
 		}
 		else
 		{
@@ -441,7 +443,7 @@ class ObjectList extends LayoutGroup
 				}
 			
 			case Keyboard.ENTER, Keyboard.NUMPAD_ENTER :
-				if (this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorObject).object, IValEditorContainer))
+				if (this._grid.selectedItems.length == 1 && Std.isOfType(cast(this._grid.selectedItem, ValEditorObject).object, IContainerEditable))
 				{
 					onObjectOpenButton(null);
 				}
@@ -600,9 +602,9 @@ class ObjectList extends LayoutGroup
 	{
 		var action:MultiAction;
 		var selectionClear:SelectionClear;
-		var container:ValEditorObject = cast cast(this._grid.selectedItem, ValEditorObject).template.object;
+		var container:ValEditorObject = cast(this._grid.selectedItem, ValEditorObject).template.object;
 		
-		if (cast(container.object, IValEditorContainer).isOpen)
+		if (cast(container.object, IContainerEditable).isOpen)
 		{
 			if (ValEditor.currentContainer != container.object)
 			{
@@ -642,7 +644,7 @@ class ObjectList extends LayoutGroup
 		var selectionClear:SelectionClear = SelectionClear.fromPool();
 		selectionClear.setup(ValEditor.selection);
 		
-		if (Std.isOfType(ValEditor.currentContainer, IValEditorTimeLineContainer))
+		if (Std.isOfType(ValEditor.currentContainer, ITimeLineContainerEditable))
 		{
 			var objectRemoveKeyFrame:ObjectRemoveKeyFrame;
 			
@@ -653,7 +655,7 @@ class ObjectList extends LayoutGroup
 					for (keyFrame in cast(obj, ValEditorObject).keyFrames)
 					{
 						objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
-						objectRemoveKeyFrame.setup(obj, cast keyFrame);
+						objectRemoveKeyFrame.setup(obj, keyFrame);
 						action.add(objectRemoveKeyFrame);
 					}
 				}
@@ -663,7 +665,7 @@ class ObjectList extends LayoutGroup
 				for (obj in this._grid.selectedItems)
 				{
 					objectRemoveKeyFrame = ObjectRemoveKeyFrame.fromPool();
-					objectRemoveKeyFrame.setup(obj, cast obj.currentKeyFrame);
+					objectRemoveKeyFrame.setup(obj, obj.currentKeyFrame);
 					action.add(objectRemoveKeyFrame);
 				}
 			}

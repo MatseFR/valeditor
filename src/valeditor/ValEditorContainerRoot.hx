@@ -1,10 +1,11 @@
 package valeditor;
+import valeditor.container.TimeLineContainerOpenFLStarlingEditable;
 
 /**
  * ...
  * @author Matse
  */
-class ValEditorContainerRoot extends ValEditorContainer 
+class ValEditorContainerRoot extends TimeLineContainerOpenFLStarlingEditable 
 {
 	static private var _POOL:Array<ValEditorContainerRoot> = new Array<ValEditorContainerRoot>();
 	

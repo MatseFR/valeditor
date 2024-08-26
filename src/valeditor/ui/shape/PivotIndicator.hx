@@ -1,7 +1,6 @@
 package valeditor.ui.shape;
 
 import openfl.display.Shape;
-import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 
 /**
@@ -68,7 +67,7 @@ class PivotIndicator extends Shape
 		return this._interestMap.exists(regularPropertyName);
 	}
 	
-	public function objectUpdate(object:ValEditObject):Void
+	public function objectUpdate(object:ValEditorObject):Void
 	{
 		this.x = object.getProperty(RegularPropertyName.X);
 		this.y = object.getProperty(RegularPropertyName.Y);

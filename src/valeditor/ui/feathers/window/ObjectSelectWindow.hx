@@ -19,7 +19,6 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valedit.ValEdit;
-import valedit.ValEditObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -155,7 +154,7 @@ class ObjectSelectWindow extends Panel
 		this._objectGroup.addChild(this._objectLabel);
 		
 		var columns:ArrayCollection<GridViewColumn> = new ArrayCollection<GridViewColumn>([
-			new GridViewColumn("id", (item)->cast(item, ValEditorObject).id),
+			new GridViewColumn("id", (item)->cast(item, ValEditorObject).objectID),
 			new GridViewColumn("class", (item)->item.className)
 		]);
 		
@@ -246,7 +245,7 @@ class ObjectSelectWindow extends Panel
 		this._confirmCallback(this._objectGrid.selectedItem);
 	}
 	
-	private function filterObject(object:ValEditObject):Bool
+	private function filterObject(object:ValEditorObject):Bool
 	{
 		return this._excludeObjects.indexOf(object.object) == -1;
 	}

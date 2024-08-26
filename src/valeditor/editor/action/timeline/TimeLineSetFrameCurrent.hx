@@ -48,7 +48,7 @@ class TimeLineSetFrameCurrent extends ValEditorAction
 	{
 		this.timeLine = timeLine;
 		this.keyFrame = keyFrame;
-		this.previousKeyFrame = cast this.timeLine.frameCurrent;
+		this.previousKeyFrame = this.timeLine.frameCurrent;
 	}
 	
 	public function apply():Void

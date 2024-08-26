@@ -15,7 +15,6 @@ import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
-import feathers.layout.HorizontalListLayout;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
@@ -27,8 +26,8 @@ import openfl.events.Event;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
-import valeditor.IValEditorContainer;
 import valeditor.ValEditorObject;
+import valeditor.container.IContainerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerMakeCurrent;
 import valeditor.editor.action.container.ContainerOpen;
@@ -492,14 +491,14 @@ class EditorView extends LayoutGroup
 				}
 			
 			case "open_container" :
-				var container:ValEditorObject = cast ValEditor.selection.object;
+				var container:ValEditorObject = ValEditor.selection.object;
 				if (container.template != null)
 				{
-					container = cast container.template.object;
+					container = container.template.object;
 				}
 				var selectionClear:SelectionClear;
 				action = MultiAction.fromPool();
-				if (cast(container.object, IValEditorContainer).isOpen)
+				if (cast(container.object, IContainerEditable).isOpen)
 				{
 					if (ValEditor.currentContainer != container.object)
 					{
@@ -584,7 +583,7 @@ class EditorView extends LayoutGroup
 				closeContextMenu();
 			}
 			
-			var isContainerSelected:Bool = ValEditor.selection.numObjects == 1 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) && Std.isOfType(ValEditor.selection.object.object, IValEditorContainer));
+			var isContainerSelected:Bool = ValEditor.selection.numObjects == 1 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) && Std.isOfType(ValEditor.selection.object.object, IContainerEditable));
 			var isObjectSelected:Bool = ValEditor.selection.numObjects != 0 && (Std.isOfType(ValEditor.selection.object, ValEditorObject) || Std.isOfType(ValEditor.selection.object, ValEditorObjectGroup));
 			var isObjectInClipboard:Bool = ValEditor.clipboard.numObjects != 0 && (Std.isOfType(ValEditor.clipboard.object, ValEditorObject) || Std.isOfType(ValEditor.clipboard.object, ValEditorObjectGroup));
 			

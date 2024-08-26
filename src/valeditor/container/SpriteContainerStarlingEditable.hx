@@ -1,4 +1,5 @@
-package valeditor;
+#if starling
+package valeditor.container;
 
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
@@ -6,12 +7,10 @@ import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
 import valedit.DisplayObjectType;
-import valedit.IValEditContainer;
-import valedit.IValEditStarlingContainer;
-import valedit.ValEdit;
-import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
+import valeditor.container.IContainerEditable;
+import valeditor.container.IContainerStarlingEditable;
 import valeditor.editor.data.ContainerSaveData;
 import valeditor.events.ContainerEvent;
 import valeditor.events.ObjectFunctionEvent;
@@ -25,14 +24,14 @@ import valeditor.utils.MathUtil;
  * ...
  * @author Matse
  */
-class SpriteContainerStarling extends EventDispatcher implements IValEditorContainer implements IValEditStarlingContainer implements IValEditContainer
+class SpriteContainerStarlingEditable extends EventDispatcher implements IContainerEditable implements IContainerStarlingEditable
 {
-	static private var _POOL:Array<SpriteContainerStarling> = new Array<SpriteContainerStarling>();
+	static private var _POOL:Array<SpriteContainerStarlingEditable> = new Array<SpriteContainerStarlingEditable>();
 	
-	static public function fromPool():SpriteContainerStarling
+	static public function fromPool():SpriteContainerStarlingEditable
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new SpriteContainerStarling();
+		return new SpriteContainerStarlingEditable();
 	}
 	
 	public var activeObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
@@ -268,7 +267,7 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		return this._y = value;
 	}
 	
-	private var _allObjects:Map<String, ValEditObject> = new Map<String, ValEditObject>();
+	private var _allObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _displayObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
 	private var _objects:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
@@ -373,12 +372,12 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		return visibleObjects;
 	}
 	
-	public function getActiveObject(objectID:String):ValEditObject
+	public function getActiveObject(objectID:String):ValEditorObject
 	{
 		return getObject(objectID);
 	}
 	
-	public function getObject(objectID:String):ValEditObject
+	public function getObject(objectID:String):ValEditorObject
 	{
 		return this._allObjects.get(objectID);
 	}
@@ -405,12 +404,12 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		return false;
 	}
 	
-	public function addObject(object:ValEditObject):Void
+	public function addObject(object:ValEditorObject):Void
 	{
 		this._allObjects.set(object.objectID, object);
-		this._objects[this._objects.length] = cast object;
-		this.activeObjectsCollection.add(cast object);
-		this.allObjectsCollection.add(cast object);
+		this._objects[this._objects.length] = object;
+		this.activeObjectsCollection.add(object);
+		this.allObjectsCollection.add(object);
 		
 		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
@@ -418,16 +417,16 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		
 		if (object.isDisplayObject)
 		{
-			this._displayObjects[this._displayObjects.length] = cast object;
-			this._containerStarling.addChild(cast object.object);
-			this._containerStarling.addChild(cast cast(object, ValEditorObject).interactiveObject);
+			this._displayObjects[this._displayObjects.length] = object;
+			this._containerStarling.addChild(object.object);
+			this._containerStarling.addChild(cast object.interactiveObject);
 		}
 		else if (object.isContainer)
 		{
-			this._displayObjects[this._displayObjects.length] = cast object;
+			this._displayObjects[this._displayObjects.length] = object;
 			if (object.isContainerStarling)
 			{
-				cast(object.object, IValEditStarlingContainer).rootContainerStarling = this._containerStarling;
+				cast(object.object, IContainerStarlingEditable).rootContainerStarling = this._containerStarling;
 			}
 		}
 		
@@ -437,12 +436,12 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED_TO_CONTAINER, object);
 	}
 	
-	public function removeObject(object:ValEditObject):Void
+	public function removeObject(object:ValEditorObject):Void
 	{
 		this._allObjects.remove(object.objectID);
-		this._objects.remove(cast object);
-		this.activeObjectsCollection.remove(cast object);
-		this.allObjectsCollection.remove(cast object);
+		this._objects.remove(object);
+		this.activeObjectsCollection.remove(object);
+		this.allObjectsCollection.remove(object);
 		
 		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
@@ -450,16 +449,16 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		
 		if (object.isDisplayObject)
 		{
-			this._displayObjects.remove(cast object);
+			this._displayObjects.remove(object);
 			this._containerStarling.removeChild(cast object.object);
-			this._containerStarling.removeChild(cast cast(object, ValEditorObject).interactiveObject);
+			this._containerStarling.removeChild(cast object.interactiveObject);
 		}
 		else if (object.isContainer)
 		{
-			this._displayObjects.remove(cast object);
+			this._displayObjects.remove(object);
 			if (object.isContainerStarling)
 			{
-				cast(object.object, IValEditStarlingContainer).rootContainerStarling = null;
+				cast(object.object, IContainerStarlingEditable).rootContainerStarling = null;
 			}
 		}
 		
@@ -469,7 +468,7 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, object);
 	}
 	
-	public function removeObjectCompletely(object:ValEditObject):Void
+	public function removeObjectCompletely(object:ValEditorObject):Void
 	{
 		removeObject(object);
 	}
@@ -478,9 +477,9 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 	{
 		for (object in this._objects)
 		{
-			if (object.template != null && object.clss.isContainer && !data.hasDependency(cast object.template))
+			if (object.template != null && object.clss.isContainer && !data.hasDependency(object.template))
 			{
-				data.addDependency(cast object.template);
+				data.addDependency(object.template);
 			}
 		}
 	}
@@ -505,7 +504,7 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		this.allObjectsCollection.updateAt(this.allObjectsCollection.indexOf(object));
 	}
 	
-	private function cloneTo(container:SpriteContainerStarling):Void
+	private function cloneTo(container:SpriteContainerStarlingEditable):Void
 	{
 		container.alpha = this.alpha;
 		container.blendMode = this.blendMode;
@@ -538,11 +537,11 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 		{
 			if (data.templateID != null)
 			{
-				object = cast ValEdit.getTemplate(data.templateID).getInstance(data.id);
+				object = ValEditor.getTemplate(data.templateID).getInstance(data.id);
 			}
 			else
 			{
-				object = cast ValEditor.getClassByName(data.clss).getObjectByID(data.id);
+				object = ValEditor.getClassByName(data.clss).getObjectByID(data.id);
 			}
 			object.currentCollection.apply();
 			if (object.interactiveObject != null)
@@ -582,3 +581,4 @@ class SpriteContainerStarling extends EventDispatcher implements IValEditorConta
 	}
 	
 }
+#end

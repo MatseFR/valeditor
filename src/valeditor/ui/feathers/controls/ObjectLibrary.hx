@@ -8,6 +8,7 @@ import feathers.layout.AnchorLayout;
 import feathers.layout.AnchorLayoutData;
 import valeditor.ValEditor;
 import valeditor.events.EditorEvent;
+import valeditor.ui.feathers.theme.variant.TabBarVariant;
 
 /**
  * ...
@@ -40,7 +41,8 @@ class ObjectLibrary extends LayoutGroup
 		]);
 		
 		this._tabNavigator = new TabNavigator(views);
-		this._tabNavigator.layoutData = new AnchorLayoutData(Padding.MINIMAL, 0, 0, 0);
+		this._tabNavigator.customTabBarVariant = TabBarVariant.TOP_SPACING;
+		this._tabNavigator.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		addChild(this._tabNavigator);
 		
 		ValEditor.addEventListener(EditorEvent.CONTAINER_CURRENT, onEditorContainerCurrent);

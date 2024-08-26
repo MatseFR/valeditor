@@ -8,8 +8,8 @@ import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ValEditKeyFrame;
-import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.container.ContainerSetCurrentLayer;
 import valeditor.editor.action.selection.SelectionSetObject;
@@ -28,14 +28,14 @@ class TimeLineItem extends LayoutGroup
 {
 	static private var _POOL:Array<TimeLineItem> = new Array<TimeLineItem>();
 	
-	static public function fromPool(layer:ValEditorLayer = null):TimeLineItem
+	static public function fromPool(layer:ITimeLineLayerEditable = null):TimeLineItem
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(layer);
 		return new TimeLineItem(layer);
 	}
 	
 	public var isCurrent(get, set):Bool;
-	public var layer(get, set):ValEditorLayer;
+	public var layer(get, set):ITimeLineLayerEditable;
 	public var maxScrollX(get, never):Float;
 	public var minScrollX(get, never):Float;
 	public var scrollX(get, set):Float;
@@ -53,15 +53,15 @@ class TimeLineItem extends LayoutGroup
 		return this._isCurrent = value;
 	}
 	
-	private var _layer:ValEditorLayer;
-	private function get_layer():ValEditorLayer { return this._layer; }
-	private function set_layer(value:ValEditorLayer):ValEditorLayer
+	private var _layer:ITimeLineLayerEditable;
+	private function get_layer():ITimeLineLayerEditable { return this._layer; }
+	private function set_layer(value:ITimeLineLayerEditable):ITimeLineLayerEditable
 	{
 		if (this._layer == value) return value;
 		
 		if (value != null)
 		{
-			this._timeLine = cast value.timeLine;
+			this._timeLine = value.timeLine;
 			this._timeLine.addEventListener(TimeLineEvent.SELECTED_FRAME_INDEX_CHANGE, onTimeLineSelectedFrameIndexChange);
 			this._list.dataProvider = this._timeLine.frameCollection;
 			this._list.validateNow();
@@ -104,7 +104,7 @@ class TimeLineItem extends LayoutGroup
 	private var _list:ListView;
 	private var _frame:ValEditKeyFrame;
 
-	public function new(layer:ValEditorLayer) 
+	public function new(layer:ITimeLineLayerEditable) 
 	{
 		super();
 		initializeNow();
@@ -162,7 +162,7 @@ class TimeLineItem extends LayoutGroup
 			if (this.layer.container.currentLayer != this.layer)
 			{
 				var setCurrentLayer:ContainerSetCurrentLayer = ContainerSetCurrentLayer.fromPool();
-				setCurrentLayer.setup(cast this.layer.container, this.layer);
+				setCurrentLayer.setup(this.layer.container, this.layer);
 				action.add(setCurrentLayer);
 			}
 			
@@ -176,7 +176,7 @@ class TimeLineItem extends LayoutGroup
 			if (this._timeLine.parent.frameIndex != this._list.selectedIndex)
 			{
 				var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
-				setFrameIndex.setup(cast this._timeLine.parent, this._list.selectedIndex);
+				setFrameIndex.setup(this._timeLine.parent, this._list.selectedIndex);
 				action.add(setFrameIndex);
 			}
 			
@@ -198,7 +198,7 @@ class TimeLineItem extends LayoutGroup
 		}
 	}
 	
-	private function setTo(layer:ValEditorLayer):TimeLineItem
+	private function setTo(layer:ITimeLineLayerEditable):TimeLineItem
 	{
 		this.layer = layer;
 		return this;
@@ -211,7 +211,7 @@ class TimeLineItem extends LayoutGroup
 		if (this.layer.container.currentLayer != this.layer)
 		{
 			var setCurrentLayer:ContainerSetCurrentLayer = ContainerSetCurrentLayer.fromPool();
-			setCurrentLayer.setup(cast this.layer.container, this.layer);
+			setCurrentLayer.setup(this.layer.container, this.layer);
 			action.add(setCurrentLayer);
 		}
 		
@@ -225,7 +225,7 @@ class TimeLineItem extends LayoutGroup
 		if (this._timeLine.parent.frameIndex != evt.state.index)
 		{
 			var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
-			setFrameIndex.setup(cast this._timeLine.parent, evt.state.index);
+			setFrameIndex.setup(this._timeLine.parent, evt.state.index);
 			action.add(setFrameIndex);
 		}
 		

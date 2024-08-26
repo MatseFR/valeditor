@@ -14,6 +14,7 @@ import valeditor.ui.feathers.theme.components.ScenarioViewStyles;
 import valeditor.ui.feathers.theme.components.ScrollContainerStyles;
 import valeditor.ui.feathers.theme.components.SelectionGroupStyles;
 import valeditor.ui.feathers.theme.components.SortOrderHeaderRendererStyles;
+import valeditor.ui.feathers.theme.components.TabBarStyles;
 import valeditor.ui.feathers.theme.components.TextInputStyles;
 import valeditor.ui.feathers.theme.components.ToggleButtonStyles;
 import valeditor.ui.feathers.theme.components.ToggleCustomStyles;
@@ -54,6 +55,7 @@ class ValEditorTheme extends SimpleTheme
 		ScrollContainerStyles.initialize(this, this.styleProvider);
 		SelectionGroupStyles.initialize(this, this.styleProvider);
 		SortOrderHeaderRendererStyles.initialize(this, this.styleProvider);
+		TabBarStyles.initialize(this, this.styleProvider);
 		TextInputStyles.initialize(this, this.styleProvider);
 		ToggleButtonStyles.initialize(this, this.styleProvider);
 		ToggleCustomStyles.initialize(this, this.styleProvider);

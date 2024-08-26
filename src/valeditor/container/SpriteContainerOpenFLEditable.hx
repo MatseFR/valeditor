@@ -1,17 +1,16 @@
-package valeditor;
+package valeditor.container;
+
 import feathers.data.ArrayCollection;
+import openfl.display.BlendMode;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
-import starling.display.Sprite3D;
 import valedit.DisplayObjectType;
-import valedit.IValEditContainer;
-import valedit.IValEditStarlingContainer;
-import valedit.ValEdit;
-import valedit.ValEditObject;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
+import valeditor.container.IContainerEditable;
+import valeditor.container.IContainerOpenFLEditable;
 import valeditor.editor.data.ContainerSaveData;
 import valeditor.events.ContainerEvent;
 import valeditor.events.ObjectFunctionEvent;
@@ -19,48 +18,36 @@ import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.shape.PivotIndicator;
-import valeditor.utils.MathUtil;
 
 /**
  * ...
  * @author Matse
  */
-class SpriteContainerStarling3D extends EventDispatcher implements IValEditorContainer implements IValEditStarlingContainer implements IValEditContainer
+class SpriteContainerOpenFLEditable extends EventDispatcher implements IContainerEditable implements IContainerOpenFLEditable
 {
-	static private var _POOL:Array<SpriteContainerStarling3D> = new Array<SpriteContainerStarling3D>();
+	static private var _POOL:Array<SpriteContainerOpenFLEditable> = new Array<SpriteContainerOpenFLEditable>();
 	
-	static public function fromPool():SpriteContainerStarling3D
+	static public function fromPool():SpriteContainerOpenFLEditable
 	{
 		if (_POOL.length != 0) return _POOL.pop();
-		return new SpriteContainerStarling3D();
+		return new SpriteContainerOpenFLEditable();
 	}
 	
 	public var activeObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	public var allObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	public var alpha(get, set):Float;
-	public var blendMode(get, set):String;
+	public var blendMode(get, set):BlendMode;
 	public var cameraX(get, set):Float;
 	public var cameraY(get, set):Float;
-	public var containerStarling(get, never):starling.display.DisplayObjectContainer;
+	public var container(get, never):DisplayObjectContainer;
 	public var containerUI(default, null):DisplayObjectContainer = new Sprite();
 	public var height(get, set):Float;
 	public var isOpen(get, never):Bool;
-	public var mask(get, set):starling.display.DisplayObject;
-	public var maskInverted(get, set):Bool;
-	public var parent(get, never):starling.display.DisplayObjectContainer;
-	public var pivotX(get, set):Float;
-	public var pivotY(get, set):Float;
-	public var pivotZ(get, set):Float;
+	public var parent(get, never):DisplayObjectContainer;
 	public var rootContainer(get, set):DisplayObjectContainer;
-	public var rootContainerStarling(get, set):starling.display.DisplayObjectContainer;
-	public var rotationX(get, set):Float;
-	public var rotationY(get, set):Float;
-	public var rotationZ(get, set):Float;
+	public var rotation(get, set):Float;
 	public var scaleX(get, set):Float;
 	public var scaleY(get, set):Float;
-	public var scaleZ(get, set):Float;
-	//public var skewX(get, set):Float;
-	//public var skewY(get, set):Float;
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
@@ -69,25 +56,24 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 	public var width(get, set):Float;
 	public var x(get, set):Float;
 	public var y(get, set):Float;
-	public var z(get, set):Float;
 	
-	private function get_alpha():Float { return this._containerStarling.alpha; }
+	private function get_alpha():Float { return this._container.alpha; }
 	private function set_alpha(value:Float):Float
 	{
-		return this._containerStarling.alpha = value;
+		return this._container.alpha = value;
 	}
 	
-	private function get_blendMode():String { return this._containerStarling.blendMode; }
-	private function set_blendMode(value:String):String
+	private function get_blendMode():BlendMode { return this._container.blendMode; }
+	private function set_blendMode(value:BlendMode):BlendMode
 	{
-		return this._containerStarling.blendMode = value;
+		return this._container.blendMode = value;
 	}
 	
 	private var _cameraX:Float = 0;
 	private function get_cameraX():Float { return this._cameraX; }
 	private function set_cameraX(value:Float):Float
 	{
-		this._containerStarling.x = this.x - value;
+		this._container.x = this.x - value;
 		this.containerUI.x = this.x - value;
 		return this._cameraX = value;
 	}
@@ -96,54 +82,24 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 	private function get_cameraY():Float { return this._cameraY; }
 	private function set_cameraY(value:Float):Float
 	{
-		this._containerStarling.y = this.y - value;
+		this._container.y = this.y - value;
 		this.containerUI.y = this.y - value;
 		return this._cameraY = value;
 	}
 	
-	private var _containerStarling:Sprite3D = new Sprite3D();
-	private function get_containerStarling():Sprite3D { return this._containerStarling; }
+	private var _container:Sprite = new Sprite();
+	private function get_container():DisplayObjectContainer { return this._container; }
 	
-	private function get_height():Float { return this._containerStarling.height; }
+	private function get_height():Float { return this._container.height; }
 	private function set_height(value:Float):Float
 	{
-		return this._containerStarling.height = value;
+		return this._container.height = value;
 	}
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
 	
-	private function get_mask():starling.display.DisplayObject { return this._containerStarling.mask; }
-	private function set_mask(value:starling.display.DisplayObject):starling.display.DisplayObject
-	{
-		return this._containerStarling.mask = value;
-	}
-	
-	private function get_maskInverted():Bool { return this._containerStarling.maskInverted; }
-	private function set_maskInverted(value:Bool):Bool
-	{
-		return this._containerStarling.maskInverted = value;
-	}
-	
-	private function get_parent():starling.display.DisplayObjectContainer { return this._rootContainerStarling; }
-	
-	private function get_pivotX():Float { return this._containerStarling.pivotX; }
-	private function set_pivotX(value:Float):Float
-	{
-		return this._containerStarling.pivotX = value;
-	}
-	
-	private function get_pivotY():Float { return this._containerStarling.pivotY; }
-	private function set_pivotY(value:Float):Float
-	{
-		return this._containerStarling.pivotY = value;
-	}
-	
-	private function get_pivotZ():Float { return this._containerStarling.pivotZ; }
-	private function set_pivotZ(value:Float):Float
-	{
-		return this._containerStarling.pivotZ = value;
-	}
+	private function get_parent():DisplayObjectContainer { return this._rootContainer; }
 	
 	private var _rootContainer:DisplayObjectContainer;
 	private function get_rootContainer():DisplayObjectContainer { return this._rootContainer; }
@@ -153,86 +109,39 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		
 		if (this._rootContainer != null)
 		{
+			this._rootContainer.removeChild(this._container);
 			this._rootContainer.removeChild(this.containerUI);
 		}
 		
 		if (value != null)
 		{
+			value.addChild(this._container);
 			value.addChild(this.containerUI);
 		}
 		
 		return this._rootContainer = value;
 	}
 	
-	private var _rootContainerStarling:starling.display.DisplayObjectContainer;
-	private function get_rootContainerStarling():starling.display.DisplayObjectContainer { return this._rootContainerStarling; }
-	private function set_rootContainerStarling(value:starling.display.DisplayObjectContainer):starling.display.DisplayObjectContainer
+	private function get_rotation():Float { return this._container.rotation; }
+	private function set_rotation(value:Float):Float
 	{
-		if (value == this._rootContainerStarling) return value;
-		
-		if (this._rootContainerStarling != null)
-		{
-			this._rootContainerStarling.removeChild(this._containerStarling);
-		}
-		
-		if (value != null)
-		{
-			value.addChild(this._containerStarling);
-		}
-		
-		return this._rootContainerStarling = value;
+		this.containerUI.rotation = value;
+		return this._container.rotation = value;
 	}
 	
-	private function get_rotationX():Float { return this._containerStarling.rotationX; }
-	private function set_rotationX(value:Float):Float
-	{
-		this.containerUI.rotation = MathUtil.rad2deg(value);
-		return this._containerStarling.rotationX = value;
-	}
-	
-	private function get_rotationY():Float { return this._containerStarling.rotationY; }
-	private function set_rotationY(value:Float):Float
-	{
-		return this._containerStarling.rotationY = value;
-	}
-	
-	private function get_rotationZ():Float { return this._containerStarling.rotationZ; }
-	private function set_rotationZ(value:Float):Float
-	{
-		return this._containerStarling.rotationZ = value;
-	}
-	
-	private function get_scaleX():Float { return this._containerStarling.scaleX; }
+	private function get_scaleX():Float { return this._container.scaleX; }
 	private function set_scaleX(value:Float):Float
 	{
 		this.containerUI.scaleX = value;
-		return this._containerStarling.scaleX = value;
+		return this._container.scaleX = value;
 	}
 	
-	private function get_scaleY():Float { return this._containerStarling.scaleY; }
+	private function get_scaleY():Float { return this._container.scaleY; }
 	private function set_scaleY(value:Float):Float
 	{
 		this.containerUI.scaleY = value;
-		return this._containerStarling.scaleY = value;
+		return this._container.scaleY = value;
 	}
-	
-	private function get_scaleZ():Float { return this._containerStarling.scaleZ; }
-	private function set_scaleZ(value:Float):Float
-	{
-		return this._containerStarling.scaleZ = value;
-	}
-	
-	//private function get_skewX():Float { return this._containerStarling.skewX; }
-	//private function set_skewX(value:Float):Float
-	//{
-		//return this._containerStarling.skewX = value;
-	//}
-	
-	//private function get_skewY():Float { return this._containerStarling.skewY; }
-	//private function set_skewY(value:Float):Float
-	//{
-		//return this._containerStarling.skewY = value;
-	//}
 	
 	private var _viewCenterX:Float = 0;
 	private function get_viewCenterX():Float { return this._viewCenterX; }
@@ -266,24 +175,24 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		return this._viewWidth = value;
 	}
 	
-	private function get_visible():Bool { return this._containerStarling.visible; }
+	private function get_visible():Bool { return this._container.visible; }
 	private function set_visible(value:Bool):Bool
 	{
 		this.containerUI.visible = value;
-		return this._containerStarling.visible = value;
+		return this._container.visible = value;
 	}
 	
-	private function get_width():Float { return this._containerStarling.width; }
+	private function get_width():Float { return this._container.width; }
 	private function set_width(value:Float):Float
 	{
-		return this._containerStarling.width = value;
+		return this._container.width = value;
 	}
 	
 	private var _x:Float = 0;
 	private function get_x():Float { return this._x; }
 	private function set_x(value:Float):Float
 	{
-		this._containerStarling.x = value - this._cameraX;
+		this._container.x = value - this._cameraX;
 		this.containerUI.x = value - this._cameraX;
 		return this._x = value;
 	}
@@ -292,20 +201,12 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 	private function get_y():Float { return this._y; }
 	private function set_y(value:Float):Float
 	{
-		this._containerStarling.y = value - this._cameraY;
+		this._container.y = value - this._cameraY;
 		this.containerUI.y = value - this._cameraY;
 		return this._y = value;
 	}
 	
-	private var _z:Float = 0;
-	private function get_z():Float { return this._z; }
-	private function set_z(value:Float):Float
-	{
-		this._containerStarling.z = value;
-		return this._z = value;
-	}
-	
-	private var _allObjects:Map<String, ValEditObject> = new Map<String, ValEditObject>();
+	private var _allObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _displayObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
 	private var _objects:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
@@ -360,27 +261,28 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 	
 	public function adjustView():Void
 	{
-		// no need ?
+		this.viewCenterX = this._viewCenterX;
+		this.viewCenterY = this._viewCenterY;
 	}
 	
 	public function getBounds(targetSpace:Dynamic):Rectangle
 	{
 		if (targetSpace == this)
 		{
-			targetSpace = this._containerStarling;
+			targetSpace = this._container;
 		}
-		return this._containerStarling.getBounds(targetSpace);
+		return this._container.getBounds(targetSpace);
 	}
 	
 	public function canAddObject(object:ValEditorObject):Bool
 	{
 		if (object.isDisplayObject)
 		{
-			return object.displayObjectType == DisplayObjectType.STARLING;
+			return object.displayObjectType == DisplayObjectType.OPENFL;
 		}
 		else if (object.isContainer)
 		{
-			return object.isContainerStarling && !object.isContainerOpenFL;
+			return object.isContainerOpenFL && !object.isContainerStarling;
 		}
 		return true;
 	}
@@ -393,6 +295,7 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		{
 			objects[objects.length] = object;
 		}
+		
 		return objects;
 	}
 	
@@ -407,15 +310,16 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 				visibleObjects[visibleObjects.length] = object;
 			}
 		}
+		
 		return visibleObjects;
 	}
 	
-	public function getActiveObject(objectID:String):ValEditObject
+	public function getActiveObject(objectID:String):ValEditorObject
 	{
 		return getObject(objectID);
 	}
 	
-	public function getObject(objectID:String):ValEditObject
+	public function getObject(objectID:String):ValEditorObject
 	{
 		return this._allObjects.get(objectID);
 	}
@@ -442,12 +346,12 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		return false;
 	}
 	
-	public function addObject(object:ValEditObject):Void
+	public function addObject(object:ValEditorObject):Void
 	{
 		this._allObjects.set(object.objectID, object);
-		this._objects[this._objects.length] = cast object;
-		this.activeObjectsCollection.add(cast object);
-		this.allObjectsCollection.add(cast object);
+		this._objects[this._objects.length] = object;
+		this.activeObjectsCollection.add(object);
+		this.allObjectsCollection.add(object);
 		
 		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
@@ -455,16 +359,16 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		
 		if (object.isDisplayObject)
 		{
-			this._displayObjects[this._displayObjects.length] = cast object;
-			this._containerStarling.addChild(cast object.object);
-			this._containerStarling.addChild(cast cast(object, ValEditorObject).interactiveObject);
+			this._displayObjects[this._displayObjects.length] = object;
+			this._container.addChild(cast object.object);
+			this._container.addChild(cast object.interactiveObject);
 		}
 		else if (object.isContainer)
 		{
-			this._displayObjects[this._displayObjects.length] = cast object;
-			if (object.isContainerStarling)
+			this._displayObjects[this._displayObjects.length] = object;
+			if (object.isContainerOpenFL)
 			{
-				cast(object.object, IValEditStarlingContainer).rootContainerStarling = this._containerStarling;
+				cast(object.object, IContainerOpenFLEditable).rootContainer = this.container;
 			}
 		}
 		
@@ -474,12 +378,12 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_ADDED_TO_CONTAINER, object);
 	}
 	
-	public function removeObject(object:ValEditObject):Void
+	public function removeObject(object:ValEditorObject):Void
 	{
 		this._allObjects.remove(object.objectID);
-		this._objects.remove(cast object);
-		this.activeObjectsCollection.remove(cast object);
-		this.allObjectsCollection.remove(cast object);
+		this._objects.remove(object);
+		this.activeObjectsCollection.remove(object);
+		this.allObjectsCollection.remove(object);
 		
 		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
@@ -487,16 +391,16 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		
 		if (object.isDisplayObject)
 		{
-			this._displayObjects.remove(cast object);
-			this._containerStarling.removeChild(cast object.object);
-			this._containerStarling.removeChild(cast cast(object, ValEditorObject).interactiveObject);
+			this._displayObjects.remove(object);
+			this._container.removeChild(cast object.object);
+			this._container.removeChild(cast object.interactiveObject);
 		}
 		else if (object.isContainer)
 		{
-			this._displayObjects.remove(cast object);
-			if (object.isContainerStarling)
+			this._displayObjects.remove(object);
+			if (object.isContainerOpenFL)
 			{
-				cast(object.object, IValEditStarlingContainer).rootContainerStarling = null;
+				cast(object.object, IContainerOpenFLEditable).rootContainer = null;
 			}
 		}
 		
@@ -506,7 +410,7 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		ContainerEvent.dispatch(this, ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, object);
 	}
 	
-	public function removeObjectCompletely(object:ValEditObject):Void
+	public function removeObjectCompletely(object:ValEditorObject):Void
 	{
 		removeObject(object);
 	}
@@ -515,9 +419,9 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 	{
 		for (object in this._objects)
 		{
-			if (object.template != null && object.clss.isContainer && !data.hasDependency(cast object.template))
+			if (object.template != null && object.clss.isContainer && !data.hasDependency(object.template))
 			{
-				data.addDependency(cast object.template);
+				data.addDependency(object.template);
 			}
 		}
 	}
@@ -542,22 +446,18 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		this.allObjectsCollection.updateAt(this.allObjectsCollection.indexOf(object));
 	}
 	
-	private function cloneTo(container:SpriteContainerStarling3D):Void
+	private function cloneTo(container:SpriteContainerOpenFLEditable):Void
 	{
 		container.alpha = this.alpha;
 		container.blendMode = this.blendMode;
-		container.rotationX = this.rotationX;
-		container.rotationY = this.rotationY;
-		container.rotationZ = this.rotationZ;
+		container.rotation = this.rotation;
 		container.scaleX = this.scaleX;
 		container.scaleY = this.scaleY;
-		container.scaleZ = this.scaleZ;
 		container.visible = this.visible;
 		container.viewCenterX = this.viewCenterX;
 		container.viewCenterY = this.viewCenterY;
 		container.x = this.x;
 		container.y = this.y;
-		container.z = this.z;
 		
 		var cloneObject:ValEditorObject;
 		for (object in this._objects)
@@ -579,11 +479,11 @@ class SpriteContainerStarling3D extends EventDispatcher implements IValEditorCon
 		{
 			if (data.templateID != null)
 			{
-				object = cast ValEdit.getTemplate(data.templateID).getInstance(data.id);
+				object = ValEditor.getTemplate(data.templateID).getInstance(data.id);
 			}
 			else
 			{
-				object = cast ValEditor.getClassByName(data.clss).getObjectByID(data.id);
+				object = ValEditor.getClassByName(data.clss).getObjectByID(data.id);
 			}
 			object.currentCollection.apply();
 			if (object.interactiveObject != null)

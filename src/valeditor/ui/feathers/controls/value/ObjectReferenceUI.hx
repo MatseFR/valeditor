@@ -163,7 +163,7 @@ class ObjectReferenceUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
-			var object:ValEditObject = this._objectReferenceValue._valEditObjectReference;
+			var object:ValEditorObject = this._objectReferenceValue._valEditObjectReference;
 			if (object != null)
 			{
 				this._idLabel.text = object.id;
@@ -267,13 +267,13 @@ class ObjectReferenceUI extends ValueUI
 		else
 		{
 			this._exposedValue.value = object;
-			if (Std.isOfType(object, ValEditObject))
+			if (Std.isOfType(object, ValEditorObject))
 			{
-				this._idLabel.text = cast(object, ValEditObject).id;
+				this._idLabel.text = cast(object, ValEditorObject).id;
 			}
 			else
 			{
-				throw new Error("missing ValEditObject");
+				throw new Error("missing ValEditorObject");
 			}
 		}
 	}

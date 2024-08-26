@@ -140,7 +140,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 		
 		recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
 			cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
-			renderer.text = state.data.className;
+			renderer.text = cast(state.data, ValEditorClass).exportClassName;
 		};
 		
 		this._classCollection.addAll(ValEditor.classCollection);
@@ -297,7 +297,7 @@ class ObjectCreationFromClassView extends LayoutGroup
 	{
 		if (this._classPicker.selectedIndex != -1)
 		{
-			this._valEditorClass = ValEditor.getValEditorClassByClassName(this._classPicker.selectedItem.value);
+			this._valEditorClass = this._classPicker.selectedItem;
 			this._constructorCollection = ValEditor.editConstructor(this._valEditorClass.className, this._constructorContainer);
 		}
 		else

@@ -93,7 +93,7 @@ class SelectionBox extends Sprite
 		
 		if (object.useBounds)
 		{
-			var bounds:Rectangle = object.getBounds(Reflect.getProperty(object.object, "parent"));
+			var bounds:Rectangle = object.getBounds(object.getProperty(RegularPropertyName.PARENT));
 			
 			if (object.hasScaleProperties)
 			{

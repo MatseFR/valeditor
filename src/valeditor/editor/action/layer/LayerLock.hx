@@ -1,7 +1,8 @@
 package valeditor.editor.action.layer;
 
 import openfl.errors.Error;
-import valeditor.ValEditorLayer;
+import valeditor.container.LayerOpenFLStarlingEditable;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -18,7 +19,7 @@ class LayerLock extends ValEditorAction
 		return new LayerLock();
 	}
 	
-	public var layers:Array<ValEditorLayer>;
+	public var layers:Array<ITimeLineLayerEditable>;
 	public var lockValues:Array<Bool>;
 	
 	public function new() 
@@ -40,15 +41,15 @@ class LayerLock extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(layers:Array<ValEditorLayer>, lockValues:Array<Bool>):Void
+	public function setup(layers:Array<ITimeLineLayerEditable>, lockValues:Array<Bool>):Void
 	{
 		this.layers = layers;
 		this.lockValues = lockValues;
 	}
 	
-	public function addLayer(layer:ValEditorLayer, lock:Bool):Void
+	public function addLayer(layer:ITimeLineLayerEditable, lock:Bool):Void
 	{
-		if (this.layers == null) this.layers = new Array<ValEditorLayer>();
+		if (this.layers == null) this.layers = new Array<ITimeLineLayerEditable>();
 		if (this.lockValues == null) this.lockValues = new Array<Bool>();
 		
 		this.layers.push(layer);

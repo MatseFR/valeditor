@@ -1,5 +1,6 @@
 package valeditor;
 import haxe.iterators.ArrayIterator;
+import valeditor.container.ITimeLineContainerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectRemove;
 import valeditor.editor.action.object.ObjectRemoveKeyFrame;
@@ -53,7 +54,7 @@ class ValEditorObjectGroup
 		var objectsToDelete:Array<ValEditorObject> = this._objects.copy();
 		if (action == null)
 		{
-			if (Std.isOfType(ValEditor.currentContainer, IValEditorTimeLineContainer))
+			if (Std.isOfType(ValEditor.currentContainer, ITimeLineContainerEditable))
 			{
 				for (object in objectsToDelete)
 				{
@@ -81,7 +82,7 @@ class ValEditorObjectGroup
 		}
 		else
 		{
-			if (Std.isOfType(ValEditor.currentContainer, IValEditorTimeLineContainer))
+			if (Std.isOfType(ValEditor.currentContainer, ITimeLineContainerEditable))
 			{
 				var objectRemoveKeyFrame:ObjectRemoveKeyFrame;
 				for (object in objectsToDelete)

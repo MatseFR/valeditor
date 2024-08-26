@@ -1,7 +1,8 @@
 package valeditor.editor.action.layer;
 
 import openfl.errors.Error;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -18,8 +19,8 @@ class LayerIndexUp extends ValEditorAction
 		return new LayerIndexUp();
 	}
 	
-	public var container:IValEditorTimeLineContainer;
-	public var layers:Array<ValEditorLayer>;
+	public var container:ITimeLineContainerEditable;
+	public var layers:Array<ITimeLineLayerEditable>;
 	
 	public function new() 
 	{
@@ -40,7 +41,7 @@ class LayerIndexUp extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorTimeLineContainer, layers:Array<ValEditorLayer>):Void
+	public function setup(container:ITimeLineContainerEditable, layers:Array<ITimeLineLayerEditable>):Void
 	{
 		this.container = container;
 		this.layers = layers;

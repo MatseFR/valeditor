@@ -5,20 +5,15 @@ import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
-import valedit.DisplayObjectType;
 import openfl.events.EventDispatcher;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
-#if starling
-import starling.events.Touch;
-import starling.events.TouchPhase;
-import starling.events.TouchEvent;
-#end
-import valedit.IValEditOpenFLContainer;
-import valedit.IValEditStarlingContainer;
+import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.value.base.ExposedValue;
-import valeditor.IValEditorContainer;
+import valeditor.container.IContainerEditable;
+import valeditor.container.IContainerOpenFLEditable;
+import valeditor.container.IContainerStarlingEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectSelect;
 import valeditor.editor.action.object.ObjectUnselect;
@@ -32,6 +27,11 @@ import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
+#if starling
+import starling.events.Touch;
+import starling.events.TouchPhase;
+import starling.events.TouchEvent;
+#end
 
 /**
  * ...
@@ -39,13 +39,13 @@ import valeditor.ui.shape.PivotIndicator;
  */
 class ValEditorContainerController implements IAnimatable
 {
-	public var container(get, never):IValEditorContainer;
+	public var container(get, never):IContainerEditable;
 	public var containerObject(get, set):ValEditorObject;
 	public var ignoreRightClick(default, null):Bool;
 	public var selection(default, null):ValEditorObjectGroup = new ValEditorObjectGroup();
 	
-	private var _container:IValEditorContainer;
-	private function get_container():IValEditorContainer { return this._container; }
+	private var _container:IContainerEditable;
+	private function get_container():IContainerEditable { return this._container; }
 	
 	private var _containerObject:ValEditorObject;
 	private function get_containerObject():ValEditorObject { return this._containerObject; }
@@ -105,12 +105,12 @@ class ValEditorContainerController implements IAnimatable
 			
 			if (value.isContainerOpenFL)
 			{
-				this._containerOpenFL = cast(this._container, IValEditOpenFLContainer).container;
+				this._containerOpenFL = cast(this._container, IContainerOpenFLEditable).container;
 			}
 			#if starling
 			if (value.isContainerStarling)
 			{
-				this._containerStarling = cast(this._container, IValEditStarlingContainer).containerStarling;
+				this._containerStarling = cast(this._container, IContainerStarlingEditable).containerStarling;
 			}
 			#end
 		}
@@ -197,15 +197,15 @@ class ValEditorContainerController implements IAnimatable
 		{
 			if (object.isContainerOpenFL)
 			{
-				cast(object.object, IValEditOpenFLContainer).container.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-				this._interactiveObjectToValEditObject.set(cast(object.object, IValEditOpenFLContainer).container, object);
+				cast(object.object, IContainerOpenFLEditable).container.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+				this._interactiveObjectToValEditObject.set(cast(object.object, IContainerOpenFLEditable).container, object);
 			}
 			
 			#if starling
 			if (object.isContainerStarling)
 			{
-				cast(object.object, IValEditStarlingContainer).containerStarling.addEventListener(TouchEvent.TOUCH, onObjectTouch);
-				this._interactiveObjectToValEditObject.set(cast(object.object, IValEditStarlingContainer).containerStarling, object);
+				cast(object.object, IContainerStarlingEditable).containerStarling.addEventListener(TouchEvent.TOUCH, onObjectTouch);
+				this._interactiveObjectToValEditObject.set(cast(object.object, IContainerStarlingEditable).containerStarling, object);
 			}
 			#end
 		}
@@ -243,15 +243,15 @@ class ValEditorContainerController implements IAnimatable
 		{
 			if (object.isContainerOpenFL)
 			{
-				cast(object.object, IValEditOpenFLContainer).container.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-				this._interactiveObjectToValEditObject.remove(cast(object.object, IValEditOpenFLContainer).container);
+				cast(object.object, IContainerOpenFLEditable).container.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
+				this._interactiveObjectToValEditObject.remove(cast(object.object, IContainerOpenFLEditable).container);
 			}
 			
 			#if starling
 			if (object.isContainerStarling)
 			{
-				cast(object.object, IValEditStarlingContainer).containerStarling.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
-				this._interactiveObjectToValEditObject.remove(cast(object.object, IValEditStarlingContainer).containerStarling);
+				cast(object.object, IContainerStarlingEditable).containerStarling.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
+				this._interactiveObjectToValEditObject.remove(cast(object.object, IContainerStarlingEditable).containerStarling);
 			}
 			#end
 		}
@@ -592,7 +592,7 @@ class ValEditorContainerController implements IAnimatable
 			}
 			else
 			{
-				if (Std.isOfType(object.object, IValEditorContainer))
+				if (Std.isOfType(object.object, IContainerEditable))
 				{
 					touch.getLocation(this._containerStarling, this._pt);
 					this._pt.x -= this._mouseObject.getProperty(RegularPropertyName.X);

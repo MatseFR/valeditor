@@ -14,7 +14,7 @@ import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.layer.LayerRename;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
@@ -40,10 +40,10 @@ class LayerRenameWindow extends Panel
 		return this._confirmCallback = value;
 	}
 	
-	public var layer(get, set):ValEditorLayer;
-	private var _layer:ValEditorLayer;
-	private function get_layer():ValEditorLayer { return this._layer; }
-	private function set_layer(value:ValEditorLayer):ValEditorLayer
+	public var layer(get, set):ITimeLineLayerEditable;
+	private var _layer:ITimeLineLayerEditable;
+	private function get_layer():ITimeLineLayerEditable { return this._layer; }
+	private function set_layer(value:ITimeLineLayerEditable):ITimeLineLayerEditable
 	{
 		this._layer = value;
 		if (this._initialized && this._layer != null)
@@ -134,7 +134,7 @@ class LayerRenameWindow extends Panel
 		}
 		else
 		{
-			if (this._nameInput.text == this._layer.name || !cast(this._layer.container, IValEditorTimeLineContainer).layerNameExists(this._nameInput.text))
+			if (this._nameInput.text == this._layer.name || !this._layer.container.layerNameExists(this._nameInput.text))
 			{
 				this._nameInput.errorString = null;
 			}

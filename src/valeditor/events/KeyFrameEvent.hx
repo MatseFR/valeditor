@@ -2,7 +2,6 @@ package valeditor.events;
 
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
-import valedit.ValEditObject;
 
 /**
  * ...
@@ -21,14 +20,14 @@ class KeyFrameEvent extends Event
 	#if !flash
 	static private var _POOL:Array<KeyFrameEvent> = new Array<KeyFrameEvent>();
 	
-	static private function fromPool(type:String, object:ValEditObject, bubbles:Bool, cancelable:Bool):KeyFrameEvent
+	static private function fromPool(type:String, object:ValEditorObject, bubbles:Bool, cancelable:Bool):KeyFrameEvent
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, bubbles, cancelable);
 		return new KeyFrameEvent(type, object, bubbles, cancelable);
 	}
 	#end
 	
-	static public function dispatch(dispatcher:IEventDispatcher, type:String, object:ValEditObject = null,
+	static public function dispatch(dispatcher:IEventDispatcher, type:String, object:ValEditorObject = null,
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
@@ -41,9 +40,9 @@ class KeyFrameEvent extends Event
 		#end
 	}
 	
-	public var object(default, null):ValEditObject;
+	public var object(default, null):ValEditorObject;
 	
-	public function new(type:String, object:ValEditObject, bubbles:Bool=false, cancelable:Bool=false) 
+	public function new(type:String, object:ValEditorObject, bubbles:Bool=false, cancelable:Bool=false) 
 	{
 		super(type, bubbles, cancelable);
 		this.object = object;
@@ -70,7 +69,7 @@ class KeyFrameEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	private function setTo(type:String, object:ValEditObject, bubbles:Bool, cancelable:Bool):KeyFrameEvent
+	private function setTo(type:String, object:ValEditorObject, bubbles:Bool, cancelable:Bool):KeyFrameEvent
 	{
 		this.type = type;
 		this.object = object;

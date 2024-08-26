@@ -14,31 +14,33 @@ import inputAction.controllers.KeyboardController;
 import juggler.animation.Juggler;
 import openfl.Lib;
 import openfl.display.BitmapData;
+import openfl.display.DisplayObject;
 import openfl.display.DisplayObjectContainer;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
 import openfl.utils.ByteArray;
-#if starling
-import starling.core.Starling;
-#end
 import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
-import valedit.IValEditOpenFLContainer;
-import valedit.IValEditStarlingContainer;
 import valedit.ValEdit;
-import valedit.ValEditClass;
-import valedit.ValEditObject;
-import valeditor.ValEditorContainerController;
 import valedit.animation.ValEditUpdater;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetSource;
 import valedit.ui.IValueUI;
+import valedit.utils.PropertyMap;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ZipUtil;
 import valedit.value.base.ExposedValue;
 import valedit.value.base.ExposedValueWithCollection;
+import valeditor.ValEditorContainerController;
+import valeditor.container.IContainerEditable;
+import valeditor.container.IContainerOpenFLEditable;
+import valeditor.container.IContainerStarlingEditable;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
+import valeditor.container.LayerOpenFLStarlingEditable;
+import valeditor.container.TimeLineContainerOpenFLStarlingEditable;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import valeditor.editor.action.MultiAction;
@@ -67,6 +69,9 @@ import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.utils.ArraySort;
+#if starling
+import starling.core.Starling;
+#end
 #if desktop
 import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
 #else
@@ -92,9 +97,9 @@ class ValEditor
 	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
 	static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
-	static public var currentContainer(get, never):IValEditorContainer;
+	static public var currentContainer(get, never):IContainerEditable;
 	static public var currentContainerObject(get, set):ValEditorObject;
-	static public var currentTimeLineContainer(get, never):IValEditorTimeLineContainer;
+	static public var currentTimeLineContainer(get, never):ITimeLineContainerEditable;
 	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
 	static public var exportSettings(default, null):ExportSettings = new ExportSettings();
@@ -108,14 +113,14 @@ class ValEditor
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
 	static public var openedContainers(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
-	static public var rootContainer(get, never):IValEditorContainer;
+	static public var rootContainer(get, never):IContainerEditable;
 	static public var rootContainerObject(get, set):ValEditorObject;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
 	#end
 	/** can be either the root container or an open container template */
-	static public var sceneContainer(get, set):IValEditorContainer;
+	static public var sceneContainer(get, set):IContainerEditable;
 	static public var selection(default, null):Selection = new Selection();
 	static public var theme:ValEditorTheme;
 	static public var themeDefaultValues:ExposedCollection;
@@ -133,8 +138,8 @@ class ValEditor
 	static public var isMouseOverUI:Bool;
 	static public var juggler(default, null):Juggler;
 	
-	static private var _currentContainer:IValEditorContainer;
-	static private function get_currentContainer():IValEditorContainer
+	static private var _currentContainer:IContainerEditable;
+	static private function get_currentContainer():IContainerEditable
 	{
 		return _currentContainer;
 	}
@@ -155,13 +160,13 @@ class ValEditor
 			
 			if (_currentContainerObject.isContainerOpenFL)
 			{
-				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = null;
+				cast(_currentContainer, IContainerOpenFLEditable).rootContainer = null;
 			}
 			#if starling
 			if (_currentContainerObject.isContainerStarling)
 			{
-				cast(_currentContainer, IValEditorStarlingContainer).rootContainer = null;
-				cast(_currentContainer, IValEditorStarlingContainer).rootContainerStarling = null;
+				cast(_currentContainer, IContainerStarlingEditable).rootContainer = null;
+				cast(_currentContainer, IContainerStarlingEditable).rootContainerStarling = null;
 			}
 			#end
 			
@@ -172,7 +177,7 @@ class ValEditor
 		if (_currentContainerObject != null)
 		{
 			_currentContainer = _currentContainerObject.object;
-			if (Std.isOfType(_currentContainer, IValEditorTimeLineContainer))
+			if (_currentContainerObject.isTimeLineContainer)
 			{
 				_currentTimeLineContainer = cast _currentContainer;
 				_currentTimeLineContainer.juggler = juggler;
@@ -180,13 +185,13 @@ class ValEditor
 			
 			if (_currentContainerObject.isContainerOpenFL)
 			{
-				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = _rootScene;
+				cast(_currentContainer, IContainerOpenFLEditable).rootContainer = _rootScene;
 			}
 			#if starling
 			if (_currentContainerObject.isContainerStarling)
 			{
-				cast(_currentContainer, IValEditorStarlingContainer).rootContainer = _rootScene;
-				cast(_currentContainer, IValEditorStarlingContainer).rootContainerStarling = _rootSceneStarling;
+				cast(_currentContainer, IContainerStarlingEditable).rootContainer = _rootScene;
+				cast(_currentContainer, IContainerStarlingEditable).rootContainerStarling = _rootSceneStarling;
 			}
 			#end
 			
@@ -202,8 +207,8 @@ class ValEditor
 		return _currentContainerObject;
 	}
 	
-	static private var _currentTimeLineContainer:IValEditorTimeLineContainer;
-	static private function get_currentTimeLineContainer():IValEditorTimeLineContainer { return _currentTimeLineContainer; }
+	static private var _currentTimeLineContainer:ITimeLineContainerEditable;
+	static private function get_currentTimeLineContainer():ITimeLineContainerEditable { return _currentTimeLineContainer; }
 	
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 	static private function get_eventDispatcher():EventDispatcher { return _eventDispatcher; }
@@ -214,8 +219,8 @@ class ValEditor
 		return ValEdit.isLoadingFile = value;
 	}
 	
-	static private var _rootContainer:IValEditorContainer;
-	static private function get_rootContainer():IValEditorContainer { return _rootContainer; }
+	static private var _rootContainer:IContainerEditable;
+	static private function get_rootContainer():IContainerEditable { return _rootContainer; }
 	
 	static private var _rootContainerObject:ValEditorObject;
 	static private function get_rootContainerObject():ValEditorObject { return _rootContainerObject; }
@@ -275,7 +280,7 @@ class ValEditor
 	static public function closeContainer():Void
 	{
 		var object:ValEditorObject = openedContainers.pop();
-		var container:IValEditorContainer = object.object;
+		var container:IContainerEditable = object.object;
 		openedContainerCollection.remove(object);
 		
 		object.removeEventListener(RenameEvent.RENAMED, onOpenContainerObjectRenamed);
@@ -316,7 +321,7 @@ class ValEditor
 		{
 			if (_currentContainerObject.isContainerOpenFL)
 			{
-				cast(_currentContainer, IValEditOpenFLContainer).rootContainer = value;
+				cast(_currentContainer, IContainerOpenFLEditable).rootContainer = value;
 			}
 		}
 		return _rootScene = value;
@@ -331,16 +336,16 @@ class ValEditor
 		{
 			if (_currentContainerObject.isContainerStarling)
 			{
-				cast(_currentContainer, IValEditStarlingContainer).rootContainerStarling = value;
+				cast(_currentContainer, IContainerStarlingEditable).rootContainerStarling = value;
 			}
 		}
 		return _rootSceneStarling = value;
 	}
 	#end
 	
-	static private var _sceneContainer:IValEditorContainer;
-	static private function get_sceneContainer():IValEditorContainer { return _sceneContainer; }
-	static private function set_sceneContainer(value:IValEditorContainer):IValEditorContainer
+	static private var _sceneContainer:IContainerEditable;
+	static private function get_sceneContainer():IContainerEditable { return _sceneContainer; }
+	static private function set_sceneContainer(value:IContainerEditable):IContainerEditable
 	{
 		return _sceneContainer = value;
 	}
@@ -373,8 +378,10 @@ class ValEditor
 	static private var _categoryToStringData:Map<String, StringData> = new Map<String, StringData>();
 	static private var _classNameToStringData:Map<String, StringData> = new Map<String, StringData>();
 	
+	static private var _baseClassToClassList:Map<String, Array<String>> = new Map<String, Array<String>>();
 	static private var _classMap:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
 	static private var _displayMap:Map<DisplayObjectContainer, ValEditorClass> = new Map<DisplayObjectContainer, ValEditorClass>();
+	static private var _templateMap:Map<String, ValEditorTemplate> = new Map<String, ValEditorTemplate>();
 	static private var _uiClassMap:Map<String, Void->IValueUI> = new Map<String, Void->IValueUI>();
 	
 	static private var _liveActionManager:LiveInputActionManager;
@@ -472,19 +479,58 @@ class ValEditor
 	{
 		if (settings == null) settings = ValEditorClassSettings.fromPool();
 		
-		ValEdit.getClassSettings(type, settings);
-		
+		getClassDisplayObjectSettings(type, settings);
 		getClassInteractiveSettings(type, settings);
 		
 		#if starling
 		if (settings.isDisplayObject && settings.displayObjectType == DisplayObjectType.STARLING)
 		{
+			settings.disposeFunctionName = "dispose";
 			settings.hasRadianRotation = true;
 			settings.usePivotScaling = true;
 		}
 		#end
 		
 		return settings;
+	}
+	
+	static public function getClassDisplayObjectSettings(type:Class<Dynamic>, settings:ValEditorClassSettings):Void
+	{
+		var clss:Class<Dynamic> = type;
+		if (clss == DisplayObject)
+		{
+			settings.isDisplayObject = true;
+			settings.displayObjectType = DisplayObjectType.OPENFL;
+		}
+		#if starling
+		if (clss == starling.display.DisplayObject)
+		{
+			settings.isDisplayObject = true;
+			settings.displayObjectType = DisplayObjectType.STARLING;
+		}
+		#end
+		else
+		{
+			while (true)
+			{
+				clss = Type.getSuperClass(clss);
+				if (clss == null) break;
+				if (clss == DisplayObject)
+				{
+					settings.isDisplayObject = true;
+					settings.displayObjectType = DisplayObjectType.OPENFL;
+					break;
+				}
+				#if starling
+				else if (clss == starling.display.DisplayObject)
+				{
+					settings.isDisplayObject = true;
+					settings.displayObjectType = DisplayObjectType.STARLING;
+					break;
+				}
+				#end
+			}
+		}
 	}
 	
 	static public function getClassInteractiveSettings(type:Class<Dynamic>, settings:ValEditorClassSettings):Void
@@ -525,17 +571,19 @@ class ValEditor
 		
 		var v:ValEditorClass = ValEditorClass.fromPool(type, className, settings.collection, settings.constructorCollection);
 		
-		var result:ValEditClass = ValEdit.registerClass(type, settings, v);
-		if (result == null)
-		{
-			v.pool();
-			return null;
-		}
-		
 		_classMap.set(className, v);
 		
 		var index:Int = className.lastIndexOf(".");
-		v.classNameShort = className.substr(index+1);
+		v.classNameShort = className.substr(index + 1);
+		v.classPackage = className.substr(0, index + 1);
+		if (settings.exportClassName != null)
+		{
+			v.exportClassName = settings.exportClassName;
+			index = settings.exportClassName.lastIndexOf(".");
+			v.exportClassNameShort = settings.exportClassName.substr(index + 1);
+			v.exportClassPackage = settings.exportClassName.substr(0, index + 1);
+		}
+		
 		v.canBeCreated = settings.canBeCreated;
 		for (category in settings.categories)
 		{
@@ -551,11 +599,31 @@ class ValEditor
 		
 		classVisibilities.add(v.visibilityCollectionDefault);
 		
+		v.addToDisplayFunction = settings.addToDisplayFunction;
+		v.addToDisplayFunctionName = settings.addToDisplayFunctionName;
+		v.cloneFromFunctionName = settings.cloneFromFunctionName;
+		v.cloneToFunctionName = settings.cloneToFunctionName;
+		v.creationFunction = settings.creationFunction;
+		v.creationFunctionForLoading = settings.creationFunctionForLoading;
+		v.creationFunctionForTemplateInstance = settings.creationFunctionForTemplateInstance;
+		v.creationInitFunction = settings.creationInitFunction;
+		v.creationInitFunctionName = settings.creationInitFunctionName;
+		v.displayObjectType = settings.displayObjectType;
+		v.disposeFunction = settings.disposeFunction;
+		v.disposeFunctionName = settings.disposeFunctionName;
 		v.exportClassName = settings.exportClassName;
 		v.getBoundsFunctionName = settings.getBoundsFunctionName;
-		v.iconBitmapData = settings.iconBitmapData;
 		v.hasRadianRotation = settings.hasRadianRotation;
+		v.iconBitmapData = settings.iconBitmapData;
 		v.interactiveFactory = settings.interactiveFactory;
+		v.isContainer = settings.isContainer;
+		v.isContainerOpenFL = settings.isContainerOpenFL;
+		v.isContainerStarling = settings.isContainerStarling;
+		v.isDisplayObject = settings.isDisplayObject;
+		v.isTimeLineContainer = settings.isTimeLineContainer;
+		v.propertyMap = settings.propertyMap != null ? settings.propertyMap : PropertyMap.fromPool();
+		v.removeFromDisplayFunction = settings.removeFromDisplayFunction;
+		v.removeFromDisplayFunctionName = settings.removeFromDisplayFunctionName;
 		v.useBounds = settings.useBounds;
 		v.usePivotScaling = settings.usePivotScaling;
 		
@@ -564,6 +632,36 @@ class ValEditor
 		v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
 		v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
 		v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
+		
+		var clss:Class<Dynamic> = type;
+		var superName:String;
+		var nameList:Array<String>;
+		
+		nameList = _baseClassToClassList.get(className);
+		if (nameList == null)
+		{
+			nameList = new Array<String>();
+			_baseClassToClassList.set(className, nameList);
+		}
+		nameList.push(className);
+		
+		while (true)
+		{
+			clss = Type.getSuperClass(clss);
+			if (clss == null) break;
+			superName = Type.getClassName(clss);
+			
+			v.addSuperClassName(superName);
+			
+			nameList = _baseClassToClassList.get(superName);
+			if (nameList == null)
+			{
+				nameList = new Array<String>();
+				nameList.push(superName);
+				_baseClassToClassList.set(superName, nameList);
+			}
+			nameList.push(className);
+		}
 		
 		var objCollection:ArrayCollection<ValEditorObject>;
 		var clssCollection:ArrayCollection<ValEditorClass>;
@@ -693,13 +791,13 @@ class ValEditor
 			}
 		}
 		
-		var objectList:Array<ValEditObject> = valClass.getObjectList();
+		var objectList:Array<ValEditorObject> = valClass.getObjectList();
 		
 		if (valClass.canBeCreated)
 		{
 			for (obj in objectList)
 			{
-				destroyObjectInternal(cast obj);
+				destroyObjectInternal(obj);
 			}
 			
 			classCollection.remove(valClass);
@@ -709,7 +807,7 @@ class ValEditor
 		{
 			for (obj in objectList)
 			{
-				unregisterObjectInternal(cast obj);
+				unregisterObjectInternal(obj);
 			}
 		}
 		
@@ -763,7 +861,7 @@ class ValEditor
 		
 		if (Std.isOfType(object, ValEditorObject))
 		{
-			valClass = cast cast(object, ValEditorObject).clss;
+			valClass = cast(object, ValEditorObject).clss;
 			if (collection == null)
 			{
 				collection = cast(object, ValEditorObject).currentCollection;
@@ -867,7 +965,7 @@ class ValEditor
 		
 		if (template == null) return;
 		
-		var valClass:ValEditorClass = cast template.clss;
+		var valClass:ValEditorClass = template.clss;
 		_displayMap[container] = valClass;
 		valClass.addTemplateContainer(container, template);
 	}
@@ -907,7 +1005,7 @@ class ValEditor
 		var clss:Class<T> = Type.getClass(exposedValue);
 		var className:String = Type.getClassName(clss);
 		var control:IValueUI = _uiClassMap[className]();
-		control.exposedValue = cast exposedValue;
+		control.exposedValue = exposedValue;
 		return control;
 	}
 	
@@ -918,10 +1016,27 @@ class ValEditor
 	
 	static public function createObjectWithClassName(className:String, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null):ValEditorObject
 	{
+		if (params == null) params = [];
 		var valClass:ValEditorClass = _classMap.get(className);
 		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
-		ValEdit.createObjectWithClassName(className, id, params, valObject, collection, objectID, object);
+		createObject(valObject, valClass, params, false, object);
+		valObject.objectID = objectID;
+		
+		var collectionProvided:Bool = collection != null;
+		if (collection == null)
+		{
+			collection = valClass.getCollection();
+		}
+		valObject.defaultCollection = collection;
+		if (collectionProvided)
+		{
+			collection.applyAndSetObject(valObject.object);
+		}
+		else
+		{
+			collection.readAndSetObject(valObject.object);
+		}
 		
 		valObject.applyClassVisibility(valClass.visibilityCollectionCurrent);
 		
@@ -932,6 +1047,7 @@ class ValEditor
 		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.propertyMap = valClass.propertyMap;
 		valObject.useBounds = valClass.useBounds;
 		valObject.usePivotScaling = valClass.usePivotScaling;
 		
@@ -941,9 +1057,54 @@ class ValEditor
 			interactiveObjectController.register(valObject.interactiveObject);
 		}
 		
+		valObject.ready();
+		
 		registerObjectInternal(valObject);
 		
 		return valObject;
+	}
+	
+	static private function createObject(valObject:ValEditorObject, valClass:ValEditorClass, params:Array<Dynamic>, isTemplateInstance:Bool, object:Dynamic = null):Void
+	{
+		if (object == null)
+		{
+			if (isLoadingFile && valClass.creationFunctionForLoading != null)
+			{
+				valObject.object = Reflect.callMethod(null, valClass.creationFunctionForLoading, params);
+			}
+			else if (isTemplateInstance && valClass.creationFunctionForTemplateInstance != null)
+			{
+				valObject.object = Reflect.callMethod(null, valClass.creationFunctionForTemplateInstance, params);
+			}
+			else if (valClass.creationFunction != null)
+			{
+				valObject.object = Reflect.callMethod(null, valClass.creationFunction, params);
+			}
+			else
+			{
+				valObject.object = Type.createInstance(valClass.classReference, params);
+			}
+		}
+		else
+		{
+			valObject.object = object;
+		}
+		
+		valObject.isContainer = valClass.isContainer;
+		valObject.isContainerOpenFL = valClass.isContainerOpenFL;
+		#if starling
+		valObject.isContainerStarling = valClass.isContainerStarling;
+		#end
+		valObject.isTimeLineContainer = valClass.isTimeLineContainer;
+		
+		if (valClass.creationInitFunction != null)
+		{
+			Reflect.callMethod(null, valClass.creationInitFunction, [valObject.object]);
+		}
+		else if (valClass.creationInitFunctionName != null)
+		{
+			Reflect.callMethod(valObject.object, Reflect.getProperty(valObject.object, valClass.creationInitFunctionName), []);
+		}
 	}
 	
 	static public function createTemplateWithClass(clss:Class<Dynamic>, ?id:String, ?constructorCollection:ExposedCollection):ValEditorTemplate
@@ -953,11 +1114,25 @@ class ValEditor
 	
 	static public function createTemplateWithClassName(className:String, ?id:String, ?constructorCollection:ExposedCollection):ValEditorTemplate
 	{
+		var params:Array<Dynamic>;
+		if (constructorCollection != null)
+		{
+			params = constructorCollection.toValueArray();
+		}
+		else
+		{
+			params = [];
+		}
+		
 		var valClass:ValEditorClass = _classMap.get(className);
-		var template:ValEditorTemplate = ValEditorTemplate.fromPool(valClass, id, null, constructorCollection);
 		
-		ValEdit.createTemplateWithClassName(className, id, constructorCollection, template);
+		var collection:ExposedCollection = valClass.getCollection();
+		if (constructorCollection != null)
+		{
+			constructorCollection.copyValuesTo(collection);
+		}
 		
+		var template:ValEditorTemplate = ValEditorTemplate.fromPool(valClass, id, collection, constructorCollection);
 		template.object = createObjectWithTemplate(template, id, template.collection, false);
 		template.object.currentCollection.readValues();
 		
@@ -972,7 +1147,7 @@ class ValEditor
 	
 	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, ?objectID:String, registerToTemplate:Bool = true):ValEditorObject
 	{
-		var valClass:ValEditorClass = cast template.clss;
+		var valClass:ValEditorClass = template.clss;
 		
 		if (id == null)
 		{
@@ -981,6 +1156,16 @@ class ValEditor
 		
 		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
 		
+		var params:Array<Dynamic> = [];
+		if (template.constructorCollection != null)
+		{
+			template.constructorCollection.toValueArray(params);
+		}
+		
+		createObject(valObject, valClass, params, registerToTemplate);
+		valObject.objectID = objectID;
+		valObject.template = template;
+		
 		valObject.getBoundsFunctionName = valClass.getBoundsFunctionName;
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
 		valObject.hasScaleProperties = valClass.hasScaleProperties;
@@ -988,15 +1173,37 @@ class ValEditor
 		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
+		valObject.propertyMap = valClass.propertyMap;
 		valObject.useBounds = valClass.useBounds;
 		valObject.usePivotScaling = valClass.usePivotScaling;
 		
-		ValEdit.createObjectWithTemplate(template, id, valObject, collection, objectID, registerToTemplate);
-		
 		if (registerToTemplate)
 		{
-			valObject.applyTemplateVisibility(template.visibilityCollectionCurrent);
+			if (valClass.cloneFromFunctionName != null)
+			{
+				Reflect.callMethod(valObject.object, Reflect.getProperty(valObject.object, valClass.cloneFromFunctionName), [template.object.object]);
+			}
+			else if (valClass.cloneToFunctionName != null)
+			{
+				Reflect.callMethod(template.object.object, Reflect.getProperty(template.object.object, valClass.cloneToFunctionName), [valObject.object]);
+			}
+			template.addInstance(valObject);
 		}
+		
+		template.collection.applyToObject(valObject.object);
+		
+		if (collection == null)
+		{
+			collection = valClass.getCollection();
+			collection.readAndSetObject(valObject.object);
+		}
+		else
+		{
+			collection.applyAndSetObject(valObject.object);
+		}
+		valObject.defaultCollection = collection;
+		
+		valObject.ready();
 		
 		if (valClass.interactiveFactory != null)
 		{
@@ -1006,6 +1213,7 @@ class ValEditor
 		
 		if (registerToTemplate)
 		{
+			valObject.applyTemplateVisibility(template.visibilityCollectionCurrent);
 			registerObjectInternal(valObject);
 		}
 		
@@ -1017,7 +1225,7 @@ class ValEditor
 		var newObject:ValEditorObject;
 		if (object.template != null)
 		{
-			newObject = createObjectWithTemplate(cast object.template, id, object.currentCollection.clone(true), object.objectID);
+			newObject = createObjectWithTemplate(object.template, id, object.currentCollection.clone(true), object.objectID);
 		}
 		else
 		{
@@ -1033,7 +1241,13 @@ class ValEditor
 	
 	static private function registerObjectInternal(valObject:ValEditorObject):Void
 	{
-		ValEdit.registerObjectInternal(valObject);
+		// DEBUG : all objects should have an id when registered
+		if (valObject.id == null)
+		{
+			throw new Error("ValEditor.registerObjectInternal ::: null object id");
+		}
+		//\DEBUG
+		valObject.clss.addObject(valObject);
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.add(valObject);
@@ -1044,7 +1258,7 @@ class ValEditor
 			objCollection.add(valObject);
 		}
 		
-		for (category in cast(valObject.clss, ValEditorClass).categories)
+		for (category in valObject.clss.categories)
 		{
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.add(valObject);
@@ -1058,6 +1272,9 @@ class ValEditor
 	
 	static private function registerTemplateInternal(template:ValEditorTemplate):Void
 	{
+		template.clss.addTemplate(template);
+		_templateMap.set(template.id, template);
+		
 		template.addEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.addEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
 		template.addEventListener(TemplateEvent.INSTANCE_SUSPENDED, onTemplateInstanceSuspended);
@@ -1067,7 +1284,7 @@ class ValEditor
 		
 		if (template.isSuspended)
 		{
-			cast(template.clss, ValEditorClass).unsuspendTemplate(template);
+			template.clss.unsuspendTemplate(template);
 		}
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
@@ -1079,7 +1296,7 @@ class ValEditor
 			collection.add(template);
 		}
 		
-		for (category in cast(template.clss, ValEditorClass).categories)
+		for (category in template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.add(template);
@@ -1122,7 +1339,7 @@ class ValEditor
 	
 	static private function unregisterObjectInternal(valObject:ValEditorObject):Void
 	{
-		ValEdit.unregisterObjectInternal(valObject);
+		valObject.clss.removeObject(valObject);
 		
 		var objCollection:ArrayCollection<ValEditorObject> = _classToObjectCollection.get(valObject.className);
 		objCollection.remove(valObject);
@@ -1133,7 +1350,7 @@ class ValEditor
 			objCollection.remove(valObject);
 		}
 		
-		for (category in cast(valObject.clss, ValEditorClass).categories)
+		for (category in valObject.clss.categories)
 		{
 			objCollection = _categoryToObjectCollection.get(category);
 			objCollection.remove(valObject);
@@ -1149,7 +1366,7 @@ class ValEditor
 	{
 		if (template.object != null)
 		{
-			destroyObject(cast template.object);
+			destroyObject(template.object);
 			template.object = null;
 		}
 		
@@ -1165,7 +1382,8 @@ class ValEditor
 	
 	static private function unregisterTemplateInternal(template:ValEditorTemplate):Void
 	{
-		ValEdit.unregisterTemplateInternal(template);
+		template.clss.removeTemplate(template);
+		_templateMap.remove(template.id);
 		
 		template.removeEventListener(TemplateEvent.INSTANCE_ADDED, onTemplateInstanceAdded);
 		template.removeEventListener(TemplateEvent.INSTANCE_REMOVED, onTemplateInstanceRemoved);
@@ -1174,7 +1392,7 @@ class ValEditor
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
 		
-		cast(template.clss, ValEditorClass).suspendTemplate(template);
+		template.clss.suspendTemplate(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.remove(template);
@@ -1185,7 +1403,7 @@ class ValEditor
 			collection.remove(template);
 		}
 		
-		for (category in cast(template.clss, ValEditorClass).categories)
+		for (category in template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.remove(template);
@@ -1251,6 +1469,11 @@ class ValEditor
 		return _classToObjectCollection.get(className);
 	}
 	
+	static public function getTemplate(id:String):ValEditorTemplate
+	{
+		return _templateMap.get(id);
+	}
+	
 	static public function getTemplateUICollectionForClassName(className:String):ArrayCollection<ValEditorTemplate>
 	{
 		return _classToTemplateCollection.get(className);
@@ -1286,15 +1509,14 @@ class ValEditor
 		return _eventDispatcher.willTrigger(type);
 	}
 	
-	static public function createContainer():ValEditorContainer
+	static public function setupTimeLineContainer(container:ITimeLineContainerEditable):Void
 	{
-		var container:ValEditorContainer = ValEditorContainer.fromPool();
 		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
-		var layer:ValEditorLayer = createLayer();
+		var layer:ITimeLineLayerEditable = container.createLayer();
 		container.addLayer(layer);
-		return container;
+		layer.timeLine.insertKeyFrame();
 	}
 	
 	static public function createContainerRoot():ValEditorContainerRoot
@@ -1303,7 +1525,7 @@ class ValEditor
 		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
-		var layer:ValEditorLayer = createLayer();
+		var layer:LayerOpenFLStarlingEditable = createLayer();
 		container.addLayer(layer);
 		return container;
 	}
@@ -1315,22 +1537,13 @@ class ValEditor
 		return keyFrame;
 	}
 	
-	static public function createLayer():ValEditorLayer
+	static public function createLayer():LayerOpenFLStarlingEditable
 	{
-		var layer:ValEditorLayer = ValEditorLayer.fromPool(createTimeLine());
+		var layer:LayerOpenFLStarlingEditable = LayerOpenFLStarlingEditable.fromPool();
+		layer.timeLine.numFrames = fileSettings.numFramesDefault;
+		layer.timeLine.frameIndex = 0;
+		layer.timeLine.insertKeyFrame();
 		return layer;
-	}
-	
-	static public function createTimeLine():ValEditorTimeLine
-	{
-		//var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(fileSettings.numFramesDefault);
-		//timeLine.frameIndex = 0;
-		//timeLine.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
-		//timeLine.insertKeyFrame();
-		var timeLine:ValEditorTimeLine = ValEditorTimeLine.fromPool(1);
-		timeLine.frameIndex = 0;
-		timeLine.insertKeyFrame();
-		return timeLine;
 	}
 	
 	static public function copy(?action:MultiAction):Void
@@ -1418,7 +1631,7 @@ class ValEditor
 		if (currentTimeLineContainer.isPlaying) return;
 		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).insertFrame(action);
+		currentTimeLineContainer.currentLayer.timeLine.insertFrame(action);
 	}
 	
 	static public function insertKeyFrame(?action:MultiAction):Void
@@ -1427,7 +1640,7 @@ class ValEditor
 		if (currentTimeLineContainer.isPlaying) return;
 		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).insertKeyFrame(action);
+		currentTimeLineContainer.currentLayer.timeLine.insertKeyFrame(action);
 	}
 	
 	static public function removeFrame(?action:MultiAction):Void
@@ -1436,7 +1649,7 @@ class ValEditor
 		if (currentTimeLineContainer.isPlaying) return;
 		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).removeFrame(action);
+		currentTimeLineContainer.currentLayer.timeLine.removeFrame(action);
 	}
 	
 	static public function removeKeyFrame(?action:MultiAction):Void
@@ -1445,7 +1658,7 @@ class ValEditor
 		if (currentTimeLineContainer.isPlaying) return;
 		if (currentTimeLineContainer.currentLayer == null) return;
 		
-		cast(currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).removeKeyFrame(action);
+		currentTimeLineContainer.currentLayer.timeLine.removeKeyFrame(action);
 	}
 	
 	static public function firstFrame():Void
@@ -1524,7 +1737,7 @@ class ValEditor
 			if (index != -1) collection.updateAt(index);
 		}
 		
-		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		for (category in evt.template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			index = collection.indexOf(evt.template);
@@ -1545,7 +1758,7 @@ class ValEditor
 			if (index != -1) collection.updateAt(index);
 		}
 		
-		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		for (category in evt.template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			index = collection.indexOf(evt.template);
@@ -1566,7 +1779,7 @@ class ValEditor
 			if (index != -1) collection.updateAt(index);
 		}
 		
-		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		for (category in evt.template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			index = collection.indexOf(evt.template);
@@ -1587,7 +1800,7 @@ class ValEditor
 			if (index != -1) collection.updateAt(index);
 		}
 		
-		for (category in cast(evt.template.clss, ValEditorClass).categories)
+		for (category in evt.template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			index = collection.indexOf(evt.template);
@@ -1598,7 +1811,9 @@ class ValEditor
 	static private function onTemplateRenamed(evt:RenameEvent):Void
 	{
 		var template:ValEditorTemplate = evt.target;
-		ValEdit.renameTemplate(template, evt.previousNameOrID);
+		
+		_templateMap.remove(evt.previousNameOrID);
+		_templateMap.set(template.id, template);
 		
 		templateCollection.updateAt(templateCollection.indexOf(template));
 		
@@ -1609,7 +1824,7 @@ class ValEditor
 			collection.updateAt(collection.indexOf(template));
 		}
 		
-		for (category in cast(template.clss, ValEditorClass).categories)
+		for (category in template.clss.categories)
 		{
 			collection = _categoryToTemplateCollection.get(category);
 			collection.updateAt(collection.indexOf(template));
@@ -1710,7 +1925,7 @@ class ValEditor
 		for (template in containerTemplates)
 		{
 			saveData = ContainerSaveData.fromPool(template);
-			cast(template.object.object, IValEditorContainer).getContainerDependencies(saveData);
+			cast(template.object.object, IContainerEditable).getContainerDependencies(saveData);
 			templateDependencies.set(template, saveData);
 			templateSave.set(template, false);
 		}

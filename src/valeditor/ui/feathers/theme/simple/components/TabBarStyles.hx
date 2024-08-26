@@ -30,10 +30,6 @@ class TabBarStyles
 				
 				if (tabBar.backgroundSkin == null)
 				{
-					//var skin = new RectangleSkin();
-					//skin.fill = theme.getLightFill();
-					//skin.disabledFill = theme.getLightFillDark();
-					//tabBar.backgroundSkin = skin;
 					var skin = new UnderlineSkin();
 					skin.fill = theme.getLightFill();
 					skin.border = theme.getContrastBorderLight();

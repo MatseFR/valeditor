@@ -69,7 +69,7 @@ class TimeLineSetFrameIndex extends MultiAction
 		getActionsForTimeLine(this.timeLine, selection);
 		for (line in this.timeLine.slaves)
 		{
-			getActionsForTimeLine(cast line, selection);
+			getActionsForTimeLine(line, selection);
 		}
 	}
 	
@@ -79,8 +79,8 @@ class TimeLineSetFrameIndex extends MultiAction
 		var newKeyFrame:ValEditorKeyFrame;
 		var objectUnselect:ObjectUnselect;
 		
-		prevKeyFrame = cast timeLine.getKeyFrameAt(this.previousFrameIndex);
-		newKeyFrame = cast timeLine.getKeyFrameAt(this.frameIndex);
+		prevKeyFrame = timeLine.getKeyFrameAt(this.previousFrameIndex);
+		newKeyFrame = timeLine.getKeyFrameAt(this.frameIndex);
 		
 		if (newKeyFrame != prevKeyFrame && prevKeyFrame != null)
 		{
@@ -89,9 +89,9 @@ class TimeLineSetFrameIndex extends MultiAction
 			
 			for (object in prevKeyFrame.objects)
 			{
-				if (selection.hasObject(cast object))
+				if (selection.hasObject(object))
 				{
-					objectUnselect.addObject(cast object);
+					objectUnselect.addObject(object);
 				}
 			}
 			

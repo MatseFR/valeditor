@@ -1,6 +1,7 @@
 package valeditor.editor.action.container;
 
 import openfl.errors.Error;
+import valeditor.container.IContainerEditable;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -17,7 +18,7 @@ class ContainerClose extends ValEditorAction
 		return new ContainerClose();
 	}
 	
-	public var container:IValEditorContainer;
+	public var container:IContainerEditable;
 	
 	public function new() 
 	{
@@ -37,7 +38,7 @@ class ContainerClose extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorContainer):Void
+	public function setup(container:IContainerEditable):Void
 	{
 		this.container = container;
 	}

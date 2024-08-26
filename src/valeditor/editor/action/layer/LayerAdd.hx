@@ -1,7 +1,8 @@
 package valeditor.editor.action.layer;
 import openfl.errors.Error;
 import valedit.utils.ReverseIterator;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
 
 /**
  * ...
@@ -17,8 +18,8 @@ class LayerAdd extends ValEditorAction
 		return new LayerAdd();
 	}
 	
-	public var container:IValEditorTimeLineContainer;
-	public var layers:Array<ValEditorLayer>;
+	public var container:ITimeLineContainerEditable;
+	public var layers:Array<ITimeLineLayerEditable>;
 	public var layerIndex:Int = -1;
 	
 	public function new() 
@@ -48,7 +49,7 @@ class LayerAdd extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(container:IValEditorTimeLineContainer, layers:Array<ValEditorLayer>, layerIndex:Int):Void
+	public function setup(container:ITimeLineContainerEditable, layers:Array<ITimeLineLayerEditable>, layerIndex:Int):Void
 	{
 		this.container = container;
 		this.layers = layers;

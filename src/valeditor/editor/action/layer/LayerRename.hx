@@ -1,7 +1,7 @@
 package valeditor.editor.action.layer;
 
 import openfl.errors.Error;
-import valeditor.ValEditorLayer;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.ValEditorAction;
 
 /**
@@ -18,7 +18,7 @@ class LayerRename extends ValEditorAction
 		return new LayerRename();
 	}
 	
-	public var layer:ValEditorLayer;
+	public var layer:ITimeLineLayerEditable;
 	public var newName:String;
 	public var previousName:String;
 	
@@ -42,7 +42,7 @@ class LayerRename extends ValEditorAction
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function setup(layer:ValEditorLayer, newName:String):Void
+	public function setup(layer:ITimeLineLayerEditable, newName:String):Void
 	{
 		this.layer = layer;
 		this.newName = newName;

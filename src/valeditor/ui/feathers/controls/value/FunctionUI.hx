@@ -105,7 +105,7 @@ class FunctionUI extends ValueUI
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.paddingBottom = vLayout.paddingTop = Padding.SMALL;
-		vLayout.paddingLeft = vLayout.paddingRight = Padding.VALUE;
+		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
 		this.layout = vLayout;
 		
 		this._button = new Button();

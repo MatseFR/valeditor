@@ -53,11 +53,11 @@ class TemplateRemove extends ValEditorAction
 		var unselect:ObjectUnselect;
 		for (instance in this.template.instances)
 		{
-			if (ValEditor.selection.hasObject(cast instance))
+			if (ValEditor.selection.hasObject(instance))
 			{
 				unselect = ObjectUnselect.fromPool();
 				unselect.setup();
-				unselect.addObject(cast instance);
+				unselect.addObject(instance);
 				this.action.add(unselect);
 			}
 		}

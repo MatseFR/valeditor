@@ -60,7 +60,7 @@ class TimeLineSetFrame extends ValEditorAction
 		
 		for (i in this.indexStart...this.indexEnd + 1)
 		{
-			this.previousFrames.push(cast this.timeLine._frames[i]);
+			this.previousFrames.push(this.timeLine._frames[i]);
 		}
 	}
 	

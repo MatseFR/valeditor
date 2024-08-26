@@ -1,8 +1,7 @@
 package valeditor.events;
 import openfl.events.Event;
 import openfl.events.IEventDispatcher;
-import valedit.ValEditLayer;
-import valedit.ValEditObject;
+import valeditor.container.ITimeLineLayerEditable;
 
 /**
  * ...
@@ -26,14 +25,14 @@ class LayerEvent extends Event
 	#if !flash
 	static private var _POOL:Array<LayerEvent> = new Array<LayerEvent>();
 	
-	static private function fromPool(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool, cancelable:Bool):LayerEvent
+	static private function fromPool(type:String, layer:ITimeLineLayerEditable, object:ValEditorObject, bubbles:Bool, cancelable:Bool):LayerEvent
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(type, layer, object, bubbles, cancelable);
 		return new LayerEvent(type, layer, object, bubbles, cancelable);
 	}
 	#end
 	
-	static public function dispatch(dispatcher:IEventDispatcher, type:String, layer:ValEditLayer, object:ValEditObject = null,
+	static public function dispatch(dispatcher:IEventDispatcher, type:String, layer:ITimeLineLayerEditable, object:ValEditorObject = null,
 									bubbles:Bool = false, cancelable:Bool = false):Bool
 	{
 		#if flash
@@ -46,10 +45,10 @@ class LayerEvent extends Event
 		#end
 	}
 	
-	public var layer(default, null):ValEditLayer;
-	public var object(default, null):ValEditObject;
+	public var layer(default, null):ITimeLineLayerEditable;
+	public var object(default, null):ValEditorObject;
 
-	public function new(type:String, layer:ValEditLayer, object:ValEditObject = null, bubbles:Bool = false, cancelable:Bool = false) 
+	public function new(type:String, layer:ITimeLineLayerEditable, object:ValEditorObject = null, bubbles:Bool = false, cancelable:Bool = false) 
 	{
 		super(type, bubbles, cancelable);
 		this.layer = layer;
@@ -78,7 +77,7 @@ class LayerEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	private function setTo(type:String, layer:ValEditLayer, object:ValEditObject, bubbles:Bool, cancelable:Bool):LayerEvent
+	private function setTo(type:String, layer:ITimeLineLayerEditable, object:ValEditorObject, bubbles:Bool, cancelable:Bool):LayerEvent
 	{
 		this.type = type;
 		this.layer = layer;

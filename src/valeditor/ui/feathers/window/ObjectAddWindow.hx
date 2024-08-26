@@ -15,7 +15,6 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
-import valedit.ValEditObject;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
@@ -27,8 +26,8 @@ class ObjectAddWindow extends Panel
 {
 	public var cancelCallback(get, set):Void->Void;
 	public var newObjectCallback(get, set):Void->Void;
-	public var reusableObjects(get, set):Array<ValEditObject>;
-	public var reuseObjectCallback(get, set):ValEditObject->Void;
+	public var reusableObjects(get, set):Array<ValEditorObject>;
+	public var reuseObjectCallback(get, set):ValEditorObject->Void;
 	public var title(get, set):String;
 	
 	private var _cancelCallback:Void->Void;
@@ -45,17 +44,17 @@ class ObjectAddWindow extends Panel
 		return this._newObjectCallback = value;
 	}
 	
-	private var _reusableObjects:Array<ValEditObject>;
-	private function get_reusableObjects():Array<ValEditObject> { return this._reusableObjects; }
-	private function set_reusableObjects(value:Array<ValEditObject>):Array<ValEditObject>
+	private var _reusableObjects:Array<ValEditorObject>;
+	private function get_reusableObjects():Array<ValEditorObject> { return this._reusableObjects; }
+	private function set_reusableObjects(value:Array<ValEditorObject>):Array<ValEditorObject>
 	{
 		this._reuseObjectCollection.array = value;
 		return this._reusableObjects = value;
 	}
 	
-	private var _reuseObjectCallback:ValEditObject->Void;
-	private function get_reuseObjectCallback():ValEditObject->Void { return this._reuseObjectCallback; }
-	private function set_reuseObjectCallback(value:ValEditObject->Void):ValEditObject->Void
+	private var _reuseObjectCallback:ValEditorObject->Void;
+	private function get_reuseObjectCallback():ValEditorObject->Void { return this._reuseObjectCallback; }
+	private function set_reuseObjectCallback(value:ValEditorObject->Void):ValEditorObject->Void
 	{
 		return this._reuseObjectCallback = value;
 	}
@@ -84,7 +83,7 @@ class ObjectAddWindow extends Panel
 	private var _reuseObjectGroup:LayoutGroup;
 	private var _reuseObjectRadio:Radio;
 	private var _reuseObjectList:ListView;
-	private var _reuseObjectCollection:ArrayCollection<ValEditObject> = new ArrayCollection();
+	private var _reuseObjectCollection:ArrayCollection<ValEditorObject> = new ArrayCollection();
 	
 	private var _radioGroup:ToggleGroup;
 
@@ -187,7 +186,7 @@ class ObjectAddWindow extends Panel
 		}
 	}
 	
-	private function itemToText(item:ValEditObject):String
+	private function itemToText(item:ValEditorObject):String
 	{
 		return item.id;
 	}

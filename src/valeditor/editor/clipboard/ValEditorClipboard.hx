@@ -1,6 +1,5 @@
 package valeditor.editor.clipboard;
 import valedit.ExposedCollection;
-import valedit.ValEditObject;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
@@ -278,7 +277,7 @@ class ValEditorClipboard
 		if (ValEditor.currentTimeLineContainer != null)
 		{
 			// look for reusable objects
-			var reusableObjects:Array<ValEditObject> = cast(ValEditor.currentTimeLineContainer.currentLayer.timeLine, ValEditorTimeLine).getReusableObjectsWithTemplateForKeyFrame(copy.object.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+			var reusableObjects:Array<ValEditorObject> = ValEditor.currentTimeLineContainer.currentLayer.timeLine.getReusableObjectsWithTemplateForKeyFrame(copy.object.template, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 			if (reusableObjects.length != 0)
 			{
 				FeathersWindows.showObjectAddWindow(reusableObjects, onNewObject, onReuseObject, onCancelObject);
@@ -302,7 +301,7 @@ class ValEditorClipboard
 	private function onNewObject():Void
 	{
 		var copy:ValEditorObjectCopy = this._objectGroup.getCopyAt(this._pasteIndex);
-		var object:ValEditorObject = ValEditor.createObjectWithTemplate(cast copy.object.template, null, copy.collection.clone(true));
+		var object:ValEditorObject = ValEditor.createObjectWithTemplate(copy.object.template, null, copy.collection.clone(true));
 		
 		if (this._pasteAction != null)
 		{
@@ -313,7 +312,7 @@ class ValEditorClipboard
 			if (ValEditor.currentTimeLineContainer != null)
 			{
 				var objectAddKeyFrame:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-				objectAddKeyFrame.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
+				objectAddKeyFrame.setup(object, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 				this._pasteAction.add(objectAddKeyFrame);
 			}
 			else
@@ -347,7 +346,7 @@ class ValEditorClipboard
 			collection = object.createCollectionForKeyFrame(ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent);
 			
 			var objectAdd:ObjectAddKeyFrame = ObjectAddKeyFrame.fromPool();
-			objectAdd.setup(object, cast ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent, collection);
+			objectAdd.setup(object, ValEditor.currentTimeLineContainer.currentLayer.timeLine.frameCurrent, collection);
 			this._pasteAction.add(objectAdd);
 			
 			collection.copyValuesFrom(copy.collection, this._pasteAction);

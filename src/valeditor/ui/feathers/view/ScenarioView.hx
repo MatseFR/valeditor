@@ -38,10 +38,10 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import valedit.events.PlayEvent;
 import valedit.utils.ReverseIterator;
-import valeditor.IValEditorTimeLineContainer;
 import valeditor.ValEditor;
-import valeditor.ValEditorLayer;
 import valeditor.ValEditorTimeLine;
+import valeditor.container.ITimeLineContainerEditable;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.Selection;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.layer.LayerAdd;
@@ -141,7 +141,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _hScrollBar:HScrollBar;
 	private var _vScrollBar:VScrollBar;
 	
-	private var _container:IValEditorTimeLineContainer;
+	private var _container:ITimeLineContainerEditable;
 	private var _currentTimeLineItem:TimeLineItem;
 	
 	private var _cursor:LayoutGroup;
@@ -162,8 +162,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private var _layerContextMenu:ListView;
 	private var _layerContextMenuCollection:ArrayCollection<MenuItem>;
 	private var _layerPopupAdapter:CalloutPopUpAdapter = new CalloutPopUpAdapter();
-	private var _contextSelectedLayers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
-	private var _contextOtherLayers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+	private var _contextSelectedLayers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
+	private var _contextOtherLayers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 	
 	private var _insertLayerItem:MenuItem;
 	private var _removeLayerItem:MenuItem;
@@ -649,9 +649,9 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		switch (this._layerContextMenu.selectedItem.id)
 		{
 			case "insert layer" :
-				var layer:ValEditorLayer = ValEditor.createLayer();
+				var layer:ITimeLineLayerEditable = this._container.createLayer();
 				
-				var layers:Array<ValEditorLayer> = [layer];
+				var layers:Array<ITimeLineLayerEditable> = [layer];
 				var action:LayerAdd = LayerAdd.fromPool();
 				action.setup(this._container, layers, this._layerList.selectedIndex);
 				ValEditor.actionStack.add(action);
@@ -660,7 +660,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 				this._currentTimeLineItem = null;
 				
 				var action:LayerRemove = LayerRemove.fromPool();
-				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 				for (layer in this._layerList.selectedItems)
 				{
 					layers.push(layer);
@@ -742,7 +742,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			
 			case "move up" :
 				var action:LayerIndexUp = LayerIndexUp.fromPool();
-				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 				for (layer in this._layerList.selectedItems)
 				{
 					layers.push(layer);
@@ -752,7 +752,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			
 			case "move down" :
 				var action:LayerIndexDown = LayerIndexDown.fromPool();
-				var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+				var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 				for (layer in this._layerList.selectedItems)
 				{
 					layers.push(layer);
@@ -826,7 +826,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		{
 			var setFrameIndex:TimeLineSetFrameIndex = TimeLineSetFrameIndex.fromPool();
 			// use copied selection
-			setFrameIndex.setup(cast this._container.timeLine, this._container.frameIndex, this._lastFrameIndex, this._selection);
+			setFrameIndex.setup(this._container.timeLine, this._container.frameIndex, this._lastFrameIndex, this._selection);
 			ValEditor.actionStack.add(setFrameIndex);
 			this._selection.clear();
 		}
@@ -904,9 +904,9 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this.stage.removeEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onLayerContextMenuStageMouseDown);
 	}
 	
-	private function createTimeLineItem(layer:ValEditorLayer, index:Int):Void
+	private function createTimeLineItem(layer:ITimeLineLayerEditable, index:Int):Void
 	{
-		var timeLine:ValEditorTimeLine = cast layer.timeLine;
+		var timeLine:ValEditorTimeLine = layer.timeLine;
 		var item:TimeLineItem = TimeLineItem.fromPool(layer);
 		item.addEventListener(Event.SCROLL, onTimeLineItemScroll);
 		item.addEventListener(MouseEvent.RIGHT_CLICK, onTimeLineFrameRightClick);
@@ -927,15 +927,15 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		item.pool();
 	}
 	
-	private function layerRegister(layer:ValEditorLayer):Void
+	private function layerRegister(layer:ITimeLineLayerEditable):Void
 	{
 		layer.addEventListener(LayerEvent.LOCK_CHANGE, onLayerChange);
 		layer.addEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
 		
-		createTimeLineItem(cast layer, this._container.getLayerIndex(layer));
+		createTimeLineItem(layer, this._container.getLayerIndex(layer));
 	}
 	
-	private function layerUnregister(layer:ValEditorLayer):Void
+	private function layerUnregister(layer:ITimeLineLayerEditable):Void
 	{
 		layer.removeEventListener(LayerEvent.LOCK_CHANGE, onLayerChange);
 		layer.removeEventListener(LayerEvent.VISIBLE_CHANGE, onLayerChange);
@@ -964,7 +964,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._currentTimeLineItem = null;
 		}
 		
-		if (Std.isOfType(evt.object, IValEditorTimeLineContainer))
+		if (Std.isOfType(evt.object, ITimeLineContainerEditable))
 		{
 			this._container = cast evt.object;
 		}
@@ -983,8 +983,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._container.timeLine.addEventListener(TimeLineEvent.NUM_FRAMES_CHANGE, onNumFramesChange);
 			this._container.timeLine.addEventListener(TimeLineEvent.FRAME_INDEX_CHANGE, onTimeLineFrameIndexChange);
 			this._layerList.dataProvider = this._container.layerCollection;
-			this._timeLineRulerList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
-			this._timeLineNumberList.dataProvider = cast(this._container.timeLine, ValEditorTimeLine).frameCollection;
+			this._timeLineRulerList.dataProvider = this._container.timeLine.frameCollection;
+			this._timeLineNumberList.dataProvider = this._container.timeLine.frameCollection;
 			
 			controlsEnable();
 			
@@ -1056,9 +1056,9 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	{
 		if (this._layerList.selectedIndex != -1)
 		{
-			var layer:ValEditorLayer = ValEditor.createLayer();
+			var layer:ITimeLineLayerEditable = this._container.createLayer();
 			
-			var layers:Array<ValEditorLayer> = [layer];
+			var layers:Array<ITimeLineLayerEditable> = [layer];
 			var action:LayerAdd = LayerAdd.fromPool();
 			action.setup(this._container, layers, this._layerList.selectedIndex);
 			ValEditor.actionStack.add(action);
@@ -1082,7 +1082,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onLayerDownButton(evt:TriggerEvent):Void
 	{
 		var action:LayerIndexDown = LayerIndexDown.fromPool();
-		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+		var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 		for (layer in this._layerList.selectedItems)
 		{
 			layers.push(layer);
@@ -1107,7 +1107,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onLayerItemRightClick(evt:MouseEvent):Void
 	{
 		var itemRenderer:LayerItemRenderer = evt.currentTarget;
-		var clickLayer:ValEditorLayer = itemRenderer.layer;
+		var clickLayer:ITimeLineLayerEditable = itemRenderer.layer;
 		
 		if (this._layerList.selectedItems.indexOf(clickLayer) == -1)
 		{
@@ -1190,7 +1190,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._currentTimeLineItem = null;
 			
 			var action:LayerRemove = LayerRemove.fromPool();
-			var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+			var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 			for (layer in this._layerList.selectedItems)
 			{
 				layers.push(layer);
@@ -1202,8 +1202,8 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerRemoved(evt:ContainerEvent):Void
 	{
-		var layer:ValEditorLayer = evt.object;
-		var timeLineItem:TimeLineItem = this._timeLineToItem.get(cast layer.timeLine);
+		var layer:ITimeLineLayerEditable = evt.object;
+		var timeLineItem:TimeLineItem = this._timeLineToItem.get(layer.timeLine);
 		destroyTimeLineItem(timeLineItem);
 		this._timeLineList.validateNow();
 		updateVScrollBar();
@@ -1212,7 +1212,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	
 	private function onLayerRenameButton(evt:TriggerEvent):Void
 	{
-		FeathersWindows.showLayerRenameWindow(cast this._container.currentLayer);
+		FeathersWindows.showLayerRenameWindow(this._container.currentLayer);
 	}
 	
 	private function onLayerSelected(evt:ContainerEvent):Void
@@ -1222,7 +1222,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			this._currentTimeLineItem.isCurrent = false;
 		}
 		
-		var layer:ValEditorLayer = cast evt.object;
+		var layer:ITimeLineLayerEditable = cast evt.object;
 		if (layer == null) return;
 		
 		var layerIndex:Int = this._container.getLayerIndex(layer);
@@ -1236,7 +1236,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 	private function onLayerUpButton(evt:TriggerEvent):Void
 	{
 		var action:LayerIndexUp = LayerIndexUp.fromPool();
-		var layers:Array<ValEditorLayer> = new Array<ValEditorLayer>();
+		var layers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
 		for (layer in this._layerList.selectedItems)
 		{
 			layers.push(layer);

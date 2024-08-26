@@ -1,7 +1,10 @@
 package valeditor;
 
+import haxe.Constraints.Function;
 import openfl.display.BitmapData;
-import valedit.ValEditClassSettings;
+import valedit.DisplayObjectType;
+import valedit.ExposedCollection;
+import valedit.utils.PropertyMap;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.ui.IInteractiveObject;
 
@@ -9,7 +12,7 @@ import valeditor.ui.IInteractiveObject;
  * ...
  * @author Matse
  */
-class ValEditorClassSettings extends ValEditClassSettings 
+class ValEditorClassSettings
 {
 	static private var _POOL:Array<ValEditorClassSettings> = new Array<ValEditorClassSettings>();
 	
@@ -19,11 +22,53 @@ class ValEditorClassSettings extends ValEditClassSettings
 		return new ValEditorClassSettings();
 	}
 	
+	/** external/static function of type Dynamic->DisplayObjectContainer->Void to call instead of doing a simple addChild
+	 *  This is only useful if isDisplayObject is set to true */
+	public var addToDisplayFunction:Function;
+	
+	/** name of the object's DisplayObjectContainer->Void function to call instead of doing a simple addChild */
+	public var addToDisplayFunctionName:String;
+	
 	/** @default true **/
 	public var canBeCreated:Bool = true;
 	
 	/** @default null **/
 	public var categories:Array<String> = new Array<String>();
+	
+	/** name of the cloneFrom function, if any */
+	public var cloneFromFunctionName:String;
+	
+	/** name of the cloneTo function, if any */
+	public var cloneToFunctionName:String;
+	
+	/** class collection */
+	public var collection:ExposedCollection;
+	
+	/** constructor collection */
+	public var constructorCollection:ExposedCollection;
+	
+	/** if not null, this function will be used to create objects from this class
+	 *  make sure the function's signature matches the constructorCollection (if any) */
+	public var creationFunction:Function;
+	
+	public var creationFunctionForLoading:Function;
+	
+	public var creationFunctionForTemplateInstance:Function;
+	
+	/** external/static function of type Dynamic->Void to call on object creation */
+	public var creationInitFunction:Function;
+	
+	/** name of the object's function to call on object creation */
+	public var creationInitFunctionName:String;
+	
+	/** displayObjectType is only useful if isDisplayObject is set to true */
+	public var displayObjectType:Int = DisplayObjectType.NONE;
+	
+	/** external/static function of type Dynamic->Void to call on object destruction */
+	public var disposeFunction:Function;
+	
+	/** name of the object's function to call on object destruction */
+	public var disposeFunctionName:String;
 	
 	/** @default null **/
 	public var exportClassName:String;
@@ -41,6 +86,32 @@ class ValEditorClassSettings extends ValEditClassSettings
 	 *  this is only useful if isDisplayObject is set to true **/
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 	
+	/** set this to true if the class implements IValEditContainer */
+	public var isContainer:Bool;
+	
+	/** set this to true if the class implements IValEditContainerOpenFL */
+	public var isContainerOpenFL:Bool;
+	
+	#if starling
+	/** set this to true if the class implements IValEditContainerStarling */
+	public var isContainerStarling:Bool;
+	#end
+	
+	/** @default false **/
+	public var isDisplayObject:Bool;
+	
+	/** @default false **/
+	public var isTimeLineContainer:Bool;
+	
+	public var propertyMap:PropertyMap;
+	
+	/** external/static function of type Dynamic->DisplayObjectContainer->Void to call instead of doing a simple removeChild
+	 *  This is only useful is isDisplayObject is set to true */
+	public var removeFromDisplayFunction:Function;
+	
+	/** name of the object's DisplayObjectContainer->Void function to call instead of doing a simple removeChild */
+	public var removeFromDisplayFunctionName:String;
+	
 	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
 	
@@ -52,26 +123,45 @@ class ValEditorClassSettings extends ValEditClassSettings
 
 	public function new() 
 	{
-		super();
+		
 	}
 	
-	override public function clear():Void 
+	public function clear():Void 
 	{
-		this.visibilityCollection = null;
-		
-		super.clear();
-		
+		this.addToDisplayFunction = null;
+		this.addToDisplayFunctionName = null;
 		this.canBeCreated = true;
 		this.categories.resize(0);
+		this.collection = null;
+		this.constructorCollection = null;
+		this.creationFunction = null;
+		this.creationFunctionForLoading = null;
+		this.creationFunctionForTemplateInstance = null;
+		this.creationInitFunction = null;
+		this.creationInitFunctionName = null;
+		this.displayObjectType = DisplayObjectType.NONE;
+		this.disposeFunction = null;
+		this.disposeFunctionName = null;
+		this.exportClassName = null;
 		this.getBoundsFunctionName = "getBounds";
 		this.hasRadianRotation = false;
 		this.iconBitmapData = null;
 		this.interactiveFactory = null;
+		this.isContainer = false;
+		this.isContainerOpenFL = false;
+		#if starling
+		this.isContainerStarling = false;
+		#end
+		this.isDisplayObject = false;
+		this.propertyMap = null;
+		this.removeFromDisplayFunction = null;
+		this.removeFromDisplayFunctionName = null;
 		this.useBounds = false;
 		this.usePivotScaling = false;
+		this.visibilityCollection = null;
 	}
 	
-	override public function pool():Void 
+	public function pool():Void 
 	{
 		clear();
 		_POOL[_POOL.length] = this;

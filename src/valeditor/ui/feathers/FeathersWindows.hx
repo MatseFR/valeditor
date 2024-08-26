@@ -4,10 +4,13 @@ import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.events.MouseEvent;
 import valedit.ExposedCollection;
-import valedit.ValEditObject;
-import valeditor.ValEditorLayer;
+import valedit.asset.BinaryAsset;
+import valedit.asset.BitmapAsset;
+import valedit.asset.SoundAsset;
+import valedit.asset.TextAsset;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorTemplate;
+import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.settings.EditorSettings;
 import valeditor.editor.settings.ExportSettings;
 import valeditor.editor.settings.FileSettings;
@@ -28,6 +31,7 @@ import valeditor.ui.feathers.window.MessageConfirmWindow;
 import valeditor.ui.feathers.window.MessageWindow;
 import valeditor.ui.feathers.window.ObjectAddWindow;
 import valeditor.ui.feathers.window.ObjectCreationWindow;
+import valeditor.ui.feathers.window.ObjectEditWindow;
 import valeditor.ui.feathers.window.ObjectRenameWindow;
 import valeditor.ui.feathers.window.ObjectSelectWindow;
 import valeditor.ui.feathers.window.StartMenuWindow;
@@ -39,20 +43,14 @@ import valeditor.ui.feathers.window.VersionsWindow;
 import valeditor.ui.feathers.window.asset.AssetBrowser;
 import valeditor.ui.feathers.window.asset.BinaryAssetsWindow;
 import valeditor.ui.feathers.window.asset.BitmapAssetsWindow;
-import valeditor.ui.feathers.window.ObjectEditWindow;
 import valeditor.ui.feathers.window.asset.SoundAssetsWindow;
 import valeditor.ui.feathers.window.asset.TextAssetsWindow;
-import valedit.asset.BinaryAsset;
-import valedit.asset.BitmapAsset;
-import valedit.asset.SoundAsset;
-import valedit.asset.TextAsset;
 #if starling
 import valedit.asset.starling.StarlingAtlasAsset;
 import valeditor.ui.feathers.window.asset.starling.StarlingAtlasAssetsWindow;
 import valedit.asset.starling.StarlingTextureAsset;
 import valeditor.ui.feathers.window.asset.starling.StarlingTextureAssetsWindow;
 #end
-import valeditor.ui.UIConfig;
 
 /**
  * ...
@@ -425,7 +423,7 @@ class FeathersWindows
 		openWindow(_fileSettings);
 	}
 	
-	static public function showLayerRenameWindow(layer:ValEditorLayer, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void):Void
+	static public function showLayerRenameWindow(layer:ITimeLineLayerEditable, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void):Void
 	{
 		if (_layerRename == null)
 		{
@@ -481,7 +479,7 @@ class FeathersWindows
 		openWindow(_messageConfirmWindow);
 	}
 	
-	static public function showObjectAddWindow(reusableObjects:Array<ValEditObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
+	static public function showObjectAddWindow(reusableObjects:Array<ValEditorObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
 	{
 		if (_objectAdd == null)
 		{
