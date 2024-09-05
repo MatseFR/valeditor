@@ -7,7 +7,6 @@ import feathers.events.ScrollEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
-import valedit.ValEditKeyFrame;
 import valeditor.ValEditorTimeLine;
 import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.MultiAction;
@@ -102,7 +101,6 @@ class TimeLineItem extends LayoutGroup
 	
 	private var _dispatchScrollEvents:Bool = true;
 	private var _list:ListView;
-	private var _frame:ValEditKeyFrame;
 
 	public function new(layer:ITimeLineLayerEditable) 
 	{
