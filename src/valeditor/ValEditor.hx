@@ -1199,7 +1199,14 @@ class ValEditor
 		}
 		else
 		{
-			collection.applyAndSetObject(valObject.object);
+			if (registerToTemplate)
+			{
+				collection.applyAndSetObject(valObject.object);
+			}
+			else
+			{
+				collection.readAndSetObject(valObject.object);
+			}
 		}
 		valObject.defaultCollection = collection;
 		
@@ -1427,6 +1434,11 @@ class ValEditor
 	static public function getCategoryStringData(category:String):StringData
 	{
 		return _categoryToStringData.get(category);
+	}
+	
+	static public function getClassListForBaseClass(baseClassName:String):Array<String>
+	{
+		return _baseClassToClassList.get(baseClassName);
 	}
 	
 	static public function getClassUICollectionForCategory(category:String):ArrayCollection<ValEditorClass>
