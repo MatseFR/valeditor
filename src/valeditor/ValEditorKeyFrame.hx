@@ -5,8 +5,6 @@ import juggler.animation.Transitions;
 import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import valedit.ExposedCollection;
-import valedit.ValEdit;
-import valedit.ValEditKeyFrame;
 import valedit.animation.FrameTween;
 import valedit.animation.TweenData;
 import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
@@ -529,7 +527,7 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 		var objects:Array<Dynamic> = json.objects;
 		for (node in objects)
 		{
-			template = cast ValEdit.getTemplate(node.templateID);
+			template = cast ValEditor.getTemplate(node.templateID);
 			object = cast template.getInstance(node.id);
 			collection = template.clss.getCollection();
 			collection.readValuesFromObject(object.object);
