@@ -997,10 +997,6 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 							keyFrameCreate.setup(keyFrame);
 							action.add(keyFrameCreate);
 							
-							keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
-							keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
-							action.add(keyFrameCopyObjectsFrom);
-							
 							timeLineSetFrame = TimeLineSetFrame.fromPool();
 							timeLineSetFrame.setup(this, keyFrame, this._frameIndex + 1, this._frameIndex + 1);
 							action.add(timeLineSetFrame);
@@ -1008,6 +1004,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 							timeLineRegisterKeyFrame = TimeLineRegisterKeyFrame.fromPool();
 							timeLineRegisterKeyFrame.setup(this, keyFrame);
 							action.add(timeLineRegisterKeyFrame);
+							
+							keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
+							keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
+							action.add(keyFrameCopyObjectsFrom);
 						}
 					}
 				}
@@ -1034,10 +1034,6 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 						keyFrameCreate.setup(keyFrame);
 						action.add(keyFrameCreate);
 						
-						keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
-						keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
-						action.add(keyFrameCopyObjectsFrom);
-						
 						indexEnd = this._frameCurrent.indexEnd;
 						
 						timeLineSetFrame = TimeLineSetFrame.fromPool();
@@ -1051,6 +1047,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 						timeLineRegisterKeyFrame = TimeLineRegisterKeyFrame.fromPool();
 						timeLineRegisterKeyFrame.setup(this, keyFrame);
 						action.add(timeLineRegisterKeyFrame);
+						
+						keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
+						keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
+						action.add(keyFrameCopyObjectsFrom);
 					}
 				}
 				
@@ -1070,7 +1070,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 				keyFrame = ValEditor.createKeyFrame();
 				if (action == null)
 				{
-					keyFrame.copyObjectsFrom(this._frameCurrent);
+					//keyFrame.copyObjectsFrom(this._frameCurrent);
 					
 					keyFrame.indexStart = this._frameIndex;
 					keyFrame.indexEnd = this._frameCurrent.indexEnd;
@@ -1083,6 +1083,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					
 					registerKeyFrame(keyFrame);
 					
+					keyFrame.copyObjectsFrom(this._frameCurrent);
+					
 					setFrameCurrent(keyFrame);
 				}
 				else
@@ -1090,10 +1092,6 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					keyFrameCreate = KeyFrameCreate.fromPool();
 					keyFrameCreate.setup(keyFrame);
 					action.add(keyFrameCreate);
-					
-					keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
-					keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
-					action.add(keyFrameCopyObjectsFrom);
 					
 					indexEnd = this._frameCurrent.indexEnd;
 					
@@ -1109,9 +1107,13 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					timeLineRegisterKeyFrame.setup(this, keyFrame);
 					action.add(timeLineRegisterKeyFrame);
 					
+					keyFrameCopyObjectsFrom = KeyFrameCopyObjectsFrom.fromPool();
+					keyFrameCopyObjectsFrom.setup(keyFrame, this._frameCurrent);
+					action.add(keyFrameCopyObjectsFrom);
+					
 					timeLineSetFrameCurrent = TimeLineSetFrameCurrent.fromPool();
 					timeLineSetFrameCurrent.setup(this, keyFrame);
-					action.add(timeLineSetFrameCurrent);
+					action.addPost(timeLineSetFrameCurrent);
 				}
 			}
 		}
@@ -1211,7 +1213,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 				
 				timeLineSetFrameCurrent = TimeLineSetFrameCurrent.fromPool();
 				timeLineSetFrameCurrent.setup(this, keyFrame);
-				action.add(timeLineSetFrameCurrent);
+				action.addPost(timeLineSetFrameCurrent);
 			}
 		}
 		
