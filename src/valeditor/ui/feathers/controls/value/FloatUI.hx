@@ -133,7 +133,6 @@ class FloatUI extends ValueUI
 		this._mainGroup.addChild(this._label);
 		
 		this._input = new TextInput();
-		this._input.variant = TextInputVariant.FULL_WIDTH;
 		this._input.prompt = "null";
 		this._mainGroup.addChild(this._input);
 		
@@ -160,7 +159,7 @@ class FloatUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
-		this._input.variant = this._floatValue.inputVariant;
+		this._input.variant = this._floatValue.inputVariant != null ? this._floatValue.inputVariant : TextInputVariant.FULL_WIDTH;
 		switch (this._floatValue.numericMode)
 		{
 			case NumericMode.Positive :

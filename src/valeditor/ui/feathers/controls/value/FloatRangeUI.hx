@@ -138,7 +138,6 @@ class FloatRangeUI extends ValueUI
 		this._mainGroup.addChild(this._slider);
 		
 		this._input = new TextInput();
-		this._input.variant = TextInputVariant.NUMERIC_MEDIUM;
 		this._input.prompt = "null";
 		this._mainGroup.addChild(this._input);
 		
@@ -165,7 +164,7 @@ class FloatRangeUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
-		this._input.variant = this._floatRange.inputVariant;
+		this._input.variant = this._floatRange.inputVariant != null ? this._floatRange.inputVariant : TextInputVariant.NUMERIC_MEDIUM;
 		
 		this._slider.minimum = this._floatRange.min;
 		this._slider.maximum = this._floatRange.max;

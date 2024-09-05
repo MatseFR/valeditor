@@ -132,7 +132,6 @@ class IntUI extends ValueUI
 		this._mainGroup.addChild(this._label);
 		
 		this._input = new TextInput();
-		this._input.variant = TextInputVariant.FULL_WIDTH;
 		this._input.prompt = "null";
 		this._mainGroup.addChild(this._input);
 		
@@ -159,7 +158,7 @@ class IntUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
-		this._input.variant = this._intValue.inputVariant;
+		this._input.variant = this._intValue.inputVariant != null ? this._intValue.inputVariant : TextInputVariant.FULL_WIDTH;
 		switch (this._intValue.numericMode)
 		{
 			case NumericMode.Positive :

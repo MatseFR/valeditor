@@ -137,7 +137,6 @@ class IntRangeUI extends ValueUI
 		this._mainGroup.addChild(this._slider);
 		
 		this._input = new TextInput();
-		this._input.variant = TextInputVariant.NUMERIC_MEDIUM;
 		this._input.prompt = "null";
 		this._mainGroup.addChild(this._input);
 		
@@ -169,7 +168,7 @@ class IntRangeUI extends ValueUI
 		this._slider.step = this._intRange.step;
 		this._slider.snapInterval = this._intRange.step;
 		
-		this._input.variant = this._intRange.inputVariant;
+		this._input.variant = this._intRange.inputVariant != null ? this._intRange.inputVariant : TextInputVariant.NUMERIC_MEDIUM;
 		if (this._intRange.min < 0)
 		{
 			this._input.restrict = "-0123456789";
