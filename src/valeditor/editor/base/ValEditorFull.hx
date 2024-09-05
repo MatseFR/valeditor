@@ -24,9 +24,13 @@ import openfl.ui.Keyboard;
 import openfl.utils.Assets;
 import valedit.DisplayObjectType;
 import valedit.SpriteContainerOpenFL;
+import valedit.SpriteContainerOpenFLStarling;
 import valedit.SpriteContainerStarling;
 import valedit.SpriteContainerStarling3D;
+import valedit.TimeLineContainerOpenFL;
 import valedit.TimeLineContainerOpenFLStarling;
+import valedit.TimeLineContainerStarling;
+import valedit.TimeLineContainerStarling3D;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
@@ -54,6 +58,7 @@ import valedit.object.openfl.display.WedgeShape;
 import valeditor.ValEditorClassSettings;
 import valeditor.ValEditorKeyFrame;
 import valeditor.container.SpriteContainerOpenFLEditable;
+import valeditor.container.SpriteContainerOpenFLStarlingEditable;
 import valeditor.container.SpriteContainerStarling3DEditable;
 import valeditor.container.SpriteContainerStarlingEditable;
 import valeditor.container.TimeLineContainerOpenFLEditable;
@@ -1227,7 +1232,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
-		// SpriteContainer
+		// SpriteContainerOpenFL
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
 		settings.creationFunction = SpriteContainerOpenFLEditable.fromPool;
@@ -1244,6 +1249,27 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(SpriteContainerOpenFLEditable, settings);
 		settings.clear();
 		
+		// SpriteContainerOpenFLStarling
+		#if starling
+		settings.canBeCreated = true;
+		settings.cloneToFunctionName = "cloneTo";
+		settings.creationFunction = SpriteContainerOpenFLStarlingEditable.fromPool;
+		settings.creationFunctionForLoading = SpriteContainerOpenFLStarlingEditable.fromPool;
+		settings.creationFunctionForTemplateInstance = SpriteContainerOpenFLStarlingEditable.fromPool;
+		settings.disposeFunctionName = "pool";
+		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl_starling.png");
+		settings.exportClassName = Type.getClassName(SpriteContainerOpenFLStarling);
+		settings.isContainer = true;
+		settings.isContainerOpenFL = true;
+		settings.isContainerStarling = true;
+		settings.collection = ContainerData.exposeSpriteContainerOpenFLEditable();
+		settings.visibilityCollection = ContainerData.getSpriteContainerOpenFLEditableVisibility();
+		settings.useBounds = true;
+		ValEditor.registerClass(SpriteContainerOpenFLStarlingEditable, settings);
+		settings.clear();
+		#end
+		
+		#if starling
 		// SpriteContainerStarling
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1261,7 +1287,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		ValEditor.registerClass(SpriteContainerStarlingEditable, settings);
 		settings.clear();
+		#end
 		
+		#if starling
 		// SpriteContainerStarling3D
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1279,6 +1307,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.hasRadianRotation = true;
 		ValEditor.registerClass(SpriteContainerStarling3DEditable, settings);
 		settings.clear();
+		#end
 		
 		// TimeLineContainerOpenFL
 		settings.canBeCreated = true;
@@ -1288,7 +1317,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForTemplateInstance = TimeLineContainerOpenFLEditable.fromPool;
 		settings.disposeFunctionName = "pool";
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
-		settings.exportClassName = null;
+		settings.exportClassName = Type.getClassName(TimeLineContainerOpenFL);
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.isContainer = true;
@@ -1308,7 +1337,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForTemplateInstance = TimeLineContainerStarlingEditable.fromPool;
 		settings.disposeFunctionName = "pool";
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
-		settings.exportClassName = null;
+		settings.exportClassName = Type.getClassName(TimeLineContainerStarling);
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.isContainer = true;
@@ -1328,7 +1357,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.creationFunctionForTemplateInstance = TimeLineContainerStarling3DEditable.fromPool;
 		settings.disposeFunctionName = "pool";
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
-		settings.exportClassName = null;
+		settings.exportClassName = Type.getClassName(TimeLineContainerStarling3D);
 		settings.addCategory(CategoryID.STARLING);
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.isContainer = true;
