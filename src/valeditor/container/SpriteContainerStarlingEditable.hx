@@ -81,8 +81,7 @@ class SpriteContainerStarlingEditable extends EventDispatcher implements IContai
 	private function get_cameraX():Float { return this._cameraX; }
 	private function set_cameraX(value:Float):Float
 	{
-		this._containerStarling.x = this.x - value;
-		this.containerUI.x = this.x - value;
+		this._containerStarling.x = this.containerUI.x = this.x - value;
 		return this._cameraX = value;
 	}
 	
@@ -90,8 +89,7 @@ class SpriteContainerStarlingEditable extends EventDispatcher implements IContai
 	private function get_cameraY():Float { return this._cameraY; }
 	private function set_cameraY(value:Float):Float
 	{
-		this._containerStarling.y = this.y - value;
-		this.containerUI.y = this.y - value;
+		this._containerStarling.y = this.containerUI.y = this.y - value;
 		return this._cameraY = value;
 	}
 	
@@ -181,14 +179,12 @@ class SpriteContainerStarlingEditable extends EventDispatcher implements IContai
 	private function get_scaleX():Float { return this._containerStarling.scaleX; }
 	private function set_scaleX(value:Float):Float
 	{
-		this.containerUI.scaleX = value;
 		return this._containerStarling.scaleX = value;
 	}
 	
 	private function get_scaleY():Float { return this._containerStarling.scaleY; }
 	private function set_scaleY(value:Float):Float
 	{
-		this.containerUI.scaleY = value;
 		return this._containerStarling.scaleY = value;
 	}
 	
@@ -253,8 +249,7 @@ class SpriteContainerStarlingEditable extends EventDispatcher implements IContai
 	private function get_x():Float { return this._x; }
 	private function set_x(value:Float):Float
 	{
-		this._containerStarling.x = value - this._cameraX;
-		this.containerUI.x = value - this._cameraX;
+		this._containerStarling.x = this.containerUI.x = value - this._cameraX;
 		return this._x = value;
 	}
 	
@@ -262,8 +257,7 @@ class SpriteContainerStarlingEditable extends EventDispatcher implements IContai
 	private function get_y():Float { return this._y; }
 	private function set_y(value:Float):Float
 	{
-		this._containerStarling.y = value - this._cameraY;
-		this.containerUI.y = value - this._cameraY;
+		this._containerStarling.y = this.containerUI.y = value - this._cameraY;
 		return this._y = value;
 	}
 	

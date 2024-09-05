@@ -107,10 +107,7 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 	private function get_blendMode():String { return this._blendMode; }
 	private function set_blendMode(value:String):String
 	{
-		if (this._blendMode == value) return value;
-		
 		this._containerStarling.blendMode = value;
-		
 		return this._blendMode = value;
 	}
 	
@@ -189,9 +186,7 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 	private function get_height():Float { return this._containerStarling.height; }
 	private function set_height(value:Float):Float
 	{
-		this._containerStarling.height = value;
-		this.containerUI.scaleY = this._containerStarling.scaleY;
-		return value;
+		return this._containerStarling.height = value;
 	}
 	
 	private function get_lastFrameIndex():Int { return this.timeLine.lastFrameIndex; }
@@ -337,9 +332,7 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 	private function get_width():Float { return this._containerStarling.width; }
 	private function set_width(value:Float):Float
 	{
-		this._containerStarling.width = value;
-		this.containerUI.scaleX = this._containerStarling.scaleX;
-		return value;
+		return this._containerStarling.width = value;
 	}
 	
 	private var _x:Float = 0;
@@ -971,7 +964,7 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 		ContainerEvent.dispatch(this, ContainerEvent.LAYER_VISIBILITY_CHANGE, evt.layer);
 	}
 	
-	public function cloneTo(container:TimeLineContainerOpenFLEditable):Void
+	public function cloneTo(container:TimeLineContainerStarling3DEditable):Void
 	{
 		container.alpha = this.alpha;
 		container.autoPlay = this.autoPlay;

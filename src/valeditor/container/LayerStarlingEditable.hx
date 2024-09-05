@@ -88,7 +88,7 @@ class LayerStarlingEditable extends EventDispatcher implements ITimeLineLayerEdi
 		
 		if (value != null)
 		{
-			this._rootContainerStarling.addChildAt(this._displayContainerStarling, this._index);
+			value.addChildAt(this._displayContainerStarling, this._index);
 		}
 		
 		return this._rootContainerStarling = value;
@@ -138,6 +138,10 @@ class LayerStarlingEditable extends EventDispatcher implements ITimeLineLayerEdi
 	
 	public function clear():Void 
 	{
+		this.timeLine.clear();
+		this.timeLine.activateFunction = this.activate;
+		this.timeLine.deactivateFunction = this.deactivate;
+		
 		this.rootContainerStarling = null;
 		
 		this.allObjects.resize(0);

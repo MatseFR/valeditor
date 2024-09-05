@@ -90,7 +90,7 @@ class LayerOpenFLEditable extends EventDispatcher implements ITimeLineLayerEdita
 		
 		if (value != null)
 		{
-			this._rootContainer.addChildAt(this._displayContainer, this._index);
+			value.addChildAt(this._displayContainer, this._index);
 		}
 		
 		return this._rootContainer = value;
@@ -140,6 +140,10 @@ class LayerOpenFLEditable extends EventDispatcher implements ITimeLineLayerEdita
 	
 	public function clear():Void 
 	{
+		this.timeLine.clear();
+		this.timeLine.activateFunction = this.activate;
+		this.timeLine.deactivateFunction = this.deactivate;
+		
 		this.rootContainer = null;
 		
 		this.allObjects.resize(0);

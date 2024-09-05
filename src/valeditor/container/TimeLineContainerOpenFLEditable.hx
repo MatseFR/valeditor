@@ -99,8 +99,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		return this.timeLine.autoIncreaseNumFrames = value;
 	}
 	
-	private var _blendMode:BlendMode = BlendMode.NORMAL;
-	private function get_blendMode():BlendMode { return this._blendMode; }
+	private function get_blendMode():BlendMode { return this._container.blendMode; }
 	private function set_blendMode(value:BlendMode):BlendMode
 	{
 		return this._container.blendMode = value;
@@ -168,9 +167,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	private function get_height():Float { return this._container.height; }
 	private function set_height(value:Float):Float
 	{
-		this._container.height = value;
-		this.containerUI.scaleY = this._container.scaleY;
-		return value;
+		return this._container.height = value;
 	}
 	
 	private var _isOpen:Bool = false;
@@ -294,9 +291,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	private function get_width():Float { return this._container.width; }
 	private function set_width(value:Float):Float
 	{
-		this._container.width = value;
-		//this.containerUI.scaleX = this._container.scaleX;
-		return value;
+		return this._container.width = value;
 	}
 	
 	private var _x:Float = 0;
@@ -304,7 +299,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	private function set_x(value:Float):Float
 	{
 		this._container.x = this.containerUI.x = value - this._cameraX;
-		return value;
+		return this._x = value;
 	}
 	
 	private var _y:Float = 0;
@@ -312,7 +307,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	private function set_y(value:Float):Float
 	{
 		this._container.y = this.containerUI.y = value - this._cameraY;
-		return value;
+		return this._y = value;
 	}
 	
 	private var _pivotIndicator:PivotIndicator = new PivotIndicator(UIConfig.CONTAINER_PIVOT_SIZE, UIConfig.CONTAINER_PIVOT_COLOR,

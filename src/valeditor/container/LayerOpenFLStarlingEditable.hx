@@ -167,6 +167,10 @@ class LayerOpenFLStarlingEditable extends EventDispatcher implements ITimeLineLa
 	
 	public function clear():Void 
 	{
+		this.timeLine.clear();
+		this.timeLine.activateFunction = this.activate;
+		this.timeLine.deactivateFunction = this.deactivate;
+		
 		this.rootContainer = null;
 		this.rootContainerStarling = null;
 		

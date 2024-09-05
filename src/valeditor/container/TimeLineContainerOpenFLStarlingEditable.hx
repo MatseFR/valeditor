@@ -102,7 +102,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_alpha():Float { return this._alpha; }
 	private function set_alpha(value:Float):Float
 	{
-		if (this._alpha == value) return value;
 		this._container.alpha = this._containerStarling.alpha = value;
 		return this._alpha = value;
 	}
@@ -113,29 +112,22 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		return this.timeLine.autoIncreaseNumFrames = value;
 	}
 	
-	private var _blendMode:BlendMode = BlendMode.NORMAL;
-	private function get_blendMode():BlendMode { return this._blendMode; }
+	private function get_blendMode():BlendMode { return this._container.blendMode; }
 	private function set_blendMode(value:BlendMode):BlendMode
 	{
-		if (this._blendMode == value) return value;
-		this._container.blendMode = value;
-		return this._blendMode = value;
+		return this._container.blendMode = value;
 	}
 	
-	private var _blendModeStarling:String = starling.display.BlendMode.AUTO;
-	private function get_blendModeStarling():String { return this._blendModeStarling; }
+	private function get_blendModeStarling():String { return this._containerStarling.blendMode; }
 	private function set_blendModeStarling(value:String):String
 	{
-		if (this._blendModeStarling == value) return value;
-		this._containerStarling.blendMode = value;
-		return this._blendModeStarling = value;
+		return this._containerStarling.blendMode = value;
 	}
 	
 	private var _cameraX:Float = 0;
 	private function get_cameraX():Float { return this._cameraX; }
 	private function set_cameraX(value:Float):Float
 	{
-		if (this._cameraX == value) return value;
 		this.containerUI.x = this._container.x = this._containerStarling.x = this._x - value;
 		return this._cameraX = value;
 	}
@@ -144,7 +136,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_cameraY():Float { return this._cameraY; }
 	private function set_cameraY(value:Float):Float
 	{
-		if (this._cameraY == value) return value;
 		this.containerUI.y = this._container.y = this._containerStarling.y = this._y - value;
 		return this._cameraY = value;
 	}
@@ -289,9 +280,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_rotation():Float { return this._rotation; }
 	private function set_rotation(value:Float):Float 
 	{
-		if (this._rotation == value) return value;
-		this.containerUI.rotation = value;
-		this._container.rotation = value;
+		this.containerUI.rotation = this._container.rotation = value;
 		this._containerStarling.rotation = MathUtil.deg2rad(value);
 		return this._rotation = value;
 	}
@@ -300,8 +289,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_scaleX():Float { return this._scaleX; }
 	private function set_scaleX(value:Float):Float 
 	{
-		if (this._scaleX == value) return value;
-		this.containerUI.scaleX = value;
 		this._container.scaleX = this._containerStarling.scaleX = value;
 		return this._scaleX = value;
 	}
@@ -310,8 +297,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_scaleY():Float { return this._scaleY; }
 	private function set_scaleY(value:Float):Float 
 	{
-		if (this._scaleY == value) return value;
-		this.containerUI.scaleY = value;
 		this._container.scaleY = this._containerStarling.scaleY = value;
 		return this._scaleY = value;
 	}
@@ -350,25 +335,11 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_visible():Bool { return this._visible; }
 	private function set_visible(value:Bool):Bool
 	{
-		if (this._visible == value) return value;
 		this._container.visible = this._containerStarling.visible = value;
 		return this._visible = value;
 	}
 	
-	private function get_width():Float
-	{
-		var width:Float = 0.0;
-		var widthStarling:Float = 0.0;
-		if (this._container != null)
-		{
-			width = this._container.width;
-		}
-		if (this._containerStarling != null)
-		{
-			widthStarling = this._containerStarling.width;
-		}
-		return Math.max(width, widthStarling);
-	}
+	private function get_width():Float { return Math.max(this._container.width, this._containerStarling.width); }
 	private function set_width(value:Float):Float
 	{
 		var w:Float = this.width / this.scaleX;
@@ -381,19 +352,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_x():Float { return this._x; }
 	private function set_x(value:Float):Float 
 	{
-		if (this._x == value) return value;
-		if (this.containerUI != null)
-		{
-			this.containerUI.x = value - this._cameraX;
-		}
-		if (this._container != null)
-		{
-			this._container.x = value - this._cameraX;
-		}
-		if (this._containerStarling != null)
-		{
-			this._containerStarling.x = value - this._cameraX;
-		}
+		this.containerUI.x = this._container.x = this._containerStarling.x = value - this._cameraX;
 		return this._x = value;
 	}
 	
@@ -401,19 +360,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	private function get_y():Float { return this._y; }
 	private function set_y(value:Float):Float 
 	{
-		if (this._y == value) return value;
-		if (this.containerUI != null)
-		{
-			this.containerUI.y = value - this._cameraY;
-		}
-		if (this._container != null)
-		{
-			this._container.y = value - this._cameraY;
-		}
-		if (this._containerStarling != null)
-		{
-			this._containerStarling.y = value - this._cameraY;
-		}
+		this.containerUI.y = this._container.y = this._containerStarling.y = value - this._cameraY;
 		return this._y = value;
 	}
 	
@@ -438,8 +385,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	
 	public function clear():Void
 	{
-		this.timeLine.clear();
-		
 		for (layer in this._layers)
 		{
 			layerUnregister(layer);
@@ -448,6 +393,8 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		this._layers.resize(0);
 		this._layerMap.clear();
 		this._currentLayer = null;
+		
+		this.timeLine.clear();
 		
 		this.rootContainer = null;
 		this.rootContainerStarling = null;

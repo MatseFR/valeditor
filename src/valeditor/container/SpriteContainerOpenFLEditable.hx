@@ -73,8 +73,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	private function get_cameraX():Float { return this._cameraX; }
 	private function set_cameraX(value:Float):Float
 	{
-		this._container.x = this.x - value;
-		this.containerUI.x = this.x - value;
+		this._container.x = this.containerUI.x = this._x - value;
 		return this._cameraX = value;
 	}
 	
@@ -82,8 +81,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	private function get_cameraY():Float { return this._cameraY; }
 	private function set_cameraY(value:Float):Float
 	{
-		this._container.y = this.y - value;
-		this.containerUI.y = this.y - value;
+		this._container.y = this.containerUI.y = this._y - value;
 		return this._cameraY = value;
 	}
 	
@@ -125,21 +123,18 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	private function get_rotation():Float { return this._container.rotation; }
 	private function set_rotation(value:Float):Float
 	{
-		this.containerUI.rotation = value;
-		return this._container.rotation = value;
+		return this._container.rotation = this.containerUI.rotation = value;
 	}
 	
 	private function get_scaleX():Float { return this._container.scaleX; }
 	private function set_scaleX(value:Float):Float
 	{
-		this.containerUI.scaleX = value;
 		return this._container.scaleX = value;
 	}
 	
 	private function get_scaleY():Float { return this._container.scaleY; }
 	private function set_scaleY(value:Float):Float
 	{
-		this.containerUI.scaleY = value;
 		return this._container.scaleY = value;
 	}
 	
@@ -192,8 +187,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	private function get_x():Float { return this._x; }
 	private function set_x(value:Float):Float
 	{
-		this._container.x = value - this._cameraX;
-		this.containerUI.x = value - this._cameraX;
+		this._container.x = this.containerUI.x = value - this._cameraX;
 		return this._x = value;
 	}
 	
@@ -201,8 +195,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	private function get_y():Float { return this._y; }
 	private function set_y(value:Float):Float
 	{
-		this._container.y = value - this._cameraY;
-		this.containerUI.y = value - this._cameraY;
+		this._container.y = this.containerUI.y = value - this._cameraY;
 		return this._y = value;
 	}
 	
@@ -368,7 +361,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 			this._displayObjects[this._displayObjects.length] = object;
 			if (object.isContainerOpenFL)
 			{
-				cast(object.object, IContainerOpenFLEditable).rootContainer = this.container;
+				cast(object.object, IContainerOpenFLEditable).rootContainer = this._container;
 			}
 		}
 		
@@ -470,9 +463,6 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	
 	public function fromJSONSave(json:Dynamic):Void
 	{
-		this.viewCenterX = json.viewCenterX;
-		this.viewCenterY = json.viewCenterY;
-		
 		var object:ValEditorObject;
 		var objects:Array<Dynamic> = json.objects;
 		for (data in objects)
@@ -497,9 +487,6 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	public function toJSONSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};
-		
-		json.viewCenterX = this.viewCenterX;
-		json.viewCenterY = this.viewCenterY;
 		
 		var objects:Array<Dynamic> = [];
 		var data:Dynamic;
