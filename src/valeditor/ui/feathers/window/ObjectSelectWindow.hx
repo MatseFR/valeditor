@@ -187,7 +187,7 @@ class ObjectSelectWindow extends Panel
 		{
 			for (allowedName in allowedClassNames)
 			{
-				classNames = ValEdit.getClassListForBaseClass(allowedName);
+				classNames = ValEditor.getClassListForBaseClass(allowedName);
 				if (classNames != null)
 				{
 					for (className in classNames)
