@@ -58,7 +58,10 @@ class TimeLineSetFrame extends ValEditorAction
 		this.previousIndexStart = this.keyFrame.indexStart;
 		this.previousIndexEnd = this.keyFrame.indexEnd;
 		
-		for (i in this.indexStart...this.indexEnd + 1)
+		var index:Int = this.indexEnd > this.previousIndexEnd ? this.indexEnd : this.previousIndexEnd;
+		
+		//for (i in this.indexStart...this.indexEnd + 1)
+		for (i in this.indexStart...index + 1)
 		{
 			this.previousFrames.push(this.timeLine._frames[i]);
 		}
