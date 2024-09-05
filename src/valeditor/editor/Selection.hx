@@ -1,6 +1,5 @@
 package valeditor.editor;
 import openfl.events.EventDispatcher;
-import valedit.ValEditKeyFrame;
 import valeditor.ValEditorFrameGroup;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.clipboard.ClipboardAddFrame;
@@ -47,7 +46,7 @@ class Selection extends EventDispatcher
 		this._templateGroup.clear();
 		if (value != null)
 		{
-			if (Std.isOfType(value, ValEditKeyFrame))
+			if (Std.isOfType(value, ValEditorKeyFrame))
 			{
 				this._frameGroup.addFrame(cast value);
 			}
