@@ -1,7 +1,7 @@
 package valeditor.editor.base;
+
 import feathers.controls.navigators.StackItem;
 import valeditor.ui.feathers.view.EditView;
-import valedit.ValEdit;
 
 /**
  * ...
@@ -24,7 +24,7 @@ class ValEditorSimple extends ValEditorBaseFeathers
 		
 		this.editView = new EditView();
 		this.editView.initializeNow();
-		ValEdit.uiContainerDefault = this.editView.valEditContainer;
+		ValEditor.uiContainerDefault = this.editView.valEditContainer;
 		
 		item = StackItem.withDisplayObject(EditView.ID, this.editView);
 		this.screenNavigator.addItem(item);
