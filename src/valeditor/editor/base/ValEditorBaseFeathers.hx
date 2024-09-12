@@ -112,11 +112,11 @@ class ValEditorBaseFeathers extends Application
 		
 		// store default values for easy restoration
 		collection = ValEditor.getCollectionForObject(ValEditor.theme);
-		collection.readValuesFromObject(ValEditor.theme, false);
+		collection.readFromObject(ValEditor.theme, false);
 		ValEditor.themeDefaultValues = collection;
 		
 		collection = ValEditor.getCollectionForObject(ValEditor.theme);
-		collection.readValuesFromObject(ValEditor.theme, false);
+		collection.readFromObject(ValEditor.theme, false);
 		ValEditor.editorSettings.themeCustomValues = collection;
 		
 		FileUtil.loadEditorSettings();

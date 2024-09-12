@@ -46,7 +46,6 @@ class FileSettingsWindow extends Panel
 	private function get_settings():FileSettings { return this._settings; }
 	private function set_settings(value:FileSettings):FileSettings
 	{
-		//this._editSettings.clear();
 		this._settings = value;
 		if (this._settings != null)
 		{
@@ -88,7 +87,6 @@ class FileSettingsWindow extends Panel
 	private var _cancelButton:Button;
 	private var _confirmButton:Button;
 	
-	//private var _editSettings:FileSettings = FileSettings.fromPool();
 	private var _settingsCollection:ExposedCollection;
 	private var _backupSettings:FileSettings = new FileSettings();
 
@@ -190,7 +188,7 @@ class FileSettingsWindow extends Panel
 		var fullPath:String = this._settings.fullPath;
 		this._settings.clear();
 		this._settings.fullPath = fullPath;
-		this._settingsCollection.readValuesFromObject(this._settings, false);
+		this._settingsCollection.readFromObject(this._settings, false);
 	}
 	
 }

@@ -390,7 +390,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		if (collection == null)
 		{
 			collection = this.clss.getCollection();
-			collection.readValuesFromObject(this.object);
+			collection.readFromObject(this.object);
 		}
 		
 		if (this.template != null)
@@ -601,7 +601,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			var value:ExposedValue = this.currentCollection.getValue(this._realPropertyName);
 			value.valueChanged();
-			this.currentCollection.readValues();
+			this.currentCollection.read();
 		}
 		
 		if (!objectOnly)
@@ -622,7 +622,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			var value:ExposedValue = this.currentCollection.getValue(this._realPropertyName);
 			value.valueChanged();
-			this.currentCollection.readValues();
+			this.currentCollection.read();
 		}
 		
 		if (!objectOnly)

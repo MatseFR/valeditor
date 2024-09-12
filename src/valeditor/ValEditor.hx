@@ -40,7 +40,6 @@ import valeditor.container.IContainerStarlingEditable;
 import valeditor.container.ITimeLineContainerEditable;
 import valeditor.container.ITimeLineLayerEditable;
 import valeditor.container.LayerOpenFLStarlingEditable;
-import valeditor.container.TimeLineContainerOpenFLStarlingEditable;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import valeditor.editor.action.MultiAction;
@@ -1134,7 +1133,7 @@ class ValEditor
 		
 		var template:ValEditorTemplate = ValEditorTemplate.fromPool(valClass, id, collection, constructorCollection);
 		template.object = createObjectWithTemplate(template, id, template.collection, false);
-		template.object.currentCollection.readValues();
+		template.object.currentCollection.read();
 		
 		var visibility:TemplateVisibilityCollection = TemplateVisibilityCollection.fromPool();
 		visibility.populateFromClassVisibilityCollection(valClass.visibilityCollectionCurrent);

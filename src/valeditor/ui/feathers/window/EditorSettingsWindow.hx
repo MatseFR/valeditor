@@ -192,7 +192,7 @@ class EditorSettingsWindow extends Panel
 	private function onRestoreDefaultsButton(evt:TriggerEvent):Void
 	{
 		this._settings.clear();
-		this._settingsCollection.readValuesFromObject(this._settings, false);
+		this._settingsCollection.readFromObject(this._settings, false);
 	}
 	
 	private function onValueChange(evt:ValueEvent):Void

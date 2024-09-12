@@ -530,7 +530,7 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 			template = cast ValEditor.getTemplate(node.templateID);
 			object = cast template.getInstance(node.id);
 			collection = template.clss.getCollection();
-			collection.readValuesFromObject(object.object);
+			collection.readFromObject(object.object);
 			collection.fromJSONSave(node.collection);
 			template.visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
 			collection.apply();

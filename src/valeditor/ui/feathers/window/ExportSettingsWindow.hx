@@ -159,7 +159,7 @@ class ExportSettingsWindow extends Panel
 		var fullPath:String = this._editSettings.fullPath;
 		this._editSettings.clear();
 		this._editSettings.fullPath = fullPath;
-		this._settingsCollection.readValuesFromObject(this._editSettings);
+		this._settingsCollection.readFromObject(this._editSettings);
 	}
 	
 }
