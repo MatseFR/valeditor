@@ -930,8 +930,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 			layer.cloneTo(cloneLayer);
 			container.addLayer(cloneLayer);
 		}
-		
-		container.frameIndex = this.frameIndex;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

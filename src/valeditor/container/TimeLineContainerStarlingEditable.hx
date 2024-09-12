@@ -950,8 +950,6 @@ class TimeLineContainerStarlingEditable extends EventDispatcher implements ICont
 			layer.cloneTo(cloneLayer);
 			container.addLayer(cloneLayer);
 		}
-		
-		container.frameIndex = this.frameIndex;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

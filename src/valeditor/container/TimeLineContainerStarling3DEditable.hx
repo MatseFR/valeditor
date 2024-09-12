@@ -983,8 +983,6 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 			layer.cloneTo(cloneLayer);
 			container.addLayer(cloneLayer);
 		}
-		
-		container.frameIndex = this.frameIndex;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void

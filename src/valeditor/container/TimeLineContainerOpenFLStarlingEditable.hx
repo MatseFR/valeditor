@@ -1000,8 +1000,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 			layer.cloneTo(cloneLayer);
 			container.addLayer(cloneLayer);
 		}
-		
-		container.frameIndex = this.frameIndex;
 	}
 	
 	public function fromJSONSave(json:Dynamic):Void
