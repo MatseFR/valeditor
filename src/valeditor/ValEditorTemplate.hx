@@ -8,7 +8,6 @@ import valedit.value.base.ExposedValue;
 import valeditor.container.IContainerEditable;
 import valeditor.container.ITimeLineContainerEditable;
 import valeditor.container.ITimeLineLayerEditable;
-import valeditor.container.LayerOpenFLStarlingEditable;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ContainerEvent;
@@ -409,12 +408,12 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 	{
 		//trace("onTemplateContainerLayerAdded");
 		
-		var layer:LayerOpenFLStarlingEditable = evt.object;
+		var layer:ITimeLineLayerEditable = evt.object;
 		var index:Int = cast(this._object.object, ITimeLineContainerEditable).getLayerIndex(layer);
-		var objectLayer:LayerOpenFLStarlingEditable;
+		var objectLayer:ITimeLineLayerEditable;
 		for (instance in this._instances)
 		{
-			objectLayer = LayerOpenFLStarlingEditable.fromPool();
+			objectLayer = cast(instance.object, ITimeLineContainerEditable).createLayer();
 			layer.cloneTo(objectLayer);
 			for (object in objectLayer.allObjects)
 			{
