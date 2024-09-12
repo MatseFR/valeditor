@@ -179,7 +179,7 @@ class ObjectUI extends ValueUI
 		if (this._exposedObject.childCollection.uiContainer == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
-			ValEditor.edit(this._exposedValue.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
+			ValEditor.edit(this._exposedObject.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
 		}
 		
 		updateEditable();
@@ -191,14 +191,7 @@ class ObjectUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
-			if (this._exposedObject.storeValue)
-			{
-				this._exposedObject.reloadObject();
-			}
-			else
-			{
-				this._valueGroup.updateExposedValues();
-			}
+			this._exposedObject.reloadObject();
 		}
 	}
 	
