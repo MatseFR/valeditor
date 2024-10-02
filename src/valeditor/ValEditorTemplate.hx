@@ -8,6 +8,7 @@ import valedit.value.base.ExposedValue;
 import valeditor.container.IContainerEditable;
 import valeditor.container.ITimeLineContainerEditable;
 import valeditor.container.ITimeLineLayerEditable;
+import valeditor.editor.action.ValEditorAction;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.ContainerEvent;
@@ -26,26 +27,38 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 {
 	static private var _POOL:Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
 	
-	static public function fromPool(clss:ValEditorClass, ?id:String, ?collection:ExposedCollection,
+	static public function fromPool(clss:ValEditorClass, id:String, collection:ExposedCollection,
 									?constructorCollection:ExposedCollection):ValEditorTemplate
 	{
 		if (_POOL.length != 0) return _POOL.pop().setTo(clss, id, collection, constructorCollection);
 		return new ValEditorTemplate(clss, id, collection, constructorCollection);
 	}
 	
+	/** Reference to the ValEditorClass from which the template was created. */
 	public var clss:ValEditorClass;
-	public var collection:ExposedCollection;
-	public var constructorCollection:ExposedCollection;
+	/** The default and current collection of the template's object. It is applied to instances created from the template and later changes are applied to instances as well. */
+	public var collection(default, null):ExposedCollection;
+	/** The constructor collection that the template's object was created with, if any. Template's instances are created using those values for constructor parameters. */
+	public var constructorCollection(default, null):ExposedCollection;
+	/** Unique identifier, set by user or generated. */
 	public var id(get, set):String;
-	public var instances(get, never):Array<ValEditorObject>;
+	/** Contains all ValEditorObject instances for the template. */
+	public var instances(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
+	/** Tells whether the template is in clipboard or not. */
 	public var isInClipboard:Bool = false;
+	/** Tells whether the template is in library or not. This is set by 'ValEditor.registerTemplateInternal' and 'ValEditor.unregisterTemplateInternal' functions. */
 	public var isInLibrary:Bool = false;
-	public var isSuspended:Bool = false;
+	/** If true, prevents property changes and function calls propagation to instances. This is used by LibraryDragManager and Asset's update function. */
 	public var lockInstanceUpdates:Bool = false;
+	/** Tells how many instances this template has. Suspended instances are substracted from the total. */
 	public var numInstances(get, never):Int;
+	/** The template's object. */
 	public var object(get, set):ValEditorObject;
+	/** The current visibility collection. */
 	public var visibilityCollectionCurrent(default, null):TemplateVisibilityCollection;
+	/** The default visibility collection. */
 	public var visibilityCollectionDefault(get, set):TemplateVisibilityCollection;
+	/** The visibility collection from the current opened file (if any) */
 	public var visibilityCollectionFile(get, set):TemplateVisibilityCollection;
 	
 	private var _id:String;
@@ -62,7 +75,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			
 			this._instanceMap.clear();
 			var objID:String = oldID + "-";
-			for (instance in this._instances)
+			for (instance in this.instances)
 			{
 				if (instance.id.indexOf(objID) == 0)
 				{
@@ -76,10 +89,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		return this._id;
 	}
 	
-	private var _instances:Array<ValEditorObject> = new Array<ValEditorObject>();
-	private function get_instances():Array<ValEditorObject> { return this._instances; }
-	
-	private function get_numInstances():Int { return this._instances.length - this._suspendedInstances.length; }
+	private function get_numInstances():Int { return this.instances.length - this._suspendedInstances.length; }
 	
 	private var _object:ValEditorObject;
 	private function get_object():ValEditorObject { return this._object; }
@@ -166,6 +176,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 	
 	private var _instanceMap:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _objectIDIndex:Int = -1;
+	private var _registeredActions:Array<ValEditorAction> = new Array<ValEditorAction>();
 	private var _suspendedInstances:Array<ValEditorObject> = new Array<ValEditorObject>();
 
 	public function new(clss:ValEditorClass, ?id:String, ?collection:ExposedCollection, ?constructorCollection:ExposedCollection) 
@@ -174,6 +185,9 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		setTo(clss, id, collection, constructorCollection);
 	}
 	
+	/**
+	   Resets the template entirely, destroying objects and pooling visibilities if needed.
+	**/
 	public function clear():Void 
 	{
 		this.clss = null;
@@ -182,7 +196,6 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		this._id = null;
 		this.isInClipboard = false;
 		this.isInLibrary = false;
-		this.isSuspended = false;
 		this.lockInstanceUpdates = false;
 		this._objectIDIndex = -1;
 		
@@ -192,9 +205,9 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			this.object = null;
 		}
 		
-		for (i in new ReverseIterator(this._instances.length - 1, 0))
+		for (i in new ReverseIterator(this.instances.length - 1, 0))
 		{
-			ValEditor.destroyObject(this._instances[i]);
+			ValEditor.destroyObject(this.instances[i]);
 		}
 		
 		this._suspendedInstances.resize(0);
@@ -220,17 +233,50 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		//\DEBUG
 	}
 	
+	/**
+	   Clears template and sends it to pool.
+	**/
 	public function pool():Void 
 	{
 		clear();
 		_POOL[_POOL.length] = this;
 	}
 	
-	public function canBeDestroyed():Bool 
+	/**
+	   Template related actions will call this so that the template doesn't get destroyed as long as it has registered actions.
+	   @param	action
+	**/
+	public function registerAction(action:ValEditorAction):Void
 	{
-		return this.numInstances == 0 && !this.isInLibrary && !this.isInClipboard && !this.isSuspended;
+		this._registeredActions[this._registeredActions.length] = action;
 	}
 	
+	/**
+	   Template related action will call this when they are removed from stack, so that the template can be destroyed once it no longer has registered actions.
+	   @param	action
+	**/
+	public function unregisterAction(action:ValEditorAction):Void
+	{
+		this._registeredActions.remove(action);
+	}
+	
+	/**
+	   Returns true if the template can be destroyed, false otherwise.
+	   @return
+	**/
+	public function canBeDestroyed():Bool 
+	{
+		return this.numInstances == 0 && !this.isInLibrary && !this.isInClipboard && this._registeredActions.length == 0;
+	}
+	
+	/**
+	   Equivalent to the constructor when calling 'fromPool'.
+	   @param	clss
+	   @param	id
+	   @param	collection
+	   @param	constructorCollection
+	   @return
+	**/
 	private function setTo(clss:ValEditorClass, id:String, collection:ExposedCollection,
 						   constructorCollection:ExposedCollection):ValEditorTemplate
 	{
@@ -241,6 +287,9 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		return this;
 	}
 	
+	/**
+	   Determines which TemplateVisibilityCollection to use as current.
+	**/
 	public function updateVisibilityCollection():Void
 	{
 		var newVisibility:TemplateVisibilityCollection;
@@ -259,24 +308,34 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		applyVisibility();
 	}
 	
+	/**
+	   Called by ChangeUpdateQueue, applies visibility
+	**/
 	public function changeUpdate():Void
 	{
 		applyVisibility();
 	}
 	
+	/**
+	   Applies the current TemplateVisibilityCollection to the template's object's default collection and to the template instances collections.
+	**/
 	public function applyVisibility():Void
 	{
 		this.visibilityCollectionCurrent.applyToTemplateCollection(this.object.defaultCollection);
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instance.applyTemplateVisibility(this.visibilityCollectionCurrent);
 		}
 	}
 	
+	/**
+	   Adds the specified object to the template's instances. If the template is from a container class, child objects are flagged to not be saved.
+	   @param	instance
+	**/
 	public function addInstance(instance:ValEditorObject):Void 
 	{
 		instance.template = this;
-		this._instances[this._instances.length] = instance;
+		this.instances[this.instances.length] = instance;
 		this._instanceMap.set(instance.id, instance);
 		if (this.clss.isContainer)
 		{
@@ -288,19 +347,37 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_ADDED, this);
 	}
 	
+	/**
+	   Returns the ValeditorObject corresponding to the specified id.
+	   @param	id
+	   @return
+	**/
 	public function getInstance(id:String):ValEditorObject
 	{
 		return this._instanceMap.get(id);
 	}
 	
+	/**
+	   Removes the specified object from the template's instances, and unsuspends it if needed.
+	   @param	instance
+	**/
 	public function removeInstance(instance:ValEditorObject):Void 
 	{
+		if (instance.isSuspended)
+		{
+			unsuspendInstance(instance, false);
+		}
 		instance.template = null;
-		this._instances.remove(instance);
+		this.instances.remove(instance);
 		this._instanceMap.remove(instance.id);
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_REMOVED, this);
 	}
 	
+	/**
+	   Returns the constructor values used when creating the template, so that instances can use the same values.
+	   @param	values
+	   @return
+	**/
 	public function getConstructorValues(?values:Array<Dynamic>):Array<Dynamic>
 	{
 		if (values == null) values = [];
@@ -311,32 +388,48 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		return values;
 	}
 	
+	/**
+	   TODO : use ValEditorTemplate.loadComplete
+	**/
 	public function loadComplete():Void
 	{
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instance.loadComplete();
 		}
 	}
 	
+	/**
+	   Makes the template register its instances to ValEditor and call restoreKeyFrames() on all of them.
+	   This is used by TemplateAdd and TemplateRemove actions.
+	**/
 	public function registerInstances():Void
 	{
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			ValEditor.registerObject(instance);
 			instance.restoreKeyFrames();
 		}
 	}
 	
+	/**
+	   Makes the template unregister its instances from ValEditor and call backupKeyFrames() on all of them.
+	   This is used by TemplateAdd and TemplateRemove actions.
+	**/
 	public function unregisterInstances():Void
 	{
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instance.backupKeyFrames();
 			ValEditor.unregisterObject(instance);
 		}
 	}
 	
+	/**
+	   Suspends the specified instance, meaning it's not part of the template's instance count anymore.
+	   This is called by ValEditorObject when its container property is set to null.
+	   @param	instance
+	**/
 	public function suspendInstance(instance:ValEditorObject):Void
 	{
 		this._suspendedInstances.push(instance);
@@ -344,13 +437,23 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_SUSPENDED, this);
 	}
 	
-	public function unsuspendInstance(instance:ValEditorObject):Void
+	/**
+	   Unsuspends the specified instance, restoring it as part of the template's instance count.
+	   This is called by ValEditorObject when its container property is set to a non-null value, and by ValEditorTemplate's removeInstance function.
+	   @param	instance
+	   @param	dispatchEvent
+	**/
+	public function unsuspendInstance(instance:ValEditorObject, dispatchEvent:Bool = true):Void
 	{
 		this._suspendedInstances.remove(instance);
 		instance.isSuspended = false;
-		TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_UNSUSPENDED, this);
+		if (dispatchEvent) TemplateEvent.dispatch(this, TemplateEvent.INSTANCE_UNSUSPENDED, this);
 	}
 	
+	/**
+	   Creates and returns an instance identifier, used by ValEditor's createObjectWithTemplate function if the 'id' parameter is left null.
+	   @return
+	**/
 	public function makeObjectID():String
 	{
 		var objID:String = null;
@@ -363,11 +466,21 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		return objID;
 	}
 	
+	/**
+	   Tells whether the specified instance identifier already exists for this template or not.
+	   @param	id
+	   @return
+	**/
 	public function objectIDExists(id:String):Bool
 	{
 		return this._instanceMap.exists(id);
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a keyframe's transition property changes.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerKeyFrameTransitionChange(evt:KeyFrameEvent):Void
 	{
 		//trace("onTemplateContainerKeyFrameTransitionChange");
@@ -376,7 +489,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var instanceContainer:ITimeLineContainerEditable;
 		var frameIndex:Int = cast(this._object.object, ITimeLineContainerEditable).frameIndex;
 		var prevFrameIndex:Int;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -386,6 +499,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a keyframe's tween property changes.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerKeyFrameTweenChange(evt:KeyFrameEvent):Void
 	{
 		//trace("onTemplateContainerKeyFrameTweenChange");
@@ -394,7 +512,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var instanceContainer:ITimeLineContainerEditable;
 		var frameIndex:Int = cast(this._object.object, ITimeLineContainerEditable).frameIndex;
 		var prevFrameIndex:Int;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -404,6 +522,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is added.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerAdded(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerAdded");
@@ -411,7 +534,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var layer:ITimeLineLayerEditable = evt.object;
 		var index:Int = cast(this._object.object, ITimeLineContainerEditable).getLayerIndex(layer);
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).createLayer();
 			layer.cloneTo(objectLayer);
@@ -423,39 +546,54 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is moved down.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerIndexDown(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerIndexDown");
 		
 		var layer:ITimeLineLayerEditable = evt.object;
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayer(layer.name);
 			cast(instance.object, ITimeLineContainerEditable).layerIndexDown(objectLayer);
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is moved up.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerIndexUp(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerIndexUp");
 		
 		var layer:ITimeLineLayerEditable = evt.object;
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayer(layer.name);
 			cast(instance.object, ITimeLineContainerEditable).layerIndexUp(objectLayer);
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is removed.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerRemoved(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerRemoved");
 		
 		var layer:ITimeLineLayerEditable = evt.object;
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayer(layer.name);
 			cast(instance.object, ITimeLineContainerEditable).removeLayer(objectLayer);
@@ -463,6 +601,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is renamed.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerRenamed(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerRenamed");
@@ -470,13 +613,18 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var layer:ITimeLineLayerEditable = evt.object;
 		var index:Int = cast(this._object.object, ITimeLineContainerEditable).getLayerIndex(layer);
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayerAt(index);
 			objectLayer.name = layer.name;
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer is selected.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerSelected(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerSelected");
@@ -484,13 +632,18 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var layer:ITimeLineLayerEditable = evt.object;
 		var index:Int = cast(this._object.object, ITimeLineContainerEditable).getLayerIndex(layer);
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayerAt(index);
 			cast(instance.object, ITimeLineContainerEditable).currentLayer = objectLayer;
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a layer visibility changes.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerLayerVisibilityChange(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerLayerVisibilityChange");
@@ -498,13 +651,18 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var layer:ITimeLineLayerEditable = evt.object;
 		var index:Int = cast(this._object.object, ITimeLineContainerEditable).getLayerIndex(layer);
 		var objectLayer:ITimeLineLayerEditable;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			objectLayer = cast(instance.object, ITimeLineContainerEditable).getLayerAt(index);
 			objectLayer.visible = layer.visible;
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and an object is added to it.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerObjectAdded(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerObjectAdded");
@@ -518,7 +676,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			var frameIndex:Int = cast(this._object.object, ITimeLineContainerEditable).frameIndex;
 			var prevFrameIndex:Int;
 			
-			for (instance in this._instances)
+			for (instance in this.instances)
 			{
 				instanceContainer = cast instance.object;
 				prevFrameIndex = instanceContainer.frameIndex;
@@ -536,7 +694,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 		else
 		{
-			for (instance in this._instances)
+			for (instance in this.instances)
 			{
 				instanceObject = ValEditor.cloneObject(object);
 				cast(instance.object, IContainerEditable).addObject(instanceObject);
@@ -544,6 +702,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and an object is removed from it.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerObjectRemoved(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerObjectRemoved");
@@ -557,7 +720,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			var frameIndex:Int = cast(this._object.object, ITimeLineContainerEditable).frameIndex;
 			var prevFrameIndex:Int;
 			
-			for (instance in this._instances)
+			for (instance in this.instances)
 			{
 				timeLineContainer = cast instance.object;
 				prevFrameIndex = timeLineContainer.frameIndex;
@@ -576,7 +739,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		{
 			var instanceContainer:IContainerEditable;
 			
-			for (instance in this._instances)
+			for (instance in this.instances)
 			{
 				instanceContainer = cast instance.object;
 				if (!instanceContainer.hasActiveObject(object.objectID)) continue;
@@ -590,6 +753,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a function is called on an child object.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerObjectFunctionCalled(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerObjectFunctionCalled");
@@ -598,7 +766,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var object:ValEditorObject = functionEvent.object;
 		var instanceContainer:IContainerEditable;
 		var instanceObject:ValEditorObject;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			instanceObject = instanceContainer.getActiveObject(object.objectID);
@@ -606,6 +774,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a container and a property changes on a child object.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerObjectPropertyChange(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerObjectPropertyChange");
@@ -615,7 +788,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var templateValue:ExposedValue = object.currentCollection.getValueDeep(propertyEvent.propertyNames);
 		var instanceContainer:IContainerEditable;
 		var instanceObject:ValEditorObject;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			instanceObject = instanceContainer.getActiveObject(object.objectID);
@@ -623,17 +796,27 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and its selectedFrameIndex property changes.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerSelectedFrameIndexChange(evt:ContainerEvent):Void
 	{
 		//trace("onTemplateContainerSelectedFrameIndexChange");
 		
 		var index:Int = cast(this.object.object, ITimeLineContainerEditable).currentLayer.timeLine.selectedFrameIndex;
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			cast(instance.object, ITimeLineContainerEditable).currentLayer.timeLine.selectedFrameIndex = index;
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a frame is inserted.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerInsertFrame(evt:TimeLineActionEvent):Void
 	{
 		//trace("onTemplateContainerInsertFrame");
@@ -642,7 +825,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var prevFrameIndex:Int;
 		var instanceContainer:ITimeLineContainerEditable;
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -652,6 +835,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a keyframe is inserted.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerInsertKeyFrame(evt:TimeLineActionEvent):Void
 	{
 		//trace("onTemplateContainerInsertKeyFrame");
@@ -660,7 +848,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var prevFrameIndex:Int;
 		var instanceContainer:ITimeLineContainerEditable;
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -670,6 +858,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a frame is removed.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerRemoveFrame(evt:TimeLineActionEvent):Void
 	{
 		//trace("onTemplateContainerRemoveFrame");
@@ -678,7 +871,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var prevFrameIndex:Int;
 		var instanceContainer:ITimeLineContainerEditable;
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -688,6 +881,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Triggered when the template's object is a timeline container and a keyframe is removed.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateContainerRemoveKeyFrame(evt:TimeLineActionEvent):Void
 	{
 		//trace("onTemplateContainerRemoveKeyFrame");
@@ -696,7 +894,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		var prevFrameIndex:Int;
 		var instanceContainer:ITimeLineContainerEditable;
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instanceContainer = cast instance.object;
 			prevFrameIndex = instanceContainer.frameIndex;
@@ -706,7 +904,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
-	@:access(valedit.value.base.ExposedValue)
+	/**
+	   Triggered when a property changes on the template's object.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateObjectPropertyChange(evt:ObjectPropertyEvent):Void
 	{
 		if (this.lockInstanceUpdates)
@@ -727,12 +929,17 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			}
 		}
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instance.templatePropertyChange(templateValue, evt.propertyNames);
 		}
 	}
 	
+	/**
+	   Triggered when a function is called on the template's object.
+	   This is used by the template to replicate the change on all instances.
+	   @param	evt
+	**/
 	private function onTemplateObjectFunctionCalled(evt:ObjectFunctionEvent):Void
 	{
 		if (this.lockInstanceUpdates)
@@ -740,12 +947,16 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 			return;
 		}
 		
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			instance.templateFunctionCall(evt.functionName, evt.parameters);
 		}
 	}
 	
+	/**
+	   Loads the template from json save data.
+	   @param	json
+	**/
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.id = json.id;
@@ -779,6 +990,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Saves a container template's data to json.
+	   @param	json
+	   @return
+	**/
 	public function toJSONContainerSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};
@@ -786,6 +1002,11 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		return toJSONSave(json);
 	}
 	
+	/**
+	   Saves a template's data to json.
+	   @param	json
+	   @return
+	**/
 	public function toJSONSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};
@@ -807,7 +1028,7 @@ class ValEditorTemplate extends EventDispatcher implements IChangeUpdate
 		}
 		
 		var instances:Array<Dynamic> = [];
-		for (instance in this._instances)
+		for (instance in this.instances)
 		{
 			if (instance.save)
 			{

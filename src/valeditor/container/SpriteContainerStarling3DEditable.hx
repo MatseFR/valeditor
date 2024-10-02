@@ -1,13 +1,12 @@
-#if starling
 package valeditor.container;
 
+#if starling
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
 import starling.display.Sprite3D;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
 import valeditor.container.IContainerEditable;
@@ -355,7 +354,7 @@ class SpriteContainerStarling3DEditable extends EventDispatcher implements ICont
 	{
 		if (object.isDisplayObject)
 		{
-			return object.displayObjectType == DisplayObjectType.STARLING;
+			return object.isDisplayObjectStarling;
 		}
 		else if (object.isContainer)
 		{

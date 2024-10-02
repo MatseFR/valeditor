@@ -4,7 +4,6 @@ import haxe.ds.ObjectMap;
 import openfl.display.BitmapData;
 import openfl.display.DisplayObjectContainer;
 import openfl.events.EventDispatcher;
-import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
 import valedit.utils.PropertyMap;
 import valedit.value.base.ExposedValueWithCollection;
@@ -29,65 +28,116 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return new ValEditorClass(classReference, className, collection, constructorCollection);
 	}
 	
-	/** Dynamic->DisplayObjectContainer->Void */
+	/** This should be set if objects from this class should use a custom function to be added to a DisplayObjectContainer.
+	 * Expected function signature is Dynamic->DisplayObjectContainer->Void */
 	public var addToDisplayFunction:Function;
+	/** This should be set if objects from this class have a function that should be called when adding them to a DisplayObjectContainer. */
 	public var addToDisplayFunctionName:String;
+	/** Tells whether templates and objects can be created from from this class. */
 	public var canBeCreated:Bool;
+	/** The categories that this class belongs to. */
 	public var categories(default, null):Array<String> = new Array<String>();
+	/** The full class name with package (ex: openfl.display.Sprite) */
 	public var className:String;
+	/** The class name, without package (ex: Sprite) */
 	public var classNameShort:String;
+	/** The class package, without name (ex: openfl.display) */
 	public var classPackage:String;
+	/** Reference to the Class itself */
 	public var classReference:Class<Dynamic>;
+	/** Name of the 'cloneFrom' function on this class objects. If not null, it will be used by ValEditor when creating a template instance.
+	 * This is required for container classes so that the container's content can be replicated.
+	 * The function's signature should be T->Void */
 	public var cloneFromFunctionName:String;
+	/** Name of the 'cloneTo' function on this class objects. If not null, it will be used by ValEditor when creating a template instance.
+	 * This is required for container classes so that the container's content can be replicated.
+	 * The function's signature should be T->Void */
 	public var cloneToFunctionName:String;
+	/** The collection that will be used by templates and objects from this class. */
 	public var collection:ExposedCollection;
+	/** The constructor collection that will be used by templates and objects from this class. */
 	public var constructorCollection:ExposedCollection;
+	/** If not null, this function will be used to create an object from this class, instead of Type.createInstance. 
+	 * The function's signature has to match the constructorCollection. */
 	public var creationFunction:Function;
+	/** If not null, this function will be used to create an object from this class while ValEditor is loading a saved file. 
+	 * The function's signature has to match the constructorCollection. */
 	public var creationFunctionForLoading:Function;
+	/** If not null, this function will be used to create a template instance object from this class (taking priority over creationFunction in this case).
+	 * The function's signature has to match the constructorCollection. */
 	public var creationFunctionForTemplateInstance:Function;
-	/** Dynamic->Void external function reference, to be called on object creation */
+	/** Dynamic->Void external function reference, to be called on object creation. */
 	public var creationInitFunction:Function;
-	/** Void->Void object function name, to be called on object creation */
+	/** Void->Void object function name, to be called on object creation. */
 	public var creationInitFunctionName:String;
-	public var displayObjectType:Int = DisplayObjectType.NONE;
-	/** Dynamic->Void external function reference, to be called on object destruction */
+	/** Dynamic->Void external function reference, to be called on object destruction. */
 	public var disposeFunction:Function;
-	/** Void->Void object function name, to be called on object destruction */
+	/** Void->Void object function name, to be called on object destruction. */
 	public var disposeFunctionName:String = null;
+	/** The full class name with package, for export. If null, 'className' is returned instead. */
 	public var exportClassName(get, set):String;
+	/** The class name, without package, for export. If null, 'classNameShort' is returned instead. */
 	public var exportClassNameShort(get, set):String;
+	/** The class package, without name, for export. If null, 'classPackage' is returned instead. */
 	public var exportClassPackage(get, set):String;
+	/** Name of the 'getBounds' function on this class objects, if any. */
 	public var getBoundsFunctionName:String;
+	/** Tells whether objects from this class have pivot properties or not. */
 	public var hasPivotProperties:Bool;
+	/** Tells whether objects from this class have scale properties or not. */
 	public var hasScaleProperties:Bool;
-	public var hasTransformationMatrixProperty:Bool;
-	public var hasTransformProperty:Bool;
+	/** Tells whether objects from this class have a visible property or not. */
 	public var hasVisibleProperty:Bool;	
+	/** Tells whether objects from this class have their rotation property(ies) in radians or not. */
 	public var hasRadianRotation:Bool;
+	/** Optionnal BitmapData that will be used as icon for templates and objects from this class. */
 	public var iconBitmapData:BitmapData;
+	/** The function to call to associate an IInteractiveObject to objects from this class, if any. */
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
+	/** Tells whether objects from this class are containers or not. Container classes should not have their 'isDisplayObject' property set to true. */
 	public var isContainer:Bool;
+	/** Tells whether objects from this class are OpenFL containers or not. Mixed containers can have both their 'isContainerOpenFL' and 'isContainerStarling' properties set to true. */
 	public var isContainerOpenFL:Bool;
 	#if starling
+	/** Tells whether objects from this class are Starling containers or not. Mixed containers can have both their 'isContainerOpenFL' and 'isContainerStarling' properties set to true. */
 	public var isContainerStarling:Bool;
 	#end
+	/** Tells whether objects from this class are display objects. Should be left to false for container classes. */
 	public var isDisplayObject:Bool;
+	/** Tells whether objects from this class are OpenFL display objects. */
+	public var isDisplayObjectOpenFL:Bool;
+	#if starling
+	/** Tells whether objects from this class are Starling display objects. */
+	public var isDisplayObjectStarling:Bool;
+	#end
+	/** Tells whether objects from this class are timeline containers. */
 	public var isTimeLineContainer:Bool;
+	/** How many instances from this class are in the current file. */
 	public var numInstances(get, never):Int;
+	/** How many templates from this class are in the current file. */
 	public var numTemplates(get, never):Int;
+	/** The map storing custom property names and regular property names associations (ex: having 'posX' considered as 'x') */
 	public var propertyMap:PropertyMap;
-	/** Dynamic->DisplayObjectContainer->Void */
+	/** This should be set if objects from this class should use a custom function to be removed from a DisplayObjectContainer. 
+	 * Dynamic->DisplayObjectContainer->Void */
 	public var removeFromDisplayFunction:Function;
+	/** This should be set if objects from this class have a function that should be called when removing them from a DisplayObjectContainer. */
 	public var removeFromDisplayFunctionName:String;
+	/** Stores all class names that this class inherits from. Automatically set by ValEditor when registering the class. */
 	public var superClassNames(default, null):Array<String> = new Array<String>();
+	/** Stores all templates from this class in the current file. */
 	public var templates(default, null):Array<ValEditorTemplate> = new Array<ValEditorTemplate>();
-	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
+	/** if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
 	public var useBounds:Bool;
-	//public var useBoundsForPosition:Bool;
+	/** Set this to true if objects from this class have pivot properties that should be scaled, typically true for starling display objects. */
 	public var usePivotScaling:Bool;
+	/** The current visibility collection. */
 	public var visibilityCollectionCurrent(default, null):ClassVisibilityCollection;
+	/** The default visibility collection. */
 	public var visibilityCollectionDefault(get, set):ClassVisibilityCollection;
+	/** The visibility collection for the current file, if any. Highest priority. */
 	public var visibilityCollectionFile(get, set):ClassVisibilityCollection;
+	/** The visibility collection from editor settings, if any. Highest priority after 'visibilityCollectionFile'. */
 	public var visibilityCollectionSettings(get, set):ClassVisibilityCollection;
 	
 	private var _exportClassName:String = null;
@@ -147,7 +197,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 	
 	private var _IDToObject:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _objectIDIndex:Int = -1;
-	private var _objectToValEditObject:ObjectMap<Dynamic, ValEditorObject> = new ObjectMap<Dynamic, ValEditorObject>();
+	private var _objectToValEditorObject:ObjectMap<Dynamic, ValEditorObject> = new ObjectMap<Dynamic, ValEditorObject>();
 	
 	private var _IDToTemplate:Map<String, ValEditorTemplate> = new Map<String, ValEditorTemplate>();
 	private var _templateIDIndex:Int = -1;
@@ -174,6 +224,9 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this.constructorCollection = constructorCollection;
 	}
 	
+	/**
+	   Resets the class entirely, destroying objects and pooling collections and visibilities if needed.
+	**/
 	public function clear():Void 
 	{
 		this.addToDisplayFunction = null;
@@ -201,7 +254,6 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this.creationFunctionForTemplateInstance = null;
 		this.creationInitFunction = null;
 		this.creationInitFunctionName = null;
-		this.displayObjectType = DisplayObjectType.NONE;
 		this.disposeFunction = null;
 		this.disposeFunctionName = null;
 		this.exportClassName = null;
@@ -209,8 +261,6 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this.exportClassPackage = null;
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
-		this.hasTransformationMatrixProperty = false;
-		this.hasTransformProperty = false;
 		this.hasVisibleProperty = false;
 		this.hasRadianRotation = false;
 		this.iconBitmapData = null;
@@ -221,6 +271,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this.isContainerStarling = false;
 		#end
 		this.isDisplayObject = false;
+		this.isDisplayObjectOpenFL = false;
+		#if starling
+		this.isDisplayObjectStarling = false;
+		#end
 		this.isTimeLineContainer = false;
 		this._numObjects = 0;
 		this._numTemplates = 0;
@@ -258,7 +312,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		
 		this._IDToObject.clear();
 		this._objectIDIndex = -1;
-		this._objectToValEditObject.clear();
+		this._objectToValEditorObject.clear();
 		this._IDToTemplate.clear();
 		this._templateIDIndex = -1;
 		
@@ -275,12 +329,23 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this._constructorPool.resize(0);
 	}
 	
+	/**
+	   Clears class and sends it to pool.
+	**/
 	public function pool():Void 
 	{
 		clear();
 		_POOL[_POOL.length] = this;
 	}
 	
+	/**
+	   Equivalent to the constructor when calling 'fromPool'.
+	   @param	classReference
+	   @param	className
+	   @param	collection
+	   @param	constructorCollection
+	   @return
+	**/
 	private function setTo(classReference:Class<Dynamic>, className:String, collection:ExposedCollection, constructorCollection:ExposedCollection):ValEditorClass
 	{
 		this.classReference = classReference;
@@ -290,6 +355,9 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return this;
 	}
 	
+	/**
+	   Determines which ClassVisibilityCollection to use as current.
+	**/
 	private function updateVisibilityCollection():Void
 	{
 		var newVisibility:ClassVisibilityCollection;
@@ -310,11 +378,17 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		ValEditor.registerForChangeUpdate(this);
 	}
 	
+	/**
+	   Called by ChangeUpdateQueue, applies visibility
+	**/
 	public function changeUpdate():Void
 	{
 		applyVisibility();
 	}
 	
+	/**
+	   Applies the current ClassVisibilityCollection to templates and objects.
+	**/
 	private function applyVisibility():Void
 	{
 		var visibility:TemplateVisibilityCollection;
@@ -337,11 +411,19 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   adds the specified superClassName
+	   @param	superClassName
+	**/
 	public function addSuperClassName(superClassName:String):Void
 	{
 		this.superClassNames.push(superClassName);
 	}
 	
+	/**
+	   Returns a collection from this class
+	   @return
+	**/
 	public function getCollection():ExposedCollection
 	{
 		var collection:ExposedCollection;
@@ -356,6 +438,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return collection;
 	}
 	
+	/**
+	   Creates and returns an object identifier.
+	   @return
+	**/
 	public function makeObjectID():String
 	{
 		var objID:String = null;
@@ -368,11 +454,20 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return objID;
 	}
 	
-	public function objectIDExists(name:String):Bool
+	/**
+	   Tells whether the specified object identifier already exists for this class or not.
+	   @param	id
+	   @return
+	**/
+	public function objectIDExists(id:String):Bool
 	{
-		return this._IDToObject.exists(name);
+		return this._IDToObject.exists(id);
 	}
 	
+	/**
+	   Creates and returns a possible template identifier (doesn't increase the internal template identifier index).
+	   @return
+	**/
 	public function makeTemplateIDPreview():String
 	{
 		var templateID:String = null;
@@ -386,6 +481,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return templateID;
 	}
 	
+	/**
+	   Creates and returns a template identifier.
+	   @return
+	**/
 	public function makeTemplateID():String
 	{
 		var templateID:String = null;
@@ -398,11 +497,19 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return templateID;
 	}
 	
+	/**
+	   Tells whether the specified template identifier already exists for this class or not.
+	   @param	id
+	   @return
+	**/
 	public function templateIDExists(id:String):Bool
 	{
 		return this._IDToTemplate.exists(id);
 	}
 	
+	/**
+	   Destroys all templates objects, called by ValEditor.reset before calling the reset function.
+	**/
 	public function prepareForReset():Void
 	{
 		var object:ValEditorObject;
@@ -414,41 +521,44 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   clears all UI containers, pools related collections, destroys templates and objects. Called by ValEditor.reset.
+	**/
 	public function reset():Void
 	{
-		var containers:Array<DisplayObjectContainer> = [];
+		var uiContainers:Array<DisplayObjectContainer> = [];
 		// object containers
-		for (container in this._containers.keys())
+		for (uiContainer in this._containers.keys())
 		{
-			containers.push(container);
+			uiContainers.push(uiContainer);
 		}
-		for (container in containers)
+		for (uiContainer in uiContainers)
 		{
-			removeContainer(container);
+			removeUIContainer(uiContainer);
 		}
-		containers.resize(0);
+		uiContainers.resize(0);
 		
 		// constructor containers
-		for (container in this._constructorContainers.keys())
+		for (uiContainer in this._constructorContainers.keys())
 		{
-			containers.push(container);
+			uiContainers.push(uiContainer);
 		}
-		for (container in containers)
+		for (uiContainer in uiContainers)
 		{
-			removeConstructorContainer(container);
+			removeConstructorUIContainer(uiContainer);
 		}
-		containers.resize(0);
+		uiContainers.resize(0);
 		
 		// template containers
-		for (container in this._templateContainers.keys())
+		for (uiContainer in this._templateContainers.keys())
 		{
-			containers.push(container);
+			uiContainers.push(uiContainer);
 		}
-		for (container in containers)
+		for (uiContainer in uiContainers)
 		{
-			removeTemplateContainer(container);
+			removeTemplateUIContainer(uiContainer);
 		}
-		containers.resize(0);
+		uiContainers.resize(0);
 		
 		for (template in this._IDToTemplate)
 		{
@@ -461,7 +571,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			ValEditor.destroyObject(object);
 		}
 		this._IDToObject.clear();
-		this._objectToValEditObject.clear();
+		this._objectToValEditorObject.clear();
 		
 		this._objectIDIndex = -1;
 		this._templateIDIndex = -1;
@@ -473,24 +583,42 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this._collectionsToPool.clear();
 	}
 	
+	/**
+	   Adds the specified category to this class.
+	   @param	category
+	**/
 	public function addCategory(category:String):Void
 	{
 		this.categories.push(category);
 	}
 	
+	/**
+	   Adds the specified object to this class.
+	   @param	object
+	**/
 	public function addObject(object:ValEditorObject):Void
 	{
 		if (object.id == null) object.id = makeObjectID();
 		this._IDToObject.set(object.id, object);
-		this._objectToValEditObject.set(object.object, object);
+		this._objectToValEditorObject.set(object.object, object);
 		this._numObjects++;
 	}
 	
+	/**
+	   Return the object with the specified id.
+	   @param	id
+	   @return
+	**/
 	public function getObjectByID(id:String):ValEditorObject
 	{
 		return this._IDToObject.get(id);
 	}
 	
+	/**
+	   Returns all objects (not template objects) added to this class
+	   @param	objList
+	   @return
+	**/
 	public function getObjectList(?objList:Array<ValEditorObject>):Array<ValEditorObject>
 	{
 		if (objList == null) objList = new Array<ValEditorObject>();
@@ -503,23 +631,40 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return objList;
 	}
 	
+	/**
+	   Returns the ValEditorObject for the specified object.
+	   @param	object
+	   @return
+	**/
 	public function getValEditObjectFromObject(object:Dynamic):ValEditorObject
 	{
-		return this._objectToValEditObject.get(object);
+		return this._objectToValEditorObject.get(object);
 	}
 	
+	/**
+	   Removes the specified object from this class.
+	   @param	object
+	**/
 	public function removeObject(object:ValEditorObject):Void
 	{
 		this._IDToObject.remove(object.id);
-		this._objectToValEditObject.remove(object.object);
+		this._objectToValEditorObject.remove(object.object);
 		this._numObjects--;
 	}
 	
+	/**
+	   Removes the object with specified id from this class.
+	   @param	id
+	**/
 	public function removeObjectByID(id:String):Void
 	{
 		removeObject(this._IDToObject.get(id));
 	}
 	
+	/**
+	   Adds specified template to this class.
+	   @param	template
+	**/
 	public function addTemplate(template:ValEditorTemplate):Void 
 	{
 		this._IDToTemplate.set(template.id, template);
@@ -530,11 +675,21 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 	}
 	
+	/**
+	   Returns the template with specified id.
+	   @param	id
+	   @return
+	**/
 	public function getTemplateByID(id:String):ValEditorTemplate
 	{
 		return this._IDToTemplate.get(id);
 	}
 	
+	/**
+	   Returns an Array with all templates added to this class.
+	   @param	templateList
+	   @return
+	**/
 	public function getTemplateList(?templateList:Array<ValEditorTemplate>):Array<ValEditorTemplate>
 	{
 		if (templateList == null) templateList = new Array<ValEditorTemplate>();
@@ -547,6 +702,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		return templateList;
 	}
 	
+	/**
+	   Removes the specified template from this class.
+	   @param	template
+	**/
 	public function removeTemplate(template:ValEditorTemplate):Void 
 	{
 		if (this._IDToTemplate.remove(template.id))
@@ -556,34 +715,22 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		
 		this.templates.remove(cast template);
 		
-		if (template.isSuspended)
-		{
-			this._suspendedTemplates.remove(cast template);
-			template.isSuspended = false;
-		}
-		
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 	}
 	
+	/**
+	   Removes the template with specified id from this class.
+	   @param	id
+	**/
 	public function removeTemplateByID(id:String):Void
 	{
 		removeTemplate(this._IDToTemplate.get(id));
 	}
 	
-	public function suspendTemplate(template:ValEditorTemplate):Void
-	{
-		this._suspendedTemplates.push(template);
-		template.isSuspended = true;
-		ClassEvent.dispatch(this, ClassEvent.TEMPLATE_SUSPENDED, this);
-	}
-	
-	public function unsuspendTemplate(template:ValEditorTemplate):Void
-	{
-		this._suspendedTemplates.remove(template);
-		template.isSuspended = false;
-		ClassEvent.dispatch(this, ClassEvent.TEMPLATE_UNSUSPENDED, this);
-	}
-	
+	/**
+	   Triggered when a template added to this class dispatches a RenameEvent.
+	   @param	evt
+	**/
 	private function onTemplateRenamed(evt:RenameEvent):Void
 	{
 		var template:ValEditorTemplate = cast evt.target;
@@ -591,7 +738,16 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this._IDToTemplate.set(template.id, template);
 	}
 	
-	public function addContainer(container:DisplayObjectContainer, object:Dynamic, collection:ExposedCollection = null, parentValue:ExposedValueWithCollection = null):ExposedCollection
+	/**
+	   Adds the specified UI container (typically a Feathers ScrollContainer or LayoutGroup) to this class, and assigns the specified collection to it (or creates one if left null).
+	   This is used by ValEditor.edit function.
+	   @param	container
+	   @param	object
+	   @param	collection
+	   @param	parentValue
+	   @return
+	**/
+	public function addUIContainer(uiContainer:DisplayObjectContainer, object:Dynamic, collection:ExposedCollection = null, parentValue:ExposedValueWithCollection = null):ExposedCollection
 	{
 		if (collection == null)
 		{
@@ -613,14 +769,20 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 				collection.readAndSetObject(object);
 			}
 		}
-		this._containers[container] = collection;
+		this._containers[uiContainer] = collection;
 		collection.parentValue = parentValue;
-		collection.uiContainer = container;
+		collection.uiContainer = uiContainer;
 		
 		return collection;
 	}
 	
-	public function addConstructorContainer(container:DisplayObjectContainer):ExposedCollection
+	/**
+	   Adds the specified constructor UI container (typically a Feathers ScrollContainer or LayoutGroup) to this class, and assigns a constructor collection to it.
+	   This is used by ValEditor.editConstructor function.
+	   @param	container
+	   @return
+	**/
+	public function addConstructorUIContainer(uiContainer:DisplayObjectContainer):ExposedCollection
 	{
 		var collection:ExposedCollection;
 		if (this._constructorPool.length != 0)
@@ -632,24 +794,35 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			collection = this.constructorCollection.clone();
 		}
 		
-		this._constructorContainers[container] = collection;
-		collection.uiContainer = container;
+		this._constructorContainers[uiContainer] = collection;
+		collection.uiContainer = uiContainer;
 		
 		return collection;
 	}
 	
-	public function addTemplateContainer(container:DisplayObjectContainer, template:ValEditorTemplate):Void
+	/**
+	   Adds the specified template UI container (typically a Feathers ScollContainer or LayoutGroup) to this class, and assigns the template's collection to it.
+	   This is used by ValEditor.editTemplate function.
+	   @param	container
+	   @param	template
+	**/
+	public function addTemplateUIContainer(uiContainer:DisplayObjectContainer, template:ValEditorTemplate):Void
 	{
-		this._templateContainers[container] = template;
-		template.collection.uiContainer = container;
+		this._templateContainers[uiContainer] = template;
+		template.collection.uiContainer = uiContainer;
 	}
 	
-	public function removeContainer(container:DisplayObjectContainer):Void
+	/**
+	   Removes the specified UI container from this class, whether it's a regular one, a constructor one or a template one. Also pools the associated collection if needed.
+	   This is used by ValEditor.clearUIContainer function.
+	   @param	uiContainer
+	**/
+	public function removeUIContainer(uiContainer:DisplayObjectContainer):Void
 	{
-		var collection:ExposedCollection = this._containers[container];
+		var collection:ExposedCollection = this._containers[uiContainer];
 		if (collection != null)
 		{
-			this._containers.remove(container);
+			this._containers.remove(uiContainer);
 			collection.parentValue = null;
 			collection.uiContainer = null;
 			if (this._collectionsToPool.exists(collection))
@@ -661,36 +834,44 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			return;
 		}
 		
-		if (this._constructorContainers.exists(container))
+		if (this._constructorContainers.exists(uiContainer))
 		{
-			removeConstructorContainer(container);
+			removeConstructorUIContainer(uiContainer);
 			return;
 		}
 		
-		if (this._templateContainers.exists(container))
+		if (this._templateContainers.exists(uiContainer))
 		{
-			removeTemplateContainer(container);
+			removeTemplateUIContainer(uiContainer);
 			return;
 		}
 	}
 	
-	public function removeConstructorContainer(container:DisplayObjectContainer):Void
+	/**
+	   Removes the specified constructor UI container from this class and pools the associated collection.
+	   @param	uiContainer
+	**/
+	public function removeConstructorUIContainer(uiContainer:DisplayObjectContainer):Void
 	{
-		var collection:ExposedCollection = this._constructorContainers[container];
+		var collection:ExposedCollection = this._constructorContainers[uiContainer];
 		if (collection != null)
 		{
-			this._constructorContainers.remove(container);
+			this._constructorContainers.remove(uiContainer);
 			collection.uiContainer = null;
 			this._constructorPool.push(collection);
 		}
 	}
 	
-	public function removeTemplateContainer(container:DisplayObjectContainer):Void
+	/**
+	   Removes the specified template UI container from this class.
+	   @param	uiContainer
+	**/
+	public function removeTemplateUIContainer(uiContainer:DisplayObjectContainer):Void
 	{
-		var template:ValEditorTemplate = this._templateContainers[container];
+		var template:ValEditorTemplate = this._templateContainers[uiContainer];
 		if (template != null)
 		{
-			this._templateContainers.remove(container);
+			this._templateContainers.remove(uiContainer);
 			template.collection.uiContainer = null;
 		}
 	}
@@ -700,6 +881,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		
 	}
 	
+	/**
+	   Loads templates for this class from json save data.
+	   @param	json
+	**/
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		var constructorCollection:ExposedCollection = null;
@@ -720,6 +905,11 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Saves templates data for this class to json.
+	   @param	json
+	   @return
+	**/
 	public function toJSONSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};

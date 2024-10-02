@@ -30,9 +30,13 @@ class TemplateRemove extends ValEditorAction
 	
 	override public function clear():Void
 	{
+		this.template.unregisterAction(this);
 		if (this.status == ValEditorActionStatus.DONE)
 		{
-			ValEditor.destroyTemplate(this.template);
+			if (this.template.canBeDestroyed())
+			{
+				ValEditor.destroyTemplate(this.template);
+			}
 		}
 		this.template = null;
 		
@@ -50,6 +54,7 @@ class TemplateRemove extends ValEditorAction
 	public function setup(template:ValEditorTemplate):Void
 	{
 		this.template = template;
+		this.template.registerAction(this);
 		var unselect:ObjectUnselect;
 		for (instance in this.template.instances)
 		{

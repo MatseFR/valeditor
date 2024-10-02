@@ -1242,7 +1242,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 			var keyFrame:ValEditorKeyFrame;
 			if (this._frameCurrent.indexStart == this._frameCurrent.indexEnd)
 			{
-				// remove key frame
+				// remove keyframe
 				removeKeyFrame(action);
 				return;
 			}
@@ -1314,8 +1314,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		}
 	}
 	
-	/* Doesn't remove frames, doesn't remove the last key frame (use removeFrame for that). 
-	 * This only works when a key frame is selected and there is another key frame in the timeline, otherwise it does nothing */
+	/* Doesn't remove frames, doesn't remove the last keyframe (use removeFrame for that). 
+	 * This only works when a keyframe is selected and there is another keyframe in the timeline, otherwise it does nothing */
 	public function removeKeyFrame(?action:MultiAction):Void
 	{
 		if (this._frameCurrent != null)
@@ -1325,7 +1325,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 				var keyFrame:ValEditorKeyFrame;
 				if (action == null)
 				{
-					// look for previous key frame
+					// look for previous keyframe
 					keyFrame = getPreviousKeyFrame(this._frameCurrent);
 					if (keyFrame != null)
 					{
@@ -1343,7 +1343,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					}
 					else
 					{
-						// look for next keyFrame
+						// look for next keyframe
 						keyFrame = getNextKeyFrame(this._frameCurrent);
 						if (keyFrame != null)
 						{
@@ -1374,7 +1374,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					var timeLineFrameUpdateAll:TimeLineFrameUpdateAll;
 					var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
 					
-					// look for previous key frame
+					// look for previous keyframe
 					keyFrame = getPreviousKeyFrame(this._frameCurrent);
 					if (keyFrame != null)
 					{
@@ -1396,7 +1396,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					}
 					else
 					{
-						// look for next keyFrame
+						// look for next keyframe
 						keyFrame = getNextKeyFrame(this._frameCurrent);
 						if (keyFrame != null)
 						{

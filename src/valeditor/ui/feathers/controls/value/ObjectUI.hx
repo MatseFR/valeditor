@@ -160,6 +160,7 @@ class ObjectUI extends ValueUI
 		
 		this._topButton.text = this._exposedValue.name;
 		this._topButton.toolTip = this._exposedValue.toolTip;
+		this._topButton.selected = this._exposedObject.isUIOpen;
 		
 		if (this._exposedObject.isUIOpen)
 		{

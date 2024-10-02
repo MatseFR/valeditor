@@ -23,7 +23,7 @@ import valeditor.ui.feathers.controls.SelectionBox;
 import valeditor.ui.shape.PivotIndicator;
 
 /**
- * ...
+ * A ValEditorObject holds the reference to a "real" object and stores the necessary data for it.
  * @author Matse
  */
 class ValEditorObject extends EventDispatcher implements IChangeUpdate
@@ -36,48 +36,100 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return new ValEditorObject(clss, id);
 	}
 	
+	/** The object's full class name (ie: openfl.display.Bitmap) */ 
 	public var className:String;
+	/** The ValEditorClass that this object was created from. */
 	public var clss:ValEditorClass;
+	/** The container for this object, if any */
 	public var container(get, set):IContainerEditable;
+	/** The current collection for this object, it can either be on related to a keyframe or the default one. */
 	public var currentCollection(default, null):ExposedCollection;
+	/** The current keyframe for this object, if any */
 	public var currentKeyFrame(default, null):ValEditorKeyFrame;
+	/** The collection used as 'currentCollection' when the object is not associated with any keyframe or when 'currentKeyFrame' is null */
 	public var defaultCollection(get, set):ExposedCollection;
-	public var displayObjectType:Int;
+	/** Name of the 'getBounds' function for this object, if any */
 	public var getBoundsFunctionName(get, set):String;
+	/** returns true if this object has a 'getBounds' function, false otherwise.
+	 * Note that this only applies to display objects and containers. */
 	public var hasBoundsFunction(get, never):Bool;
+	/** Tells whether this object has pivot properties or not (typically pivotX, pivotY). This is used by IInteractiveObject and SelectionBox. */
 	public var hasPivotProperties:Bool;
+	/** Tells whether this object has scale properties or not (typically scaleX, scaleY). This is used by IInteractiveObject and SelectionBox. */
 	public var hasScaleProperties:Bool;
-	public var hasTransformProperty:Bool;
-	public var hasTransformationMatrixProperty:Bool;
+	/** Tells whether this object has a 'visible' property or not. This is used by IInteractiveObject.
+	 * Note that this only applies to display objects. */
 	public var hasVisibleProperty:Bool;
+	/** Tells whether this object uses radians for rotation (Starling display objects, typically). */
 	public var hasRadianRotation:Bool;
+	/** the unique identifier for this object */
 	public var id(get, set):String;
+	/** the 'IInteractiveObject instance associated with this object, use by ValEditorContainerController to handle mouse/touch events.
+	 * This only applies to display objects (not containers). */
 	public var interactiveObject(get, set):IInteractiveObject;
+	/** Tells whether this object is a container (OpenFL, Starling or both) or not. */
 	public var isContainer:Bool;
+	/** Tells whether this object is an OpenFL container or not.
+	 * Note that 'isContainerOpenFL' and 'isContainerStarling' can be both true in the case of a mixed container. */
 	public var isContainerOpenFL:Bool;
 	#if starling
+	/** Tells wheter this object is a Starling container or not.
+	 * Note that 'isContainerOpenFL' and 'isContainerStarling' can be both true in the case of a mixed container. */
 	public var isContainerStarling:Bool;
 	#end
+	/** Tells whether this object is a display object (OpenFL or Starling) or not. */
 	public var isDisplayObject:Bool;
+	/** Tells whether this object is an OpenFL display object or not. */
+	public var isDisplayObjectOpenFL:Bool;
+	#if starling
+	/** Tells whether this object is a Starling display object or not. */
+	public var isDisplayObjectStarling:Bool;
+	#end
+	/** Tells whether this object is in clipboard or not. */
 	public var isInClipboard:Bool;
+	/** Tells whether this object is in pool or not. */
 	public var isInPool(get, never):Bool;
+	/** Tells whether this object received a mouse down (openfl) or begin touch (starling) event. This is used by ValEditorContainerController when moving objects around.
+	 * Note that this only applies to display objects and containers. */
 	public var isMouseDown:Bool;
+	/** Tells whether this object is selectable or not.
+	 * Note that this only applies to display objects and containers. */
 	public var isSelectable(get, set):Bool;
+	/** Tells whether this object is suspended or not. An object becomes suspended when it's a template instance and it doesn't have a container anymore but is still in the undo stack */
 	public var isSuspended:Bool;
+	/** Tells if this object is a timeline container */
 	public var isTimeLineContainer:Bool;
+	/** References to keyframes this object is associated with */
 	public var keyFrames(get, never):Array<ValEditorKeyFrame>;
+	/** Initial 'x' value before moving, this is used by ValEditorContainerController to restore an object's position when a move is cancelled.
+	 * Note that this only applies to display objects and containers */
 	public var mouseRestoreX:Float;
+	/** Initial 'y' value before moving, this is used by ValEditorContainerController to restore an object's position when a move is cancelled.
+	 * Note that this only applies to display objects and containers */
 	public var mouseRestoreY:Float;
+	/** Tells how many keyframes this object is associated with. */
 	public var numKeyFrames(default, null):Int = 0;
+	/** the real object, which can be anything */
 	public var object:Dynamic;
+	/** Not the real ID, returns the value of 'id' if null. This is used to have the same ids in container instances */
 	public var objectID(get, set):String;
+	/** Reference to the PivotIndicator instance set by ValEditorContainerController when this object is selected (null otherwise).
+	 * Note that this only applies to display objects and containers */
 	public var pivotIndicator(get, set):PivotIndicator;
+	/** PropertyMap stores associations between an object's property name and the "regular" property name.
+	 * For example an object could have a property named 'xLoc' that would need to be associated with "x". */
 	public var propertyMap:PropertyMap;
+	/** Tells whether this object should be in saved file or not. */
 	public var save:Bool = true;
+	/** Reference to the SelectionBox instance set by ValEditorContainerController when this object is selected (null otherwise).
+	 * Note that this only applies to display objects and containers. */
 	public var selectionBox(get, set):SelectionBox;
+	/** Reference to this object's template, if it has one (null otherwise). */
 	public var template:ValEditorTemplate;
-	/* if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height */
+	/** if set to true, ValEditor will use the getBounds function in order to retrieve object's position/width/height. */
 	public var useBounds:Bool;
+	/** Tells whether pivot values should be multiplied with the corresponding scale value (true) or not (false).
+	 * Starling display objects need to have their pivotX property multiplied by their scaleX property to get the "real" value, for example. */
 	public var usePivotScaling:Bool;
 	
 	private var _container:IContainerEditable;
@@ -117,7 +169,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 		if (this.currentCollection == null)
 		{
-			this.currentCollection = value;
+			setCurrentCollection(value);
 		}
 		return this._defaultCollection = value;
 	}
@@ -244,6 +296,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		setTo(clss, id);
 	}
 	
+	/**
+	   resets this object entirely, removing it from container and clearing keyframes if needed
+	**/
 	public function clear():Void 
 	{
 		if (this.container != null)
@@ -280,8 +335,6 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.getBoundsFunctionName = "getBounds";
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
-		this.hasTransformProperty = false;
-		this.hasTransformationMatrixProperty = false;
 		this.hasVisibleProperty = false;
 		this.hasRadianRotation = false;
 		this.isContainer = false;
@@ -290,6 +343,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.isContainerStarling = false;
 		#end
 		this.isDisplayObject = false;
+		this.isDisplayObjectOpenFL = false;
+		#if starling
+		this.isDisplayObjectStarling = false;
+		#end
 		this.isInClipboard = false;
 		this.isMouseDown = false;
 		this.isSelectable = true;
@@ -312,6 +369,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this._restoreKeyFramesCollections.resize(0);
 	}
 	
+	/**
+	   Clears the object and sends it to pool
+	**/
 	public function pool():Void 
 	{
 		clear();
@@ -326,21 +386,62 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this._isInPool = true;
 	}
 	
+	/**
+	   Object related actions will call this so that the object doesn't get destroyed as long as it has registered actions.
+	   @param	action
+	**/
 	public function registerAction(action:ValEditorAction):Void
 	{
 		this._registeredActions[this._registeredActions.length] = action;
 	}
 	
+	/**
+	   Object related actions that registered to this object will call this when they get cleared.
+	   @param	action
+	**/
 	public function unregisterAction(action:ValEditorAction):Void
 	{
 		this._registeredActions.remove(action);
 	}
 	
+	/**
+	   Returns true if this object can be destroyed, false otherwise.
+	   @return
+	**/
 	public function canBeDestroyed():Bool 
 	{
-		return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended && this._registeredActions.length == 0;
+		return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && this._registeredActions.length == 0;
+		//return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended && this._registeredActions.length == 0;
 	}
 	
+	/**
+	   Equivalent to the constructor when calling 'fromPool'.
+	   @param	clss
+	   @param	id
+	   @return
+	**/
+	private function setTo(clss:ValEditorClass, id:String):ValEditorObject
+	{
+		this._id = id;
+		this.clss = clss;
+		this.className = clss.className;
+		this.isDisplayObject = clss.isDisplayObject;
+		if (this.isDisplayObject)
+		{
+			this.isDisplayObjectOpenFL = clss.isDisplayObjectOpenFL;
+			#if starling
+			this.isDisplayObjectStarling = clss.isDisplayObjectStarling;
+			#end
+		}
+		
+		this._isInPool = false;
+		
+		return this;
+	}
+	
+	/**
+	   Called by ValEditor on object creation once everything has been set.
+	**/
 	public function ready():Void 
 	{
 		if (this.getBoundsFunctionName != null)
@@ -349,6 +450,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Applies provided ClassVisibilityCollection to 'defaultCollection' and all keyframe related collections.
+	   @param	visibility
+	**/
 	public function applyClassVisibility(visibility:ClassVisibilityCollection):Void
 	{
 		if (this.template == null)
@@ -369,6 +474,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Applies provided TemplateVisibilityCollection to 'defaultCollection' and all keyframe related collections.
+	   @param	visibility
+	**/
 	public function applyTemplateVisibility(visibility:TemplateVisibilityCollection):Void
 	{
 		visibility.applyToTemplateObjectCollection(this._defaultCollection);
@@ -378,6 +487,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Creates and returns a collection for the specified keyframe. If this object has a keyframe that is located before the specified one in the timeline it will clone that one.
+	   @param	keyFrame
+	   @return
+	**/
 	public function createCollectionForKeyFrame(keyFrame:ValEditorKeyFrame):ExposedCollection 
 	{
 		var collection:ExposedCollection = null;
@@ -405,6 +519,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return collection;
 	}
 	
+	/**
+	   Called by ValEditorTemplate through TemplateAdd (cancel) and TemplateRemove (apply) actions.
+	**/
 	public function backupKeyFrames():Void
 	{
 		for (keyFrame in this._keyFrames)
@@ -419,6 +536,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Called by ValEditorTemplate through TemplateAdd (apply) and TemplateRemove (cancel) actions.
+	**/
 	public function restoreKeyFrames():Void
 	{
 		var count:Int = this._restoreKeyFrames.length;
@@ -430,6 +550,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this._restoreKeyFramesCollections.resize(0);
 	}
 	
+	/**
+	   Associates this object to the specified keyframe, if 'collection' is null a collection is created using 'createCollectionForKeyFrame'.
+	   @param	keyFrame
+	   @param	collection
+	**/
 	public function addKeyFrame(keyFrame:ValEditorKeyFrame, collection:ExposedCollection = null):Void 
 	{
 		if (collection == null)
@@ -442,16 +567,30 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.numKeyFrames++;
 	}
 	
+	/**
+	   Returns the collection associated to specified keyframe, if any.
+	   @param	keyFrame
+	   @return
+	**/
 	public function getCollectionForKeyFrame(keyFrame:ValEditorKeyFrame):ExposedCollection
 	{
 		return this._keyFrameToCollection.get(keyFrame);
 	}
 	
+	/**
+	   Returns true if this object is associated with specified keyframe, false otherwise.
+	   @param	keyFrame
+	   @return
+	**/
 	public function hasKeyFrame(keyFrame:ValEditorKeyFrame):Bool
 	{
 		return this._keyFrameToCollection.exists(keyFrame);
 	}
 	
+	/**
+	   Removes all keyframe associations for this object and optionnally pools related collections.
+	   @param	poolCollections
+	**/
 	public function removeAllKeyFrames(poolCollections:Bool = true):Void
 	{
 		for (i in new ReverseIterator(this._keyFrames.length - 1, 0))
@@ -460,6 +599,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Removes association with specified keyframe and optionnally pools related collection.
+	   @param	keyFrame
+	   @param	poolCollection
+	**/
 	public function removeKeyFrame(keyFrame:ValEditorKeyFrame, poolCollection:Bool = true):Void 
 	{
 		if (poolCollection)
@@ -481,41 +625,62 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Sets the current keyframe for this object, updating 'currentKeyFrame' and 'currentCollection' values. The new 'currentCollection' is applied (if not null).
+	   @param	keyFrame
+	**/
 	public function setKeyFrame(keyFrame:ValEditorKeyFrame):Void 
 	{
 		if (this.currentKeyFrame == keyFrame) return;
+		
+		this.currentKeyFrame = keyFrame;
+		if (this.currentKeyFrame == null)
+		{
+			setCurrentCollection(null);
+		}
+		else
+		{
+			setCurrentCollection(this._keyFrameToCollection.get(keyFrame));
+		}
+	}
+	
+	/**
+	   Sets the 'currentCollection' value, removes object and listener on the previous one if needed then sets and applies to object, adds listener for changes and calls 'changeUpdate'.
+	   @param	collection
+	**/
+	private function setCurrentCollection(collection:ExposedCollection):Void
+	{
+		if (this.currentCollection == collection) return;
+		
 		if (this.currentCollection != null)
 		{
 			this.currentCollection.object = null;
 			this.currentCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 		}
 		
-		if (keyFrame == null)
+		if (collection == null)
 		{
-			this.currentCollection = null;
+			this.currentCollection = this._defaultCollection;
 		}
 		else
 		{
-			this.currentCollection = this._keyFrameToCollection.get(keyFrame);
+			this.currentCollection = collection;
 		}
-		this.currentKeyFrame = keyFrame;
 		
 		if (this.currentCollection != null)
 		{
 			this.currentCollection.applyAndSetObject(this.object);
 			this.currentCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 			
-			if (this._interactiveObject != null)
-			{
-				this._interactiveObject.objectUpdate(this);
-			}
-			if (this._selectionBox != null)
-			{
-				this._selectionBox.objectUpdate(this);
-			}
+			changeUpdate();
 		}
 	}
 	
+	/**
+	   This is called by template when a function is called on it, or when the template is a container and a function is called on one of its child objects.
+	   @param	propertyName
+	   @param	parameters
+	**/
 	public function templateFunctionCall(propertyName:String, parameters:Array<Dynamic>):Void
 	{
 		this._defaultCollection.applyAndSetObject(this.object);
@@ -542,7 +707,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
-	//@:access(valedit.value.base.ExposedValue)
+	/**
+	   This is called by template when an exposed property changes on the template's object.
+	   @param	templateValue
+	   @param	propertyNames
+	**/
 	public function templatePropertyChange(templateValue:ExposedValue, propertyNames:Array<String>):Void
 	{
 		templateValue.cloneValue(this._defaultCollection.getValueDeep(propertyNames));
@@ -553,29 +722,34 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   This is called by container template when a container's child property change on the template's object.
+	   @param	templateValue
+	   @param	propertyNames
+	**/
 	public function templateChildPropertyChange(templateValue:ExposedValue, propertyNames:Array<String>):Void
 	{
 		templateValue.cloneValue(this.currentCollection.getValueDeep(propertyNames));
 	}
 	
-	public function valueChange(value:ExposedValue):Void
-	{
-		// this value changed on object, reflect changes on interactiveObject & realObject if needed
-		registerForChangeUpdate();
-		
-		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, value.getPropertyNames());
-	}
-	
+	/**
+	   Triggered by a value change in the current collection.
+	   @param	evt
+	**/
 	private function onValueChange(evt:ValueEvent):Void
 	{
-		//this._regularPropertyName = this.propertyMap.getRegularPropertyName(evt.value.propertyName);
-		//if (this._regularPropertyName == null) this._regularPropertyName = evt.value.propertyName;
+		//trace("ValEditorObject.onValueChange");
 		
 		registerForChangeUpdate();
 		
 		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, evt.value.getPropertyNames());
 	}
 	
+	/**
+	   Returns the value for the specified regular property name (keep in mind 'propertyMap' will replace it if needed), directly from the object itself.
+	   @param	regularPropertyName
+	   @return
+	**/
 	public function getProperty(regularPropertyName:String):Dynamic
 	{
 		this._realPropertyName = this.propertyMap.getObjectPropertyName(regularPropertyName);
@@ -583,6 +757,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return Reflect.getProperty(this.object, this._realPropertyName);
 	}
 	
+	/**
+	   Tells whether 'currentCollection' has a value for the specified regular property name or not.
+	   @param	regularPropertyName
+	   @return
+	**/
 	public function hasProperty(regularPropertyName:String):Bool
 	{
 		if (this.currentCollection == null) return false;
@@ -591,6 +770,14 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return this.currentCollection.hasValue(this._realPropertyName);
 	}
 	
+	/**
+	   Modifies specified property by the specified amount directly on the object, then updates the related value in the current collection if there is one.
+	   This is used by ValEditorContainerController, either directly or through ValEditorObjectGroup.
+	   @param	regularPropertyName
+	   @param	value
+	   @param	objectOnly
+	   @param	dispatchValueChange
+	**/
 	public function modifyProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
 	{
 		this._realPropertyName = this.propertyMap.getObjectPropertyName(regularPropertyName);
@@ -612,6 +799,13 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, [this._realPropertyName]);
 	}
 	
+	/**
+	   Sets specified property to the specified value directly on the object, then updates the related value in the current collection if there is one.
+	   @param	regularPropertyName
+	   @param	value
+	   @param	objectOnly
+	   @param	dispatchValueChange
+	**/
 	public function setProperty(regularPropertyName:String, value:Dynamic, objectOnly:Bool = false, dispatchValueChange:Bool = true):Void
 	{
 		this._realPropertyName = this.propertyMap.getObjectPropertyName(regularPropertyName);
@@ -633,6 +827,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		ObjectPropertyEvent.dispatch(this, ObjectPropertyEvent.CHANGE, this, [this._realPropertyName]);
 	}
 	
+	/**
+	   Returns the exposed value in the current collection for the specified property name.
+	   @param	regularPropertyName
+	   @return
+	**/
 	public function getValue(regularPropertyName:String):ExposedValue
 	{
 		if (this.currentCollection == null) return null;
@@ -641,11 +840,18 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return this.currentCollection.getValue(this._realPropertyName);
 	}
 	
+	/**
+	   Adds this to the ChangeUpdateQueue for a single changeUpdate call.
+	   This prevents updating interactive object, selection box and pivot indicator for every change in a single frame.
+	**/
 	public function registerForChangeUpdate():Void
 	{
 		ValEditor.registerForChangeUpdate(this);
 	}
 	
+	/**
+	   Called by ChangeUpdateQueue, updates interactive object, selection box and pivot indicator if applicable.
+	**/
 	public function changeUpdate():Void
 	{
 		if (this._interactiveObject != null)
@@ -667,29 +873,29 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   This is used by ExposedFunction and ExposedFunctionExternal when they are executed. If the object comes from a template it will reflect that call on template instances.
+	   @param	propertyName
+	   @param	parameters
+	**/
 	public function functionCalled(propertyName:String, parameters:Array<Dynamic>):Void
 	{
 		ObjectFunctionEvent.dispatch(this, ObjectFunctionEvent.CALLED, this, propertyName, parameters);
 	}
 	
+	/**
+	   Calls the getBounds function on the real object.
+	   @param	targetSpace
+	   @return
+	**/
 	public function getBounds(targetSpace:Dynamic):Rectangle
 	{
 		return Reflect.callMethod(this.object, this._boundsFunction, [targetSpace]);
 	}
 	
-	private function setTo(clss:ValEditorClass, id:String):ValEditorObject
-	{
-		this._id = id;
-		this.clss = clss;
-		this.className = clss.className;
-		this.isDisplayObject = clss.isDisplayObject;
-		this.displayObjectType = clss.displayObjectType;
-		
-		this._isInPool = false;
-		
-		return this;
-	}
-	
+	/**
+	   Called after loading a saved file is complete. This is meant to handle reference values.
+	**/
 	public function loadComplete():Void
 	{
 		if (this.defaultCollection != null)
@@ -703,6 +909,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Loads object's default collection and objectID (if not null).
+	   @param	json
+	**/
 	public function fromJSONSave(json:Dynamic):Void
 	{
 		this.id = json.id;
@@ -720,6 +930,11 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		}
 	}
 	
+	/**
+	   Saves object's default collection and objectID (if not null).
+	   @param	json
+	   @return
+	**/
 	public function toJSONSave(json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};
@@ -745,6 +960,12 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return json;
 	}
 	
+	/**
+	   Saves the collection related to specified keyframe.
+	   @param	keyFrame
+	   @param	json
+	   @return
+	**/
 	public function toJSONSaveKeyFrame(keyFrame:ValEditorKeyFrame, json:Dynamic = null):Dynamic
 	{
 		if (json == null) json = {};

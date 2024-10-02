@@ -1,4 +1,5 @@
 package valeditor;
+
 import haxe.ds.ObjectMap;
 import juggler.animation.IAnimatable;
 import juggler.animation.Juggler;
@@ -8,7 +9,6 @@ import openfl.errors.Error;
 import openfl.events.EventDispatcher;
 import openfl.events.MouseEvent;
 import openfl.geom.Point;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.value.base.ExposedValue;
 import valeditor.container.IContainerEditable;
@@ -172,25 +172,20 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function registerObject(object:ValEditorObject):Void
 	{
-		trace("ValEditorContainerController.registerObject");
-		
 		if (object.isDisplayObject)
 		{
-			switch (object.displayObjectType)
+			if (object.isDisplayObjectOpenFL)
 			{
-				case DisplayObjectType.OPENFL :
-					var dispatcher:EventDispatcher = cast object.interactiveObject;
-					dispatcher.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-				
-				#if starling
-				case DisplayObjectType.STARLING :
-					var starlingDispatcher:starling.events.EventDispatcher = cast object.interactiveObject;
-					starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
-				#end
-				
-				default :
-					throw new Error("ValEditorContainerController.registerObject ::: unknown display object type " + object.displayObjectType);
+				var dispatcher:EventDispatcher = cast object.interactiveObject;
+				dispatcher.addEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
 			}
+			#if starling
+			else if (object.isDisplayObjectStarling)
+			{
+				var starlingDispatcher:starling.events.EventDispatcher = cast object.interactiveObject;
+				starlingDispatcher.addEventListener(TouchEvent.TOUCH, onObjectTouch);
+			}
+			#end
 		}
 		
 		if (object.isContainer)
@@ -218,25 +213,20 @@ class ValEditorContainerController implements IAnimatable
 	
 	private function unregisterObject(object:ValEditorObject):Void
 	{
-		trace("ValEditorContainerController.unregisterObject");
-		
 		if (object.isDisplayObject)
 		{
-			switch (object.displayObjectType)
+			if (object.isDisplayObjectOpenFL)
 			{
-				case DisplayObjectType.OPENFL :
-					var dispatcher:EventDispatcher = cast object.interactiveObject;
-					dispatcher.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
-				
-				#if starling
-				case DisplayObjectType.STARLING :
-					var starlingDispatcher:starling.events.EventDispatcher = cast object.interactiveObject;
-					starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
-				#end
-				
-				default :
-					throw new Error("ValEditorContainerController.unregisterObject ::: unknown display object type " + object.displayObjectType);
+				var dispatcher:EventDispatcher = cast object.interactiveObject;
+				dispatcher.removeEventListener(MouseEvent.MOUSE_DOWN, onObjectMouseDown);
 			}
+			#if starling
+			else if (object.isDisplayObjectStarling)
+			{
+				var starlingDispatcher:starling.events.EventDispatcher = cast object.interactiveObject;
+				starlingDispatcher.removeEventListener(TouchEvent.TOUCH, onObjectTouch);
+			}
+			#end
 		}
 		
 		if (object.isContainer)

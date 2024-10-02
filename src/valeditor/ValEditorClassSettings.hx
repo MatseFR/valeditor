@@ -2,7 +2,6 @@ package valeditor;
 
 import haxe.Constraints.Function;
 import openfl.display.BitmapData;
-import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
 import valedit.utils.PropertyMap;
 import valeditor.editor.visibility.ClassVisibilityCollection;
@@ -29,10 +28,10 @@ class ValEditorClassSettings
 	/** name of the object's DisplayObjectContainer->Void function to call instead of doing a simple addChild */
 	public var addToDisplayFunctionName:String;
 	
-	/** @default true **/
+	/** @default true */
 	public var canBeCreated:Bool = true;
 	
-	/** @default null **/
+	/** @default null */
 	public var categories:Array<String> = new Array<String>();
 	
 	/** name of the cloneFrom function, if any */
@@ -61,9 +60,6 @@ class ValEditorClassSettings
 	/** name of the object's function to call on object creation */
 	public var creationInitFunctionName:String;
 	
-	/** displayObjectType is only useful if isDisplayObject is set to true */
-	public var displayObjectType:Int = DisplayObjectType.NONE;
-	
 	/** external/static function of type Dynamic->Void to call on object destruction */
 	public var disposeFunction:Function;
 	
@@ -83,7 +79,7 @@ class ValEditorClassSettings
 	public var iconBitmapData:BitmapData;
 	
 	/** function that will create the clickable/touchable object for that object.
-	 *  this is only useful if isDisplayObject is set to true **/
+	 *  this is only useful if isDisplayObject is set to true */
 	public var interactiveFactory:ValEditorObject->IInteractiveObject;
 	
 	/** set this to true if the class implements IValEditContainer */
@@ -97,10 +93,21 @@ class ValEditorClassSettings
 	public var isContainerStarling:Bool;
 	#end
 	
-	/** @default false **/
+	/** Set this to true if the object is an OpenFL or Starling DisplayObject.
+	 * @default false */
 	public var isDisplayObject:Bool;
 	
-	/** @default false **/
+	/** Set this to true if the object is an OpenFL DisplayObject.
+	 * @default	false */
+	public var isDisplayObjectOpenFL:Bool;
+	
+	#if starling
+	/** Set this to true if the object is a Starling DisplayObject. 
+	 * @default false */
+	public var isDisplayObjectStarling:Bool;
+	#end
+	
+	/** @default false */
 	public var isTimeLineContainer:Bool;
 	
 	public var propertyMap:PropertyMap;
@@ -139,7 +146,6 @@ class ValEditorClassSettings
 		this.creationFunctionForTemplateInstance = null;
 		this.creationInitFunction = null;
 		this.creationInitFunctionName = null;
-		this.displayObjectType = DisplayObjectType.NONE;
 		this.disposeFunction = null;
 		this.disposeFunctionName = null;
 		this.exportClassName = null;
@@ -153,6 +159,10 @@ class ValEditorClassSettings
 		this.isContainerStarling = false;
 		#end
 		this.isDisplayObject = false;
+		this.isDisplayObjectOpenFL = false;
+		#if starling
+		this.isDisplayObjectStarling = false;
+		#end
 		this.propertyMap = null;
 		this.removeFromDisplayFunction = null;
 		this.removeFromDisplayFunctionName = null;

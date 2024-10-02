@@ -1,9 +1,9 @@
 package valeditor.ui;
 
+#if starling
 import openfl.geom.Rectangle;
 import starling.display.Quad;
 import starling.display.Sprite3D;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 import valeditor.utils.MathUtil;
@@ -230,7 +230,7 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 			
 			if (this._object.hasPivotProperties)
 			{
-				if (this._object.isDisplayObject && this._object.displayObjectType == DisplayObjectType.STARLING)
+				if (this._object.isDisplayObject && this._object.isDisplayObjectStarling)
 				{
 					if (this._object.usePivotScaling)
 					{
@@ -421,3 +421,4 @@ class InteractiveObjectStarling3D extends Sprite3D implements IInteractiveObject
 	}
 	
 }
+#end

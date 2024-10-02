@@ -166,6 +166,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	{
 		super.editorSetup();
 		
+		//UIAssets.lightMode.lockIcon = Assets.getBitmapData("valeditor\\ui\\light\\lock.png");
 		UIAssets.lightMode.lockIcon = Assets.getBitmapData("valeditor/ui/light/lock.png");
 		UIAssets.darkMode.lockIcon = Assets.getBitmapData("valeditor/ui/dark/lock.png");
 		UIAssets.lightMode.visibleIcon = Assets.getBitmapData("valeditor/ui/light/eye.png");
@@ -772,18 +773,25 @@ class ValEditorFull extends ValEditorBaseFeathers
 			}
 		}
 		
-		// look for asset file
-		for (file in fileList)
+		if (!this._isStartUp)
 		{
-			if (!this._isStartUp && ValEdit.assetLib.isValidExtension(file.extension))
+			// look for asset file
+			for (file in fileList)
 			{
-				ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
+				if (ValEdit.assetLib.isValidExtension(file.extension) && !ValEdit.assetLib.hasAssetWithPath(Path.normalize(file.nativePath), ValEdit.assetLib.getAssetTypeForExtension(file.extension)))
+				{
+					ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
+				}
+			}
+			if (!ValEditor.assetFileLoader.isRunning)
+			{
+				FeathersWindows.showMessageWindow("Assets", "importing assets");
+				ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
 			}
 		}
-		FeathersWindows.showMessageWindow("Assets", "importing assets");
-		ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
 	}
 	#elseif desktop
+	/** If there are multiple files, this function get called once per file */
 	private function onFileDrop(filePath:String):Void
 	{
 		var file:File;
@@ -794,12 +802,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 		}
 		else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(Path.extension(filePath)))
 		{
-			file = new File(filePath);
-			ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
-			if (!ValEditor.assetFileLoader.isRunning)
+			if (!ValEdit.assetLib.hasAssetWithPath(Path.normalize(filePath), ValEdit.assetLib.getAssetTypeForExtension(Path.extension(filePath))))
 			{
-				FeathersWindows.showMessageWindow("Assets", "importing assets");
-				ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
+				file = new File(filePath);
+				ValEditor.assetFileLoader.addFile(file, ValEdit.assetLib.getAssetTypeForExtension(file.extension));
+				if (!ValEditor.assetFileLoader.isRunning)
+				{
+					FeathersWindows.showMessageWindow("Assets", "importing assets");
+					ValEditor.assetFileLoader.load(onAssetFilesLoadComplete);
+				}
 			}
 		}
 	}
@@ -824,7 +835,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 			// look for asset file
 			for (file in fileList)
 			{
-				if (ValEdit.assetLib.isValidExtension(Path.extension(file.name)))
+				if (ValEdit.assetLib.isValidExtension(Path.extension(file.name)) && !ValEdit.assetLib.hasAssetWithPath(file.name, ValEdit.assetLib.getAssetTypeForExtension(Path.extension(file.name))))
 				{
 					this._fileReaderLoader.addFile(file);
 				}
@@ -882,7 +893,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL);
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = DisplayData.exposeSprite();
 		settings.visibilityCollection = DisplayData.getSpriteVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
@@ -895,7 +906,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = DisplayData.exposeBitmap();
 		settings.visibilityCollection = DisplayData.getBitmapVisibility();
 		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
@@ -909,7 +920,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeArcShape();
 		settings.visibilityCollection = ShapeData.getArcShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArcShapeConstructor();
@@ -925,7 +936,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeArrowShape();
 		settings.visibilityCollection = ShapeData.getArrowShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeArrowShapeConstructor();
@@ -941,7 +952,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeBurstShape();
 		settings.visibilityCollection = ShapeData.getBurstShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeBurstShapeConstructor();
@@ -957,7 +968,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeCircleShape();
 		settings.visibilityCollection = ShapeData.getCircleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeCircleShapeConstructor();
@@ -973,7 +984,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeDonutShape();
 		settings.visibilityCollection = ShapeData.getDonutShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeDonutShapeConstructor();
@@ -989,7 +1000,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeEllipseShape();
 		settings.visibilityCollection = ShapeData.getEllipseShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeEllipseShapeConstructor();
@@ -1005,7 +1016,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeFlowerShape();
 		settings.visibilityCollection = ShapeData.getFlowerShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeFlowerShapeConstructor();
@@ -1021,7 +1032,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeGearShape();
 		settings.visibilityCollection = ShapeData.getGearShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeGearShapeConstructor();
@@ -1037,7 +1048,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposePolygonShape();
 		settings.visibilityCollection = ShapeData.getPolygonShapeVisibility();
 		settings.constructorCollection = ShapeData.exposePolygonShapeConstructor();
@@ -1053,7 +1064,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeRectangleShape();
 		settings.visibilityCollection = ShapeData.getRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRectangleShapeConstructor();
@@ -1069,7 +1080,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeRoundRectangleShape();
 		settings.visibilityCollection = ShapeData.getRoundRectangleShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeRoundRectangleShapeConstructor();
@@ -1085,7 +1096,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeStarShape();
 		settings.visibilityCollection = ShapeData.getStarShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeStarShapeConstructor();
@@ -1101,7 +1112,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = ShapeData.exposeWedgeShape();
 		settings.visibilityCollection = ShapeData.getWedgeShapeVisibility();
 		settings.constructorCollection = ShapeData.exposeWedgeShapeConstructor();
@@ -1130,7 +1141,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_TEXT);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.OPENFL;
+		settings.isDisplayObjectOpenFL = true;
 		settings.collection = TextData.exposeTextField();
 		settings.visibilityCollection = TextData.getTextFieldVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_visible;
@@ -1160,7 +1171,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.isDisplayObjectStarling = true;
 		settings.collection = StarlingDisplayData.exposeQuad();
 		settings.visibilityCollection = StarlingDisplayData.getQuadVisibility();
 		settings.constructorCollection = StarlingDisplayData.exposeQuadConstructor();
@@ -1178,7 +1189,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.STARLING_DISPLAY);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.isDisplayObjectStarling = true;
 		settings.collection = StarlingDisplayData.exposeImage();
 		settings.visibilityCollection = StarlingDisplayData.getImageVisibility();
 		settings.constructorCollection = StarlingDisplayData.exposeImageConstructor();
@@ -1199,7 +1210,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.STARLING_TEXT);
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/starling.png");
 		settings.isDisplayObject = true;
-		settings.displayObjectType = DisplayObjectType.STARLING;
+		settings.isDisplayObjectStarling = true;
 		settings.collection = StarlingTextData.exposeTextField();
 		settings.visibilityCollection = StarlingTextData.getTextFieldVisibility();
 		settings.constructorCollection = StarlingTextData.exposeTextFieldConstructor();

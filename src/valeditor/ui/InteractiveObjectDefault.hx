@@ -3,7 +3,6 @@ package valeditor.ui;
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.geom.Rectangle;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 import valeditor.utils.MathUtil;
@@ -232,7 +231,8 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 			
 			if (this._object.hasPivotProperties)
 			{
-				if (this._object.isDisplayObject && this._object.displayObjectType == DisplayObjectType.STARLING)
+				#if starling
+				if (this._object.isDisplayObject && this._object.isDisplayObjectStarling)
 				{
 					if (this._object.usePivotScaling)
 					{
@@ -250,12 +250,15 @@ class InteractiveObjectDefault extends Sprite implements IInteractiveObject
 				}
 				else
 				{
+				#end
 					this.pivotX = -bounds.x * Math.abs(scaleX);
 					this.pivotY = -bounds.y * Math.abs(scaleY);
 					
 					this.x = this._object.getProperty(RegularPropertyName.X);
 					this.y = this._object.getProperty(RegularPropertyName.Y);
+				#if starling
 				}
+				#end
 			}
 			else
 			{

@@ -199,6 +199,7 @@ class GroupUI extends ValueUI implements IGroupUI
 		
 		this._topButton.text = this._group.name;
 		this._topButton.toolTip = this._group.toolTip;
+		this._topButton.selected = this._group.isUIOpen;
 		
 		if (this._group.isUIOpen)
 		{

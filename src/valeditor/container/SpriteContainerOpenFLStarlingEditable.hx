@@ -1,12 +1,12 @@
 package valeditor.container;
 
+#if starling
 import feathers.data.ArrayCollection;
 import openfl.display.BlendMode;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
 import valeditor.editor.data.ContainerSaveData;
@@ -325,7 +325,7 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 	{
 		if (object.isDisplayObject)
 		{
-			return object.displayObjectType == DisplayObjectType.OPENFL || object.displayObjectType == DisplayObjectType.STARLING;
+			return object.isDisplayObjectOpenFL || object.isDisplayObjectStarling;
 		}
 		else if (object.isContainer)
 		{
@@ -407,12 +407,12 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 		if (object.isDisplayObject)
 		{
 			this._displayObjects[this._displayObjects.length] = object;
-			if (object.displayObjectType == DisplayObjectType.OPENFL)
+			if (object.isDisplayObjectOpenFL)
 			{
 				this._container.addChild(cast object.object);
 				this._container.addChild(cast object.interactiveObject);
 			}
-			else
+			else if (object.isDisplayObjectStarling)
 			{
 				this._containerStarling.addChild(cast object.object);
 				this._containerStarling.addChild(cast object.interactiveObject);
@@ -451,14 +451,15 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 		if (object.isDisplayObject)
 		{
 			this._displayObjects.remove(object);
-			if (object.displayObjectType == DisplayObjectType.OPENFL)
+			if (object.isDisplayObjectOpenFL)
 			{
 				this._container.removeChild(cast object.object);
 				this._container.removeChild(cast object.interactiveObject);
 			}
-			else
+			else if (object.isDisplayObjectStarling)
 			{
 				this._containerStarling.removeChild(cast object.object);
+				this._containerStarling.removeChild(cast object.interactiveObject);
 			}
 		}
 		else if (object.isContainer)
@@ -588,3 +589,4 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 	}
 	
 }
+#end

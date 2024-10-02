@@ -1,11 +1,9 @@
-#if starling
 package valeditor.container;
 
+#if starling
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
-import openfl.errors.Error;
 import openfl.events.EventDispatcher;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.StringIndexedMap;
 import valeditor.container.IContainerOpenFLEditable;
@@ -274,40 +272,37 @@ class LayerOpenFLStarlingEditable extends EventDispatcher implements ITimeLineLa
 		{
 			this._displayObjects.set(object.id, object);
 			
-			switch (object.displayObjectType)
+			if (object.isDisplayObjectOpenFL)
 			{
-				case DisplayObjectType.OPENFL :
-					if (object.clss.addToDisplayFunction != null)
-					{
-						#if neko
-						Reflect.callMethod(null, object.clss.addToDisplayFunction, [object.object, this._displayContainer]);
-						#else
-						object.clss.addToDisplayFunction(object.object, this._displayContainer);
-						#end
-					}
-					else
-					{
-						this._displayContainer.addChild(object.object);
-					}
-					this._displayContainer.addChild(cast object.interactiveObject);
-				
-				case DisplayObjectType.STARLING :
-					if (object.clss.addToDisplayFunction != null)
-					{
-						#if neko
-						Reflect.callMethod(null, object.clss.addToDisplayFunction, [object.object, this._displayContainerStarling]);
-						#else
-						object.clss.addToDisplayFunction(object.object, this._displayContainerStarling);
-						#end
-					}
-					else
-					{
-						this._displayContainerStarling.addChild(object.object);
-					}
-					this._displayContainerStarling.addChild(cast object.interactiveObject);
-				
-				default :
-					throw new Error("ValEditorLayer.activate ::: unknown display object type " + object.displayObjectType);
+				if (object.clss.addToDisplayFunction != null)
+				{
+					#if neko
+					Reflect.callMethod(null, object.clss.addToDisplayFunction, [object.object, this._displayContainer]);
+					#else
+					object.clss.addToDisplayFunction(object.object, this._displayContainer);
+					#end
+				}
+				else
+				{
+					this._displayContainer.addChild(object.object);
+				}
+				this._displayContainer.addChild(cast object.interactiveObject);
+			}
+			else if (object.isDisplayObjectStarling)
+			{
+				if (object.clss.addToDisplayFunction != null)
+				{
+					#if neko
+					Reflect.callMethod(null, object.clss.addToDisplayFunction, [object.object, this._displayContainerStarling]);
+					#else
+					object.clss.addToDisplayFunction(object.object, this._displayContainerStarling);
+					#end
+				}
+				else
+				{
+					this._displayContainerStarling.addChild(object.object);
+				}
+				this._displayContainerStarling.addChild(cast object.interactiveObject);
 			}
 		}
 		else if (object.isContainer)
@@ -338,40 +333,37 @@ class LayerOpenFLStarlingEditable extends EventDispatcher implements ITimeLineLa
 		{
 			this._displayObjects.remove(object.id);
 			
-			switch (object.displayObjectType)
+			if (object.isDisplayObjectOpenFL)
 			{
-				case DisplayObjectType.OPENFL :
-					if (object.clss.removeFromDisplayFunction != null)
-					{
-						#if neko
-						Reflect.callMethod(null, object.clss.removeFromDisplayFunction, [object.object, this._displayContainer]);
-						#else
-						object.clss.removeFromDisplayFunction(object.object, this._displayContainer);
-						#end
-					}
-					else
-					{
-						this._displayContainer.removeChild(object.object);
-					}
-					this._displayContainer.removeChild(cast object.interactiveObject);
-				
-				case DisplayObjectType.STARLING :
-					if (object.clss.removeFromDisplayFunction != null)
-					{
-						#if neko
-						Reflect.callMethod(null, object.clss.removeFromDisplayFunction, [object.object, this._displayContainerStarling]);
-						#else
-						object.clss.removeFromDisplayFunction(object.object, this._displayContainerStarling);
-						#end
-					}
-					else
-					{
-						this._displayContainerStarling.removeChild(object.object);
-					}
-					this._displayContainerStarling.removeChild(cast object.interactiveObject);
-				
-				default :
-					throw new Error("ValEditorLayer.deactivate ::: unknown display object type " + object.displayObjectType);
+				if (object.clss.removeFromDisplayFunction != null)
+				{
+					#if neko
+					Reflect.callMethod(null, object.clss.removeFromDisplayFunction, [object.object, this._displayContainer]);
+					#else
+					object.clss.removeFromDisplayFunction(object.object, this._displayContainer);
+					#end
+				}
+				else
+				{
+					this._displayContainer.removeChild(object.object);
+				}
+				this._displayContainer.removeChild(cast object.interactiveObject);
+			}
+			else if (object.isDisplayObjectStarling)
+			{
+				if (object.clss.removeFromDisplayFunction != null)
+				{
+					#if neko
+					Reflect.callMethod(null, object.clss.removeFromDisplayFunction, [object.object, this._displayContainerStarling]);
+					#else
+					object.clss.removeFromDisplayFunction(object.object, this._displayContainerStarling);
+					#end
+				}
+				else
+				{
+					this._displayContainerStarling.removeChild(object.object);
+				}
+				this._displayContainerStarling.removeChild(cast object.interactiveObject);
 			}
 		}
 		else if (object.isContainer)

@@ -1,5 +1,6 @@
 package valeditor.ui;
 
+#if starling
 import openfl.display.BitmapData;
 import openfl.geom.Rectangle;
 import starling.display.Image;
@@ -7,7 +8,6 @@ import starling.display.Quad;
 import starling.display.Sprite;
 import starling.textures.Texture;
 import starling.utils.MathUtil;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valeditor.ValEditorObject;
 
@@ -267,7 +267,7 @@ class InteractiveObjectStarlingVisible extends Sprite implements IInteractiveObj
 			
 			if (this._object.hasPivotProperties)
 			{
-				if (this._object.isDisplayObject && this._object.displayObjectType == DisplayObjectType.STARLING)
+				if (this._object.isDisplayObject && this._object.isDisplayObjectStarling)
 				{
 					if (this._object.usePivotScaling)
 					{
@@ -445,3 +445,4 @@ class InteractiveObjectStarlingVisible extends Sprite implements IInteractiveObj
 	}
 	
 }
+#end

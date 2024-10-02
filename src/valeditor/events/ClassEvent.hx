@@ -16,8 +16,6 @@ class ClassEvent extends Event
 	inline static public var INSTANCE_UNSUSPENDED:String = "instance_unsuspended";
 	inline static public var TEMPLATE_ADDED:String = "template_added";
 	inline static public var TEMPLATE_REMOVED:String = "template_removed";
-	inline static public var TEMPLATE_SUSPENDED:String = "template_suspended";
-	inline static public var TEMPLATE_UNSUSPENDED:String = "template_unsuspended";
 	
 	#if !flash
 	static private var _POOL:Array<ClassEvent> = new Array<ClassEvent>();

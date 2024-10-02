@@ -6,7 +6,6 @@ import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
-import valedit.DisplayObjectType;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
 import valeditor.container.IContainerEditable;
@@ -271,11 +270,11 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	{
 		if (object.isDisplayObject)
 		{
-			return object.displayObjectType == DisplayObjectType.OPENFL;
+			return object.isDisplayObjectOpenFL;
 		}
 		else if (object.isContainer)
 		{
-			return object.isContainerOpenFL && !object.isContainerStarling;
+			return object.isContainerOpenFL #if starling&& !object.isContainerStarling#end;
 		}
 		return true;
 	}

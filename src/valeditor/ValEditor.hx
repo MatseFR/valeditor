@@ -21,7 +21,6 @@ import openfl.events.Event;
 import openfl.events.EventDispatcher;
 import openfl.events.EventType;
 import openfl.utils.ByteArray;
-import valedit.DisplayObjectType;
 import valedit.ExposedCollection;
 import valedit.ValEdit;
 import valedit.animation.ValEditUpdater;
@@ -482,7 +481,7 @@ class ValEditor
 		getClassInteractiveSettings(type, settings);
 		
 		#if starling
-		if (settings.isDisplayObject && settings.displayObjectType == DisplayObjectType.STARLING)
+		if (settings.isDisplayObject && settings.isDisplayObjectStarling)
 		{
 			settings.disposeFunctionName = "dispose";
 			settings.hasRadianRotation = true;
@@ -499,13 +498,13 @@ class ValEditor
 		if (clss == DisplayObject)
 		{
 			settings.isDisplayObject = true;
-			settings.displayObjectType = DisplayObjectType.OPENFL;
+			settings.isDisplayObjectOpenFL = true;
 		}
 		#if starling
-		if (clss == starling.display.DisplayObject)
+		else if (clss == starling.display.DisplayObject)
 		{
 			settings.isDisplayObject = true;
-			settings.displayObjectType = DisplayObjectType.STARLING;
+			settings.isDisplayObjectStarling = true;
 		}
 		#end
 		else
@@ -517,14 +516,14 @@ class ValEditor
 				if (clss == DisplayObject)
 				{
 					settings.isDisplayObject = true;
-					settings.displayObjectType = DisplayObjectType.OPENFL;
+					settings.isDisplayObjectOpenFL = true;
 					break;
 				}
 				#if starling
 				else if (clss == starling.display.DisplayObject)
 				{
 					settings.isDisplayObject = true;
-					settings.displayObjectType = DisplayObjectType.STARLING;
+					settings.isDisplayObjectStarling = true;
 					break;
 				}
 				#end
@@ -536,19 +535,16 @@ class ValEditor
 	{
 		if (settings.isDisplayObject)
 		{
-			switch (settings.displayObjectType)
+			if (settings.isDisplayObjectOpenFL)
 			{
-				case DisplayObjectType.OPENFL :
-					settings.interactiveFactory = InteractiveFactories.openFL_default;
-				
-				#if starling
-				case DisplayObjectType.STARLING :
-					settings.interactiveFactory = InteractiveFactories.starling_default;
-				#end
-				
-				default :
-					// nothing
+				settings.interactiveFactory = InteractiveFactories.openFL_default;
 			}
+			#if starling
+			else if (settings.isDisplayObjectStarling)
+			{
+				settings.interactiveFactory = InteractiveFactories.starling_default;
+			}
+			#end
 		}
 	}
 	
@@ -607,7 +603,6 @@ class ValEditor
 		v.creationFunctionForTemplateInstance = settings.creationFunctionForTemplateInstance;
 		v.creationInitFunction = settings.creationInitFunction;
 		v.creationInitFunctionName = settings.creationInitFunctionName;
-		v.displayObjectType = settings.displayObjectType;
 		v.disposeFunction = settings.disposeFunction;
 		v.disposeFunctionName = settings.disposeFunctionName;
 		v.exportClassName = settings.exportClassName;
@@ -617,8 +612,14 @@ class ValEditor
 		v.interactiveFactory = settings.interactiveFactory;
 		v.isContainer = settings.isContainer;
 		v.isContainerOpenFL = settings.isContainerOpenFL;
+		#if starling
 		v.isContainerStarling = settings.isContainerStarling;
+		#end
 		v.isDisplayObject = settings.isDisplayObject;
+		v.isDisplayObjectOpenFL = settings.isDisplayObjectOpenFL;
+		#if starling
+		v.isDisplayObjectStarling = settings.isDisplayObjectStarling;
+		#end
 		v.isTimeLineContainer = settings.isTimeLineContainer;
 		v.propertyMap = settings.propertyMap != null ? settings.propertyMap : PropertyMap.fromPool();
 		v.removeFromDisplayFunction = settings.removeFromDisplayFunction;
@@ -628,8 +629,6 @@ class ValEditor
 		
 		v.hasPivotProperties = checkForClassProperty(v, RegularPropertyName.PIVOT_X);
 		v.hasScaleProperties = checkForClassProperty(v, RegularPropertyName.SCALE_X);
-		v.hasTransformProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORM);
-		v.hasTransformationMatrixProperty = checkForClassProperty(v, RegularPropertyName.TRANSFORMATION_MATRIX);
 		v.hasVisibleProperty = checkForClassProperty(v, RegularPropertyName.VISIBLE);
 		
 		var clss:Class<Dynamic> = type;
@@ -876,7 +875,7 @@ class ValEditor
 		if (valClass != null)
 		{
 			_displayMap[container] = valClass;
-			return valClass.addContainer(container, object, collection, parentValue);
+			return valClass.addUIContainer(container, object, collection, parentValue);
 		}
 		else
 		{
@@ -893,7 +892,7 @@ class ValEditor
 				if (valClass != null)
 				{
 					_displayMap[container] = valClass;
-					return valClass.addContainer(container, object, collection, parentValue);
+					return valClass.addUIContainer(container, object, collection, parentValue);
 				}
 			}
 			throw new Error("ValEditor.edit ::: unknown Class " + Type.getClassName(Type.getClass(object)));
@@ -910,15 +909,15 @@ class ValEditor
 		FeathersWindows.showClassVisibilitiesWindow(fileSettings.customClassVisibilities, editorSettings.customClassVisibilities, "File classes visibilities");
 	}
 	
-	static public function editConstructor(className:String, ?container:DisplayObjectContainer):ExposedCollection
+	static public function editConstructor(className:String, ?uiContainer:DisplayObjectContainer):ExposedCollection
 	{
-		if (container == null) container = uiContainerDefault;
-		if (container == null)
+		if (uiContainer == null) uiContainer = uiContainerDefault;
+		if (uiContainer == null)
 		{
 			throw new Error("ValEditor.editConstructor ::: null container");
 		}
 		
-		clearUIContainer(container);
+		clearUIContainer(uiContainer);
 		
 		if (className == null) return null;
 		
@@ -927,8 +926,8 @@ class ValEditor
 		{
 			if (valClass.constructorCollection != null)
 			{
-				_displayMap[container] = valClass;
-				return valClass.addConstructorContainer(container);
+				_displayMap[uiContainer] = valClass;
+				return valClass.addConstructorUIContainer(uiContainer);
 			}
 			else
 			{
@@ -943,30 +942,34 @@ class ValEditor
 	
 	/**
 	   
-	   @param	a registered Class
+	   @param	clss	a registered Class
 	   @param	uiContainer	if left null uiContainerDefault is used
 	**/
-	static public function editConstructorWithClass<T>(clss:Class<T>, ?container:DisplayObjectContainer):ExposedCollection
+	static public function editConstructorWithClass<T>(clss:Class<T>, ?uiContainer:DisplayObjectContainer):ExposedCollection
 	{
-		return editConstructor(Type.getClassName(clss), container);
+		return editConstructor(Type.getClassName(clss), uiContainer);
 	}
 	
-	
-	static public function editTemplate(template:ValEditorTemplate, ?container:DisplayObjectContainer):Void
+	/**
+	   
+	   @param	template
+	   @param	uiContainer
+	**/
+	static public function editTemplate(template:ValEditorTemplate, ?uiContainer:DisplayObjectContainer):Void
 	{
-		if (container == null) container = uiContainerDefault;
-		if (container == null)
+		if (uiContainer == null) uiContainer = uiContainerDefault;
+		if (uiContainer == null)
 		{
 			throw new Error("ValEditor.editTemplate ::: null container");
 		}
 		
-		clearUIContainer(container);
+		clearUIContainer(uiContainer);
 		
 		if (template == null) return;
 		
 		var valClass:ValEditorClass = template.clss;
-		_displayMap[container] = valClass;
-		valClass.addTemplateContainer(container, template);
+		_displayMap[uiContainer] = valClass;
+		valClass.addTemplateUIContainer(uiContainer, template);
 	}
 	
 	static public function editUITheme():Void
@@ -989,7 +992,7 @@ class ValEditor
 		var valClass:ValEditorClass = _displayMap[container];
 		if (valClass != null)
 		{
-			valClass.removeContainer(container);
+			valClass.removeUIContainer(container);
 			_displayMap.remove(container);
 		}
 	}
@@ -1042,8 +1045,6 @@ class ValEditor
 		valObject.getBoundsFunctionName = valClass.getBoundsFunctionName;
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
 		valObject.hasScaleProperties = valClass.hasScaleProperties;
-		valObject.hasTransformProperty = valClass.hasTransformProperty;
-		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
 		valObject.propertyMap = valClass.propertyMap;
@@ -1144,6 +1145,15 @@ class ValEditor
 		return template;
 	}
 	
+	/**
+	   Creates a ValEditorObject from the specified template.
+	   @param	template
+	   @param	id
+	   @param	collection
+	   @param	objectID
+	   @param	registerToTemplate	set to false only for the default template's object
+	   @return
+	**/
 	static public function createObjectWithTemplate(template:ValEditorTemplate, ?id:String, ?collection:ExposedCollection, ?objectID:String, registerToTemplate:Bool = true):ValEditorObject
 	{
 		var valClass:ValEditorClass = template.clss;
@@ -1168,8 +1178,6 @@ class ValEditor
 		valObject.getBoundsFunctionName = valClass.getBoundsFunctionName;
 		valObject.hasPivotProperties = valClass.hasPivotProperties;
 		valObject.hasScaleProperties = valClass.hasScaleProperties;
-		valObject.hasTransformProperty = valClass.hasTransformProperty;
-		valObject.hasTransformationMatrixProperty = valClass.hasTransformationMatrixProperty;
 		valObject.hasVisibleProperty = valClass.hasVisibleProperty;
 		valObject.hasRadianRotation = valClass.hasRadianRotation;
 		valObject.propertyMap = valClass.propertyMap;
@@ -1187,9 +1195,13 @@ class ValEditor
 				Reflect.callMethod(template.object.object, Reflect.getProperty(template.object.object, valClass.cloneToFunctionName), [valObject.object]);
 			}
 			template.addInstance(valObject);
+			
+			// apply template values
+			// this is only for template instances
+			template.collection.applyToObject(valObject.object);
 		}
 		
-		template.collection.applyToObject(valObject.object);
+		//template.collection.applyToObject(valObject.object);
 		
 		if (collection == null)
 		{
@@ -1287,11 +1299,6 @@ class ValEditor
 		template.addEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.addEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.add(template);
-		
-		if (template.isSuspended)
-		{
-			template.clss.unsuspendTemplate(template);
-		}
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.add(template);
@@ -1397,8 +1404,6 @@ class ValEditor
 		template.removeEventListener(TemplateEvent.INSTANCE_UNSUSPENDED, onTemplateInstanceUnsuspended);
 		template.removeEventListener(RenameEvent.RENAMED, onTemplateRenamed);
 		templateCollection.remove(template);
-		
-		template.clss.suspendTemplate(template);
 		
 		var collection:ArrayCollection<ValEditorTemplate> = _classToTemplateCollection.get(template.clss.className);
 		collection.remove(template);
