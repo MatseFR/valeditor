@@ -13,7 +13,9 @@ import valedit.utils.RegularPropertyName;
 import valedit.value.base.ExposedValue;
 import valeditor.container.IContainerEditable;
 import valeditor.container.IContainerOpenFLEditable;
+#if starling
 import valeditor.container.IContainerStarlingEditable;
+#end
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.object.ObjectSelect;
 import valeditor.editor.action.object.ObjectUnselect;
@@ -37,11 +39,12 @@ import starling.events.TouchEvent;
  * ...
  * @author Matse
  */
-class ValEditorContainerController implements IAnimatable
+class ValEditorContainerController implements IAnimatable implements IContainerController
 {
 	public var container(get, never):IContainerEditable;
 	public var containerObject(get, set):ValEditorObject;
 	public var ignoreRightClick(default, null):Bool;
+	public var ignoreSelectionEvents(get, set):Bool;
 	public var selection(default, null):ValEditorObjectGroup = new ValEditorObjectGroup();
 	
 	private var _container:IContainerEditable;
@@ -60,7 +63,8 @@ class ValEditorContainerController implements IAnimatable
 			this._container.removeEventListener(ContainerEvent.OBJECT_ADDED_TO_CONTAINER, onObjectAdded);
 			this._container.removeEventListener(ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, onObjectRemoved);
 			
-			ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
+			if (!this._ignoreSelectionEvents) ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
+			
 			Lib.current.stage.removeEventListener(MouseEvent.CLICK, onStageMouseClick);
 			Lib.current.stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
 			Lib.current.stage.removeEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onMiddleMouseUp);
@@ -88,7 +92,7 @@ class ValEditorContainerController implements IAnimatable
 			this._container.addEventListener(ContainerEvent.OBJECT_ADDED_TO_CONTAINER, onObjectAdded);
 			this._container.addEventListener(ContainerEvent.OBJECT_REMOVED_FROM_CONTAINER, onObjectRemoved);
 			
-			ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
+			if (!this._ignoreSelectionEvents) ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
 			
 			Lib.current.stage.addEventListener(MouseEvent.CLICK, onStageMouseClick);
 			Lib.current.stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
@@ -116,6 +120,27 @@ class ValEditorContainerController implements IAnimatable
 		}
 		
 		return this._containerObject = value;
+	}
+	
+	private var _ignoreSelectionEvents:Bool = false;
+	private function get_ignoreSelectionEvents():Bool { return this._ignoreSelectionEvents; }
+	private function set_ignoreSelectionEvents(value:Bool):Bool
+	{
+		if (this._ignoreSelectionEvents == value) return value;
+		
+		if (this._container != null)
+		{
+			if (value)
+			{
+				ValEditor.selection.addEventListener(SelectionEvent.CHANGE, onSelectionChange);
+			}
+			else
+			{
+				ValEditor.selection.removeEventListener(SelectionEvent.CHANGE, onSelectionChange);
+			}
+		}
+		
+		return this._ignoreSelectionEvents = value;
 	}
 	
 	private var _containerOpenFL:DisplayObjectContainer;
