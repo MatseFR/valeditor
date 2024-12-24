@@ -1,6 +1,7 @@
 package valeditor.container;
 import feathers.data.ArrayCollection;
 import juggler.animation.Juggler;
+import valeditor.ValEditorTimeLine;
 import valeditor.container.IContainerEditable;
 
 /**
