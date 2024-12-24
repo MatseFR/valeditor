@@ -35,6 +35,7 @@ class InputActionID
 	inline static public var MOVE_UP_10:String = "move_up_10";
 	
 	// file
+	inline static public var CLOSE_FILE:String = "close_file";
 	inline static public var EXPORT:String = "export";
 	inline static public var EXPORT_AS:String = "export_as";
 	inline static public var NEW_FILE:String = "new_file";
