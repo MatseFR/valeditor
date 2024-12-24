@@ -1,4 +1,5 @@
 package valeditor;
+#if starling
 import valeditor.container.TimeLineContainerOpenFLStarlingEditable;
 
 /**
@@ -27,3 +28,4 @@ class ValEditorContainerRoot extends TimeLineContainerOpenFLStarlingEditable
 	}
 	
 }
+#end

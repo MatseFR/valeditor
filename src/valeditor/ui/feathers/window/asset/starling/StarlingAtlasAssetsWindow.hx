@@ -1,5 +1,5 @@
 package valeditor.ui.feathers.window.asset.starling;
-
+#if starling
 import feathers.controls.Button;
 import feathers.controls.ListView;
 import feathers.controls.popups.CalloutPopUpAdapter;
@@ -214,3 +214,4 @@ class StarlingAtlasAssetsWindow extends AssetsWindow<StarlingAtlasAsset>
 		closeContextMenu();
 	}
 }
+#end

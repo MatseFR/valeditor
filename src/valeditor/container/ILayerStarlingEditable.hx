@@ -1,5 +1,5 @@
-#if starling
 package valeditor.container;
+#if starling
 import starling.display.DisplayObjectContainer;
 
 /**

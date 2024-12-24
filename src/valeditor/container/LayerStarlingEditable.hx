@@ -1,6 +1,5 @@
-#if starling
 package valeditor.container;
-
+#if starling
 import openfl.events.EventDispatcher;
 import starling.display.DisplayObjectContainer;
 import starling.display.Sprite;

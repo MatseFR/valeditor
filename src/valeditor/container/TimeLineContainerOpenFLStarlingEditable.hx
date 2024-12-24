@@ -1,6 +1,5 @@
-#if starling
 package valeditor.container;
-
+#if starling
 import feathers.data.ArrayCollection;
 import haxe.ds.ObjectMap;
 import juggler.animation.Juggler;

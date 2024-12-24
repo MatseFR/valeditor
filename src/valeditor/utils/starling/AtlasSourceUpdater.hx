@@ -1,4 +1,5 @@
 package valeditor.utils.starling;
+#if starling
 import valedit.asset.BitmapAsset;
 import valedit.asset.TextAsset;
 import valedit.asset.starling.StarlingAtlasAsset;
@@ -104,3 +105,4 @@ class AtlasSourceUpdater
 	}
 	
 }
+#end

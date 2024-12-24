@@ -1,4 +1,5 @@
 package valeditor.utils.starling;
+#if starling
 import valedit.asset.BitmapAsset;
 import valedit.asset.starling.StarlingTextureAsset;
 import valeditor.ui.feathers.FeathersWindows;
@@ -97,3 +98,4 @@ class TextureSourceUpdater
 	}
 	
 }
+#end

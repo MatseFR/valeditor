@@ -94,8 +94,9 @@ class FileSettings
 			collection = this.customClassVisibilities.get(clss.className);
 			clss.visibilityCollectionFile = collection;
 		}
-		
+		#if starling
 		this.starlingSettings.apply();
+		#end
 	}
 	
 	public function clone(toSettings:FileSettings = null):FileSettings

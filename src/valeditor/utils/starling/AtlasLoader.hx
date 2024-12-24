@@ -1,4 +1,5 @@
 package valeditor.utils.starling;
+#if starling
 import starling.textures.Texture;
 import starling.textures.TextureAtlas;
 import valeditor.ui.feathers.FeathersWindows;
@@ -114,3 +115,4 @@ class AtlasLoader
 	}
 	
 }
+#end

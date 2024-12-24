@@ -1,5 +1,5 @@
 package valeditor.ui.feathers.renderers.asset.starling;
-
+#if starling
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.layout.HorizontalAlign;
@@ -96,3 +96,4 @@ class StarlingAtlasAssetItemRenderer extends AssetItemRenderer
 	}
 	
 }
+#end

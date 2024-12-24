@@ -1,4 +1,5 @@
 package valeditor.ui.feathers.controls.value.starling;
+#if starling
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
@@ -261,3 +262,4 @@ class StarlingTextureUI extends ValueUI
 	}
 	
 }
+#end
