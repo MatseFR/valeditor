@@ -36,10 +36,14 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return new ValEditorObject(clss, id);
 	}
 	
+	/** if not null this function is called when the object is added to display */
+	public var addToDisplayFunction:Function;
 	/** The object's full class name (ie: openfl.display.Bitmap) */ 
 	public var className:String;
 	/** The ValEditorClass that this object was created from. */
 	public var clss:ValEditorClass;
+	/** The constructor collection for this object, if any. Objects created from a template don't have a constructor collection. */
+	public var constructorCollection(get, set):ExposedCollection;
 	/** The container for this object, if any */
 	public var container(get, set):IContainerEditable;
 	/** The current collection for this object, it can either be on related to a keyframe or the default one. */
@@ -85,8 +89,12 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	/** Tells whether this object is a Starling display object or not. */
 	public var isDisplayObjectStarling:Bool;
 	#end
+	/** Tells whether this object was created by ValEditor (false) or provided from another source (true) */
+	public var isExternal:Bool;
 	/** Tells whether this object is in clipboard or not. */
 	public var isInClipboard:Bool;
+	/** Tells whether this object is in a library (which will prevent it from being destroyed) or not. */
+	public var isInLibrary:Bool;
 	/** Tells whether this object is in pool or not. */
 	public var isInPool(get, never):Bool;
 	/** Tells whether this object received a mouse down (openfl) or begin touch (starling) event. This is used by ValEditorContainerController when moving objects around.
@@ -119,6 +127,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	/** PropertyMap stores associations between an object's property name and the "regular" property name.
 	 * For example an object could have a property named 'xLoc' that would need to be associated with "x". */
 	public var propertyMap:PropertyMap;
+	/** if not null this function is called when the object is removed from display */
+	public var removeFromDisplayFunction:Function;
 	/** Tells whether this object should be in saved file or not. */
 	public var save:Bool = true;
 	/** Reference to the SelectionBox instance set by ValEditorContainerController when this object is selected (null otherwise).
@@ -131,6 +141,23 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	/** Tells whether pivot values should be multiplied with the corresponding scale value (true) or not (false).
 	 * Starling display objects need to have their pivotX property multiplied by their scaleX property to get the "real" value, for example. */
 	public var usePivotScaling:Bool;
+	
+	private var _constructorCollection:ExposedCollection;
+	private function get_constructorCollection():ExposedCollection { return this._constructorCollection; }
+	private function set_constructorCollection(value:ExposedCollection):ExposedCollection
+	{
+		if (this._constructorCollection == value) return value;
+		
+		if (this._constructorCollection != null)
+		{
+			this._constructorCollection.valEditorObject = null;
+		}
+		if (value != null)
+		{
+			value.valEditorObject = this;
+		}
+		return this._constructorCollection = value;
+	}
 	
 	private var _container:IContainerEditable;
 	private function get_container():IContainerEditable { return this._container; }
@@ -166,6 +193,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		if (value != null)
 		{
 			value.valEditorObject = this;
+			value.readFromObject(this.object);
 		}
 		if (this.currentCollection == null)
 		{
@@ -324,12 +352,18 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		
 		this.clss = null;
 		this.currentCollection = null;
+		if (this._constructorCollection != null)
+		{
+			this._constructorCollection.pool();
+			this._constructorCollection = null;
+		}
 		if (this._defaultCollection != null)
 		{
 			this._defaultCollection.pool();
 			this._defaultCollection = null;
 		}
 		
+		this.addToDisplayFunction = null;
 		this._boundsFunction = null;
 		this.container = null;
 		this.getBoundsFunctionName = "getBounds";
@@ -347,7 +381,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		#if starling
 		this.isDisplayObjectStarling = false;
 		#end
+		this.isExternal = false;
 		this.isInClipboard = false;
+		this.isInLibrary = false;
 		this.isMouseDown = false;
 		this.isSelectable = true;
 		this.isSuspended = false;
@@ -356,6 +392,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.object = null;
 		this.objectID = null;
 		this.propertyMap = null;
+		this.removeFromDisplayFunction = null;
 		this.save = true;
 		this.template = null;
 		this.useBounds = false;
@@ -410,7 +447,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	**/
 	public function canBeDestroyed():Bool 
 	{
-		return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && this._registeredActions.length == 0;
+		return !this._isInPool && !this.isInLibrary && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && this._registeredActions.length == 0;
 		//return !this._isInPool && this.container == null && this.numKeyFrames == 0 && !this.isInClipboard && !this.isSuspended && this._registeredActions.length == 0;
 	}
 	
@@ -578,6 +615,23 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	}
 	
 	/**
+	   Returns keyframe with startIndex >= frameIndex and endIndex >= frameIndex if available, null otherwise
+	   @param	frameIndex
+	   @return
+	**/
+	public function getKeyFrameForFrameIndex(frameIndex:Int):ValEditorKeyFrame
+	{
+		for (keyFrame in this._keyFrames)
+		{
+			if (keyFrame.indexStart >= frameIndex && keyFrame.indexEnd >= frameIndex)
+			{
+				return keyFrame;
+			}
+		}
+		return null;
+	}
+	
+	/**
 	   Returns true if this object is associated with specified keyframe, false otherwise.
 	   @param	keyFrame
 	   @return
@@ -585,6 +639,23 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public function hasKeyFrame(keyFrame:ValEditorKeyFrame):Bool
 	{
 		return this._keyFrameToCollection.exists(keyFrame);
+	}
+	
+	/**
+	   Returns true if this object is associated with a keyframe with startIndex >= frameIndex and endIndex >= frameIndex
+	   @param	frameIndex
+	   @return
+	**/
+	public function hasKeyFrameForFrameIndex(frameIndex:Int):Bool
+	{
+		for (keyFrame in this._keyFrames)
+		{
+			if (keyFrame.indexStart >= frameIndex && keyFrame.indexEnd >= frameIndex)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**
@@ -920,13 +991,21 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			this.objectID = json.objectID;
 		}
+		if (json.constructorCollection != null)
+		{
+			if (this._constructorCollection == null)
+			{
+				this.constructorCollection = this.clss.getConstructorCollection();
+			}
+			this._constructorCollection.fromJSONSave(json.constructorCollection);
+		}
 		if (json.defaultCollection != null)
 		{
-			if (this.defaultCollection == null)
+			if (this._defaultCollection == null)
 			{
-				this.defaultCollection = ExposedCollection.fromPool();
+				this.defaultCollection = this.clss.getCollection();
 			}
-			this.defaultCollection.fromJSONSave(json.defaultCollection);
+			this._defaultCollection.fromJSONSave(json.defaultCollection);
 		}
 	}
 	
@@ -944,14 +1023,35 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			json.objectID = this._objectID;
 		}
-		if (this._defaultCollection != null && this.numKeyFrames == 0)
+		
+		//if (this._defaultCollection != null && this.numKeyFrames == 0)
+		//{
+			//if (this.template != null)
+			//{
+				//json.templateID = this.template.id;
+				//json.defaultCollection = this._defaultCollection.toJSONSave(null, false, this.template.collection);
+			//}
+			//else
+			//{
+				//json.defaultCollection = this._defaultCollection.toJSONSave();
+			//}
+		//}
+		if (this.template != null)
 		{
-			if (this.template != null)
+			json.templateID = this.template.id;
+			if (this._defaultCollection != null)
 			{
-				json.templateID = this.template.id;
 				json.defaultCollection = this._defaultCollection.toJSONSave(null, false, this.template.collection);
 			}
-			else
+		}
+		else
+		{
+			json.clss = this.clss.className;
+			if (this._constructorCollection != null)
+			{
+				json.constructorCollection = this._constructorCollection.toJSONSave();
+			}
+			if (this._defaultCollection != null)
 			{
 				json.defaultCollection = this._defaultCollection.toJSONSave();
 			}
@@ -971,10 +1071,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		if (json == null) json = {};
 		
 		json.id = this.id;
-		//if (this._objectID != null)
-		//{
-			//json.objectID = this._objectID;
-		//}
+		if (this._objectID != null)
+		{
+			json.objectID = this._objectID;
+		}
 		var collection:ExposedCollection = this._keyFrameToCollection.get(keyFrame);
 		
 		if (this.template != null)
