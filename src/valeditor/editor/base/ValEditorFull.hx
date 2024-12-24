@@ -22,15 +22,8 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import openfl.utils.Assets;
-import valedit.DisplayObjectType;
 import valedit.SpriteContainerOpenFL;
-import valedit.SpriteContainerOpenFLStarling;
-import valedit.SpriteContainerStarling;
-import valedit.SpriteContainerStarling3D;
 import valedit.TimeLineContainerOpenFL;
-import valedit.TimeLineContainerOpenFLStarling;
-import valedit.TimeLineContainerStarling;
-import valedit.TimeLineContainerStarling3D;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
@@ -78,6 +71,14 @@ import valeditor.ui.InteractiveObjectController;
 import valeditor.ui.feathers.FeathersWindows;
 import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.view.EditorView;
+#if starling
+import valedit.SpriteContainerOpenFLStarling;
+import valedit.SpriteContainerStarling;
+import valedit.SpriteContainerStarling3D;
+import valedit.TimeLineContainerOpenFLStarling;
+import valedit.TimeLineContainerStarling;
+import valedit.TimeLineContainerStarling3D;
+#end
 
 #if air
 import flash.desktop.ClipboardFormats;
@@ -86,7 +87,7 @@ import flash.events.NativeDragEvent;
 import flash.filesystem.File;
 #elseif desktop
 import openfl.filesystem.File;
-#else
+#elseif html5
 import js.html.FileList;
 import openfl.net.FileReference;
 import valeditor.utils.file.FileReaderLoader;
@@ -223,7 +224,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		this._saveFileAsItem = new MenuItem("save as", "Save As", true, "Ctrl+Shift+S");
 		this._fileSettingsItem = new MenuItem("file settings", "File Settings");
 		this._exportSettingsItem = new MenuItem("export settings", "Export Settings");
-		
+
 		this._fileMenuCollection = new ArrayCollection<MenuItem>([
 			this._newFileItem,
 			this._openFileItem,
@@ -310,6 +311,13 @@ class ValEditorFull extends ValEditorBaseFeathers
 		//sprite.graphics.endFill();
 		//addChild(sprite);
 		
+		//var txt:starling.text.TextField = new starling.text.TextField(200, 20, "TEST TEXT");
+		//txt.x = 500;
+		//txt.y = 300;
+		//var filter:starling.filters.DropShadowFilter = new starling.filters.DropShadowFilter(4, 0.785, 0xffffff, 1, 1, 1);
+		//txt.filter = filter;
+		//Starling.current.stage.addChild(txt);
+		
 		//var tf:TextField = new TextField();
 		//tf.y = 100;
 		//var format:TextFormat = tf.defaultTextFormat;
@@ -329,7 +337,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		#if air
 		Lib.current.stage.addEventListener(NativeDragEvent.NATIVE_DRAG_ENTER, onFileDragIn);
 		Lib.current.stage.addEventListener(NativeDragEvent.NATIVE_DRAG_DROP, onFileDrop);
-		#else
+		#elseif !flash
 		Lib.current.stage.window.onDropFile.add(onFileDrop);
 		#end
 	}
@@ -548,7 +556,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 			case InputActionID.DELETE :
 				if (this._isStartUp) return;
 				action = MultiAction.fromPool();
-				ValEditor.delete(action);
+				ValEditor.erase(action);
 				if (action.numActions != 0)
 				{
 					ValEditor.actionStack.add(action);
@@ -1340,6 +1348,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(TimeLineContainerOpenFLEditable, settings);
 		settings.clear();
 		
+		#if starling
 		// TimeLineContainerStarling
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1359,7 +1368,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		ValEditor.registerClass(TimeLineContainerStarlingEditable, settings);
 		settings.clear();
+		#end
 		
+		#if starling
 		// TimeLineContainerStarling3D
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1379,7 +1390,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		ValEditor.registerClass(TimeLineContainerStarling3DEditable, settings);
 		settings.clear();
+		#end
 		
+		#if starling
 		// TimeLineContainerOpenFLStarling
 		settings.canBeCreated = true;
 		settings.cloneToFunctionName = "cloneTo";
@@ -1402,7 +1415,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		ValEditor.registerClass(TimeLineContainerOpenFLStarlingEditable, settings);
 		settings.clear();
+		#end
 		
+		#if starling
 		// ValEditorContainerRoot
 		settings.canBeCreated = false;
 		settings.creationFunction = ValEditor.createContainerRoot;
@@ -1418,6 +1433,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		ValEditor.registerClass(ValEditorContainerRoot, settings);
 		settings.clear();
+		#end
 		
 		// ValEditorKeyFrame
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
