@@ -19,7 +19,7 @@ import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.BinaryAssetItemRenderer;
 import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import valeditor.utils.file.FileOpenerDesktop;
 import valeditor.utils.file.asset.BinaryFilesLoaderDesktop;
@@ -37,7 +37,7 @@ import valeditor.utils.file.asset.BinaryFileUpdater;
  */
 class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 {
-	#if desktop
+	#if (desktop || air)
 	private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	private var _binaryLoader:BinaryFilesLoaderDesktop = new BinaryFilesLoaderDesktop();
 	private var _binaryUpdater:BinaryFileUpdaterDesktop = new BinaryFileUpdaterDesktop();
@@ -54,7 +54,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 	private var _pt:Point = new Point();
 	
 	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
-	#if desktop
+	#if (desktop || air)
 	private var _refreshMenuItem:AssetMenuItem;
 	#end
 	private var _importMenuItem:AssetMenuItem;
@@ -99,13 +99,13 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 			return item.name;
 		};
 		
-		#if desktop
+		#if (desktop || air)
 		this._refreshMenuItem = new AssetMenuItem("refresh", "refresh");
 		#end
 		this._importMenuItem = new AssetMenuItem("import", "import");
 		this._removeMenuItem = new AssetMenuItem("remove", "remove");
 		
-		#if desktop
+		#if (desktop || air)
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._refreshMenuItem, this._importMenuItem, this._removeMenuItem]);
 		#else
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
@@ -149,7 +149,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDown);
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
 		this._binaryLoader.addFiles(files);
@@ -179,7 +179,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :
-				#if desktop
+				#if (desktop || air)
 				var file:File = new File(this._contextMenuAsset.path);
 				if (file.exists)
 				{
@@ -209,7 +209,7 @@ class BinaryAssetsWindow extends AssetsWindow<BinaryAsset>
 		
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private function onAssetFileSelected(file:File):Void
 	{
 		this._binaryUpdater.start(this._contextMenuAsset, file, onAssetUpdateComplete);

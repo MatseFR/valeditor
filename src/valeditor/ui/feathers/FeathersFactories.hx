@@ -27,7 +27,7 @@ import valeditor.ui.feathers.controls.value.StringUI;
 import valeditor.ui.feathers.controls.value.TextAssetUI;
 import valeditor.ui.feathers.controls.value.TextUI;
 
-#if desktop
+#if (desktop || air)
 import valeditor.ui.feathers.controls.value.FilePathUI;
 import valeditor.ui.feathers.controls.value.PathUI;
 #end
@@ -51,7 +51,7 @@ class FeathersFactories
 		BoolUI.disposePool();
 		ByteArrayUI.disposePool();
 		ColorUI.disposePool();
-		#if desktop
+		#if (desktop || air)
 		FilePathUI.disposePool();
 		#end
 		FloatUI.disposePool();
@@ -67,7 +67,7 @@ class FeathersFactories
 		NoteUI.disposePool();
 		ObjectUI.disposePool();
 		ObjectReferenceUI.disposePool();
-		#if desktop
+		#if (desktop || air)
 		PathUI.disposePool();
 		#end
 		SelectComboUI.disposePool();
@@ -110,7 +110,7 @@ class FeathersFactories
 		return ColorUI.fromPool();
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	static public function exposedFilePath():IValueUI
 	{
 		return FilePathUI.fromPool();
@@ -187,7 +187,7 @@ class FeathersFactories
 		return ObjectReferenceUI.fromPool();
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	static public function exposedPath():IValueUI
 	{
 		return PathUI.fromPool();

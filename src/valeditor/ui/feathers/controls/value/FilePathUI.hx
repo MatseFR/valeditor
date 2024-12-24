@@ -1,4 +1,5 @@
 package valeditor.ui.feathers.controls.value;
+#if (desktop || air)
 import feathers.controls.TextInput;
 import openfl.errors.Error;
 import openfl.events.Event;
@@ -10,7 +11,6 @@ import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.events.ValueUIEvent;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
-#if desktop
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;

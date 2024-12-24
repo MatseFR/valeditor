@@ -1,7 +1,7 @@
 package valeditor.editor.file;
 import openfl.filesystem.FileMode;
 import openfl.utils.ByteArray;
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import openfl.filesystem.FileStream;
 import valeditor.utils.file.FileOpenerDesktop;
@@ -18,7 +18,7 @@ import valeditor.utils.file.FileSaver;
  */
 class FileController 
 {
-	#if desktop
+	#if (desktop || air)
 	static private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	static private var _fileSaver:FileSaverDesktop = new FileSaverDesktop();
 	static private var _fileStream:FileStream = new FileStream();
@@ -34,14 +34,14 @@ class FileController
 	{
 		_completeCallback = completeCallback;
 		_cancelCallback = cancelCallback;
-		#if desktop
+		#if (desktop || air)
 		_fileOpener.start(onOpenComplete, onOpenCancel);
 		#else
 		_fileOpener.start(onOpenComplete, onOpenCancel);
 		#end
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	static public function openFile(file:File, ?completeCallback:String->Void):Void
 	{
 		_completeCallback = completeCallback;
@@ -55,7 +55,7 @@ class FileController
 	}
 	#end
 	
-	#if desktop
+	#if (desktop || air)
 	static private function onOpenComplete(file:File):Void
 	{
 		var ba:ByteArray = new ByteArray();
@@ -99,14 +99,14 @@ class FileController
 	{
 		var data:Dynamic = ValEditor.toZipSave();
 		
-		#if desktop
+		#if (desktop || air)
 		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fullPath, ValEditor.fileSettings.filePath == null || forceBrowse, ValEditor.fileExtension);
 		#else
 		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fileName);
 		#end
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	static private function onSaveComplete(path:String):Void
 	{
 		ValEditor.fileSettings.fullPath = path;

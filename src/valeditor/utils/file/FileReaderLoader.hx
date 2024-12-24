@@ -1,4 +1,5 @@
 package valeditor.utils.file;
+#if html5
 import haxe.io.Path;
 import js.html.Event;
 import js.html.File;
@@ -95,3 +96,4 @@ class FileReaderLoader
 	}
 	
 }
+#end

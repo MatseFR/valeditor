@@ -10,7 +10,7 @@ import valeditor.editor.visibility.ClassVisibilityCollection;
  */
 class EditorSettings 
 {
-	#if desktop
+	#if (desktop || air)
 	public var autoSave:Bool = true;
 	public var autoSaveInterval:Int = 5;
 	#end
@@ -27,7 +27,7 @@ class EditorSettings
 	
 	public function clear():Void
 	{
-		#if desktop
+		#if (desktop || air)
 		this.autoSave = true;
 		this.autoSaveInterval = 5;
 		#end
@@ -60,7 +60,7 @@ class EditorSettings
 	{
 		if (toSettings == null) toSettings = new EditorSettings();
 		
-		#if desktop
+		#if (desktop || air)
 		toSettings.autoSave = this.autoSave;
 		toSettings.autoSaveInterval = this.autoSaveInterval;
 		#end
@@ -84,7 +84,7 @@ class EditorSettings
 	
 	public function fromJSON(json:Dynamic):Void
 	{
-		#if desktop
+		#if (desktop || air)
 		this.autoSave = json.autoSave;
 		this.autoSaveInterval = json.autoSaveInterval;
 		#end
@@ -107,7 +107,7 @@ class EditorSettings
 	{
 		if (json == null) json = {};
 		
-		#if desktop
+		#if (desktop || air)
 		json.autoSave = this.autoSave;
 		json.autoSaveInterval = this.autoSaveInterval;
 		#end

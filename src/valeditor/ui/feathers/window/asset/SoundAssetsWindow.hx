@@ -21,7 +21,7 @@ import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.SoundAssetItemRenderer;
 import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import valeditor.utils.file.FileOpenerDesktop;
 import valeditor.utils.file.asset.SoundFileUpdaterDesktop;
@@ -39,7 +39,7 @@ import valeditor.utils.file.asset.SoundFileUpdater;
  */
 class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 {
-	#if desktop
+	#if (desktop || air)
 	private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	private var _soundLoader:SoundFilesLoaderDesktop = new SoundFilesLoaderDesktop();
 	private var _soundUpdater:SoundFileUpdaterDesktop = new SoundFileUpdaterDesktop();
@@ -56,7 +56,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 	private var _pt:Point = new Point();
 	
 	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
-	#if desktop
+	#if (desktop || air)
 	private var _refreshMenuItem:AssetMenuItem;
 	#end
 	private var _importMenuItem:AssetMenuItem;
@@ -106,13 +106,13 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 			return item.name;
 		};
 		
-		#if desktop
+		#if (desktop || air)
 		this._refreshMenuItem = new AssetMenuItem("refresh", "refresh");
 		#end
 		this._importMenuItem = new AssetMenuItem("import", "import");
 		this._removeMenuItem = new AssetMenuItem("remove", "remove");
 		
-		#if desktop
+		#if (desktop || air)
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._refreshMenuItem, this._importMenuItem, this._removeMenuItem]);
 		#else
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
@@ -156,7 +156,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDown);
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
 		this._soundLoader.addFiles(files);
@@ -186,7 +186,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :
-				#if desktop
+				#if (desktop || air)
 				var file:File = new File(this._contextMenuAsset.path);
 				if (file.exists)
 				{
@@ -216,7 +216,7 @@ class SoundAssetsWindow extends AssetsWindow<SoundAsset>
 		
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private function onAssetFileSelected(file:File):Void
 	{
 		this._soundUpdater.start(this._contextMenuAsset, file, onAssetUpdateComplete);

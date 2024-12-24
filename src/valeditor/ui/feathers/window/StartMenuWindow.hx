@@ -17,7 +17,7 @@ class StartMenuWindow extends Panel
 {
 	public var newFileCallback(get, set):Void->Void;
 	public var loadFileCallback(get, set):Void->Void;
-	#if desktop
+	#if (desktop || air)
 	public var loadRecentFileCallback(get, set):String->Void;
 	#end
 	
@@ -35,7 +35,7 @@ class StartMenuWindow extends Panel
 		return this._loadFileCallback = value;
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private var _loadRecentFileCallback:String->Void;
 	private function get_loadRecentFileCallback():String->Void { return this._loadRecentFileCallback; }
 	private function set_loadRecentFileCallback(value:String->Void):String->Void

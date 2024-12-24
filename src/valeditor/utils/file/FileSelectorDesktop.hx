@@ -1,5 +1,5 @@
 package valeditor.utils.file;
-#if desktop
+#if (desktop || air)
 import openfl.events.Event;
 import openfl.net.FileFilter;
 import openfl.filesystem.File;

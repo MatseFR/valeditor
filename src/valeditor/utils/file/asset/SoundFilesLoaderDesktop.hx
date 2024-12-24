@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+#if (desktop || air)
 import flash.filesystem.FileStream;
 import haxe.io.Bytes;
 import openfl.filesystem.File;
@@ -106,3 +107,4 @@ class SoundFilesLoaderDesktop
 	}
 	
 }
+#end

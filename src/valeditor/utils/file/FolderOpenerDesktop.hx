@@ -1,4 +1,5 @@
 package valeditor.utils.file;
+#if (desktop || air)
 import openfl.events.Event;
 import openfl.filesystem.File;
 
@@ -48,3 +49,4 @@ class FolderOpenerDesktop
 	}
 	
 }
+#end

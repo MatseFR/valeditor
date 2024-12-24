@@ -40,7 +40,7 @@ import valeditor.ui.feathers.FeathersFactories;
 import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.utils.file.FileUtil;
 
-#if desktop
+#if (desktop || air)
 import valedit.value.ExposedFilePath;
 import valedit.value.ExposedPath;
 #end
@@ -165,7 +165,7 @@ class ValEditorBaseFeathers extends Application
 		ExposedValue.registerFactory(ExposedText, ExposedText.fromPool);
 		ExposedValue.registerFactory(ExposedTextAsset, ExposedTextAsset.fromPool);
 		
-		#if desktop
+		#if (desktop || air)
 		ExposedValue.registerFactory(ExposedFilePath, ExposedFilePath.fromPool);
 		ExposedValue.registerFactory(ExposedPath, ExposedPath.fromPool);
 		#end
@@ -209,7 +209,7 @@ class ValEditorBaseFeathers extends Application
 		ValEditor.registerUIClass(ExposedText, FeathersFactories.exposedText);
 		ValEditor.registerUIClass(ExposedTextAsset, FeathersFactories.exposedTextAsset);
 		
-		#if desktop
+		#if (desktop || air)
 		ValEditor.registerUIClass(ExposedFilePath, FeathersFactories.exposedFilePath);
 		ValEditor.registerUIClass(ExposedPath, FeathersFactories.exposedPath);
 		#end

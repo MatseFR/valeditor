@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+#if (desktop || air)
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;
@@ -58,3 +59,4 @@ class BinaryFileUpdaterDesktop
 	}
 	
 }
+#end

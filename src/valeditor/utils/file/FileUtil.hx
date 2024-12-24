@@ -1,7 +1,7 @@
 package valeditor.utils.file;
 import haxe.Json;
 
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;
@@ -15,7 +15,7 @@ import openfl.net.SharedObject;
  */
 class FileUtil 
 {
-	#if desktop
+	#if (desktop || air)
 	static public function getFilesFromDirectory(directory:File, allowedExtensions:Array<String> = null, fileList:Array<File> = null):Array<File>
 	{
 		if (fileList == null) fileList = new Array<File>();
@@ -42,7 +42,7 @@ class FileUtil
 	
 	static public function loadEditorSettings():Void
 	{
-		#if desktop
+		#if (desktop || air)
 		var file:File = File.applicationStorageDirectory.resolvePath("editorSettings.json");
 		if (file.exists)
 		{
@@ -66,7 +66,7 @@ class FileUtil
 	{
 		var json:Dynamic = ValEditor.editorSettings.toJSON();
 		
-		#if desktop
+		#if (desktop || air)
 		var str:String = Json.stringify(json);
 		var file:File = File.applicationStorageDirectory.resolvePath("editorSettings.json");
 		var fileStream:FileStream = new FileStream();

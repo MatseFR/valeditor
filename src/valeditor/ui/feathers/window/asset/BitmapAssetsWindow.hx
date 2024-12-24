@@ -22,7 +22,7 @@ import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.BitmapAssetItemRenderer;
 import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import valeditor.utils.file.FileOpenerDesktop;
 import valeditor.utils.file.asset.BitmapFilesLoaderDesktop;
@@ -40,7 +40,7 @@ import valeditor.utils.file.asset.BitmapFileUpdater;
  */
 class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 {	
-	#if desktop
+	#if (desktop || air)
 	private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	private var _imageLoader:BitmapFilesLoaderDesktop = new BitmapFilesLoaderDesktop();
 	private var _imageUpdater:BitmapFileUpdaterDesktop = new BitmapFileUpdaterDesktop();
@@ -57,7 +57,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 	private var _pt:Point = new Point();
 	
 	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
-	#if desktop
+	#if (desktop || air)
 	private var _refreshMenuItem:AssetMenuItem;
 	#end
 	private var _importMenuItem:AssetMenuItem;
@@ -102,13 +102,13 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 			return item.name;
 		};
 		
-		#if desktop
+		#if (desktop || air)
 		this._refreshMenuItem = new AssetMenuItem("refresh", "refresh");
 		#end
 		this._importMenuItem = new AssetMenuItem("import", "import");
 		this._removeMenuItem = new AssetMenuItem("remove", "remove");
 		
-		#if desktop
+		#if (desktop || air)
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._refreshMenuItem, this._importMenuItem, this._removeMenuItem]);
 		#else
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
@@ -154,7 +154,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		//this._contextMenuAsset = null;
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
 		this._imageLoader.addFiles(files);
@@ -184,7 +184,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :
-				#if desktop
+				#if (desktop || air)
 				var file:File = new File(this._contextMenuAsset.path);
 				if (file.exists)
 				{
@@ -214,7 +214,7 @@ class BitmapAssetsWindow extends AssetsWindow<BitmapAsset>
 		
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private function onAssetFileSelected(file:File):Void
 	{
 		this._imageUpdater.start(this._contextMenuAsset, file, onAssetUpdateComplete);

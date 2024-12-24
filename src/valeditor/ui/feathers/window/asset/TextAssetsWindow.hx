@@ -19,7 +19,7 @@ import valeditor.ui.feathers.data.AssetMenuItem;
 import valeditor.ui.feathers.renderers.asset.TextAssetItemRenderer;
 import valeditor.ui.feathers.theme.variant.ListViewVariant;
 import valeditor.ui.feathers.window.asset.AssetsWindow;
-#if desktop
+#if (desktop || air)
 import openfl.filesystem.File;
 import valeditor.utils.file.FileOpenerDesktop;
 import valeditor.utils.file.asset.TextFilesLoaderDesktop;
@@ -37,7 +37,7 @@ import valeditor.utils.file.asset.TextFileUpdater;
  */
 class TextAssetsWindow extends AssetsWindow<TextAsset>
 {
-	#if desktop
+	#if (desktop || air)
 	private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	private var _textLoader:TextFilesLoaderDesktop = new TextFilesLoaderDesktop();
 	private var _textUpdater:TextFileUpdaterDesktop = new TextFileUpdaterDesktop();
@@ -54,7 +54,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 	private var _pt:Point = new Point();
 	
 	private var _contextMenuData:ArrayCollection<AssetMenuItem>;
-	#if desktop
+	#if (desktop || air)
 	private var _refreshMenuItem:AssetMenuItem;
 	#end
 	private var _importMenuItem:AssetMenuItem;
@@ -99,13 +99,13 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 			return item.name;
 		};
 		
-		#if desktop
+		#if (desktop || air)
 		this._refreshMenuItem = new AssetMenuItem("refresh", "refresh");
 		#end
 		this._importMenuItem = new AssetMenuItem("import", "import");
 		this._removeMenuItem = new AssetMenuItem("remove", "remove");
 		
-		#if desktop
+		#if (desktop || air)
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._refreshMenuItem, this._importMenuItem, this._removeMenuItem]);
 		#else
 		this._contextMenuData = new ArrayCollection<AssetMenuItem>([this._importMenuItem, this._removeMenuItem]);
@@ -149,7 +149,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		this.stage.removeEventListener(MouseEvent.MOUSE_DOWN, onStageMouseDown);
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	override function onAddFilesComplete(files:Array<File>):Void 
 	{
 		this._textLoader.addFiles(files);
@@ -179,7 +179,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		switch (this._contextMenu.selectedItem.id)
 		{
 			case "refresh" :
-				#if desktop
+				#if (desktop || air)
 				var file:File = new File(this._contextMenuAsset.path);
 				if (file.exists)
 				{
@@ -209,7 +209,7 @@ class TextAssetsWindow extends AssetsWindow<TextAsset>
 		
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private function onAssetFileSelected(file:File):Void
 	{
 		this._textUpdater.start(this._contextMenuAsset, file, onAssetUpdateComplete);

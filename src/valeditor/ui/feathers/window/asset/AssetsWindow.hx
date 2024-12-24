@@ -19,7 +19,7 @@ import openfl.net.FileFilter;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
-#if desktop
+#if (desktop || air)
 import valeditor.utils.file.FilesOpenerDesktop;
 import valeditor.utils.file.FolderOpenerDesktop;
 import openfl.filesystem.File;
@@ -109,7 +109,7 @@ class AssetsWindow<T> extends Panel
 	private var _assetList:ListView;
 	
 	private var _addFilesButton:Button;
-	#if desktop
+	#if (desktop || air)
 	private var _addFolderButton:Button;
 	#end
 	private var _cancelButton:Button;
@@ -120,7 +120,7 @@ class AssetsWindow<T> extends Panel
 	private var _extensionList:Array<String>;
 	private var _filterList:Array<FileFilter>;
 	
-	#if desktop
+	#if (desktop || air)
 	private var _filesOpener:FilesOpenerDesktop = new FilesOpenerDesktop();
 	private var _filesDialogTitle:String = "Select file(s)";
 	private var _folderOpener:FolderOpenerDesktop = new FolderOpenerDesktop();
@@ -169,7 +169,7 @@ class AssetsWindow<T> extends Panel
 		}
 		this._buttonList.push(this._addFilesButton);
 		
-		#if desktop
+		#if (desktop || air)
 		this._addFolderButton = new Button("add folder");
 		if (this._filesEnabled)
 		{
@@ -236,7 +236,7 @@ class AssetsWindow<T> extends Panel
 		this._assetList.removeEventListener(Event.CHANGE, onSelectionChange);
 		this._assetList.removeEventListener(MouseEvent.CLICK, onAssetListBackgroundClick);
 		this._addFilesButton.removeEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
-		#if desktop
+		#if (desktop || air)
 		this._addFolderButton.removeEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
 		if (this._cancelButton != null) this._cancelButton.removeEventListener(TriggerEvent.TRIGGER, onCancelButton);
@@ -250,7 +250,7 @@ class AssetsWindow<T> extends Panel
 		this._assetList.addEventListener(Event.CHANGE, onSelectionChange);
 		this._assetList.addEventListener(MouseEvent.CLICK, onAssetListBackgroundClick);
 		this._addFilesButton.addEventListener(TriggerEvent.TRIGGER, onAddFilesButton);
-		#if desktop
+		#if (desktop || air)
 		this._addFolderButton.addEventListener(TriggerEvent.TRIGGER, onAddFolderButton);
 		#end
 		if (this._cancelButton != null) this._cancelButton.addEventListener(TriggerEvent.TRIGGER, onCancelButton);
@@ -294,7 +294,7 @@ class AssetsWindow<T> extends Panel
 		}
 	}
 	
-	#if desktop
+	#if (desktop || air)
 	private function onAddFilesButton(evt:TriggerEvent):Void
 	{
 		disableUI();

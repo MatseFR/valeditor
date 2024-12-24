@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+#if (desktop || air)
 import haxe.io.Bytes;
 import openfl.display.BitmapData;
 import openfl.filesystem.File;
@@ -111,3 +112,4 @@ class BitmapFilesLoaderDesktop
 	}
 	
 }
+#end

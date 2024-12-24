@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+#if (desktop || air)
 import openfl.display.BitmapData;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
@@ -72,3 +73,4 @@ class BitmapFileUpdaterDesktop
 	}
 	
 }
+#end

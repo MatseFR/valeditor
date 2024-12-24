@@ -1,4 +1,5 @@
 package valeditor.utils.file.asset;
+#if (desktop || air)
 import openfl.errors.Error;
 import openfl.filesystem.File;
 import valedit.ValEdit;
@@ -271,3 +272,4 @@ class AssetFilesLoaderDesktop
 	}
 	
 }
+#end

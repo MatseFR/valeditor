@@ -1,4 +1,5 @@
 package valeditor.utils.file;
+#if (desktop || air)
 import haxe.io.Path;
 import openfl.events.Event;
 import openfl.filesystem.File;
@@ -149,3 +150,4 @@ class FileSaverDesktop
 	}
 	
 }
+#end
