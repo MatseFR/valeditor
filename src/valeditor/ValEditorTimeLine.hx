@@ -7,6 +7,7 @@ import openfl.events.EventDispatcher;
 import valedit.ExposedCollection;
 import valedit.events.PlayEvent;
 import valedit.utils.ReverseIterator;
+import valeditor.container.ITimeLineContainerEditable;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
 import valeditor.editor.action.keyframe.KeyFrameCreate;
@@ -41,6 +42,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 	public var activateFunction(get, set):ValEditorObject->Void;
 	public var autoIncreaseNumFrames:Bool = true;
 	public var children(get, never):Array<ValEditorTimeLine>;
+	public var container:ITimeLineContainerEditable;
 	public var deactivateFunction(get, set):ValEditorObject->Void;
 	public var frameCollection(default, null):ArrayCollection<FrameData>;
 	public var frameCurrent(get, never):ValEditorKeyFrame;
@@ -336,6 +338,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		
 		// WARNING : children are NOT pooled since the typical case is children time lines are owned by layers
 		this._slaves.resize(0);
+		
+		this.container = null;
 		
 		this.activateFunction = null;
 		this.deactivateFunction = null;
@@ -1551,6 +1555,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		for (node in frameList)
 		{
 			keyFrame = ValEditorKeyFrame.fromPool();
+			keyFrame.timeLine = this;
 			keyFrame.fromJSONSave(node);
 			addKeyFrame(keyFrame);
 		}
