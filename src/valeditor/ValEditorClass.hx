@@ -10,7 +10,6 @@ import valedit.value.base.ExposedValueWithCollection;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
-import valeditor.events.ClassEvent;
 import valeditor.events.RenameEvent;
 import valeditor.ui.IInteractiveObject;
 
@@ -436,6 +435,35 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			collection = this.collection.clone();
 		}
 		return collection;
+	}
+	
+	public function getConstructorCollection():ExposedCollection
+	{
+		if (this.constructorCollection == null) return null;
+		
+		var collection:ExposedCollection;
+		if (this._constructorPool.length != 0)
+		{
+			collection = this._constructorPool.pop();
+		}
+		else
+		{
+			collection = this.constructorCollection.clone();
+		}
+		return collection;
+	}
+	
+	public function makeObjectIDPreview():String
+	{
+		var objID:String = null;
+		var num:Int = this._objectIDIndex;
+		while (true)
+		{
+			num++;
+			objID = this.exportClassName + num;
+			if (!this._IDToObject.exists(objID)) break;
+		}
+		return objID;
 	}
 	
 	/**
