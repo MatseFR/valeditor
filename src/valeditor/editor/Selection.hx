@@ -401,7 +401,7 @@ class Selection extends EventDispatcher
 		}
 	}
 	
-	public function delete(action:MultiAction):Void
+	public function erase(action:MultiAction):Void
 	{
 		if (this._templateGroup.numTemplates != 0)
 		{

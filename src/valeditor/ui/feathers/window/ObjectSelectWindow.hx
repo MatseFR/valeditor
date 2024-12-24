@@ -19,6 +19,7 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import openfl.events.Event;
 import valedit.ValEdit;
+import valeditor.ValEditorObject;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -31,6 +32,10 @@ import valeditor.utils.ArraySort;
 class ObjectSelectWindow extends Panel 
 {
 	public var cancelCallback(get, set):Void->Void;
+	public var confirmCallback(get, set):ValEditorObject->Void;
+	public var sourceObjectCollection(get, set):ArrayCollection<ValEditorObject>;
+	public var title(get, set):String;
+	
 	private var _cancelCallback:Void->Void;
 	private function get_cancelCallback():Void->Void { return this._cancelCallback; }
 	private function set_cancelCallback(value:Void->Void):Void->Void
@@ -38,15 +43,25 @@ class ObjectSelectWindow extends Panel
 		return this._cancelCallback = value;
 	}
 	
-	public var confirmCallback(get, set):Dynamic->Void;
-	private var _confirmCallback:Dynamic->Void;
-	private function get_confirmCallback():Dynamic->Void { return this._confirmCallback; }
-	private function set_confirmCallback(value:Dynamic->Void):Dynamic->Void
+	private var _confirmCallback:ValEditorObject->Void;
+	private function get_confirmCallback():ValEditorObject->Void { return this._confirmCallback; }
+	private function set_confirmCallback(value:ValEditorObject->Void):ValEditorObject->Void
 	{
 		return this._confirmCallback = value;
 	}
 	
-	public var title(get, set):String;
+	private var _sourceObjectCollection:ArrayCollection<ValEditorObject>;
+	private function get_sourceObjectCollection():ArrayCollection<ValEditorObject> { return this._sourceObjectCollection; }
+	private function set_sourceObjectCollection(value:ArrayCollection<ValEditorObject>):ArrayCollection<ValEditorObject>
+	{
+		this._objectCollection.removeAll();
+		if (value != null)
+		{
+			this._objectCollection.addAll(value);
+		}
+		return this._sourceObjectCollection = value;
+	}
+	
 	private var _title:String = "";
 	private function get_title():String { return this._title; }
 	private function set_title(value:String):String
@@ -77,6 +92,8 @@ class ObjectSelectWindow extends Panel
 	private var _objectCollection:ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	
 	private var _excludeObjects:Array<Dynamic>;
+	
+	private var _selectedClassName:String;
 	
 	public function new() 
 	{
@@ -172,7 +189,7 @@ class ObjectSelectWindow extends Panel
 		var selectedItem:StringData = this._classPicker.selectedItem;
 		this._classCollection.array = null;
 		
-		this._objectCollection.removeAll();
+		//this._objectCollection.removeAll();
 		this._excludeObjects = excludeObjects;
 		if (this._excludeObjects != null && this._excludeObjects.length != 0)
 		{
@@ -221,11 +238,14 @@ class ObjectSelectWindow extends Panel
 	
 	private function onClassChange(evt:Event):Void
 	{
-		this._objectCollection.removeAll();
-		if (this._classPicker.selectedItem != null)
-		{
-			this._objectCollection.addAll(ValEditor.getObjectUICollectionForClassName(this._classPicker.selectedItem.value));
-		}
+		//this._objectCollection.removeAll();
+		//if (this._classPicker.selectedItem != null)
+		//{
+			//this._objectCollection.addAll(ValEditor.getObjectUICollectionForClassName(this._classPicker.selectedItem.value));
+		//}
+		
+		this._selectedClassName = this._classPicker.selectedItem.value;
+		this._objectCollection.refresh();
 	}
 	
 	private function onObjectChange(evt:Event):Void
@@ -247,7 +267,8 @@ class ObjectSelectWindow extends Panel
 	
 	private function filterObject(object:ValEditorObject):Bool
 	{
-		return this._excludeObjects.indexOf(object.object) == -1;
+		if (this._excludeObjects.indexOf(object.object) != -1) return false;
+		return object.clss.className == this._selectedClassName || object.clss.superClassNames.indexOf(this._selectedClassName) != -1;
 	}
 	
 }

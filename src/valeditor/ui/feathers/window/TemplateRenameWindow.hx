@@ -115,6 +115,7 @@ class TemplateRenameWindow extends Panel
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
 		this._nameInput.addEventListener(KeyboardEvent.KEY_DOWN, onNameInputKeyDown);
+		this._nameInput.addEventListener(KeyboardEvent.KEY_UP, onNameInputKeyUp);
 		if (this._template != null)
 		{
 			this._nameInput.text = this._template.id;
@@ -177,6 +178,35 @@ class TemplateRenameWindow extends Panel
 				onConfirmButton(null);
 			}
 		}
+		
+		evt.stopPropagation();
+	}
+	
+	private function onNameInputKeyUp(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		evt.stopPropagation();
 	}
 	
 }

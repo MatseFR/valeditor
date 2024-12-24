@@ -1,5 +1,6 @@
 package valeditor.ui.feathers;
 import feathers.core.PopUpManager;
+import feathers.data.ArrayCollection;
 import openfl.Lib;
 import openfl.display.DisplayObject;
 import openfl.events.MouseEvent;
@@ -499,7 +500,7 @@ class FeathersWindows
 		openWindow(_objectAdd);
 	}
 	
-	static public function showObjectCreationWindow(?confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void
+	static public function showObjectCreationWindow(confirmCallback:ValEditorObject->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void
 	{
 		if (_objectCreate == null)
 		{
@@ -551,7 +552,7 @@ class FeathersWindows
 		openWindow(_objectRename);
 	}
 	
-	static public function showObjectSelectWindow(confirmCallback:Dynamic->Void, ?cancelCallback:Void->Void, ?allowedClassNames:Array<String>, ?allowedCategories:Array<String>, ?excludeObjects:Array<Dynamic>, title:String = "Select Object"):Void
+	static public function showObjectSelectWindow(objectCollection:ArrayCollection<ValEditorObject>, confirmCallback:ValEditorObject->Void, ?cancelCallback:Void->Void, ?allowedClassNames:Array<String>, ?excludeObjects:Array<Dynamic>, title:String = "Select Object"):Void
 	{
 		if (_objectSelect == null)
 		{
@@ -559,6 +560,7 @@ class FeathersWindows
 		}
 		
 		_objectSelect.title = title;
+		_objectSelect.sourceObjectCollection = objectCollection;
 		_objectSelect.cancelCallback = cancelCallback;
 		_objectSelect.confirmCallback = confirmCallback;
 		_objectSelect.reset(allowedClassNames, excludeObjects);

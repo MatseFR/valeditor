@@ -4,7 +4,6 @@ import feathers.controls.Button;
 import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
-import feathers.controls.Panel;
 import feathers.controls.TextInput;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
@@ -17,12 +16,13 @@ import openfl.ui.Keyboard;
 import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.action.layer.LayerRename;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
+import valeditor.ui.feathers.window.base.PanelWindow;
 
 /**
  * ...
  * @author Matse
  */
-class LayerRenameWindow extends Panel 
+class LayerRenameWindow extends PanelWindow 
 {
 	public var cancelCallback(get, set):Void->Void;
 	private var _cancelCallback:Void->Void;
@@ -115,6 +115,7 @@ class LayerRenameWindow extends Panel
 		this._nameInput = new TextInput();
 		this._nameInput.addEventListener(Event.CHANGE, onNameInputChange);
 		this._nameInput.addEventListener(KeyboardEvent.KEY_DOWN, onNameInputKeyDown);
+		this._nameInput.addEventListener(KeyboardEvent.KEY_UP, onNameInputKeyUp);
 		if (this._layer != null)
 		{
 			this._nameInput.text = this._layer.name;
@@ -178,5 +179,34 @@ class LayerRenameWindow extends Panel
 				onConfirmButton(null);
 			}
 		}
+		
+		evt.stopPropagation();
+	}
+	
+	private function onNameInputKeyUp(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		evt.stopPropagation();
 	}
 }

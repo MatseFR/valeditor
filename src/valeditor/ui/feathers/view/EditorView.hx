@@ -221,7 +221,7 @@ class EditorView extends LayoutGroup
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.TOP;
 		hLayout.gap = Spacing.HORIZONTAL_GAP;
-		hLayout.paddingBottom = 1;
+		hLayout.paddingBottom = 2;
 		this._menuBar.layout = hLayout;
 		addChild(this._menuBar);
 		
@@ -480,7 +480,7 @@ class EditorView extends LayoutGroup
 			
 			case "delete" :
 				action = MultiAction.fromPool();
-				ValEditor.delete(action);
+				ValEditor.erase(action);
 				if (action.numActions != 0)
 				{
 					ValEditor.actionStack.add(action);

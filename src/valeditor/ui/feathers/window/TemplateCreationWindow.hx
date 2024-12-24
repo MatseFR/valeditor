@@ -9,7 +9,6 @@ import feathers.controls.ListView;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
-import feathers.controls.dataRenderers.ItemRenderer;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
@@ -21,8 +20,9 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
-import openfl.display.Bitmap;
 import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valedit.ExposedCollection;
 import valeditor.ValEditorClass;
 import valeditor.ValEditorTemplate;
@@ -33,7 +33,6 @@ import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.renderers.ClassItemRenderer;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 import valeditor.ui.feathers.theme.simple.variants.LayoutGroupVariant;
-import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
 
 /**
  * ...
@@ -164,6 +163,8 @@ class TemplateCreationWindow extends Panel
 		this._categoryGroup.addChild(this._categoryControlsGroup);
 		
 		this._categoryPicker = new ComboBox(this._categoryCollection, onCategoryChange);
+		this._categoryPicker.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
+		this._categoryPicker.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._categoryPicker.listViewFactory = function():ListView
 		{
 			var layout:VerticalListLayout = new VerticalListLayout();
@@ -193,17 +194,6 @@ class TemplateCreationWindow extends Panel
 		this._classLabel = new Label("Template Class");
 		this._classGroup.addChild(this._classLabel);
 		
-		//var recycler = DisplayObjectRecycler.withFunction(() -> {
-			//var renderer:ItemRenderer = new ItemRenderer();
-			//renderer.icon = new Bitmap();
-			//return renderer;
-		//});
-		//
-		//recycler.update = (renderer:ItemRenderer, state:ListViewItemState) -> {
-			//cast(renderer.icon, Bitmap).bitmapData = state.data.iconBitmapData;
-			//renderer.text = cast(state.data, ValEditorClass).exportClassName;
-		//};
-		
 		var recycler = DisplayObjectRecycler.withFunction(() -> {
 			return ClassItemRenderer.fromPool();
 		});
@@ -217,6 +207,8 @@ class TemplateCreationWindow extends Panel
 		};
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
+		this._classPicker.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
+		this._classPicker.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._classPicker.listViewFactory = function():ListView
 		{
 			var layout:VerticalListLayout = new VerticalListLayout();
@@ -243,6 +235,8 @@ class TemplateCreationWindow extends Panel
 		this._idGroup.addChild(this._idLabel);
 		
 		this._idInput = new TextInput("", null, onIDInputChange);
+		this._idInput.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
+		this._idInput.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 		this._idGroup.addChild(this._idInput);
 		
 		// constructor
@@ -320,7 +314,7 @@ class TemplateCreationWindow extends Panel
 		}
 		else if (this._idInput.text != "")
 		{
-			if (this._valEditorClass.objectIDExists(this._idInput.text))
+			if (this._valEditorClass.templateIDExists(this._idInput.text))
 			{
 				isValid = false;
 				this._idInput.errorString = "ID already in use";
@@ -350,7 +344,7 @@ class TemplateCreationWindow extends Panel
 	
 	private function onClassChange(evt:Event):Void
 	{
-		if (this._classPicker.selectedItem != null)
+		if (this._classPicker.selectedItem != null && Std.isOfType(this._classPicker.selectedItem, ValEditorClass))
 		{
 			this._valEditorClass = this._classPicker.selectedItem;
 			this._constructorCollection = ValEditor.editConstructor(this._valEditorClass.className, this._constructorContainer);
@@ -411,6 +405,48 @@ class TemplateCreationWindow extends Panel
 	private function onConstructorDefaultsButton(evt:TriggerEvent):Void
 	{
 		this._constructorCollection.restoreDefaultValues();
+	}
+	
+	private function onComboKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onComboKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onInputKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onInputKeyUp(evt:KeyboardEvent):Void
+	{
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		else if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			if (this.focusManager != null)
+			{
+				this.focusManager.focus = null;
+			}
+			else if (this.stage != null)
+			{
+				this.stage.focus = null;
+			}
+		}
+		evt.stopPropagation();
 	}
 	
 }

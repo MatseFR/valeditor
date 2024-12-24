@@ -35,10 +35,11 @@ import valedit.value.base.ExposedValueWithCollection;
 import valeditor.ValEditorContainerController;
 import valeditor.container.IContainerEditable;
 import valeditor.container.IContainerOpenFLEditable;
+#if starling
 import valeditor.container.IContainerStarlingEditable;
+#end
 import valeditor.container.ITimeLineContainerEditable;
 import valeditor.container.ITimeLineLayerEditable;
-import valeditor.container.LayerOpenFLStarlingEditable;
 import valeditor.editor.Selection;
 import valeditor.editor.ViewPort;
 import valeditor.editor.action.MultiAction;
@@ -70,7 +71,7 @@ import valeditor.utils.ArraySort;
 #if starling
 import starling.core.Starling;
 #end
-#if desktop
+#if (desktop || air)
 import valeditor.utils.file.asset.AssetFilesLoaderDesktop;
 #else
 import valeditor.utils.file.asset.AssetFilesLoader;
@@ -88,15 +89,19 @@ class ValEditor
 	static public var VERSION:String = Compiler.getDefine("valeditor");
 	
 	static public var actionStack:ValEditorActionStack;
-	#if desktop
+	#if (desktop || air)
 	static public var assetFileLoader:AssetFilesLoaderDesktop;
 	#else
 	static public var assetFileLoader:AssetFilesLoader;
 	#end
 	static public var clipboard:ValEditorClipboard = new ValEditorClipboard();
-	static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
+	//static public var containerController(default, null):ValEditorContainerController = new ValEditorContainerController();
+	static public var containerController:IContainerController;
+	#if flash @:flash.property #end
 	static public var currentContainer(get, never):IContainerEditable;
+	#if flash @:flash.property #end
 	static public var currentContainerObject(get, set):ValEditorObject;
+	#if flash @:flash.property #end
 	static public var currentTimeLineContainer(get, never):ITimeLineContainerEditable;
 	static public var editorSettings(default, null):EditorSettings = new EditorSettings();
 	static public var eventDispatcher(get, never):EventDispatcher;
@@ -111,13 +116,16 @@ class ValEditor
 	static public var keyboardController(default, null):KeyboardController;
 	static public var libraryDragManager(default, null):LibraryDragManager;
 	static public var openedContainers(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
+	#if flash @:flash.property #end
 	static public var rootContainer(get, never):IContainerEditable;
+	#if flash @:flash.property #end
 	static public var rootContainerObject(get, set):ValEditorObject;
 	static public var rootScene(get, set):DisplayObjectContainer;
 	#if starling
 	static public var rootSceneStarling(get, set):starling.display.DisplayObjectContainer;
 	#end
 	/** can be either the root container or an open container template */
+	#if flash @:flash.property #end
 	static public var sceneContainer(get, set):IContainerEditable;
 	static public var selection(default, null):Selection = new Selection();
 	static public var theme:ValEditorTheme;
@@ -193,8 +201,11 @@ class ValEditor
 			}
 			#end
 			
-			_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
-			_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
+			if (_currentContainerObject.hasProperty(RegularPropertyName.X))
+			{
+				_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
+				_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
+			}
 			_currentContainer.viewWidth = viewPort.width;
 			_currentContainer.viewHeight = viewPort.height;
 			_currentContainer.adjustView();
@@ -359,8 +370,11 @@ class ValEditor
 		#end
 		if (_currentContainerObject != null)
 		{
-			_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
-			_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
+			if (_currentContainerObject.hasProperty(RegularPropertyName.X))
+			{
+				_currentContainerObject.setProperty(RegularPropertyName.X, viewPort.x);
+				_currentContainerObject.setProperty(RegularPropertyName.Y, viewPort.y);
+			}
 			_currentContainer.viewWidth = viewPort.width;
 			_currentContainer.viewHeight = viewPort.height;
 			_currentContainer.adjustView();
@@ -387,16 +401,25 @@ class ValEditor
 	static private var _valEditUpdater:ValEditUpdater;
 	static private var _zipSaveLoader:ZipSaveLoader;
 	
+	#if SWC
+	// force some imports
+	static private var __forceImport1:IContainerOpenFLEditable;
+	#end
+	
 	static public function init(completeCallback:Void->Void):Void
 	{
 		actionStack = new ValEditorActionStack();
 		if (assetFileLoader == null)
 		{
-			#if desktop
+			#if (desktop || air)
 			assetFileLoader = new AssetFilesLoaderDesktop();
 			#else
 			assetFileLoader = new AssetFilesLoader();
 			#end
+		}
+		if (containerController == null)
+		{
+			containerController = new ValEditorContainerController();
 		}
 		clipboard.isRealClipboard = true;
 		keyboardController = new KeyboardController(Lib.current.stage);
@@ -427,11 +450,40 @@ class ValEditor
 		ValEdit.init(completeCallback);
 	}
 	
+	static public function initSimple(completeCallback:Void->Void):Void
+	{
+		actionStack = new ValEditorActionStack();
+		if (containerController == null)
+		{
+			containerController = new ValEditorContainerController();
+		}
+		clipboard.isRealClipboard = true;
+		keyboardController = new KeyboardController(Lib.current.stage);
+		input.addController(keyboardController);
+		_liveActionManager = new LiveInputActionManager();
+		_changeUpdateQueue = new ChangeUpdateQueue();
+		_valEditUpdater = new ValEditUpdater();
+		_zipSaveLoader = new ZipSaveLoader();
+		juggler = new Juggler();
+		Juggler.start();
+		Juggler.root.add(juggler);
+		juggler.add(_valEditUpdater);
+		juggler.add(input);
+		juggler.add(_liveActionManager);
+		juggler.add(_changeUpdateQueue);
+		
+		categoryCollection.sortCompareFunction = ArraySort.stringData;
+		classCollection.sortCompareFunction = ArraySort.clss;
+		templateCollection.sortCompareFunction = ArraySort.template;
+		
+		ValEdit.init(completeCallback);
+	}
+	
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
-		openContainer(rootObject);
+		//var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
+		//openContainer(rootObject);
 	}
 	
 	static public function fileSaved():Void
@@ -1011,16 +1063,23 @@ class ValEditor
 		return control;
 	}
 	
-	static public function createObjectWithClass(clss:Class<Dynamic>, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null):ValEditorObject
+	static public function createObjectWithClass(clss:Class<Dynamic>, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null, valObject:ValEditorObject = null):ValEditorObject
 	{
 		return createObjectWithClassName(Type.getClassName(clss), id, params, collection, objectID, object);
 	}
 	
-	static public function createObjectWithClassName(className:String, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null):ValEditorObject
+	static public function createObjectWithClassName(className:String, id:String = null, params:Array<Dynamic> = null, collection:ExposedCollection = null, objectID:String = null, object:Dynamic = null, valObject:ValEditorObject = null):ValEditorObject
 	{
 		if (params == null) params = [];
 		var valClass:ValEditorClass = _classMap.get(className);
-		var valObject:ValEditorObject = ValEditorObject.fromPool(valClass, id);
+		if (id == null)
+		{
+			id = valClass.makeObjectID();
+		}
+		if (valObject == null)
+		{
+			valObject = ValEditorObject.fromPool(valClass, id);
+		}
 		
 		createObject(valObject, valClass, params, false, object);
 		valObject.objectID = objectID;
@@ -1064,6 +1123,16 @@ class ValEditor
 		return valObject;
 	}
 	
+	static public function createObjectFromObject(object:Dynamic, id:String = null, objectID:String = null, collection:ExposedCollection = null):ValEditorObject
+	{
+		var valClass:ValEditorClass = getValEditorClassForObject(object);
+		if (valClass == null)
+		{
+			throw new Error("ValEditor.createObjectFromObject ::: no ValEditorClass found for object");
+		}
+		return createObjectWithClassName(valClass.className, id, null, collection, objectID, object);
+	}
+	
 	static private function createObject(valObject:ValEditorObject, valClass:ValEditorClass, params:Array<Dynamic>, isTemplateInstance:Bool, object:Dynamic = null):Void
 	{
 		if (object == null)
@@ -1084,10 +1153,12 @@ class ValEditor
 			{
 				valObject.object = Type.createInstance(valClass.classReference, params);
 			}
+			valObject.isExternal = false;
 		}
 		else
 		{
 			valObject.object = object;
+			valObject.isExternal = true;
 		}
 		
 		valObject.isContainer = valClass.isContainer;
@@ -1096,6 +1167,14 @@ class ValEditor
 		valObject.isContainerStarling = valClass.isContainerStarling;
 		#end
 		valObject.isTimeLineContainer = valClass.isTimeLineContainer;
+		if (valClass.addToDisplayFunctionName != null)
+		{
+			valObject.addToDisplayFunction = Reflect.getProperty(valObject.object, valClass.addToDisplayFunctionName);
+		}
+		if (valClass.removeFromDisplayFunctionName != null)
+		{
+			valObject.removeFromDisplayFunction = Reflect.getProperty(valObject.object, valClass.removeFromDisplayFunctionName);
+		}
 		
 		if (valClass.creationInitFunction != null)
 		{
@@ -1457,7 +1536,7 @@ class ValEditor
 	
 	static public function getCollectionForObject(object:Dynamic):ExposedCollection
 	{
-		var valClass:ValEditorClass = getValEditorClassByClass(ValEdit.getObjectClass(object));
+		var valClass:ValEditorClass = getValEditorClassForClass(ValEdit.getObjectClass(object));
 		if (valClass != null)
 		{
 			return valClass.getCollection();
@@ -1465,14 +1544,36 @@ class ValEditor
 		return null;
 	}
 	
-	static public function getValEditorClassByClass(clss:Class<Dynamic>):ValEditorClass
+	static public function getValEditorClassForClass(clss:Class<Dynamic>, strict:Bool = false):ValEditorClass
 	{
-		return _classMap.get(Type.getClassName(clss));
+		var className:String = Type.getClassName(clss);
+		if (_classMap.exists(className))
+		{
+			return _classMap.get(className);
+		}
+		else if (!strict)
+		{
+			var valClass:ValEditorClass;
+			while (true)
+			{
+				clss = Type.getSuperClass(clss);
+				if (clss == null) break;
+				className = Type.getClassName(clss);
+				valClass = _classMap.get(className);
+				if (valClass != null) return valClass;
+			}
+		}
+		return null;
 	}
 	
-	static public function getValEditorClassByClassName(className:String):ValEditorClass
+	static public function getValEditorClassForClassName(className:String):ValEditorClass
 	{
 		return _classMap.get(className);
+	}
+	
+	static public function getValEditorClassForObject(object:Dynamic, strict:Bool = false):ValEditorClass
+	{
+		return getValEditorClassForClass(Type.getClass(object));
 	}
 	
 	static public function getObjectUICollectionForClass(clss:Class<Dynamic>):ArrayCollection<ValEditorObject>
@@ -1535,16 +1636,18 @@ class ValEditor
 		layer.timeLine.insertKeyFrame();
 	}
 	
+	#if starling
 	static public function createContainerRoot():ValEditorContainerRoot
 	{
 		var container:ValEditorContainerRoot = ValEditorContainerRoot.fromPool();
 		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
 		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
-		var layer:LayerOpenFLStarlingEditable = createLayer();
+		var layer:ITimeLineLayerEditable = container.createLayer();
 		container.addLayer(layer);
 		return container;
 	}
+	#end
 	
 	static public function createKeyFrame():ValEditorKeyFrame
 	{
@@ -1553,14 +1656,14 @@ class ValEditor
 		return keyFrame;
 	}
 	
-	static public function createLayer():LayerOpenFLStarlingEditable
-	{
-		var layer:LayerOpenFLStarlingEditable = LayerOpenFLStarlingEditable.fromPool();
-		layer.timeLine.numFrames = fileSettings.numFramesDefault;
-		layer.timeLine.frameIndex = 0;
-		layer.timeLine.insertKeyFrame();
-		return layer;
-	}
+	//static public function createLayer():LayerOpenFLStarlingEditable
+	//{
+		//var layer:LayerOpenFLStarlingEditable = LayerOpenFLStarlingEditable.fromPool();
+		//layer.timeLine.numFrames = fileSettings.numFramesDefault;
+		//layer.timeLine.frameIndex = 0;
+		//layer.timeLine.insertKeyFrame();
+		//return layer;
+	//}
 	
 	static public function copy(?action:MultiAction):Void
 	{
@@ -1604,12 +1707,12 @@ class ValEditor
 		}
 	}
 	
-	static public function delete(action:MultiAction):Void
+	static public function erase(action:MultiAction):Void
 	{
 		var selectionClear:SelectionClear = SelectionClear.fromPool();
 		selectionClear.setup(selection);
 		
-		selection.delete(action);
+		selection.erase(action);
 		
 		action.addPost(selectionClear);
 	}
@@ -1854,6 +1957,7 @@ class ValEditor
 	
 	static public function fromJSONSave(json:Dynamic):Void
 	{
+		#if starling // TODO : remove starling hack
 		isLoadingFile = true;
 		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
 		var container:ValEditorContainerRoot = rootObject.object;
@@ -1899,6 +2003,7 @@ class ValEditor
 		isLoadingFile = false;
 		
 		openContainer(rootObject);
+		#end
 	}
 	
 	static public function toJSONSave(json:Dynamic = null):Dynamic
