@@ -527,12 +527,22 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 		var objects:Array<Dynamic> = json.objects;
 		for (node in objects)
 		{
-			template = cast ValEditor.getTemplate(node.templateID);
-			object = cast template.getInstance(node.id);
-			collection = template.clss.getCollection();
-			collection.readFromObject(object.object);
-			collection.fromJSONSave(node.collection);
-			template.visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
+			if (node.templateID != null)
+			{
+				template = ValEditor.getTemplate(node.templateID);
+				object = template.getInstance(node.id);
+				collection = template.clss.getCollection();
+				collection.readFromObject(object.object);
+				collection.fromJSONSave(node.collection);
+				template.visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
+			}
+			else
+			{
+				object = this.timeLine.container.getObjectFromLibrary(node.objectID != null ? node.objectID : node.id);
+				collection = object.clss.getCollection();
+				collection.readFromObject(object.object);
+				collection.fromJSONSave(node.collection);
+			}
 			collection.apply();
 			add(object, collection);
 		}
