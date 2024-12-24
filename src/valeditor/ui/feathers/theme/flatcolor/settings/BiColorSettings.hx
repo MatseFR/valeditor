@@ -11,7 +11,7 @@ class BiColorSettings extends ColorSettings
 {
 	public var alpha2(get, set):Float;
 	public var borderAlpha2(get, set):Float;
-	public var borderColor2(get, set):Float;
+	public var borderColor2(get, set):Int;
 	public var color2(get, set):Int;
 	
 	private var _alpha2:Float = 1.0;
