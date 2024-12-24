@@ -1,5 +1,6 @@
 package valeditor.container;
 import openfl.events.IEventDispatcher;
+import valeditor.ValEditorTimeLine;
 import valeditor.container.ITimeLineContainerEditable;
 
 /**
