@@ -8,6 +8,7 @@ import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
+import valeditor.ValEditorObject;
 import valeditor.container.IContainerEditable;
 import valeditor.container.IContainerOpenFLEditable;
 import valeditor.editor.data.ContainerSaveData;
@@ -42,6 +43,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	public var containerUI(default, null):DisplayObjectContainer = new Sprite();
 	public var height(get, set):Float;
 	public var isOpen(get, never):Bool;
+	public var libraryObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	public var parent(get, never):DisplayObjectContainer;
 	public var rootContainer(get, set):DisplayObjectContainer;
 	public var rotation(get, set):Float;
@@ -200,6 +202,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	
 	private var _allObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _displayObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
+	private var _libraryObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _objects:Array<ValEditorObject> = new Array<ValEditorObject>();
 	
 	private var _pivotIndicator:PivotIndicator = new PivotIndicator(UIConfig.CONTAINER_PIVOT_SIZE, UIConfig.CONTAINER_PIVOT_COLOR,
@@ -212,6 +215,8 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	
 	public function clear():Void
 	{
+		clearLibrary();
+		
 		var object:ValEditorObject;
 		for (i in new ReverseIterator(this._objects.length - 1, 0))
 		{
@@ -225,6 +230,31 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 		
 		this.activeObjectsCollection.removeAll();
 		this.allObjectsCollection.removeAll();
+		this.libraryObjectsCollection.removeAll();
+		
+		this._allObjects.clear();
+		this._displayObjects.resize(0);
+		this._libraryObjects.clear();
+		this._objects.resize(0);
+		
+		this.alpha = 1.0;
+		this.blendMode = BlendMode.NORMAL;
+		this.cameraX = 0;
+		this.cameraY = 0;
+		this.rotation = 0;
+		this.scaleX = 1.0;
+		this.scaleY = 1.0;
+		this.visible = true;
+		this.x = 0;
+		this.y = 0;
+	}
+	
+	private function clearLibrary():Void
+	{
+		for (object in this.libraryObjectsCollection)
+		{
+			object.removeEventListener(RenameEvent.RENAMED, object_renamed);
+		}
 	}
 	
 	public function pool():Void
@@ -338,6 +368,27 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 		return false;
 	}
 	
+	public function addObjectToLibrary(object:ValEditorObject):Void
+	{
+		this._libraryObjects.set(object.objectID, object);
+		this.libraryObjectsCollection.add(object);
+		object.isInLibrary = true;
+		object.addEventListener(RenameEvent.RENAMED, object_renamed);
+	}
+	
+	public function getObjectFromLibrary(objectID:String):ValEditorObject
+	{
+		return this._libraryObjects.get(objectID);
+	}
+	
+	public function removeObjectFromLibrary(object:ValEditorObject):Void
+	{
+		this._libraryObjects.remove(object.objectID);
+		this.libraryObjectsCollection.remove(object);
+		object.isInLibrary = false;
+		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
+	}
+	
 	public function addObject(object:ValEditorObject):Void
 	{
 		this._allObjects.set(object.objectID, object);
@@ -347,7 +398,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 		
 		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
-		object.addEventListener(RenameEvent.RENAMED, object_renamed);
+		if (!object.isInLibrary) object.addEventListener(RenameEvent.RENAMED, object_renamed);
 		
 		if (object.isDisplayObject)
 		{
@@ -379,7 +430,7 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 		
 		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
-		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
+		if (!object.isInLibrary) object.removeEventListener(RenameEvent.RENAMED, object_renamed);
 		
 		if (object.isDisplayObject)
 		{
@@ -432,10 +483,20 @@ class SpriteContainerOpenFLEditable extends EventDispatcher implements IContaine
 	{
 		var object:ValEditorObject = cast evt.target;
 		
-		this._allObjects.remove(evt.previousNameOrID);
-		this._allObjects.set(object.objectID, object);
-		this.activeObjectsCollection.updateAt(this.activeObjectsCollection.indexOf(object));
-		this.allObjectsCollection.updateAt(this.allObjectsCollection.indexOf(object));
+		if (this._allObjects.exists(evt.previousNameOrID))
+		{
+			this._allObjects.remove(evt.previousNameOrID);
+			this._allObjects.set(object.objectID, object);
+			this.activeObjectsCollection.updateAt(this.activeObjectsCollection.indexOf(object));
+			this.allObjectsCollection.updateAt(this.allObjectsCollection.indexOf(object));
+		}
+		
+		if (this._libraryObjects.exists(evt.previousNameOrID))
+		{
+			this._libraryObjects.remove(evt.previousNameOrID);
+			this._libraryObjects.set(object.objectID, object);
+			this.libraryObjectsCollection.updateAt(this.libraryObjectsCollection.indexOf(object));
+		}
 	}
 	
 	private function cloneTo(container:SpriteContainerOpenFLEditable):Void

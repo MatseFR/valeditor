@@ -2,6 +2,7 @@ package valeditor.container;
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.events.EventType;
+import valeditor.ValEditorObject;
 import valeditor.editor.data.ContainerSaveData;
 
 /**
@@ -15,6 +16,7 @@ interface IContainerEditable
 	public var cameraY(get, set):Float;
 	public var containerUI(default, null):DisplayObjectContainer;
 	public var isOpen(get, never):Bool;
+	public var libraryObjectsCollection(default, null):ArrayCollection<ValEditorObject>;
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
@@ -23,6 +25,7 @@ interface IContainerEditable
 	public var y(get, set):Float;
 	
 	function addObject(object:ValEditorObject):Void;
+	function addObjectToLibrary(object:ValEditorObject):Void;
 	function adjustView():Void;
 	function canAddObject(object:ValEditorObject):Bool;
 	function close():Void;
@@ -32,6 +35,7 @@ interface IContainerEditable
 	function getAllVisibleObjects(?visibleObjects:Array<ValEditorObject>):Array<ValEditorObject>;
 	function getContainerDependencies(data:ContainerSaveData):Void;
 	function getObject(objectID:String):ValEditorObject;
+	function getObjectFromLibrary(objectID:String):ValEditorObject;
 	function hasActiveObject(objectID:String):Bool;
 	function hasObject(objectID:String):Bool;
 	function hasVisibleObject():Bool;
@@ -39,6 +43,7 @@ interface IContainerEditable
 	function pool():Void;
 	function removeObject(object:ValEditorObject):Void;
 	function removeObjectCompletely(object:ValEditorObject):Void;
+	function removeObjectFromLibrary(object:ValEditorObject):Void;
 	function toJSONSave(json:Dynamic = null):Dynamic;
 	
 	function addEventListener<T>(type:EventType<T>, listener:T->Void, useCapture:Bool = false, priority:Int = 0, useWeakReference:Bool = false):Void;
