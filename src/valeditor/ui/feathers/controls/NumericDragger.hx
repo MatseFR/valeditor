@@ -587,10 +587,10 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private function startDragging():Void
 	{
 		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
-		this.stage.addEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
+		this.stage.addEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler, false, 500);
 		if (this._cancelDragWithRightClick)
 		{
-			this.stage.addEventListener(MouseEvent.RIGHT_CLICK, dragLabel_stage_rightClickHandler);
+			this.stage.addEventListener(MouseEvent.RIGHT_CLICK, dragLabel_stage_rightClickHandler, false, 500);
 		}
 		
 		this._hasMoved = false;
@@ -728,6 +728,9 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		{
 			this.stage.focus = null;
 		}
+		
+		//evt.stopImmediatePropagation();
+		//evt.stopPropagation();
 	}
 	
 	private function dragLabel_stage_rightClickHandler(evt:MouseEvent):Void
@@ -748,6 +751,9 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		{
 			this.stage.focus = null;
 		}
+		
+		//evt.stopImmediatePropagation();
+		//evt.stopPropagation();
 	}
 	
 	private function focusInHandler(evt:FocusEvent):Void
