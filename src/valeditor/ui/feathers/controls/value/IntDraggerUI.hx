@@ -297,7 +297,8 @@ class IntDraggerUI extends ValueUI
 		
 		if (this._action == null)
 		{
-			throw new Error("IntDraggerUI ::: action should not be null");
+			return;
+			//throw new Error("IntDraggerUI ::: action should not be null");
 		}
 		
 		this._valueChangeAction.newValue = this._exposedValue.value;

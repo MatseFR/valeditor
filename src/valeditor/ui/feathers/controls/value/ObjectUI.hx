@@ -47,7 +47,12 @@ class ObjectUI extends ValueUI
 		else
 		{
 			this._exposedObject = cast value;
-			if (this._exposedObject.childCollection.uiContainer == null)
+			if (this._exposedObject.value == null && this._exposedObject.autoCreateIfNull && this._exposedObject.autoCreationObject == null)
+			{
+				this._exposedObject.autoCreate();
+			}
+			
+			if (this._exposedObject.childCollection != null && this._exposedObject.childCollection.uiContainer == null)
 			{
 				ValEditor.edit(value.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
 			}
@@ -177,7 +182,7 @@ class ObjectUI extends ValueUI
 			}
 		}
 		
-		if (this._exposedObject.childCollection.uiContainer == null)
+		if (this._exposedObject.childCollection != null && this._exposedObject.childCollection.uiContainer == null)
 		{
 			// this is needed in case ExposedObject didn't have an object when this.exposedValue was set
 			ValEditor.edit(this._exposedObject.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
@@ -212,13 +217,16 @@ class ObjectUI extends ValueUI
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 
 	{
-		if (this._exposedObject.childCollection.uiContainer == null)
+		if (this._exposedObject.childCollection != null)
 		{
-			ValEditor.edit(this._exposedObject.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
-		}
-		else
-		{
-			this._exposedObject.childCollection.readAndSetObject(this._exposedObject.value);
+			if (this._exposedObject.childCollection.uiContainer == null)
+			{
+				ValEditor.edit(this._exposedObject.value, this._exposedObject.childCollection, this._valueGroup, this._exposedObject);
+			}
+			else
+			{
+				this._exposedObject.childCollection.readAndSetObject(this._exposedObject.value);
+			}
 		}
 		super.onValueObjectChange(evt);
 	}

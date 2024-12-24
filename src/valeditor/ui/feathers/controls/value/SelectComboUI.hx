@@ -12,6 +12,8 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalListLayout;
+import haxe.ds.ObjectMap;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
@@ -64,6 +66,7 @@ class SelectComboUI extends ValueUI
 	
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
+	private var _listLayout:VerticalListLayout;
 	private var _list:ComboBox;
 	
 	private var _nullGroup:LayoutGroup;
@@ -71,6 +74,7 @@ class SelectComboUI extends ValueUI
 	private var _nullButton:Button;
 	
 	private var _collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>();
+	private var _valueToItem:ObjectMap<Dynamic, Dynamic> = new ObjectMap<Dynamic, Dynamic>();
 
 	public function new() 
 	{
@@ -81,6 +85,8 @@ class SelectComboUI extends ValueUI
 	override public function clear():Void 
 	{
 		super.clear();
+		this._collection.removeAll();
+		this._valueToItem.clear();
 		this._combo = null;
 	}
 	
@@ -116,15 +122,28 @@ class SelectComboUI extends ValueUI
 		this._label.variant = LabelVariant.VALUE_NAME;
 		this._mainGroup.addChild(this._label);
 		
+		this._listLayout = new VerticalListLayout();
+		
 		this._list = new ComboBox(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String { return item.text; }
 		this._list.listViewFactory = () ->
 		{
 			var lv:ListView = new ListView();
-			lv.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
-			lv.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
+			lv.layout = this._listLayout;
+			lv.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+			lv.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 			lv.addEventListener(MouseEvent.CLICK, onListMouseClick);
+			lv.addEventListener(MouseEvent.DOUBLE_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_UP, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_WHEEL, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onListMouseEvent);
 			return lv;
 		};
 		this._mainGroup.addChild(this._list);
@@ -153,13 +172,21 @@ class SelectComboUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
+		this._listLayout.contentJustify = this._combo.contentJustify;
+		this._listLayout.requestedMaxRowCount = this._combo.requestedMaxRowCount;
+		this._listLayout.requestedMinRowCount = this._combo.requestedMinRowCount;
+		
 		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._combo.listPercentWidth;
 		
 		this._collection.removeAll();
+		this._valueToItem.clear();
+		var item:Dynamic;
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
 		{
-			this._collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
+			item = {text:this._combo.choiceList[i], value:this._combo.valueList[i]};
+			this._collection.add(item);
+			this._valueToItem.set(this._combo.valueList[i], item);
 		}
 		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
@@ -178,7 +205,8 @@ class SelectComboUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			this._list.selectedIndex = this._combo.valueList.indexOf(this._exposedValue.value);
+			//this._list.selectedIndex = this._combo.valueList.indexOf(this._exposedValue.value);
+			this._list.selectedItem = this._valueToItem.get(this._exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
 	}
@@ -205,8 +233,8 @@ class SelectComboUI extends ValueUI
 		this._list.removeEventListener(Event.CHANGE, onListChange);
 		this._list.removeEventListener(Event.CLOSE, onListClose);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
-		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
-		this._list.removeEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
+		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -218,19 +246,9 @@ class SelectComboUI extends ValueUI
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(Event.CLOSE, onListClose);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
-		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
-		this._list.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
+		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
-	}
-	
-	private function onComboKeyDown(evt:KeyboardEvent):Void
-	{
-		evt.stopPropagation();
-	}
-	
-	private function onComboKeyUp(evt:KeyboardEvent):Void
-	{
-		evt.stopPropagation();
 	}
 	
 	private function onListChange(evt:Event):Void
@@ -303,6 +321,11 @@ class SelectComboUI extends ValueUI
 		}
 	}
 	
+	private function onListKeyboardEvent(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
 	private function onListMouseClick(evt:MouseEvent):Void
 	{
 		if (this.focusManager != null)
@@ -313,6 +336,13 @@ class SelectComboUI extends ValueUI
 		{
 			this.stage.focus = null;
 		}
+		
+		evt.stopPropagation();
+	}
+	
+	private function onListMouseEvent(evt:MouseEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void

@@ -13,6 +13,7 @@ import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
+import feathers.layout.VerticalListLayout;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
@@ -66,6 +67,7 @@ class SelectUI extends ValueUI
 	private var _mainGroup:LayoutGroup;
 	private var _label:Label;
 	private var _list:PopUpListView;
+	private var _listLayout:VerticalListLayout;
 	private var _collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>();
 	
 	private var _nullGroup:LayoutGroup;
@@ -84,6 +86,7 @@ class SelectUI extends ValueUI
 	override public function clear():Void 
 	{
 		super.clear();
+		this._collection.removeAll();
 		this._select = null;
 	}
 	
@@ -119,15 +122,28 @@ class SelectUI extends ValueUI
 		this._label.variant = LabelVariant.VALUE_NAME;
 		this._mainGroup.addChild(this._label);
 		
+		this._listLayout = new VerticalListLayout();
+		
 		this._list = new PopUpListView(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String { return item.text; };
 		this._list.listViewFactory = () ->
 		{
 			var lv:ListView = new ListView();
-			lv.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
-			lv.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
+			lv.layout = this._listLayout;
+			lv.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+			lv.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 			lv.addEventListener(MouseEvent.CLICK, onListMouseClick);
+			lv.addEventListener(MouseEvent.DOUBLE_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MIDDLE_MOUSE_UP, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_UP, onListMouseEvent);
+			lv.addEventListener(MouseEvent.MOUSE_WHEEL, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_CLICK, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, onListMouseEvent);
+			lv.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onListMouseEvent);
 			return lv;
 		};
 		this._mainGroup.addChild(this._list);
@@ -155,9 +171,19 @@ class SelectUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
+		this._listLayout.contentJustify = this._select.contentJustify;
+		this._listLayout.requestedMaxRowCount = this._select.requestedMaxRowCount;
+		this._listLayout.requestedMinRowCount = this._select.requestedMinRowCount;
+		
 		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._select.listPercentWidth;
 		
 		this._collection.removeAll();
+		if (this._select.isConstructor && this._select.choiceList.length == 0)
+		{
+			this._select.retrieveChoiceList(this._select.object);
+			this._select.retrieveValueList(this._select.object);
+		}
+		
 		var count:Int = this._select.choiceList.length;
 		for (i in 0...count)
 		{
@@ -207,8 +233,8 @@ class SelectUI extends ValueUI
 		this._list.removeEventListener(Event.CHANGE, onListChange);
 		this._list.removeEventListener(Event.CLOSE, onListClose);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
-		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
-		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
+		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.removeEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -220,8 +246,8 @@ class SelectUI extends ValueUI
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(Event.CLOSE, onListClose);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
-		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
-		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
+		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
+		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
 	}
 	
@@ -295,12 +321,7 @@ class SelectUI extends ValueUI
 		}
 	}
 	
-	private function onListKeyDown(evt:KeyboardEvent):Void
-	{
-		evt.stopPropagation();
-	}
-	
-	private function onListKeyUp(evt:KeyboardEvent):Void
+	private function onListKeyboardEvent(evt:KeyboardEvent):Void
 	{
 		evt.stopPropagation();
 	}
@@ -315,6 +336,13 @@ class SelectUI extends ValueUI
 		{
 			this.stage.focus = null;
 		}
+		
+		evt.stopPropagation();
+	}
+	
+	private function onListMouseEvent(evt:MouseEvent):Void
+	{
+		evt.stopPropagation();
 	}
 	
 	private function onNullButton(evt:TriggerEvent):Void

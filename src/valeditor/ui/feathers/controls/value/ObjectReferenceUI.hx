@@ -2,6 +2,9 @@ package valeditor.ui.feathers.controls.value;
 import feathers.controls.Button;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
+import feathers.controls.ListView;
+import feathers.controls.PopUpListView;
+import feathers.data.ArrayCollection;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
@@ -9,12 +12,18 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
+import openfl.events.Event;
+import openfl.events.KeyboardEvent;
+import openfl.events.MouseEvent;
 import valedit.value.base.ExposedValue;
 import valedit.ValEditObject;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObjectReference;
+import valedit.value.reference.ReferenceRange;
+import valeditor.ValEditorObject;
 import valeditor.editor.action.MultiAction;
+import valeditor.editor.action.value.ReferenceRangeChange;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.FeathersWindows;
@@ -63,6 +72,9 @@ class ObjectReferenceUI extends ValueUI
 	
 	private var _idLabel:Label;
 	
+	private var _rangeList:PopUpListView;
+	private var _rangeCollection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>();
+	
 	private var _buttonGroup:LayoutGroup;
 	private var _loadButton:Button;
 	private var _clearButton:Button;
@@ -77,6 +89,7 @@ class ObjectReferenceUI extends ValueUI
 	{
 		super.clear();
 		this._objectReferenceValue = null;
+		this._rangeCollection.removeAll();
 	}
 	
 	public function pool():Void
@@ -115,6 +128,20 @@ class ObjectReferenceUI extends ValueUI
 		this._idLabel = new Label();
 		this._contentGroup.addChild(this._idLabel);
 		
+		this._rangeList = new PopUpListView(this._rangeCollection);
+		//this._list.layoutData = new HorizontalLayoutData(100);
+		this._rangeList.itemToText = function(item:Dynamic):String { return item.text; };
+		this._rangeList.listViewFactory = () ->
+		{
+			var lv:ListView = new ListView();
+			lv.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyDown);
+			lv.addEventListener(KeyboardEvent.KEY_UP, onListKeyUp);
+			lv.addEventListener(MouseEvent.CLICK, onListMouseClick);
+			return lv;
+		};
+		this._rangeList.addEventListener(Event.CHANGE, onRangeListChange);
+		this._contentGroup.addChild(this._rangeList);
+		
 		this._buttonGroup = new LayoutGroup();
 		hLayout = new HorizontalLayout();
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
@@ -138,6 +165,12 @@ class ObjectReferenceUI extends ValueUI
 		this._label.toolTip = this._exposedValue.toolTip;
 		
 		this._label.text = this._exposedValue.name;
+		
+		var count:Int = this._objectReferenceValue.allowedReferenceRanges.length;
+		for (i in 0...count)
+		{
+			this._rangeCollection.add({text:this._objectReferenceValue.allowedReferenceRanges[i], value:this._objectReferenceValue.allowedReferenceRanges[i]});
+		}
 		
 		if (this._readOnly)
 		{
@@ -163,6 +196,9 @@ class ObjectReferenceUI extends ValueUI
 		
 		if (this._initialized && this._exposedValue != null)
 		{
+			var index:Int = this._objectReferenceValue.allowedReferenceRanges.indexOf(this._objectReferenceValue._referenceRange);
+			this._rangeList.selectedIndex = index;
+			
 			var object:ValEditorObject = this._objectReferenceValue._valEditObjectReference;
 			if (object != null)
 			{
@@ -236,19 +272,95 @@ class ObjectReferenceUI extends ValueUI
 	
 	private function onLoadButton(evt:TriggerEvent):Void
 	{
-		var excludeObjects:Array<Dynamic>;
+		var excludeObjects:Array<ValEditorObject>;
 		if (this._objectReferenceValue.allowSelfReference)
 		{
 			excludeObjects = null;
 		}
 		else
 		{
-			excludeObjects = [this._objectReferenceValue.object];
+			excludeObjects = [this._objectReferenceValue.valEditorObject];
 		}
-		FeathersWindows.showObjectSelectWindow(objectSelected, null, this._objectReferenceValue.classList, excludeObjects);
+		var objectCollection:ArrayCollection<ValEditorObject>;
+		switch (this._objectReferenceValue._referenceRange)
+		{
+			case ReferenceRange.CONTAINER :
+				objectCollection = ValEditor.currentContainer.allObjectsCollection;
+			
+			case ReferenceRange.CONTAINER_LIBRARY :
+				objectCollection = ValEditor.currentContainer.libraryObjectsCollection;
+			
+			default :
+				throw new Error("unknown ReferenceRange : " + this._objectReferenceValue._referenceRange);
+		}
+		FeathersWindows.showObjectSelectWindow(objectCollection, objectSelected, null, this._objectReferenceValue.classList, excludeObjects);
 	}
 	
-	private function objectSelected(object:Dynamic):Void
+	private function onListKeyDown(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onListKeyUp(evt:KeyboardEvent):Void
+	{
+		evt.stopPropagation();
+	}
+	
+	private function onListMouseClick(evt:MouseEvent):Void
+	{
+		if (this.focusManager != null)
+		{
+			this.focusManager.focus = null;
+		}
+		else if (this.stage != null)
+		{
+			this.stage.focus = null;
+		}
+	}
+	
+	private function onRangeListChange(evt:Event):Void
+	{
+		var newReferenceRange:String;
+		if (this._rangeList.selectedIndex == -1)
+		{
+			newReferenceRange = null;
+			this._loadButton.enabled = false;
+			this._clearButton.enabled = false;
+		}
+		else
+		{
+			newReferenceRange = this._objectReferenceValue.allowedReferenceRanges[this._rangeList.selectedIndex];
+			this._loadButton.enabled = true;
+			this._clearButton.enabled = true;
+		}
+		
+		if (this._exposedValue != null)
+		{
+			if (this._exposedValue.useActions)
+			{
+				if (newReferenceRange != this._objectReferenceValue._referenceRange)
+				{
+					var action:MultiAction = MultiAction.fromPool();
+					
+					var referenceRangeChange:ReferenceRangeChange = ReferenceRangeChange.fromPool();
+					referenceRangeChange.setup(this._objectReferenceValue, newReferenceRange);
+					action.add(referenceRangeChange);
+					
+					var valueUIUpdate:ValueUIUpdate = ValueUIUpdate.fromPool();
+					valueUIUpdate.setup(this._exposedValue);
+					action.addPost(valueUIUpdate);
+					
+					ValEditor.actionStack.add(action);
+				}
+			}
+			else
+			{
+				this._objectReferenceValue._referenceRange = newReferenceRange;
+			}
+		}
+	}
+	
+	private function objectSelected(object:ValEditorObject):Void
 	{
 		if (this._exposedValue.useActions)
 		{
