@@ -25,6 +25,8 @@ import openfl.ui.Keyboard;
 import valedit.ExposedCollection;
 import valedit.events.ValueEvent;
 import valeditor.ValEditorObject;
+import valeditor.ValEditorObjectLibrary;
+import valeditor.events.LoadEvent;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.renderers.ClassItemRenderer;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -38,6 +40,10 @@ import valeditor.ui.feathers.window.base.PanelWindow;
 class ObjectCreationWindow extends PanelWindow 
 {
 	public var cancelCallback(get, set):Void->Void;
+	public var confirmCallback(get, set):ValEditorObject->Void;
+	public var library(get, set):ValEditorObjectLibrary;
+	public var title(get, set):String;
+	
 	private var _cancelCallback:Void->Void;
 	private function get_cancelCallback():Void->Void { return this._cancelCallback; }
 	private function set_cancelCallback(value:Void->Void):Void->Void
@@ -45,7 +51,6 @@ class ObjectCreationWindow extends PanelWindow
 		return this._cancelCallback = value;
 	}
 	
-	public var confirmCallback(get, set):ValEditorObject->Void;
 	private var _confirmCallback:ValEditorObject->Void;
 	private function get_confirmCallback():ValEditorObject->Void { return this._confirmCallback; }
 	private function set_confirmCallback(value:ValEditorObject->Void):ValEditorObject->Void
@@ -53,7 +58,13 @@ class ObjectCreationWindow extends PanelWindow
 		return this._confirmCallback = value;
 	}
 	
-	public var title(get, set):String;
+	private var _library:ValEditorObjectLibrary;
+	private function get_library():ValEditorObjectLibrary { return this._library; }
+	private function set_library(value:ValEditorObjectLibrary):ValEditorObjectLibrary
+	{
+		return this._library = value;
+	}
+	
 	private var _title:String = "";
 	private function get_title():String { return this._title; }
 	private function set_title(value:String):String
@@ -106,6 +117,8 @@ class ObjectCreationWindow extends PanelWindow
 	{
 		super();
 		initializeNow();
+		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 	}
 	
 	override function initialize():Void 
@@ -315,7 +328,16 @@ class ObjectCreationWindow extends PanelWindow
 		}
 		else if (this._idInput.text != "")
 		{
-			if (this._valEditorClass.objectIDExists(this._idInput.text))
+			//if (this._valEditorClass.objectIDExists(this._idInput.text))
+			//{
+				//isValid = false;
+				//this._idInput.errorString = "ID already in use";
+			//}
+			//else
+			//{
+				//this._idInput.errorString = null;
+			//}
+			if (this._library != null && this._library.hasObjectWithID(this._idInput.text))
 			{
 				isValid = false;
 				this._idInput.errorString = "ID already in use";
@@ -335,6 +357,16 @@ class ObjectCreationWindow extends PanelWindow
 			isValid = this._constructorCollection.validateConstructor();
 		}
 		this._confirmButton.enabled = isValid;
+	}
+	
+	private function onAddedToStage(evt:Event):Void
+	{
+		ValEditor.actionStack.pushSession();
+	}
+	
+	private function onRemovedFromStage(evt:Event):Void
+	{
+		ValEditor.actionStack.popSession();
 	}
 	
 	private function onCategoryChange(evt:Event):Void
@@ -407,11 +439,27 @@ class ObjectCreationWindow extends PanelWindow
 		//action.setup(template);
 		//ValEditor.actionStack.add(action);
 		
-		var object:ValEditorObject = ValEditor.createObjectWithClassName(this._valEditorClass.className, id, constructorCollection != null ? constructorCollection.toValueArray() : null);
+		var object:ValEditorObject = ValEditor.createObjectWithClassName(this._valEditorClass.className, null, constructorCollection != null ? constructorCollection.toValueArray() : null, null, id);
 		object.constructorCollection = constructorCollection;
 		
+		if (object.isLoaded)
+		{
+			FeathersWindows.closeWindow(this);
+			this._confirmCallback(object);
+		}
+		else
+		{
+			object.addEventListener(LoadEvent.COMPLETE, onObjectLoadComplete);
+			FeathersWindows.showActivityWindow("Creating object");
+		}
+	}
+	
+	private function onObjectLoadComplete(evt:LoadEvent):Void
+	{
+		var object:ValEditorObject = evt.target;
+		object.removeEventListener(LoadEvent.COMPLETE, onObjectLoadComplete);
+		FeathersWindows.hideActivityWindow();
 		FeathersWindows.closeWindow(this);
-		//if (this._confirmCallback != null) this._confirmCallback(object);
 		this._confirmCallback(object);
 	}
 	
