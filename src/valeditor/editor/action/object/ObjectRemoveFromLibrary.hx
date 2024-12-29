@@ -65,7 +65,7 @@ class ObjectRemoveFromLibrary extends ValEditorAction
 			throw new Error("ObjectRemoveFromLibrary already applied");
 		}
 		
-		this.container.removeObjectFromLibrary(this.object);
+		this.container.objectLibrary.removeObject(this.object);
 		this.status = ValEditorActionStatus.DONE;
 	}
 	
@@ -76,7 +76,7 @@ class ObjectRemoveFromLibrary extends ValEditorAction
 			throw new Error("ObjectRemoveFromLibrary already cancelled");
 		}
 		
-		this.container.addObjectToLibrary(this.object);
+		this.container.objectLibrary.addObject(this.object);
 		this.status = ValEditorActionStatus.UNDONE;
 	}
 	
