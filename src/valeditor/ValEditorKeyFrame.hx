@@ -538,7 +538,7 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 			}
 			else
 			{
-				object = this.timeLine.container.getObjectFromLibrary(node.objectID != null ? node.objectID : node.id);
+				object = this.timeLine.container.objectLibrary.getObject(node.objectID != null ? node.objectID : node.id);
 				collection = object.clss.getCollection();
 				collection.readFromObject(object.object);
 				collection.fromJSONSave(node.collection);
