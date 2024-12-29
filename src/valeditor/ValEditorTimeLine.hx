@@ -12,6 +12,10 @@ import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.keyframe.KeyFrameCopyObjectsFrom;
 import valeditor.editor.action.keyframe.KeyFrameCreate;
 import valeditor.editor.action.keyframe.KeyFrameDestroy;
+import valeditor.editor.action.timeline.TimeLineEventInsertFrame;
+import valeditor.editor.action.timeline.TimeLineEventInsertKeyFrame;
+import valeditor.editor.action.timeline.TimeLineEventRemoveFrame;
+import valeditor.editor.action.timeline.TimeLineEventRemoveKeyFrame;
 import valeditor.editor.action.timeline.TimeLineFrameUpdateAll;
 import valeditor.editor.action.timeline.TimeLineRegisterKeyFrame;
 import valeditor.editor.action.timeline.TimeLineSetFrame;
@@ -912,6 +916,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		{
 			this.frameCollection.updateAll();
 			updateLastFrameIndex();
+			TimeLineEvent.dispatch(this, TimeLineEvent.INSERT_FRAME);
 		}
 		else
 		{
@@ -922,6 +927,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 			timeLineUpdateLastFrameIndex = TimeLineUpdateLastFrameIndex.fromPool();
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
+			
+			var timeLineEventInsertFrame:TimeLineEventInsertFrame = TimeLineEventInsertFrame.fromPool();
+			timeLineEventInsertFrame.setup(this);
+			action.addPost(timeLineEventInsertFrame);
 		}
 	}
 	
@@ -1224,8 +1233,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		if (action == null)
 		{
 			this.frameCollection.updateAll();
-			
 			updateLastFrameIndex();
+			TimeLineEvent.dispatch(this, TimeLineEvent.INSERT_KEYFRAME);
 		}
 		else
 		{
@@ -1236,6 +1245,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 			timeLineUpdateLastFrameIndex = TimeLineUpdateLastFrameIndex.fromPool();
 			timeLineUpdateLastFrameIndex.setup(this);
 			action.addPost(timeLineUpdateLastFrameIndex);
+			
+			var timeLineEventInsertKeyFrame:TimeLineEventInsertKeyFrame = TimeLineEventInsertKeyFrame.fromPool();
+			timeLineEventInsertKeyFrame.setup(this);
+			action.addPost(timeLineEventInsertKeyFrame);
 		}
 	}
 	
@@ -1277,6 +1290,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					this.frameCollection.updateAll();
 					
 					updateLastFrameIndex();
+					
+					TimeLineEvent.dispatch(this, TimeLineEvent.REMOVE_FRAME);
 				}
 				else
 				{
@@ -1284,6 +1299,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					var timeLineSetFrameCurrent:TimeLineSetFrameCurrent;
 					var timeLineFrameUpdateAll:TimeLineFrameUpdateAll;
 					var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
+					var timeLineEventRemoveFrame:TimeLineEventRemoveFrame;
 					
 					// remove frame
 					timeLineSetFrame = TimeLineSetFrame.fromPool();
@@ -1311,6 +1327,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					timeLineUpdateLastFrameIndex = TimeLineUpdateLastFrameIndex.fromPool();
 					timeLineUpdateLastFrameIndex.setup(this);
 					action.addPost(timeLineUpdateLastFrameIndex);
+					
+					timeLineEventRemoveFrame = TimeLineEventRemoveFrame.fromPool();
+					timeLineEventRemoveFrame.setup(this);
+					action.addPost(timeLineEventRemoveFrame);
 				}
 			}
 			
@@ -1368,6 +1388,8 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					this.frameCollection.updateAll();
 					
 					updateLastFrameIndex();
+					
+					TimeLineEvent.dispatch(this, TimeLineEvent.REMOVE_KEYFRAME);
 				}
 				else
 				{
@@ -1377,6 +1399,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					var timeLineSetFrameCurrent:TimeLineSetFrameCurrent;
 					var timeLineFrameUpdateAll:TimeLineFrameUpdateAll;
 					var timeLineUpdateLastFrameIndex:TimeLineUpdateLastFrameIndex;
+					var timeLineEventRemoveKeyFrame:TimeLineEventRemoveKeyFrame;
 					
 					// look for previous keyframe
 					keyFrame = getPreviousKeyFrame(this._frameCurrent);
@@ -1429,6 +1452,10 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 					timeLineUpdateLastFrameIndex = TimeLineUpdateLastFrameIndex.fromPool();
 					timeLineUpdateLastFrameIndex.setup(this);
 					action.addPost(timeLineUpdateLastFrameIndex);
+					
+					timeLineEventRemoveKeyFrame = TimeLineEventRemoveKeyFrame.fromPool();
+					timeLineEventRemoveKeyFrame.setup(this);
+					action.addPost(timeLineEventRemoveKeyFrame);
 				}
 			}
 			
