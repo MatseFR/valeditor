@@ -69,6 +69,10 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 	public var creationInitFunction:Function;
 	/** Void->Void object function name, to be called on object creation. */
 	public var creationInitFunctionName:String;
+	/** Name of the event to listen for after creating the object to know when it's ready to use, if any */
+	public var creationReadyEventName:String;
+	/** Name of the object's function to call with a callback after creating the object to know when it's ready to use, if any */
+	public var creationReadyRegisterFunctionName:String;
 	/** Dynamic->Void external function reference, to be called on object destruction. */
 	public var disposeFunction:Function;
 	/** Void->Void object function name, to be called on object destruction. */
@@ -253,6 +257,8 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		this.creationFunctionForTemplateInstance = null;
 		this.creationInitFunction = null;
 		this.creationInitFunctionName = null;
+		this.creationReadyEventName = null;
+		this.creationReadyRegisterFunctionName = null;
 		this.disposeFunction = null;
 		this.disposeFunctionName = null;
 		this.exportClassName = null;
