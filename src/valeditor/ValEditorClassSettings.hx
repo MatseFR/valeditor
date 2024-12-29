@@ -50,8 +50,12 @@ class ValEditorClassSettings
 	 *  make sure the function's signature matches the constructorCollection (if any) */
 	public var creationFunction:Function;
 	
+	/** If not null, this function will be used to create an object from this class while ValEditor is loading a saved file. 
+	 * The function's signature has to match the constructorCollection. */
 	public var creationFunctionForLoading:Function;
 	
+	/** If not null, this function will be used to create a template instance object from this class (taking priority over creationFunction in this case).
+	 * The function's signature has to match the constructorCollection. */
 	public var creationFunctionForTemplateInstance:Function;
 	
 	/** external/static function of type Dynamic->Void to call on object creation */
@@ -59,6 +63,12 @@ class ValEditorClassSettings
 	
 	/** name of the object's function to call on object creation */
 	public var creationInitFunctionName:String;
+	
+	/** Name of the event to listen for after creating the object to know when it's ready to use, if any */
+	public var creationReadyEventName:String;
+	
+	/** Name of the object's function to call with a callback after creating the object to know when it's ready to use, if any */
+	public var creationReadyRegisterFunctionName:String;
 	
 	/** external/static function of type Dynamic->Void to call on object destruction */
 	public var disposeFunction:Function;
@@ -146,6 +156,8 @@ class ValEditorClassSettings
 		this.creationFunctionForTemplateInstance = null;
 		this.creationInitFunction = null;
 		this.creationInitFunctionName = null;
+		this.creationReadyEventName = null;
+		this.creationReadyRegisterFunctionName = null;
 		this.disposeFunction = null;
 		this.disposeFunctionName = null;
 		this.exportClassName = null;
