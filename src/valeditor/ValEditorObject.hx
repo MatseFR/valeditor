@@ -15,6 +15,7 @@ import valeditor.editor.action.ValEditorAction;
 import valeditor.editor.change.IChangeUpdate;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
+import valeditor.events.LoadEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
 import valeditor.events.RenameEvent;
@@ -46,6 +47,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var constructorCollection(get, set):ExposedCollection;
 	/** The container for this object, if any */
 	public var container(get, set):IContainerEditable;
+	/** Name of the event to listen for after creating the object to know when it's ready to use, if any */
+	public var creationReadyEventName:String;
+	/** Name of the object's function to call with a callback after creating the object to know when it's ready to use, if any */
+	public var creationReadyRegisterFunctionName:String;
 	/** The current collection for this object, it can either be on related to a keyframe or the default one. */
 	public var currentCollection(default, null):ExposedCollection;
 	/** The current keyframe for this object, if any */
@@ -81,6 +86,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	 * Note that 'isContainerOpenFL' and 'isContainerStarling' can be both true in the case of a mixed container. */
 	public var isContainerStarling:Bool;
 	#end
+	/** Tells wether this objet is created asynchronously (or requires some loading) */
+	public var isCreationAsync(get, never):Bool;
 	/** Tells whether this object is a display object (OpenFL or Starling) or not. */
 	public var isDisplayObject:Bool;
 	/** Tells whether this object is an OpenFL display object or not. */
@@ -97,6 +104,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var isInLibrary:Bool;
 	/** Tells whether this object is in pool or not. */
 	public var isInPool(get, never):Bool;
+	public var isLoaded(default, null):Bool = true;
 	/** Tells whether this object received a mouse down (openfl) or begin touch (starling) event. This is used by ValEditorContainerController when moving objects around.
 	 * Note that this only applies to display objects and containers. */
 	public var isMouseDown:Bool;
@@ -245,6 +253,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return this._interactiveObject = value;
 	}
 	
+	private function get_isCreationAsync():Bool { return !this.isExternal && (this.creationReadyEventName != null || this.creationReadyRegisterFunctionName != null); }
+	
 	private var _isInPool:Bool = false;
 	private function get_isInPool():Bool { return this._isInPool; }
 	
@@ -366,6 +376,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.addToDisplayFunction = null;
 		this._boundsFunction = null;
 		this.container = null;
+		this.creationReadyEventName = null;
+		this.creationReadyRegisterFunctionName = null;
 		this.getBoundsFunctionName = "getBounds";
 		this.hasPivotProperties = false;
 		this.hasScaleProperties = false;
@@ -384,6 +396,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this.isExternal = false;
 		this.isInClipboard = false;
 		this.isInLibrary = false;
+		this.isLoaded = true;
 		this.isMouseDown = false;
 		this.isSelectable = true;
 		this.isSuspended = false;
@@ -414,7 +427,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		clear();
 		// DEBUG
 		// TODO : remove when no longer useful
-		if (_POOL.indexOf(this) != -1)
+		if (this._isInPool)
 		{
 			throw new Error("ValEditorObject.pool ::: object already in pool");
 		}
@@ -964,6 +977,34 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		return Reflect.callMethod(this.object, this._boundsFunction, [targetSpace]);
 	}
 	
+	public function loadSetup():Void
+	{
+		this.isLoaded = false;
+		if (this.creationReadyEventName != null)
+		{
+			this.object.addEventListener(this.creationReadyEventName, onObjectLoadedEvent);
+		}
+		else if (this.creationReadyRegisterFunctionName != null)
+		{
+			Reflect.callMethod(this.object, Reflect.getProperty(this.object, this.creationReadyRegisterFunctionName), [onObjectLoadedCallback]);
+		}
+	}
+	
+	private function onObjectLoadedCallback(obj:Dynamic = null):Void
+	{
+		this.isLoaded = true;
+		ready();
+		LoadEvent.dispatch(this, LoadEvent.COMPLETE);
+	}
+	
+	private function onObjectLoadedEvent(evt:Dynamic):Void
+	{
+		this.object.removeEventListener(this.creationReadyEventName, onObjectLoadedEvent);
+		this.isLoaded = true;
+		ready();
+		LoadEvent.dispatch(this, LoadEvent.COMPLETE);
+	}
+	
 	/**
 	   Called after loading a saved file is complete. This is meant to handle reference values.
 	**/
@@ -1024,18 +1065,6 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 			json.objectID = this._objectID;
 		}
 		
-		//if (this._defaultCollection != null && this.numKeyFrames == 0)
-		//{
-			//if (this.template != null)
-			//{
-				//json.templateID = this.template.id;
-				//json.defaultCollection = this._defaultCollection.toJSONSave(null, false, this.template.collection);
-			//}
-			//else
-			//{
-				//json.defaultCollection = this._defaultCollection.toJSONSave();
-			//}
-		//}
 		if (this.template != null)
 		{
 			json.templateID = this.template.id;
