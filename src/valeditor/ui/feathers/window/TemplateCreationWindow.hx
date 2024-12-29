@@ -105,6 +105,8 @@ class TemplateCreationWindow extends Panel
 	{
 		super();
 		initializeNow();
+		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 	}
 	
 	override function initialize():Void 
@@ -330,6 +332,16 @@ class TemplateCreationWindow extends Panel
 		}
 		this._constructorDefaultsButton.enabled = this._constructorCollection != null;
 		this._confirmButton.enabled = isValid;
+	}
+	
+	private function onAddedToStage(evt:Event):Void
+	{
+		ValEditor.actionStack.pushSession();
+	}
+	
+	private function onRemovedFromStage(evt:Event):Void
+	{
+		ValEditor.actionStack.popSession();
 	}
 	
 	private function onCategoryChange(evt:Event):Void
