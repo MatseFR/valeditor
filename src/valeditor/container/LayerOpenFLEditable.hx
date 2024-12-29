@@ -200,7 +200,7 @@ class LayerOpenFLEditable extends EventDispatcher implements ITimeLineLayerEdita
 		}
 	}
 	
-	public function canAddObject():Bool
+	public function canAddObject(object:ValEditorObject):Bool
 	{
 		return this.timeLine.frameCurrent != null && (!this.timeLine.frameCurrent.tween || this.timeLine.frameCurrent.indexCurrent == this.timeLine.frameCurrent.indexStart);
 	}

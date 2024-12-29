@@ -1,5 +1,6 @@
 package valeditor.container;
 import openfl.events.IEventDispatcher;
+import valeditor.ValEditorObject;
 import valeditor.ValEditorTimeLine;
 import valeditor.container.ITimeLineContainerEditable;
 
@@ -19,7 +20,7 @@ interface ITimeLineLayerEditable extends IEventDispatcher
 	
 	function clear():Void;
 	function pool():Void;
-	function canAddObject():Bool;
+	function canAddObject(object:ValEditorObject):Bool;
 	function addObject(object:ValEditorObject):Void;
 	function removeObject(object:ValEditorObject):Void;
 	function getAllObjects(?objects:Array<ValEditorObject>):Array<ValEditorObject>;
