@@ -10,6 +10,7 @@ import valedit.asset.BitmapAsset;
 import valedit.asset.SoundAsset;
 import valedit.asset.TextAsset;
 import valeditor.ValEditorObject;
+import valeditor.ValEditorObjectLibrary;
 import valeditor.ValEditorTemplate;
 import valeditor.container.ITimeLineLayerEditable;
 import valeditor.editor.settings.EditorSettings;
@@ -20,6 +21,7 @@ import valeditor.editor.visibility.ClassVisibilityCollection;
 import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.ui.InteractiveObjectController;
 import valeditor.ui.feathers.theme.ValEditorTheme;
+import valeditor.ui.feathers.window.ActivityWindow;
 import valeditor.ui.feathers.window.ClassVisibilitiesWindow;
 import valeditor.ui.feathers.window.ClassVisibilityWindow;
 import valeditor.ui.feathers.window.CreditsWindow;
@@ -62,6 +64,8 @@ class FeathersWindows
 	static public var isWindowOpen(get, never):Bool;
 	
 	static private function get_isWindowOpen():Bool { return _windowList.length != 0; }
+	
+	static private var _activityWindow:ActivityWindow;
 	
 	// Assets
 	static private var _assetBrowser:AssetBrowser;
@@ -174,6 +178,28 @@ class FeathersWindows
 	static private function getSmallWindowHeight():Float
 	{
 		return Lib.current.stage.stageHeight * 0.33;
+	}
+	
+	static public function showActivityWindow(title:String):Void
+	{
+		if (_activityWindow == null)
+		{
+			_activityWindow = new ActivityWindow();
+		}
+		
+		_activityWindow.title = title;
+		
+		_activityWindow.width = getSmallWindowWidth();
+		_activityWindow.validateNow();
+		
+		openWindow(_activityWindow);
+	}
+	
+	static public function hideActivityWindow():Void
+	{
+		if (_activityWindow == null) return;
+		
+		closeWindow(_activityWindow);
 	}
 	
 	static public function showAssetBrowser():Void
@@ -500,7 +526,7 @@ class FeathersWindows
 		openWindow(_objectAdd);
 	}
 	
-	static public function showObjectCreationWindow(confirmCallback:ValEditorObject->Void, ?cancelCallback:Void->Void, title:String = "Create Object"):Void
+	static public function showObjectCreationWindow(confirmCallback:ValEditorObject->Void, ?cancelCallback:Void->Void, library:ValEditorObjectLibrary = null, title:String = "Create Object"):Void
 	{
 		if (_objectCreate == null)
 		{
@@ -510,6 +536,7 @@ class FeathersWindows
 		_objectCreate.title = title;
 		_objectCreate.confirmCallback = confirmCallback;
 		_objectCreate.cancelCallback = cancelCallback;
+		_objectCreate.library = library;
 		_objectCreate.reset();
 		
 		_objectCreate.width = getMediumWindowWidth();
