@@ -10,6 +10,7 @@ import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
 import valedit.events.PlayEvent;
 import valeditor.ValEditorObject;
+import valeditor.ValEditorObjectLibrary;
 import valeditor.ValEditorTimeLine;
 import valeditor.editor.data.ContainerSaveData;
 import valeditor.events.ContainerEvent;
@@ -59,23 +60,18 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	public var hasInvisibleLayer(get, never):Bool;
 	public var hasLockedLayer(get, never):Bool;
 	public var height(get, set):Float;
+	public var isLoaded(get, never):Bool;
 	public var isOpen(get, never):Bool;
 	public var isPlaying(get, never):Bool;
 	public var isReverse(get, never):Bool;
 	public var juggler(get, set):Juggler;
 	public var lastFrameIndex(get, never):Int;
-	//#if SWC
-	//public var layerCollection(get, never):ArrayCollection<ITimeLineLayerEditable>;
-	//private var _layerCollection:ArrayCollection<ITimeLineLayerEditable> = new ArrayCollection<ITimeLineLayerEditable>();
-	//private function get_layerCollection():ArrayCollection<ITimeLineLayerEditable> { return this._layerCollection; }
-	//#else
 	public var layerCollection(default, null):ArrayCollection<ITimeLineLayerEditable> = new ArrayCollection<ITimeLineLayerEditable>();
-	//#end
-	public var libraryObjectsCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	public var loop(get, set):Bool;
 	public var numFrames(get, set):Int;
 	public var numLayers(get, never):Int;
 	public var numLoops(get, set):Int;
+	public var objectLibrary(default, null):ValEditorObjectLibrary = new ValEditorObjectLibrary();
 	public var parent(get, never):DisplayObjectContainer;
 	/** reverse animation on every odd loop */
 	public var reverse(get, set):Bool;
@@ -83,20 +79,8 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	public var rotation(get, set):Float;
 	public var scaleX(get, set):Float;
 	public var scaleY(get, set):Float;
-	//#if SWC
-	//public var selectedLayers(get, never):Array<ITimeLineLayerEditable>;
-	//private var _selectedLayers:Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
-	//private function get_selectedLayers():Array<ITimeLineLayerEditable> { return this._selectedLayers; }
-	//#else
 	public var selectedLayers(default, null):Array<ITimeLineLayerEditable> = new Array<ITimeLineLayerEditable>();
-	//#end
-	//#if SWC
-	//public var timeLine(get, never):ValEditorTimeLine;
-	//private var _timeLine:ValEditorTimeLine;
-	//private function get_timeLine():ValEditorTimeLine { return this._timeLine; }
-	//#else
 	public var timeLine(default, null):ValEditorTimeLine;
-	//#end
 	public var viewCenterX(get, set):Float;
 	public var viewCenterY(get, set):Float;
 	public var viewHeight(get, set):Float;
@@ -188,6 +172,8 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	{
 		return this._container.height = value;
 	}
+	
+	private function get_isLoaded():Bool { return this.objectLibrary.isLoaded; }
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
@@ -338,26 +324,21 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	
 	private var _allObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _activeObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
-	private var _libraryObjects:Map<String, ValEditorObject> = new Map<String, ValEditorObject>();
 	private var _objectToLayer:ObjectMap<ValEditorObject, ITimeLineLayerEditable> = new ObjectMap<ValEditorObject, ITimeLineLayerEditable>();
 	
 	public function new() 
 	{
 		super();
 		
-		//#if SWC
-		//this._timeLine = new ValEditorTimeLine(0);
-		//#else
 		this.timeLine = new ValEditorTimeLine(0);
 		this.timeLine.container = this;
-		//#end
 		this.timeLine.addEventListener(PlayEvent.PLAY, onPlay);
 		this.timeLine.addEventListener(PlayEvent.STOP, onStop);
 	}
 	
 	public function clear():Void
 	{
-		clearLibrary();
+		this.objectLibrary.clear();
 		this.timeLine.clear();
 		
 		for (layer in this._layers)
@@ -374,7 +355,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		this.layerCollection.removeAll();
 		this.activeObjectsCollection.removeAll();
 		this.allObjectsCollection.removeAll();
-		this.libraryObjectsCollection.removeAll();
 		
 		this.viewCenterX = 0;
 		this.viewCenterY = 0;
@@ -399,15 +379,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		
 		this._allObjects.clear();
 		this._activeObjects.clear();
-		this._libraryObjects.clear();
-	}
-	
-	private function clearLibrary():Void
-	{
-		for (object in this.libraryObjectsCollection)
-		{
-			object.removeEventListener(RenameEvent.RENAMED, object_renamed);
-		}
 	}
 	
 	public function pool():Void
@@ -465,7 +436,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	
 	public function canAddObject(object:ValEditorObject):Bool
 	{
-		return this._currentLayer.canAddObject();
+		return this._currentLayer.canAddObject(object);
 	}
 	
 	public function hasActiveObject(objectID:String):Bool
@@ -713,27 +684,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		layer.timeLine.removeEventListener(KeyFrameEvent.TWEEN_CHANGE, keyFrame_tweenChange);
 	}
 	
-	public function addObjectToLibrary(object:ValEditorObject):Void
-	{
-		this._libraryObjects.set(object.objectID, object);
-		this.libraryObjectsCollection.add(object);
-		object.isInLibrary = true;
-		object.addEventListener(RenameEvent.RENAMED, object_renamed);
-	}
-	
-	public function getObjectFromLibrary(objectID:String):ValEditorObject
-	{
-		return this._libraryObjects.get(objectID);
-	}
-	
-	public function removeObjectFromLibrary(object:ValEditorObject):Void
-	{
-		this._libraryObjects.remove(object.objectID);
-		this.libraryObjectsCollection.remove(object);
-		object.isInLibrary = false;
-		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
-	}
-	
 	public function addObject(object:ValEditorObject):Void
 	{
 		this._currentLayer.addObject(object);
@@ -768,7 +718,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		
 		object.addEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.addEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
-		if (!object.isInLibrary) object.addEventListener(RenameEvent.RENAMED, object_renamed);
+		object.addEventListener(RenameEvent.RENAMED, object_renamed);
 		
 		object.container = this;
 		
@@ -783,7 +733,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		
 		object.removeEventListener(ObjectFunctionEvent.CALLED, object_functionCalled);
 		object.removeEventListener(ObjectPropertyEvent.CHANGE, object_propertyChange);
-		if (!object.isInLibrary) object.removeEventListener(RenameEvent.RENAMED, object_renamed);
+		object.removeEventListener(RenameEvent.RENAMED, object_renamed);
 		
 		object.container = null;
 		
@@ -892,13 +842,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 			this._activeObjects.remove(evt.previousNameOrID);
 			this._activeObjects.set(object.objectID, object);
 			this.activeObjectsCollection.updateAt(this.activeObjectsCollection.indexOf(object));
-		}
-		
-		if (this._libraryObjects.exists(evt.previousNameOrID))
-		{
-			this._libraryObjects.remove(evt.previousNameOrID);
-			this._libraryObjects.set(object.objectID, object);
-			this.libraryObjectsCollection.updateAt(this.libraryObjectsCollection.indexOf(object));
 		}
 	}
 	
