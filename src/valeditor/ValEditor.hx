@@ -1116,7 +1116,14 @@ class ValEditor
 			interactiveObjectController.register(valObject.interactiveObject);
 		}
 		
-		valObject.ready();
+		if (valObject.isCreationAsync)
+		{
+			valObject.loadSetup();
+		}
+		else
+		{
+			valObject.ready();
+		}
 		
 		registerObjectInternal(valObject);
 		
@@ -1161,6 +1168,8 @@ class ValEditor
 			valObject.isExternal = true;
 		}
 		
+		valObject.creationReadyEventName = valClass.creationReadyEventName;
+		valObject.creationReadyRegisterFunctionName = valClass.creationReadyRegisterFunctionName;
 		valObject.isContainer = valClass.isContainer;
 		valObject.isContainerOpenFL = valClass.isContainerOpenFL;
 		#if starling
@@ -1404,14 +1413,17 @@ class ValEditor
 	
 	static private function destroyObjectInternal(valObject:ValEditorObject):Void
 	{
-		if (valObject.clss.disposeFunctionName != null)
+		if (!valObject.isExternal)
 		{
-			var func:Function = Reflect.field(valObject.object, valObject.clss.disposeFunctionName);
-			Reflect.callMethod(valObject.object, func, []);
-		}
-		else if (valObject.clss.disposeFunction != null)
-		{
-			Reflect.callMethod(valObject.clss.disposeFunction, valObject.clss.disposeFunction, [valObject.object]);
+			if (valObject.clss.disposeFunctionName != null)
+			{
+				var func:Function = Reflect.field(valObject.object, valObject.clss.disposeFunctionName);
+				Reflect.callMethod(valObject.object, func, []);
+			}
+			else if (valObject.clss.disposeFunction != null)
+			{
+				Reflect.callMethod(valObject.clss.disposeFunction, valObject.clss.disposeFunction, [valObject.object]);
+			}
 		}
 		
 		if (valObject.template != null)
