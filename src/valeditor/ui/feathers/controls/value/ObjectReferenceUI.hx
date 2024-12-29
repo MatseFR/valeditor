@@ -288,7 +288,7 @@ class ObjectReferenceUI extends ValueUI
 				objectCollection = ValEditor.currentContainer.allObjectsCollection;
 			
 			case ReferenceRange.CONTAINER_LIBRARY :
-				objectCollection = ValEditor.currentContainer.libraryObjectsCollection;
+				objectCollection = ValEditor.currentContainer.objectLibrary.objectCollection;
 			
 			default :
 				throw new Error("unknown ReferenceRange : " + this._objectReferenceValue._referenceRange);
