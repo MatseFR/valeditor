@@ -482,8 +482,10 @@ class ValEditor
 	static public function newFile():Void
 	{
 		isNewFile = true;
-		//var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
-		//openContainer(rootObject);
+		#if !SWC
+		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
+		openContainer(rootObject);
+		#end
 	}
 	
 	static public function fileSaved():Void
@@ -497,7 +499,10 @@ class ValEditor
 	{
 		FeathersWindows.closeAll();
 		actionStack.clearSessions();
-		assetFileLoader.clear();
+		if (assetFileLoader != null)
+		{
+			assetFileLoader.clear();
+		}
 		selection.clear();
 		
 		closeAllContainers();
@@ -1969,7 +1974,7 @@ class ValEditor
 	
 	static public function fromJSONSave(json:Dynamic):Void
 	{
-		#if starling // TODO : remove starling hack
+		#if !SWC
 		isLoadingFile = true;
 		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
 		var container:ValEditorContainerRoot = rootObject.object;
