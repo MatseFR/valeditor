@@ -1,4 +1,5 @@
 package valeditor.container;
+import valeditor.ValEditorObject;
 
 #if starling
 import openfl.display.DisplayObjectContainer;
@@ -219,7 +220,7 @@ class LayerOpenFLStarlingEditable extends EventDispatcher implements ITimeLineLa
 		}
 	}
 	
-	public function canAddObject():Bool
+	public function canAddObject(object:ValEditorObject):Bool
 	{
 		return this.timeLine.frameCurrent != null && (!this.timeLine.frameCurrent.tween || this.timeLine.frameCurrent.indexCurrent == this.timeLine.frameCurrent.indexStart);
 	}

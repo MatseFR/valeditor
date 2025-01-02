@@ -26,26 +26,14 @@ class LayerOpenFLEditable extends EventDispatcher implements ITimeLineLayerEdita
 		return new LayerOpenFLEditable();
 	}
 	
-	//#if SWC
-	//public var allObjects(get, never):Array<ValEditorObject>;
-	//private var _allObjects:Array<ValEditorObject> = new Array<ValEditorObject>();
-	//private function get_allObjects():Array<ValEditorObject> { return this._allObjects; }
-	//#else
 	public var allObjects(default, null):Array<ValEditorObject> = new Array<ValEditorObject>();
-	//#end
 	public var container(get, set):ITimeLineContainerEditable;
 	public var index(get, set):Int;
 	public var locked(get, set):Bool;
 	public var name(get, set):String;
 	public var rootContainer(get, set):DisplayObjectContainer;
 	public var selected(get, set):Bool;
-	//#if SWC
-	//public var timeLine(get, never):ValEditorTimeLine;
-	//private var _timeLine:ValEditorTimeLine;
-	//private function get_timeLine():ValEditorTimeLine { return this._timeLine; }
-	//#else
 	public var timeLine(default, null):ValEditorTimeLine;
-	//#end
 	public var visible(get, set):Bool;
 	
 	private var _container:ITimeLineContainerEditable;
@@ -146,11 +134,7 @@ class LayerOpenFLEditable extends EventDispatcher implements ITimeLineLayerEdita
 	{
 		super();
 		
-		//#if SWC
-		//this._timeLine = ValEditorTimeLine.fromPool(0);
-		//#else
 		this.timeLine = ValEditorTimeLine.fromPool(0);
-		//#end
 		this.timeLine.activateFunction = this.activate;
 		this.timeLine.deactivateFunction = this.deactivate;
 		this.timeLine.addEventListener(KeyFrameEvent.OBJECT_ADDED, onKeyFrameObjectAdded);

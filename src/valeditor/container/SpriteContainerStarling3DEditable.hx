@@ -1,4 +1,6 @@
 package valeditor.container;
+import starling.display.BlendMode;
+import valeditor.ValEditorObjectLibrary;
 
 #if starling
 import feathers.data.ArrayCollection;
@@ -43,9 +45,11 @@ class SpriteContainerStarling3DEditable extends EventDispatcher implements ICont
 	public var containerStarling(get, never):starling.display.DisplayObjectContainer;
 	public var containerUI(default, null):DisplayObjectContainer = new Sprite();
 	public var height(get, set):Float;
+	public var isLoaded(get, never):Bool;
 	public var isOpen(get, never):Bool;
 	public var mask(get, set):starling.display.DisplayObject;
 	public var maskInverted(get, set):Bool;
+	public var objectLibrary(default, null):ValEditorObjectLibrary = new ValEditorObjectLibrary();
 	public var parent(get, never):starling.display.DisplayObjectContainer;
 	public var pivotX(get, set):Float;
 	public var pivotY(get, set):Float;
@@ -104,6 +108,8 @@ class SpriteContainerStarling3DEditable extends EventDispatcher implements ICont
 	{
 		return this._containerStarling.height = value;
 	}
+	
+	private function get_isLoaded():Bool { return this.objectLibrary.isLoaded; }
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
@@ -297,6 +303,8 @@ class SpriteContainerStarling3DEditable extends EventDispatcher implements ICont
 	
 	public function clear():Void
 	{
+		this.objectLibrary.clear();
+		
 		var object:ValEditorObject;
 		for (i in new ReverseIterator(this._objects.length - 1, 0))
 		{
@@ -310,6 +318,25 @@ class SpriteContainerStarling3DEditable extends EventDispatcher implements ICont
 		
 		this.activeObjectsCollection.removeAll();
 		this.allObjectsCollection.removeAll();
+		
+		this._allObjects.clear();
+		this._displayObjects.resize(0);
+		this._objects.resize(0);
+		
+		this.alpha = 1.0;
+		this.blendMode = BlendMode.NORMAL;
+		this.cameraX = 0;
+		this.cameraY = 0;
+		this.rotationX = 0;
+		this.rotationY = 0;
+		this.rotationZ = 0;
+		this.scaleX = 1.0;
+		this.scaleY = 1.0;
+		this.scaleZ = 1.0;
+		this.visible = true;
+		this.x = 0;
+		this.y = 0;
+		this.z = 0;
 	}
 	
 	public function pool():Void

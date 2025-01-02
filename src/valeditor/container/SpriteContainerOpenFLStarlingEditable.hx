@@ -1,4 +1,5 @@
 package valeditor.container;
+import valeditor.ValEditorObjectLibrary;
 
 #if starling
 import feathers.data.ArrayCollection;
@@ -43,7 +44,9 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 	public var containerStarling(get, never):starling.display.DisplayObjectContainer;
 	public var containerUI(default, null):DisplayObjectContainer = new Sprite();
 	public var height(get, set):Float;
+	public var isLoaded(get, never):Bool;
 	public var isOpen(get, never):Bool;
+	public var objectLibrary(default, null):ValEditorObjectLibrary = new ValEditorObjectLibrary();
 	public var parent(get, never):DisplayObjectContainer;
 	public var rootContainer(get, set):DisplayObjectContainer;
 	public var rootContainerStarling(get, set):starling.display.DisplayObjectContainer;
@@ -107,6 +110,8 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 		this.scaleY = value / h;
 		return value;
 	}
+	
+	private function get_isLoaded():Bool { return this.objectLibrary.isLoaded; }
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
@@ -254,6 +259,8 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 	
 	public function clear():Void
 	{
+		this.objectLibrary.clear();
+		
 		var object:ValEditorObject;
 		for (i in new ReverseIterator(this._objects.length - 1, 0))
 		{
@@ -267,6 +274,21 @@ class SpriteContainerOpenFLStarlingEditable extends EventDispatcher implements I
 		
 		this.activeObjectsCollection.removeAll();
 		this.allObjectsCollection.removeAll();
+		
+		this._allObjects.clear();
+		this._displayObjects.resize(0);
+		this._objects.resize(0);
+		
+		this.alpha = 1.0;
+		this.blendMode = BlendMode.NORMAL;
+		this.cameraX = 0;
+		this.cameraY = 0;
+		this.rotation = 0;
+		this.scaleX = 1.0;
+		this.scaleY = 1.0;
+		this.visible = true;
+		this.x = 0;
+		this.y = 0;
 	}
 	
 	public function pool():Void

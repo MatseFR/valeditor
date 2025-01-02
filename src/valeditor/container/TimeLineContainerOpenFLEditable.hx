@@ -379,6 +379,7 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		
 		this._allObjects.clear();
 		this._activeObjects.clear();
+		this._objectToLayer.clear();
 	}
 	
 	public function pool():Void

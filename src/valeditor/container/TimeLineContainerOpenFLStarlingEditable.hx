@@ -1,4 +1,5 @@
 package valeditor.container;
+import valeditor.ValEditorObjectLibrary;
 #if starling
 import feathers.data.ArrayCollection;
 import haxe.ds.ObjectMap;
@@ -68,6 +69,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	public var hasInvisibleLayer(get, never):Bool;
 	public var hasLockedLayer(get, never):Bool;
 	public var height(get, set):Float;
+	public var isLoaded(get, never):Bool;
 	public var isOpen(get, never):Bool;
 	public var isPlaying(get, never):Bool;
 	public var isReverse(get, never):Bool;
@@ -78,6 +80,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	public var numFrames(get, set):Int;
 	public var numLayers(get, never):Int;
 	public var numLoops(get, set):Int;
+	public var objectLibrary(default, null):ValEditorObjectLibrary = new ValEditorObjectLibrary();
 	public var parent(get, never):DisplayObjectContainer;
 	/** reverse animation on every odd loop */
 	public var reverse(get, set):Bool;
@@ -193,6 +196,8 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		this.scaleY = value / h;
 		return value;
 	}
+	
+	private function get_isLoaded():Bool { return this.objectLibrary.isLoaded; }
 	
 	private var _isOpen:Bool = false;
 	private function get_isOpen():Bool { return this._isOpen; }
@@ -384,6 +389,9 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	
 	public function clear():Void
 	{
+		this.objectLibrary.clear();
+		this.timeLine.clear();
+		
 		for (layer in this._layers)
 		{
 			layerUnregister(layer);
@@ -393,14 +401,13 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		this._layerMap.clear();
 		this._currentLayer = null;
 		
-		this.timeLine.clear();
-		
 		this.rootContainer = null;
 		this.rootContainerStarling = null;
 		
 		this.layerCollection.removeAll();
 		this.activeObjectsCollection.removeAll();
 		this.allObjectsCollection.removeAll();
+		
 		this.viewCenterX = 0;
 		this.viewCenterY = 0;
 		this.viewWidth = 0;
@@ -425,6 +432,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		
 		this._allObjects.clear();
 		this._activeObjects.clear();
+		this._objectToLayer.clear();
 	}
 	
 	public function pool():Void 
@@ -495,7 +503,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	
 	public function canAddObject(object:ValEditorObject):Bool
 	{
-		return this._currentLayer.canAddObject();
+		return this._currentLayer.canAddObject(object);
 	}
 	
 	public function hasActiveObject(objectID:String):Bool
