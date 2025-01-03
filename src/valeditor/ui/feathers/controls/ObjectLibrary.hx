@@ -55,8 +55,16 @@ class ObjectLibrary extends LayoutGroup
 	
 	private function onEditorContainerCurrent(evt:EditorEvent):Void
 	{
-		this._allObjects.collection = ValEditor.currentContainer.allObjectsCollection;
-		this._activeObjects.collection = ValEditor.currentContainer.activeObjectsCollection;
+		if (ValEditor.currentContainer != null)
+		{
+			this._allObjects.collection = ValEditor.currentContainer.allObjectsCollection;
+			this._activeObjects.collection = ValEditor.currentContainer.activeObjectsCollection;
+		}
+		else
+		{
+			this._allObjects.collection = null;
+			this._activeObjects.collection = null;
+		}
 	}
 	
 }
