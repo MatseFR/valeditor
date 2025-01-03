@@ -47,6 +47,7 @@ class LayerOpenFLStarlingEditable extends EventDispatcher implements ITimeLineLa
 	private function get_container():ITimeLineContainerEditable { return this._container; }
 	private function set_container(value:ITimeLineContainerEditable):ITimeLineContainerEditable
 	{
+		this.timeLine.container = value;
 		return this._container = value;
 	}
 	
