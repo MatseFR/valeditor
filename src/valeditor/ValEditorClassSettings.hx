@@ -149,6 +149,8 @@ class ValEditorClassSettings
 		this.addToDisplayFunctionName = null;
 		this.canBeCreated = true;
 		this.categories.resize(0);
+		this.cloneFromFunctionName = null;
+		this.cloneToFunctionName = null;
 		this.collection = null;
 		this.constructorCollection = null;
 		this.creationFunction = null;
