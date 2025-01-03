@@ -339,7 +339,6 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 	public function clear():Void
 	{
 		this.objectLibrary.clear();
-		this.timeLine.clear();
 		
 		for (layer in this._layers)
 		{
@@ -349,6 +348,9 @@ class TimeLineContainerOpenFLEditable extends EventDispatcher implements IContai
 		this._layers.resize(0);
 		this._layerMap.clear();
 		this._currentLayer = null;
+		
+		this.timeLine.clear();
+		this.timeLine.container = this;
 		
 		this.rootContainer = null;
 		

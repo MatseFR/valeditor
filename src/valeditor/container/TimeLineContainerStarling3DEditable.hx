@@ -377,6 +377,7 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 	{
 		super();
 		this.timeLine = new ValEditorTimeLine(0);
+		this.timeLine.container = this;
 		this.timeLine.addEventListener(PlayEvent.PLAY, onPlay);
 		this.timeLine.addEventListener(PlayEvent.STOP, onStop);
 	}
@@ -384,7 +385,6 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 	public function clear():Void
 	{
 		this.objectLibrary.clear();
-		this.timeLine.clear();
 		
 		for (layer in this._layers)
 		{
@@ -394,6 +394,9 @@ class TimeLineContainerStarling3DEditable extends EventDispatcher implements ICo
 		this._layers.resize(0);
 		this._layerMap.clear();
 		this._currentLayer = null;
+		
+		this.timeLine.clear();
+		this.timeLine.container = this;
 		
 		this.rootContainer = null;
 		this.rootContainerStarling = null;

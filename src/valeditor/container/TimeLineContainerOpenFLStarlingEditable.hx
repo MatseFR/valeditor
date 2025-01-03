@@ -383,6 +383,7 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	{
 		super();
 		this.timeLine = new ValEditorTimeLine(0);
+		this.timeLine.container = this;
 		this.timeLine.addEventListener(PlayEvent.PLAY, onPlay);
 		this.timeLine.addEventListener(PlayEvent.STOP, onStop);
 	}
@@ -390,7 +391,6 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 	public function clear():Void
 	{
 		this.objectLibrary.clear();
-		this.timeLine.clear();
 		
 		for (layer in this._layers)
 		{
@@ -400,6 +400,9 @@ class TimeLineContainerOpenFLStarlingEditable extends EventDispatcher implements
 		this._layers.resize(0);
 		this._layerMap.clear();
 		this._currentLayer = null;
+		
+		this.timeLine.clear();
+		this.timeLine.container = this;
 		
 		this.rootContainer = null;
 		this.rootContainerStarling = null;
