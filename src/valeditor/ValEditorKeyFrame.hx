@@ -543,7 +543,7 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 				collection.readFromObject(object.object);
 				collection.fromJSONSave(node.collection);
 			}
-			collection.apply();
+			//collection.apply();
 			add(object, collection);
 		}
 		
