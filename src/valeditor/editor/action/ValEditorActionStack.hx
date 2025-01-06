@@ -72,6 +72,7 @@ class ValEditorActionStack extends EventDispatcher
 		}
 		this._sessions.resize(0);
 		this._sessionsMap.clear();
+		this.currentSession = null;
 	}
 	
 	public function addSession(session:ValEditorActionSession, makeCurrent:Bool = true):Void
