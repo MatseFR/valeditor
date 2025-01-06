@@ -1,13 +1,11 @@
 package valeditor.container;
-import starling.display.BlendMode;
-import valeditor.ValEditorObjectLibrary;
-
 #if starling
 import feathers.data.ArrayCollection;
 import openfl.display.DisplayObjectContainer;
 import openfl.display.Sprite;
 import openfl.events.EventDispatcher;
 import openfl.geom.Rectangle;
+import starling.display.BlendMode;
 import starling.display.Sprite3D;
 import valedit.utils.RegularPropertyName;
 import valedit.utils.ReverseIterator;
@@ -21,6 +19,7 @@ import valeditor.events.RenameEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.shape.PivotIndicator;
 import valeditor.utils.MathUtil;
+import valeditor.ValEditorObjectLibrary;
 
 /**
  * ...
