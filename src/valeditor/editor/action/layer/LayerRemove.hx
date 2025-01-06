@@ -101,6 +101,9 @@ class LayerRemove extends ValEditorAction
 			throw new Error("LayerRemove already applied");
 		}
 		
+		this._objectUnselect.apply();
+		this._action.apply();
+		
 		if (this.layerIndices.length == 0)
 		{
 			for (layer in this.layers)
@@ -118,9 +121,6 @@ class LayerRemove extends ValEditorAction
 		{
 			this.container.removeLayerAt(index);
 		}
-		
-		this._objectUnselect.apply();
-		this._action.apply();
 		
 		this.status = ValEditorActionStatus.DONE;
 	}
