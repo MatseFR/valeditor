@@ -781,7 +781,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 	   @param	parentValue
 	   @return
 	**/
-	public function addUIContainer(uiContainer:DisplayObjectContainer, object:Dynamic, collection:ExposedCollection = null, parentValue:ExposedValueWithCollection = null):ExposedCollection
+	public function addUIContainer(uiContainer:DisplayObjectContainer, object:Dynamic, collection:ExposedCollection = null, parentValue:ExposedValueWithCollection = null, checkForValEditorObject:Bool = true):ExposedCollection
 	{
 		if (collection == null)
 		{
@@ -794,7 +794,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 				collection = this.collection.clone();
 			}
 			this._collectionsToPool.set(collection, collection);
-			if (Std.isOfType(object, ValEditorObject))
+			if (checkForValEditorObject && Std.isOfType(object, ValEditorObject))
 			{
 				collection.readAndSetObject(cast(object, ValEditorObject).object);
 			}
