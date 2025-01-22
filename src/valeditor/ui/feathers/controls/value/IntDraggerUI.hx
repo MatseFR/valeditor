@@ -11,6 +11,7 @@ import feathers.layout.VerticalLayout;
 import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
+import openfl.ui.Keyboard;
 import valedit.value.base.ExposedValue;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
@@ -238,6 +239,11 @@ class IntDraggerUI extends ValueUI
 	
 	private function onDraggerKeyDown(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey) {
+			if (evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V) {
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
