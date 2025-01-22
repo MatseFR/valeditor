@@ -57,6 +57,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var currentKeyFrame(default, null):ValEditorKeyFrame;
 	/** The collection used as 'currentCollection' when the object is not associated with any keyframe or when 'currentKeyFrame' is null */
 	public var defaultCollection(get, set):ExposedCollection;
+	/** */
+	public var destroyOnCompletion:Bool = true;
 	/** Name of the 'getBounds' function for this object, if any */
 	public var getBoundsFunctionName(get, set):String;
 	/** returns true if this object has a 'getBounds' function, false otherwise.
@@ -137,6 +139,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var propertyMap:PropertyMap;
 	/** if not null this function is called when the object is removed from display */
 	public var removeFromDisplayFunction:Function;
+	/** */
+	public var restoreValuesOnCompletion:Bool = false;
 	/** Tells whether this object should be in saved file or not. */
 	public var save:Bool = true;
 	/** Reference to the SelectionBox instance set by ValEditorContainerController when this object is selected (null otherwise).
@@ -1032,8 +1036,22 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			this.objectID = json.objectID;
 		}
+		
+		if (json.destroyOnCompletion != null)
+		{
+			this.destroyOnCompletion = json.destroyOnCompletion;
+		}
+		if (json.restoreValuesOnCompletion != null)
+		{
+			this.restoreValuesOnCompletion = json.restoreValuesOnCompletion;
+		}
+		
 		if (json.constructorCollection != null)
 		{
+			//if (this.className == "tLotDClassic.gameObjects.platforms.FallingPlatform")
+			//{
+				//trace("debug");
+			//}
 			if (this._constructorCollection == null)
 			{
 				this.constructorCollection = this.clss.getConstructorCollection();
@@ -1064,6 +1082,8 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			json.objectID = this._objectID;
 		}
+		json.destroyOnCompletion = this.destroyOnCompletion;
+		json.restoreValuesOnCompletion = this.restoreValuesOnCompletion;
 		
 		if (this.template != null)
 		{
