@@ -956,6 +956,27 @@ class ValEditor
 		}
 	}
 	
+	static public function editValEditorObject(object:ValEditorObject, collection:ExposedCollection = null, container:DisplayObjectContainer = null):ExposedCollection
+	{
+		if (container == null) container = uiContainerDefault;
+		if (container == null)
+		{
+			throw new Error("ValEditor.editValEditorObject ::: null container");
+		}
+		
+		clearUIContainer(container);
+		
+		var valClass:ValEditorClass = getValEditorClassForClass(ValEditorObject);
+		
+		if (valClass == null)
+		{
+			throw new Error("ValEditor.editValEditorObject ::: ValEditorObject is not a registered class");
+		}
+		
+		_displayMap[container] = valClass;
+		return valClass.addUIContainer(container, object, collection, null, false);
+	}
+	
 	static public function editClassVisibilitiesEditor():Void
 	{
 		FeathersWindows.showClassVisibilitiesWindow(editorSettings.customClassVisibilities, classVisibilities, "Editor classes visibilities");
@@ -1166,11 +1187,16 @@ class ValEditor
 				valObject.object = Type.createInstance(valClass.classReference, params);
 			}
 			valObject.isExternal = false;
+			if (!isLoadingFile) 
+			{
+				valObject.destroyOnCompletion = true;
+			}
 		}
 		else
 		{
 			valObject.object = object;
 			valObject.isExternal = true;
+			valObject.destroyOnCompletion = false;
 		}
 		
 		valObject.creationReadyEventName = valClass.creationReadyEventName;
@@ -1646,6 +1672,7 @@ class ValEditor
 	static public function setupTimeLineContainer(container:ITimeLineContainerEditable):Void
 	{
 		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
+		container.frameRate = fileSettings.frameRateDefault;
 		container.numFrames = fileSettings.numFramesDefault;
 		container.frameIndex = 0;
 		var layer:ITimeLineLayerEditable = container.createLayer();
