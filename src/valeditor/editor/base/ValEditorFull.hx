@@ -35,6 +35,7 @@ import valedit.data.starling.text.StarlingTextData;
 import valedit.data.valedit.ShapeData;
 import valedit.data.valeditor.ContainerData;
 import valedit.data.valeditor.SettingsData;
+import valedit.data.valeditor.ValEditorObjectData;
 import valedit.object.openfl.display.ArcShape;
 import valedit.object.openfl.display.ArrowShape;
 import valedit.object.openfl.display.BurstShape;
@@ -50,6 +51,7 @@ import valedit.object.openfl.display.StarShape;
 import valedit.object.openfl.display.WedgeShape;
 import valeditor.ValEditorClassSettings;
 import valeditor.ValEditorKeyFrame;
+import valeditor.ValEditorObject;
 import valeditor.container.SpriteContainerOpenFLEditable;
 import valeditor.container.SpriteContainerOpenFLStarlingEditable;
 import valeditor.container.SpriteContainerStarling3DEditable;
@@ -1434,6 +1436,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		ValEditor.registerClass(ValEditorContainerRoot, settings);
 		settings.clear();
 		#end
+		
+		// ValEditorObject
+		ValEditor.registerClassSimple(ValEditorObject, false, ValEditorObjectData.exposeValEditorObject());
 		
 		// ValEditorKeyFrame
 		ValEditor.registerClassSimple(ValEditorKeyFrame, false, ContainerData.exposeValEditorKeyFrame());
