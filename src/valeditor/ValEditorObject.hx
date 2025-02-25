@@ -207,7 +207,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 			value.valEditorObject = this;
 			value.readFromObject(this.object);
 		}
-		if (this.currentCollection == null)
+		if (this.currentCollection == null && this.isLoaded)
 		{
 			setCurrentCollection(value);
 		}
@@ -996,15 +996,22 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	
 	private function onObjectLoadedCallback(obj:Dynamic = null):Void
 	{
-		this.isLoaded = true;
-		ready();
-		LoadEvent.dispatch(this, LoadEvent.COMPLETE);
+		objectLoaded();
 	}
 	
 	private function onObjectLoadedEvent(evt:Dynamic):Void
 	{
 		this.object.removeEventListener(this.creationReadyEventName, onObjectLoadedEvent);
+		objectLoaded();
+	}
+	
+	private function objectLoaded():Void
+	{
 		this.isLoaded = true;
+		if (this.currentCollection == null)
+		{
+			setCurrentCollection(this._defaultCollection);
+		}
 		ready();
 		LoadEvent.dispatch(this, LoadEvent.COMPLETE);
 	}
