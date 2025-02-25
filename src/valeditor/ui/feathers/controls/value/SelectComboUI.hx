@@ -180,6 +180,12 @@ class SelectComboUI extends ValueUI
 		
 		this._collection.removeAll();
 		this._valueToItem.clear();
+		if (this._combo.isConstructor && this._combo.choiceList.length == 0)
+		{
+			this._combo.retrieveChoiceList(this._combo.object);
+			this._combo.retrieveValueList(this._combo.object);
+		}
+		
 		var item:Dynamic;
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
