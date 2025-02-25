@@ -807,6 +807,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		if (this._debug) trace("input_focusOutHandler");
 		
 		//changeState(UP);
+		if (!this.liveTyping)
+		{
+			if (this._input.text != "" && this._input.text != "-")
+			{
+				this.value = restrictValue(Std.parseFloat(this._input.text));
+			}
+		}
 		ValueUIEvent.dispatch(this, ValueUIEvent.CHANGE_END);
 	}
 	
