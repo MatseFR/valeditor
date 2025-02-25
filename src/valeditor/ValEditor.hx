@@ -660,6 +660,8 @@ class ValEditor
 		v.creationFunctionForTemplateInstance = settings.creationFunctionForTemplateInstance;
 		v.creationInitFunction = settings.creationInitFunction;
 		v.creationInitFunctionName = settings.creationInitFunctionName;
+		v.creationReadyEventName = settings.creationReadyEventName;
+		v.creationReadyRegisterFunctionName = settings.creationReadyRegisterFunctionName;
 		v.disposeFunction = settings.disposeFunction;
 		v.disposeFunctionName = settings.disposeFunctionName;
 		v.exportClassName = settings.exportClassName;
