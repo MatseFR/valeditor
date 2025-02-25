@@ -314,7 +314,7 @@ class PathUI extends ValueUI
 		
 		if (this._action != null)
 		{
-			throw new Error("FloatDraggerUI ::: action should be null");
+			throw new Error("PathUI ::: action should be null");
 		}
 		
 		this._action = MultiAction.fromPool();
@@ -334,7 +334,7 @@ class PathUI extends ValueUI
 		
 		if (this._action == null)
 		{
-			throw new Error("FloatDraggerUI ::: action should not be null");
+			throw new Error("PathUI ::: action should not be null");
 		}
 		
 		this._valueChangeAction.newValue = this._exposedValue.value;
@@ -366,6 +366,13 @@ class PathUI extends ValueUI
 	
 	private function input_keyDownHandler(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey)
+		{
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V)
+			{
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
