@@ -240,7 +240,7 @@ class FloatDraggerUI extends ValueUI
 	private function onDraggerKeyDown(evt:KeyboardEvent):Void
 	{
 		if (evt.ctrlKey) {
-			if (evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V) {
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V) {
 				return;
 			}
 		}
