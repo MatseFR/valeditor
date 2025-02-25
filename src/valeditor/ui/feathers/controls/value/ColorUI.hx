@@ -431,6 +431,13 @@ class ColorUI extends ValueUI
 	
 	private function onRedDraggerKeyDown(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey)
+		{
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V)
+			{
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
@@ -447,6 +454,13 @@ class ColorUI extends ValueUI
 	
 	private function onGreenDraggerKeyDown(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey)
+		{
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V)
+			{
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
@@ -463,6 +477,13 @@ class ColorUI extends ValueUI
 	
 	private function onBlueDraggerKeyDown(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey)
+		{
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V)
+			{
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
@@ -558,6 +579,13 @@ class ColorUI extends ValueUI
 	
 	private function input_keyDownHandler(evt:KeyboardEvent):Void
 	{
+		if (evt.ctrlKey)
+		{
+			if (evt.keyCode == Keyboard.A || evt.keyCode == Keyboard.C || evt.keyCode == Keyboard.X || evt.keyCode == Keyboard.V)
+			{
+				return;
+			}
+		}
 		evt.stopPropagation();
 	}
 	
