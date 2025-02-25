@@ -83,6 +83,21 @@ class ValEditorObjectLibrary extends EventDispatcher
 		return this._objects[index];
 	}
 	
+	public function getObjectsWithClass(clss:Class<Dynamic>, objects:Array<ValEditorObject> = null):Array<ValEditorObject>
+	{
+		if (objects == null) objects = new Array<ValEditorObject>();
+		
+		for (object in this._objects)
+		{
+			if (Std.isOfType(object.object, clss))
+			{
+				objects[objects.length] = object;
+			}
+		}
+		
+		return objects;
+	}
+	
 	public function hasObject(object:ValEditorObject):Bool
 	{
 		return this._objectMap.exists(object.objectID);
