@@ -51,6 +51,13 @@ class SelectComboUI extends ValueUI
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
+		if (this._combo == value) return value;
+		
+		if (this._combo != null)
+		{
+			this._combo.removeEventListener(ValueEvent.DATA_CHANGE, onDataChange);
+		}
+		
 		if (value == null)
 		{
 			this._combo = null;
@@ -58,6 +65,7 @@ class SelectComboUI extends ValueUI
 		else
 		{
 			this._combo = cast value;
+			this._combo.addEventListener(ValueEvent.DATA_CHANGE, onDataChange);
 		}
 		return super.set_exposedValue(value);
 	}
@@ -255,6 +263,17 @@ class SelectComboUI extends ValueUI
 		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
 		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+	}
+	
+	private function onDataChange(evt:ValueEvent):Void
+	{
+		this._collection.removeAll();
+		var count:Int = this._combo.choiceList.length;
+		for (i in 0...count)
+		{
+			this._collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
+		}
+		this._list.selectedIndex = this._combo.valueList.indexOf(this._exposedValue.value);
 	}
 	
 	private function onListChange(evt:Event):Void
