@@ -51,6 +51,13 @@ class SelectUI extends ValueUI
 	
 	override function set_exposedValue(value:ExposedValue):ExposedValue 
 	{
+		if (this._select == value) return value;
+		
+		if (this._select != null)
+		{
+			this._select.removeEventListener(ValueEvent.DATA_CHANGE, onDataChange);
+		}
+		
 		if (value == null)
 		{
 			this._select = null;
@@ -58,6 +65,7 @@ class SelectUI extends ValueUI
 		else
 		{
 			this._select = cast value;
+			this._select.addEventListener(ValueEvent.DATA_CHANGE, onDataChange);
 		}
 		return super.set_exposedValue(value);
 	}
@@ -249,6 +257,17 @@ class SelectUI extends ValueUI
 		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
 		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
 		this._nullButton.addEventListener(TriggerEvent.TRIGGER, onNullButton);
+	}
+	
+	private function onDataChange(evt:ValueEvent):Void
+	{
+		this._collection.removeAll();
+		var count:Int = this._select.choiceList.length;
+		for (i in 0...count)
+		{
+			this._collection.add({text:this._select.choiceList[i], value:this._select.valueList[i]});
+		}
+		this._list.selectedIndex = this._select.valueList.indexOf(this._exposedValue.value);
 	}
 	
 	private function onListChange(evt:Event):Void
