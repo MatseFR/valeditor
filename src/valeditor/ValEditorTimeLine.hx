@@ -418,6 +418,11 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 		PlayEvent.dispatch(this, PlayEvent.STOP);
 	}
 	
+	public function complete():Void
+	{
+		PlayEvent.dispatch(this, PlayEvent.COMPLETE);
+	}
+	
 	public function setTime(time:Float):Void
 	{
 		this.frameIndex = 0;
@@ -475,6 +480,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 				else
 				{
 					stop();
+					complete();
 				}
 			}
 		}
@@ -505,6 +511,7 @@ class ValEditorTimeLine extends EventDispatcher implements IAnimatable
 				else
 				{
 					stop();
+					complete();
 				}
 			}
 		}
