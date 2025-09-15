@@ -404,7 +404,7 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 		this._tweens.resize(0);
 	}
 	
-	private function rebuildTweens():Void
+	public function rebuildTweens():Void
 	{
 		if (!this._tween) return;
 		
