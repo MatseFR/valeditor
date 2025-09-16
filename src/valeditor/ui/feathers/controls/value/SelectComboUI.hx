@@ -280,7 +280,7 @@ class SelectComboUI extends ValueUI
 	{
 		if (!this._combo.selectOnKeyboardNavigation && this._list.open) return;
 		
-		if (this._list.selectedItem == null) return;
+		if (this._list.selectedItem == null || Std.isOfType(this._list.selectedItem, String)) return;
 		
 		if (this._exposedValue.useActions)
 		{
