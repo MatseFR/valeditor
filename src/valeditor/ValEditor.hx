@@ -900,7 +900,7 @@ class ValEditor
 	   @param	object	instance of a registered Class
 	   @param	uiContainer	if left null uiContainerDefault is used
 	**/
-	static public function edit(object:Dynamic, collection:ExposedCollection = null, container:DisplayObjectContainer = null, parentValue:ExposedValueWithCollection = null):ExposedCollection
+	static public function edit(object:Dynamic, collection:ExposedCollection = null, container:DisplayObjectContainer = null, parentValue:ExposedValueWithCollection = null, clearContainer:Bool = true):ExposedCollection
 	{
 		if (container == null) container = uiContainerDefault;
 		if (container == null)
@@ -908,7 +908,10 @@ class ValEditor
 			throw new Error("ValEditor.edit ::: null container");
 		}
 		
-		clearUIContainer(container);
+		if (clearContainer)
+		{
+			clearUIContainer(container);
+		}
 		
 		if (object == null) return null;
 		
@@ -1174,19 +1177,19 @@ class ValEditor
 		{
 			if (isLoadingFile && valClass.creationFunctionForLoading != null)
 			{
-				valObject.object = Reflect.callMethod(null, valClass.creationFunctionForLoading, params);
+				valObject.setObject(Reflect.callMethod(null, valClass.creationFunctionForLoading, params));
 			}
 			else if (isTemplateInstance && valClass.creationFunctionForTemplateInstance != null)
 			{
-				valObject.object = Reflect.callMethod(null, valClass.creationFunctionForTemplateInstance, params);
+				valObject.setObject(Reflect.callMethod(null, valClass.creationFunctionForTemplateInstance, params));
 			}
 			else if (valClass.creationFunction != null)
 			{
-				valObject.object = Reflect.callMethod(null, valClass.creationFunction, params);
+				valObject.setObject(Reflect.callMethod(null, valClass.creationFunction, params));
 			}
 			else
 			{
-				valObject.object = Type.createInstance(valClass.classReference, params);
+				valObject.setObject(Type.createInstance(valClass.classReference, params));
 			}
 			valObject.isExternal = false;
 			if (!isLoadingFile) 
@@ -1196,7 +1199,7 @@ class ValEditor
 		}
 		else
 		{
-			valObject.object = object;
+			valObject.setObject(object);
 			valObject.isExternal = true;
 			valObject.destroyOnCompletion = false;
 		}
