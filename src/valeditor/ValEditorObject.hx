@@ -18,6 +18,7 @@ import valeditor.editor.visibility.TemplateVisibilityCollection;
 import valeditor.events.LoadEvent;
 import valeditor.events.ObjectFunctionEvent;
 import valeditor.events.ObjectPropertyEvent;
+import valeditor.events.ObjectSettingEvent;
 import valeditor.events.RenameEvent;
 import valeditor.ui.IInteractiveObject;
 import valeditor.ui.feathers.controls.SelectionBox;
@@ -57,8 +58,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var currentKeyFrame(default, null):ValEditorKeyFrame;
 	/** The collection used as 'currentCollection' when the object is not associated with any keyframe or when 'currentKeyFrame' is null */
 	public var defaultCollection(get, set):ExposedCollection;
-	/** */
-	public var destroyOnCompletion:Bool = true;
+	/** If set to true this object will be destroyed just after its container is complete. This only works with timeline containers
+	 * @default false */
+	public var destroyOnCompletion(get, set):Bool;
 	/** Name of the 'getBounds' function for this object, if any */
 	public var getBoundsFunctionName(get, set):String;
 	/** returns true if this object has a 'getBounds' function, false otherwise.
@@ -128,7 +130,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	/** Tells how many keyframes this object is associated with. */
 	public var numKeyFrames(default, null):Int = 0;
 	/** the real object, which can be anything */
-	public var object:Dynamic;
+	public var object(default, null):Dynamic;
 	/** Not the real ID, returns the value of 'id' if null. This is used to have the same ids in container instances */
 	public var objectID(get, set):String;
 	/** Reference to the PivotIndicator instance set by ValEditorContainerController when this object is selected (null otherwise).
@@ -139,8 +141,9 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	public var propertyMap:PropertyMap;
 	/** if not null this function is called when the object is removed from display */
 	public var removeFromDisplayFunction:Function;
-	/** */
-	public var restoreValuesOnCompletion:Bool = false;
+	/** if set to true this object's values will be restored by applying its default collection. this only works with timeline containers
+	 * @default false */
+	public var restoreValuesOnCompletion(get, set):Bool;
 	/** Tells whether this object should be in saved file or not. */
 	public var save:Bool = true;
 	/** Reference to the SelectionBox instance set by ValEditorContainerController when this object is selected (null otherwise).
@@ -212,6 +215,16 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 			setCurrentCollection(value);
 		}
 		return this._defaultCollection = value;
+	}
+	
+	private var _destroyOnCompletion:Bool = false;
+	private function get_destroyOnCompletion():Bool { return this._destroyOnCompletion; }
+	private function set_destroyOnCompletion(value:Bool):Bool
+	{
+		if (this._destroyOnCompletion == value) return value;
+		this._destroyOnCompletion = value;
+		ObjectSettingEvent.dispatch(this, ObjectSettingEvent.DESTROY_ON_COMPLETION, this);
+		return this._destroyOnCompletion;
 	}
 	
 	private var _getBoundsFunctionName:String;
@@ -306,6 +319,16 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 			value.objectUpdate(this);
 		}
 		return this._pivotIndicator = value;
+	}
+	
+	private var _restoreValuesOnCompletion:Bool = false;
+	private function get_restoreValuesOnCompletion():Bool { return this._restoreValuesOnCompletion; }
+	private function set_restoreValuesOnCompletion(value:Bool):Bool
+	{
+		if (this._restoreValuesOnCompletion == value) return value;
+		this._restoreValuesOnCompletion = value;
+		ObjectSettingEvent.dispatch(this, ObjectSettingEvent.RESTORE_VALUES_ON_COMPLETION, this);
+		return this._restoreValuesOnCompletion;
 	}
 	
 	private var _selectionBox:SelectionBox;
@@ -491,6 +514,31 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		this._isInPool = false;
 		
 		return this;
+	}
+	
+	public function setObject(object:Dynamic):Void
+	{
+		this.object = object;
+		if (this._defaultCollection != null)
+		{
+			this._defaultCollection.object = object;
+		}
+		
+		for (collection in this._keyFrameToCollection)
+		{
+			collection.object = object;
+			collection.object = null;
+		}
+		
+		for (keyFrame in this._keyFrames)
+		{
+			keyFrame.rebuildTweens();
+		}
+		
+		if (this.currentCollection != null)
+		{
+			this.currentCollection.object = object;
+		}
 	}
 	
 	/**
@@ -736,7 +784,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 	   Sets the 'currentCollection' value, removes object and listener on the previous one if needed then sets and applies to object, adds listener for changes and calls 'changeUpdate'.
 	   @param	collection
 	**/
-	private function setCurrentCollection(collection:ExposedCollection):Void
+	public function setCurrentCollection(collection:ExposedCollection):Void
 	{
 		if (this.currentCollection == collection) return;
 		
@@ -1043,7 +1091,10 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			this.objectID = json.objectID;
 		}
-		
+		if (json.isExternal != null)
+		{
+			this.isExternal = json.isExternal;
+		}
 		if (json.destroyOnCompletion != null)
 		{
 			this.destroyOnCompletion = json.destroyOnCompletion;
@@ -1089,6 +1140,7 @@ class ValEditorObject extends EventDispatcher implements IChangeUpdate
 		{
 			json.objectID = this._objectID;
 		}
+		json.isExternal = this.isExternal;
 		json.destroyOnCompletion = this.destroyOnCompletion;
 		json.restoreValuesOnCompletion = this.restoreValuesOnCompletion;
 		
