@@ -110,7 +110,11 @@ class LayerRemove extends ValEditorAction
 			{
 				this.layerIndices.push(this.container.getLayerIndex(layer));
 			}
-			this.layerIndices.sort(ArraySort.int_reverse);
+			#if SWC
+			this.layerIndices.sort(integer_reverse);
+			#else
+			this.layerIndices.sort(ArraySort.integer_reverse);
+			#end
 			this.layers.resize(0);
 			for (index in this.layerIndices)
 			{
@@ -124,6 +128,15 @@ class LayerRemove extends ValEditorAction
 		
 		this.status = ValEditorActionStatus.DONE;
 	}
+	
+	#if SWC
+	private function integer_reverse(a:Int, b:Int):Int
+	{
+		if (a < b) return 1;
+		if (a > b) return -1;
+		return 0;
+	}
+	#end
 	
 	public function cancel():Void
 	{

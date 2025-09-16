@@ -11,6 +11,7 @@ import valeditor.ui.feathers.data.StringData;
 class ArraySort 
 {
 
+	//#if !SWC inline #end static public function alphabetical(a:String, b:String):Int
 	inline static public function alphabetical(a:String, b:String):Int
 	{
 		a = a.toLowerCase();
@@ -20,6 +21,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function alphabetical_reverse(a:String, b:String):Int
 	inline static public function alphabetical_reverse(a:String, b:String):Int
 	{
 		a = a.toLowerCase();
@@ -29,6 +31,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function float(a:Float, b:Float):Int
 	inline static public function float(a:Float, b:Float):Int
 	{
 		if (a < b) return -1;
@@ -36,6 +39,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function float_reverse(a:Float, b:Float):Int
 	inline static public function float_reverse(a:Float, b:Float):Int
 	{
 		if (a < b) return 1;
@@ -43,20 +47,23 @@ class ArraySort
 		return 0;
 	}
 	
-	inline static public function int(a:Int, b:Int):Int
+	//#if !SWC inline #end static public function integer(a:Int, b:Int):Int
+	inline static public function integer(a:Int, b:Int):Int
 	{
 		if (a < b) return -1;
 		if (a > b) return 1;
 		return 0;
 	}
 	
-	inline static public function int_reverse(a:Int, b:Int):Int
+	//#if !SWC inline #end static public function integer_reverse(a:Int, b:Int):Int
+	inline static public function integer_reverse(a:Int, b:Int):Int
 	{
 		if (a < b) return 1;
 		if (a > b) return -1;
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function object(a:ValEditorObject, b:ValEditorObject):Int
 	inline static public function object(a:ValEditorObject, b:ValEditorObject):Int
 	{
 		var strA:String = a.className.toLowerCase();
@@ -70,6 +77,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function stringData(a:StringData, b:StringData):Int
 	inline static public function stringData(a:StringData, b:StringData):Int
 	{
 		var strA:String = a.value.toLowerCase();
@@ -79,6 +87,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function template(a:ValEditorTemplate, b:ValEditorTemplate):Int
 	inline static public function template(a:ValEditorTemplate, b:ValEditorTemplate):Int
 	{
 		var strA:String = a.clss.className.toLowerCase();
@@ -92,6 +101,7 @@ class ArraySort
 		return 0;
 	}
 	
+	//#if !SWC inline #end static public function clss(a:ValEditorClass, b:ValEditorClass):Int
 	inline static public function clss(a:ValEditorClass, b:ValEditorClass):Int
 	{
 		var strA:String = a.className.toLowerCase();
