@@ -100,7 +100,13 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 	{
 		if ((evt.value.isReadOnly || evt.value.isReadOnlyInternal) && this._controlsEnabled)
 		{
+			this._readOnly = true;
 			controlsDisable();
+		}
+		else if (!(evt.value.isReadOnly || evt.value.isReadOnlyInternal) && !this._controlsEnabled)
+		{
+			this._readOnly = false;
+			controlsEnable();
 		}
 		initExposedValue();
 	}
