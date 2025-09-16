@@ -999,8 +999,11 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 			var layerIndex:Int = this._container.getLayerIndex(this._container.currentLayer);
 			this._layerList.selectedIndex = layerIndex;
 			
-			this._currentTimeLineItem = this._timeLineItems[layerIndex];
-			this._currentTimeLineItem.isCurrent = true;
+			if (layerIndex != -1)
+			{
+				this._currentTimeLineItem = this._timeLineItems[layerIndex];
+				this._currentTimeLineItem.isCurrent = true;
+			}
 			
 			this._hScrollBar.value = 0.0;
 			
