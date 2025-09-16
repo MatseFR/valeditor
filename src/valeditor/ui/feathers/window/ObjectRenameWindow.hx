@@ -48,7 +48,7 @@ class ObjectRenameWindow extends Panel
 		this._object = value;
 		if (this._initialized && this._object != null)
 		{
-			this._nameInput.text = this._object.id;
+			this._nameInput.text = this._object.objectID;
 		}
 		return this._object;
 	}
