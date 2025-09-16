@@ -166,17 +166,20 @@ class ValEditorObjectLibrary extends EventDispatcher
 			valClass = ValEditor.getClassByName(className);
 			object = ValEditorObject.fromPool(valClass);
 			object.fromJSONSave(node);
-			if (object.constructorCollection != null)
+			if (!object.isExternal)
 			{
-				params = object.constructorCollection.toValueArray();
+				if (object.constructorCollection != null)
+				{
+					params = object.constructorCollection.toValueArray();
+				}
+				else
+				{
+					params = null;
+				}
+				ValEditor.createObjectWithClassName(className, object.id, params, object.defaultCollection, object.objectID != object.id ? object.objectID : null, null, object);
 			}
-			else
-			{
-				params = null;
-			}
-			ValEditor.createObjectWithClassName(className, object.id, params, object.defaultCollection, object.objectID != object.id ? object.objectID : null, null, object);
 			addObject(object);
-			if (object.isCreationAsync)
+			if (!object.isExternal && object.isCreationAsync && !object.isLoaded)
 			{
 				object.addEventListener(LoadEvent.COMPLETE, object_loaded);
 				object.loadSetup();
@@ -192,7 +195,7 @@ class ValEditorObjectLibrary extends EventDispatcher
 		var data:Array<Dynamic> = [];
 		for (object in this._objects)
 		{
-			if (object.isExternal) continue;
+			//if (object.isExternal) continue;
 			data.push(object.toJSONSave());
 		}
 		json.objects = data;
