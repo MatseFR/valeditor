@@ -139,6 +139,10 @@ class ValEditor
 	static public var openedContainerCollection(default, null):ArrayCollection<ValEditorObject> = new ArrayCollection<ValEditorObject>();
 	static public var templateCollection(default, null):ArrayCollection<ValEditorTemplate> = new ArrayCollection<ValEditorTemplate>();
 	
+	static public var rootContainerClassDefault(get, set):ValEditorClass;
+	static public var rootContainerClasses(default, null):Array<ValEditorClass> = new Array<ValEditorClass>();
+	static public var rootContainerClassNames(default, null):Array<String> = new Array<String>();
+	
 	static public var classVisibilities(default, null):ClassVisibilitiesCollection = new ClassVisibilitiesCollection();
 	
 	static public var isMouseOverUI:Bool;
@@ -230,6 +234,14 @@ class ValEditor
 	
 	static private var _rootContainer:IContainerEditable;
 	static private function get_rootContainer():IContainerEditable { return _rootContainer; }
+	
+	static private var _rootContainerClassDefault:ValEditorClass;
+	static private function get_rootContainerClassDefault():ValEditorClass { return _rootContainerClassDefault; }
+	static private function set_rootContainerClassDefault(value:ValEditorClass):ValEditorClass
+	{
+		fileSettings.rootContainerClass = value;
+		return _rootContainerClassDefault = value;
+	}
 	
 	static private var _rootContainerObject:ValEditorObject;
 	static private function get_rootContainerObject():ValEditorObject { return _rootContainerObject; }
@@ -483,7 +495,7 @@ class ValEditor
 	{
 		isNewFile = true;
 		#if !SWC
-		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
+		var rootObject:ValEditorObject = createObjectWithClassName(fileSettings.rootContainerClass.className, "root");
 		openContainer(rootObject);
 		#end
 	}
@@ -870,6 +882,12 @@ class ValEditor
 		
 		_classNameToStringData.remove(className);
 		strClass.pool();
+	}
+	
+	static public function addRootContainerClass(clss:ValEditorClass):Void
+	{
+		rootContainerClassNames[rootContainerClassNames.length] = clss.className;
+		rootContainerClasses[rootContainerClasses.length] = clss;
 	}
 	
 	static public function registerUIClass(exposedValueClass:Class<Dynamic>, factory:Void->IValueUI):Void
