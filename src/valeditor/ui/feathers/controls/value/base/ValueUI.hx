@@ -96,24 +96,29 @@ abstract class ValueUI extends LayoutGroup implements IValueUI
 		
 	}
 	
+	private function updateEditable():Void
+	{
+		
+	}
+	
 	private function onValueAccessChange(evt:ValueEvent):Void
 	{
 		if ((evt.value.isReadOnly || evt.value.isReadOnlyInternal) && this._controlsEnabled)
 		{
-			this._readOnly = true;
 			controlsDisable();
+			this._readOnly = true;
 		}
 		else if (!(evt.value.isReadOnly || evt.value.isReadOnlyInternal) && !this._controlsEnabled)
 		{
 			this._readOnly = false;
 			controlsEnable();
 		}
-		initExposedValue();
+		updateEditable();
 	}
 	
 	private function onValueEditableChange(evt:ValueEvent):Void
 	{
-		
+		updateEditable();
 	}
 	
 	private function onValueObjectChange(evt:ValueEvent):Void
