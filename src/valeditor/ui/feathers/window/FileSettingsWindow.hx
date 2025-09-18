@@ -14,6 +14,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ExposedCollection;
+import valedit.value.base.ExposedValue;
 import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
 
@@ -25,6 +26,7 @@ class FileSettingsWindow extends Panel
 {
 	public var cancelCallback(get, set):Void->Void;
 	public var confirmCallback(get, set):Void->Void;
+	public var isNewFile(get, set):Bool;
 	public var settings(get, set):FileSettings;
 	public var title(get, set):String;
 	
@@ -42,6 +44,20 @@ class FileSettingsWindow extends Panel
 		return this._confirmCallback = value;
 	}
 	
+	private var _isNewFile:Bool;
+	public function get_isNewFile():Bool { return this._isNewFile; }
+	public function set_isNewFile(value:Bool):Bool
+	{
+		if (this._isNewFile == value) return value;
+		
+		if (this._settingsCollection != null)
+		{
+			var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
+			val.isReadOnly = !value;
+		}
+		return this._isNewFile = value;
+	}
+	
 	private var _settings:FileSettings;
 	private function get_settings():FileSettings { return this._settings; }
 	private function set_settings(value:FileSettings):FileSettings
@@ -54,6 +70,8 @@ class FileSettingsWindow extends Panel
 			if (this._initialized)
 			{
 				this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+				var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
+				val.isReadOnly = !this._isNewFile;
 			}
 		}
 		else
@@ -142,6 +160,8 @@ class FileSettingsWindow extends Panel
 		if (this._settings != null)
 		{
 			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+			var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
+			val.isReadOnly = !this._isNewFile;
 		}
 	}
 	
