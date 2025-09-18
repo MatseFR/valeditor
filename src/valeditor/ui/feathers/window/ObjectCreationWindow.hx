@@ -354,7 +354,7 @@ class ObjectCreationWindow extends PanelWindow
 		this._constructorDefaultsButton.enabled = this._constructorCollection != null;
 		if (isValid && this._constructorCollection != null)
 		{
-			isValid = this._constructorCollection.validateConstructor();
+			isValid = this._constructorCollection.validateMandatory();
 		}
 		this._confirmButton.enabled = isValid;
 	}
