@@ -432,13 +432,14 @@ class FeathersWindows
 		openWindow(_exportSettings);
 	}
 	
-	static public function showFileSettingsWindow(settings:FileSettings, title:String, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
+	static public function showFileSettingsWindow(settings:FileSettings, title:String, isNewFile:Bool, confirmCallback:Void->Void = null, cancelCallback:Void->Void = null):Void
 	{
 		if (_fileSettings == null)
 		{
 			_fileSettings = new FileSettingsWindow();
 		}
 		
+		_fileSettings.isNewFile = isNewFile;
 		_fileSettings.settings = settings;
 		_fileSettings.title = title;
 		_fileSettings.cancelCallback = cancelCallback;
