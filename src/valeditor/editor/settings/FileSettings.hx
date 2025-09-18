@@ -1,6 +1,7 @@
 package valeditor.editor.settings;
 import haxe.io.Path;
 import juggler.animation.Transitions;
+import valeditor.ValEditorClass;
 import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 
@@ -26,6 +27,7 @@ class FileSettings
 	public var fullPath(get, set):String;
 	public var numFramesAutoIncrease:Bool = true;
 	public var numFramesDefault:Int = 120;
+	public var rootContainerClass:ValEditorClass;
 	public var tweenTransitionDefault:String = Transitions.LINEAR;
 	#if starling
 	public var starlingSettings:StarlingSettings = new StarlingSettings();
@@ -112,6 +114,7 @@ class FileSettings
 		toSettings.frameRateDefault = this.frameRateDefault;
 		toSettings.numFramesAutoIncrease = this.numFramesAutoIncrease;
 		toSettings.numFramesDefault = this.numFramesDefault;
+		toSettings.rootContainerClass = this.rootContainerClass;
 		toSettings.tweenTransitionDefault = this.tweenTransitionDefault;
 		
 		#if starling
@@ -133,6 +136,7 @@ class FileSettings
 		this.frameRateDefault = json.frameRateDefault;
 		this.numFramesAutoIncrease = json.numFramesAutoIncrease;
 		this.numFramesDefault = json.numFramesDefault;
+		this.rootContainerClass = ValEditor.getClassByName(json.rootContainerClass);
 		this.tweenTransitionDefault = json.tweenTransitionDefault;
 		
 		#if starling
@@ -157,6 +161,7 @@ class FileSettings
 		json.frameRateDefault = this.frameRateDefault;
 		json.numFramesAutoIncrease = this.numFramesAutoIncrease;
 		json.numFramesDefault = this.numFramesDefault;
+		json.rootContainerClass = this.rootContainerClass.className;
 		json.tweenTransitionDefault = this.tweenTransitionDefault;
 		
 		#if starling
