@@ -14,7 +14,6 @@ import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.variant.ToggleButtonVariant;
 import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
 import valedit.ui.IGroupUI;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedGroup;
@@ -233,18 +232,16 @@ class GroupUI extends ValueUI implements IGroupUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._topButton.enabled = this._exposedValue.isEditable;
-		this._arrowDown.enabled = this._exposedValue.isEditable;
-		this._arrowRight.enabled = this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._topButton.enabled = enabled;
+		this._arrowDown.enabled = enabled;
+		this._arrowRight.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 

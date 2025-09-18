@@ -14,7 +14,6 @@ import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
 import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFloatDrag;
 import valeditor.editor.action.MultiAction;
@@ -190,18 +189,16 @@ class FloatDraggerUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._dragger.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._dragger.enabled = enabled;
+		this._nullButton.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 

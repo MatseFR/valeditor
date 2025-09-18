@@ -201,18 +201,16 @@ class ObjectUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._topButton.enabled = this._exposedValue.isEditable;
-		this._trailGroup.enabled = this._exposedValue.isEditable;
-		this._valueGroup.enabled = this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._topButton.enabled = enabled;
+		this._trailGroup.enabled = enabled;
+		this._valueGroup.enabled = enabled;
 	}
 	
 	override function onValueObjectChange(evt:ValueEvent):Void 

@@ -16,8 +16,6 @@ import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
 import valedit.value.base.ExposedValue;
-import valedit.ValEditObject;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedObjectReference;
 import valedit.value.reference.ReferenceRange;
@@ -211,19 +209,17 @@ class ObjectReferenceUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._idLabel.enabled = this._exposedValue.isEditable;
-		this._loadButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._idLabel.enabled = enabled;
+		this._loadButton.enabled = enabled;
+		this._clearButton.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 

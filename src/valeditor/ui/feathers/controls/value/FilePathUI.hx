@@ -21,7 +21,6 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedFilePath;
 import valeditor.ui.feathers.controls.ValueWedge;
@@ -196,19 +195,17 @@ class FilePathUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._pathInput.enabled = this._exposedValue.isEditable;
-		this._setButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._clearButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._pathInput.enabled = enabled;
+		this._setButton.enabled = enabled;
+		this._clearButton.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 

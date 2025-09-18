@@ -9,7 +9,6 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ExposedCollection;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.base.ExposedFunctionBase;
 import valedit.value.base.ExposedValue;
@@ -192,19 +191,17 @@ class FunctionUI extends ValueUI
 		updateEditable();
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._parameterGroup.enabled = this._exposedValue.isEditable;
-		this._trailGroup.enabled = this._exposedValue.isEditable;
-		this._valueGroup.enabled = this._exposedValue.isEditable;
-		this._button.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._parameterGroup.enabled = enabled;
+		this._trailGroup.enabled = enabled;
+		this._valueGroup.enabled = enabled;
+		this._button.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 

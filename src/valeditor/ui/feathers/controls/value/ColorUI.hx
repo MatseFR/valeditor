@@ -1,7 +1,6 @@
 package valeditor.ui.feathers.controls.value;
 
 import feathers.controls.Button;
-import feathers.controls.HSlider;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
@@ -32,7 +31,6 @@ import valeditor.ui.feathers.theme.variant.LabelVariant;
 import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.variant.TextInputVariant;
 import valeditor.utils.ColorUtil;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.Padding;
 
@@ -311,26 +309,24 @@ class ColorUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._preview.enabled = this._exposedValue.isEditable;
-		this._hexLabel.enabled = this._exposedValue.isEditable;
-		this._redLabel.enabled = this._exposedValue.isEditable;
-		this._greenLabel.enabled = this._exposedValue.isEditable;
-		this._blueLabel.enabled = this._exposedValue.isEditable;
-		this._hexInput.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._redDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._greenDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._blueDragger.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._preview.enabled = enabled;
+		this._hexLabel.enabled = enabled;
+		this._redLabel.enabled = enabled;
+		this._greenLabel.enabled = enabled;
+		this._blueLabel.enabled = enabled;
+		this._hexInput.enabled = enabled;
+		this._redDragger.enabled = enabled;
+		this._greenDragger.enabled = enabled;
+		this._blueDragger.enabled = enabled;
+		this._nullButton.enabled = enabled;
 	}
 	
 	private function colorUpdate(updateText:Bool = true):Void

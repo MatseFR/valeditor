@@ -24,7 +24,6 @@ import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.theme.variant.LabelVariant;
 import valeditor.ui.feathers.theme.variant.TextInputVariant;
 import valedit.value.base.ExposedValue;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedIntRange;
 import valeditor.ui.feathers.Padding;
@@ -212,19 +211,17 @@ class IntRangeUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._slider.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._input.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._slider.enabled = enabled;
+		this._input.enabled = enabled;
+		this._nullButton.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void

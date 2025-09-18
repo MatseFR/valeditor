@@ -17,7 +17,6 @@ import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.theme.variant.LabelVariant;
-import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valeditor.ui.feathers.Padding;
 import valeditor.ui.feathers.Spacing;
@@ -154,18 +153,16 @@ class BoolUI extends ValueUI
 		}
 	}
 	
-	private function updateEditable():Void
+	override function updateEditable():Void 
 	{
-		this.enabled = this._exposedValue.isEditable;
-		this._label.enabled = this._exposedValue.isEditable;
-		this._check.enabled = !this._readOnly && this._exposedValue.isEditable;
-		this._nullButton.enabled = !this._readOnly && this._exposedValue.isEditable;
-	}
-	
-	override function onValueEditableChange(evt:ValueEvent):Void 
-	{
-		super.onValueEditableChange(evt);
-		updateEditable();
+		super.updateEditable();
+		
+		var enabled:Bool = this._exposedValue.isEditable && !this._exposedValue.isReadOnly;
+		
+		this.enabled = enabled;
+		this._label.enabled = enabled;
+		this._check.enabled = enabled;
+		this._nullButton.enabled = enabled;
 	}
 	
 	override function controlsDisable():Void 
