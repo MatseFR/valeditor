@@ -111,6 +111,7 @@ class FileSettingsWindow extends Panel
 	public function new() 
 	{
 		super();
+		initializeNow();
 		this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
@@ -156,13 +157,6 @@ class FileSettingsWindow extends Panel
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
 		this._editContainer.layout = vLayout;
 		addChild(this._editContainer);
-		
-		if (this._settings != null)
-		{
-			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
-			var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
-			val.isReadOnly = !this._isNewFile;
-		}
 	}
 	
 	private function onAddedToStage(evt:Event):Void
