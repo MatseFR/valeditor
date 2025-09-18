@@ -791,7 +791,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			}
 			else
 			{
-				collection = this.collection.clone();
+				collection = this.collection.clone(true);
 			}
 			this._collectionsToPool.set(collection, collection);
 			if (checkForValEditorObject && Std.isOfType(object, ValEditorObject))
@@ -825,7 +825,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 		}
 		else
 		{
-			collection = this.constructorCollection.clone();
+			collection = this.constructorCollection.clone(true);
 		}
 		
 		this._constructorContainers[uiContainer] = collection;
@@ -862,6 +862,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			if (this._collectionsToPool.exists(collection))
 			{
 				collection.object = null;
+				collection.restoreDefaultValues();
 				this._collectionsToPool.remove(collection);
 				this._pool.push(collection);
 			}
