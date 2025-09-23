@@ -1,6 +1,5 @@
 package valeditor.editor.settings;
 #if starling
-import openfl.geom.Point;
 import starling.core.Starling;
 
 /**
