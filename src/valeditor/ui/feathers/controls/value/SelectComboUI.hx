@@ -4,7 +4,10 @@ import feathers.controls.ComboBox;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
+import feathers.controls.dataRenderers.ItemRenderer;
+import feathers.core.InvalidationFlag;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
@@ -13,10 +16,14 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalListLayout;
+import feathers.utils.DisplayObjectRecycler;
 import haxe.ds.ObjectMap;
+import openfl.display.Bitmap;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
+import openfl.ui.Keyboard;
 import valedit.events.ValueEvent;
 import valedit.ui.IValueUI;
 import valedit.value.ExposedSelectCombo;
@@ -76,12 +83,14 @@ class SelectComboUI extends ValueUI
 	private var _label:Label;
 	private var _listLayout:VerticalListLayout;
 	private var _list:ComboBox;
+	private var _listInput:TextInputIcon;
 	
 	private var _nullGroup:LayoutGroup;
 	private var _wedge:ValueWedge;
 	private var _nullButton:Button;
 	
 	private var _collection:ArrayCollection<Dynamic> = new ArrayCollection<Dynamic>();
+	private var _textToItem:Map<String, Dynamic> = new Map<String, Dynamic>();
 	private var _valueToItem:ObjectMap<Dynamic, Dynamic> = new ObjectMap<Dynamic, Dynamic>();
 
 	public function new() 
@@ -94,6 +103,7 @@ class SelectComboUI extends ValueUI
 	{
 		super.clear();
 		this._collection.removeAll();
+		this._textToItem.clear();
 		this._valueToItem.clear();
 		this._combo = null;
 	}
@@ -122,7 +132,7 @@ class SelectComboUI extends ValueUI
 		hLayout.horizontalAlign = HorizontalAlign.LEFT;
 		hLayout.verticalAlign = VerticalAlign.MIDDLE;
 		hLayout.gap = Spacing.DEFAULT;
-		hLayout.paddingRight = Padding.VALUE;
+		//hLayout.paddingRight = Padding.VALUE;
 		this._mainGroup.layout = hLayout;
 		addChild(this._mainGroup);
 		
@@ -135,6 +145,7 @@ class SelectComboUI extends ValueUI
 		this._list = new ComboBox(this._collection);
 		this._list.layoutData = new HorizontalLayoutData(100);
 		this._list.itemToText = function(item:Dynamic):String { return item.text; }
+		
 		this._list.listViewFactory = () ->
 		{
 			var lv:ListView = new ListView();
@@ -154,6 +165,32 @@ class SelectComboUI extends ValueUI
 			lv.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onListMouseEvent);
 			return lv;
 		};
+		this._list.textInputFactory = () ->
+		{
+			this._listInput = new TextInputIcon();
+			this._listInput.addEventListener(KeyboardEvent.KEY_UP, onIDInputKeyUp);
+			this._listInput.leftView = new Bitmap();
+			if (this._list.selectedItem != null && !Std.isOfType(this._list.selectedItem, String))
+			{
+				cast(this._listInput.leftView, Bitmap).bitmapData = this._list.selectedItem.icon;
+			}
+			return this._listInput;
+		}
+		
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
+			var itemRenderer:ItemRenderer = new ItemRenderer();
+			
+			itemRenderer.icon = new Bitmap();
+			
+			return itemRenderer;
+		});
+		
+		recycler.update = (itemRenderer:ItemRenderer, state:ListViewItemState) -> {
+			itemRenderer.text = state.data.text;
+			cast(itemRenderer.icon, Bitmap).bitmapData = state.data.icon;
+		};
+		this._list.itemRendererRecycler = recycler;
+		this._list.addEventListener(Event.CHANGE, onListChange_internal);
 		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();
@@ -180,6 +217,9 @@ class SelectComboUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
+		this._list.prompt = this._combo.prompt;
+		this._list.allowCustomUserValue = this._combo.allowCustomUserValue;
+		
 		this._listLayout.contentJustify = this._combo.contentJustify;
 		this._listLayout.requestedMaxRowCount = this._combo.requestedMaxRowCount;
 		this._listLayout.requestedMinRowCount = this._combo.requestedMinRowCount;
@@ -187,19 +227,22 @@ class SelectComboUI extends ValueUI
 		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._combo.listPercentWidth;
 		
 		this._collection.removeAll();
+		this._textToItem.clear();
 		this._valueToItem.clear();
-		if (this._combo.isConstructor && this._combo.choiceList.length == 0)
+		if (this._combo.isConstructor)
 		{
-			this._combo.retrieveChoiceList(this._combo.object);
-			this._combo.retrieveValueList(this._combo.object);
+			if (this._combo.choiceList.length == 0) this._combo.retrieveChoiceList(this._combo.object);
+			if (this._combo.valueList.length == 0) this._combo.retrieveValueList(this._combo.object);
+			if (this._combo.iconList.length == 0) this._combo.retrieveIconList(this._combo.object);
 		}
 		
 		var item:Dynamic;
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
 		{
-			item = {text:this._combo.choiceList[i], value:this._combo.valueList[i]};
+			item = {text:this._combo.choiceList[i], value:this._combo.valueList[i], icon:this._combo.iconList[i]};
 			this._collection.add(item);
+			this._textToItem.set(this._combo.choiceList[i], item);
 			this._valueToItem.set(this._combo.valueList[i], item);
 		}
 		
@@ -219,7 +262,7 @@ class SelectComboUI extends ValueUI
 		{
 			var controlsEnabled:Bool = this._controlsEnabled;
 			if (controlsEnabled) controlsDisable();
-			//this._list.selectedIndex = this._combo.valueList.indexOf(this._exposedValue.value);
+			
 			this._list.selectedItem = this._valueToItem.get(this._exposedValue.value);
 			if (controlsEnabled) controlsEnable();
 		}
@@ -244,6 +287,8 @@ class SelectComboUI extends ValueUI
 		super.controlsDisable();
 		this._list.removeEventListener(Event.CHANGE, onListChange);
 		this._list.removeEventListener(Event.CLOSE, onListClose);
+		this._list.removeEventListener(FocusEvent.FOCUS_IN, onListFocusIn);
+		this._list.removeEventListener(FocusEvent.FOCUS_OUT, onListFocusOut);
 		this._list.removeEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._list.removeEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
 		this._list.removeEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
@@ -257,6 +302,8 @@ class SelectComboUI extends ValueUI
 		super.controlsEnable();
 		this._list.addEventListener(Event.CHANGE, onListChange);
 		this._list.addEventListener(Event.CLOSE, onListClose);
+		this._list.addEventListener(FocusEvent.FOCUS_IN, onListFocusIn);
+		this._list.addEventListener(FocusEvent.FOCUS_OUT, onListFocusOut);
 		this._list.addEventListener(ListViewEvent.ITEM_TRIGGER, onListItemTrigger);
 		this._list.addEventListener(KeyboardEvent.KEY_DOWN, onListKeyboardEvent);
 		this._list.addEventListener(KeyboardEvent.KEY_UP, onListKeyboardEvent);
@@ -266,19 +313,69 @@ class SelectComboUI extends ValueUI
 	private function onDataChange(evt:ValueEvent):Void
 	{
 		this._collection.removeAll();
+		this._textToItem.clear();
+		this._valueToItem.clear();
+		var item:Dynamic;
 		var count:Int = this._combo.choiceList.length;
 		for (i in 0...count)
 		{
-			this._collection.add({text:this._combo.choiceList[i], value:this._combo.valueList[i]});
+			item = {text:this._combo.choiceList[i], value:this._combo.valueList[i], icon:this._combo.iconList[i]};
+			this._collection.add(item);
+			this._textToItem.set(this._combo.choiceList[i], item);
+			this._valueToItem.set(this._combo.valueList[i], item);
 		}
 		this._list.selectedIndex = this._combo.valueList.indexOf(this._exposedValue.value);
+	}
+	
+	private function onInputKeyUp(evt:KeyboardEvent):Void
+	{
+		var txt:String = this._listInput.text;
+		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER || evt.keyCode == Keyboard.ESCAPE)
+		{
+			if (txt == "")
+			{
+				this._list.selectedItem = this._valueToItem.get(this._exposedValue.value);
+				return;
+			}
+		}
+		
+		var item:Dynamic = this._textToItem.get(txt);
+		var bmp:Bitmap = cast this._listInput.leftView;
+		var change:Bool = false;
+		if (item == null)
+		{
+			if (bmp.bitmapData != null)
+			{
+				bmp.bitmapData = null;
+				change = true;
+			}
+		}
+		else
+		{
+			if (bmp.bitmapData != item.icon)
+			{
+				bmp.bitmapData = item.icon;
+				change = true;
+			}
+		}
+		
+		if (change)
+		{
+			this._listInput.setInvalid(InvalidationFlag.LAYOUT);
+		}
 	}
 	
 	private function onListChange(evt:Event):Void
 	{
 		if (!this._combo.selectOnKeyboardNavigation && this._list.open) return;
 		
-		if (this._list.selectedItem == null || Std.isOfType(this._list.selectedItem, String)) return;
+		if (this._list.selectedItem == null) return;
+		
+		if (Std.isOfType(this._list.selectedItem, String))
+		{
+			this._list.selectedItem = this._valueToItem.get(this._exposedValue.value);
+			return;
+		}
 		
 		if (this._exposedValue.useActions)
 		{
@@ -303,20 +400,49 @@ class SelectComboUI extends ValueUI
 		}
 	}
 	
+	private function onListChange_internal(evt:Event):Void
+	{
+		if (this._listInput == null) return;
+		
+		var bmp:Bitmap = cast this._listInput.leftView;
+		var change:Bool = false;
+		if (this._list.selectedItem == null || Std.isOfType(this._list.selectedItem, String)) 
+		{
+			if (bmp.bitmapData != null)
+			{
+				bmp.bitmapData = null;
+				change = true;
+			}
+		}
+		else
+		{
+			if (bmp.bitmapData != this._list.selectedItem.icon)
+			{
+				bmp.bitmapData = this._list.selectedItem.icon;
+				change = true;
+			}
+		}
+		
+		if (change)
+		{
+			this._listInput.setInvalid(InvalidationFlag.LAYOUT);
+		}
+	}
+	
 	private function onListClose(evt:Event):Void
 	{
 		var value:Dynamic = this._exposedValue.value;
-		if ((this._list.selectedItem == null && value != null) || (this._list.selectedItem != null && this._list.selectedItem.value != value))
-		{
-			for (item in this._collection)
-			{
-				if (item.value == value)
-				{
-					this._list.selectedItem = item;
-					break;
-				}
-			}
-		}
+		this._list.selectedItem = this._valueToItem.get(value);
+	}
+	
+	private function onListFocusIn(evt:FocusEvent):Void
+	{
+		//trace("onListFocusIn");
+	}
+	
+	private function onListFocusOut(evt:FocusEvent):Void
+	{
+		this._list.selectedItem = this._valueToItem.get(this._exposedValue.value);
 	}
 	
 	private function onListItemTrigger(evt:ListViewEvent):Void
