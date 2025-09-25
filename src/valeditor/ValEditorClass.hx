@@ -861,7 +861,7 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 			collection.uiContainer = null;
 			if (this._collectionsToPool.exists(collection))
 			{
-				collection.object = null;
+				collection.clearObject();
 				collection.restoreDefaultValues();
 				this._collectionsToPool.remove(collection);
 				this._pool.push(collection);
