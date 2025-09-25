@@ -532,7 +532,8 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 				template = ValEditor.getTemplate(node.templateID);
 				object = template.getInstance(node.id);
 				collection = template.clss.getCollection();
-				collection.readFromObject(object.object);
+				collection.readAndSetObject(object.object);
+				collection.object = null;
 				collection.fromJSONSave(node.collection);
 				template.visibilityCollectionCurrent.applyToTemplateObjectCollection(collection);
 			}
@@ -540,10 +541,10 @@ class ValEditorKeyFrame extends EventDispatcher implements IChangeUpdate
 			{
 				object = this.timeLine.container.objectLibrary.getObject(node.objectID != null ? node.objectID : node.id);
 				collection = object.clss.getCollection();
-				collection.readFromObject(object.object);
+				collection.readAndSetObject(object.object);
+				collection.object = null;
 				collection.fromJSONSave(node.collection);
 			}
-			//collection.apply();
 			add(object, collection);
 		}
 		
