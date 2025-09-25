@@ -168,7 +168,7 @@ class SelectComboUI extends ValueUI
 		this._list.textInputFactory = () ->
 		{
 			this._listInput = new TextInputIcon();
-			this._listInput.addEventListener(KeyboardEvent.KEY_UP, onIDInputKeyUp);
+			this._listInput.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
 			this._listInput.leftView = new Bitmap();
 			if (this._list.selectedItem != null && !Std.isOfType(this._list.selectedItem, String))
 			{
