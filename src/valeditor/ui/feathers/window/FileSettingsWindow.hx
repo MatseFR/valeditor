@@ -14,6 +14,7 @@ import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import openfl.events.Event;
 import valedit.ExposedCollection;
+import valedit.events.ValueEvent;
 import valedit.value.base.ExposedValue;
 import valeditor.editor.settings.FileSettings;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -63,25 +64,29 @@ class FileSettingsWindow extends Panel
 	private function set_settings(value:FileSettings):FileSettings
 	{
 		this._settings = value;
+		
+		if (this._settingsCollection != null)
+		{
+			this._settingsCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
+		}
+		
 		if (this._settings != null)
 		{
 			this._backupSettings.clear();
 			this._settings.clone(this._backupSettings);
-			if (this._initialized)
-			{
-				this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
-				var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
-				val.isReadOnly = !this._isNewFile;
-			}
+			
+			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+			this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
+			var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
+			val.isReadOnly = !this._isNewFile;
 		}
 		else
 		{
-			if (this._initialized)
-			{
-				ValEditor.edit(null, null, this._editContainer);
-				this._settingsCollection = null;
-			}
+			ValEditor.edit(null, null, this._editContainer);
+			this._settingsCollection = null;
 		}
+		
+		checkValid();
 		
 		return this._settings;
 	}
@@ -144,6 +149,7 @@ class FileSettingsWindow extends Panel
 		this._footerGroup.addChild(this._cancelButton);
 		
 		this._confirmButton = new Button("ok", onConfirmButton);
+		this._confirmButton.enabled = false;
 		this._footerGroup.addChild(this._confirmButton);
 		
 		this._editContainer = new ScrollContainer();
@@ -157,6 +163,18 @@ class FileSettingsWindow extends Panel
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
 		this._editContainer.layout = vLayout;
 		addChild(this._editContainer);
+	}
+	
+	private function checkValid():Void
+	{
+		if (this._settingsCollection != null)
+		{
+			this._confirmButton.enabled = this._settingsCollection.validateMandatory();
+		}
+		else
+		{
+			this._confirmButton.enabled = false;
+		}
 	}
 	
 	private function onAddedToStage(evt:Event):Void
@@ -203,6 +221,11 @@ class FileSettingsWindow extends Panel
 		this._settings.clear();
 		this._settings.fullPath = fullPath;
 		this._settingsCollection.readFromObject(this._settings, false);
+	}
+	
+	private function onValueChange(evt:ValueEvent):Void
+	{
+		checkValid();
 	}
 	
 }
