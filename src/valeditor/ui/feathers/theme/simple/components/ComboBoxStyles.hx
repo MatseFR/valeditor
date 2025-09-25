@@ -83,6 +83,8 @@ class ComboBoxStyles
 				input.paddingRight = 10.0;
 				input.paddingBottom = 6.0;
 				input.paddingLeft = 10.0;
+				
+				input.leftViewGap = 4.0;
 			});
 		}
 		
