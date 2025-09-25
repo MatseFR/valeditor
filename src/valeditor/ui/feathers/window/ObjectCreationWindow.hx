@@ -8,6 +8,7 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.ScrollContainer;
 import feathers.controls.TextInput;
+import feathers.core.InvalidationFlag;
 import feathers.data.ArrayCollection;
 import feathers.data.ListViewItemState;
 import feathers.events.TriggerEvent;
@@ -19,7 +20,9 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.events.Event;
+import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
 import valedit.ExposedCollection;
@@ -27,6 +30,7 @@ import valedit.events.ValueEvent;
 import valeditor.ValEditorObject;
 import valeditor.ValEditorObjectLibrary;
 import valeditor.events.LoadEvent;
+import valeditor.ui.feathers.controls.TextInputIcon;
 import valeditor.ui.feathers.data.StringData;
 import valeditor.ui.feathers.renderers.ClassItemRenderer;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
@@ -93,6 +97,7 @@ class ObjectCreationWindow extends PanelWindow
 	private var _classGroup:LayoutGroup;
 	private var _classLabel:Label;
 	private var _classPicker:ComboBox;
+	private var _classInput:TextInputIcon;
 	private var _classCollection:ArrayCollection<ValEditorClass> = new ArrayCollection<ValEditorClass>();
 	
 	private var _idGroup:LayoutGroup;
@@ -112,6 +117,8 @@ class ObjectCreationWindow extends PanelWindow
 	
 	private var _valEditorClass:ValEditorClass;
 	private var _constructorCollection:ExposedCollection;
+	
+	private var _textToClass:Map<String, ValEditorClass> = new Map<String, ValEditorClass>();
 
 	public function new() 
 	{
@@ -221,6 +228,7 @@ class ObjectCreationWindow extends PanelWindow
 		};
 		
 		this._classPicker = new ComboBox(this._classCollection, onClassChange);
+		this._classPicker.addEventListener(FocusEvent.FOCUS_OUT, onClassFocusOut);
 		this._classPicker.addEventListener(KeyboardEvent.KEY_DOWN, onComboKeyDown);
 		this._classPicker.addEventListener(KeyboardEvent.KEY_UP, onComboKeyUp);
 		this._classPicker.listViewFactory = function():ListView
@@ -230,6 +238,13 @@ class ObjectCreationWindow extends PanelWindow
 			var listView:ListView = new ListView();
 			listView.layout = layout;
 			return listView;
+		};
+		this._classPicker.textInputFactory = () ->
+		{
+			this._classInput = new TextInputIcon();
+			this._classInput.addEventListener(KeyboardEvent.KEY_UP, onClassInputKeyUp);
+			this._classInput.leftView = new Bitmap();
+			return this._classInput;
 		};
 		this._classPicker.itemToText = function(item:Dynamic):String {
 			return cast(item, ValEditorClass).exportClassName;
@@ -249,8 +264,8 @@ class ObjectCreationWindow extends PanelWindow
 		this._idGroup.addChild(this._idLabel);
 		
 		this._idInput = new TextInput("", null, onIDInputChange);
-		this._idInput.addEventListener(KeyboardEvent.KEY_DOWN, onInputKeyDown);
-		this._idInput.addEventListener(KeyboardEvent.KEY_UP, onInputKeyUp);
+		this._idInput.addEventListener(KeyboardEvent.KEY_DOWN, onIDInputKeyDown);
+		this._idInput.addEventListener(KeyboardEvent.KEY_UP, onIDInputKeyUp);
 		this._idGroup.addChild(this._idInput);
 		
 		// constructor
@@ -301,6 +316,7 @@ class ObjectCreationWindow extends PanelWindow
 	public function reset(?allowedClasses:Array<ValEditorClass>, ?allowedCategories:Array<StringData>):Void
 	{
 		var selectedItem:ValEditorClass = this._classPicker.selectedItem;
+		this._textToClass.clear();
 		if (allowedClasses != null && allowedClasses.length != 0)
 		{
 			this._classCollection.array = allowedClasses;
@@ -311,6 +327,12 @@ class ObjectCreationWindow extends PanelWindow
 			this._classCollection.removeAll();
 			this._classCollection.addAll(ValEditor.classCollection);
 		}
+		
+		for (clss in this._classCollection)
+		{
+			this._textToClass.set(clss.exportClassName, clss);
+		}
+		
 		if (selectedItem != null)
 		{
 			var index:Int = this._classCollection.indexOf(selectedItem);
@@ -381,6 +403,9 @@ class ObjectCreationWindow extends PanelWindow
 	
 	private function onClassChange(evt:Event):Void
 	{
+		var bmp:Bitmap = cast this._classInput.leftView;
+		var change:Bool = false;
+		
 		if (this._constructorCollection != null)
 		{
 			this._constructorCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onConstructorCollectionChange);
@@ -395,6 +420,12 @@ class ObjectCreationWindow extends PanelWindow
 				this._constructorCollection.addEventListener(ValueEvent.VALUE_CHANGE, onConstructorCollectionChange);
 			}
 			this._idInput.prompt = this._valEditorClass.makeObjectIDPreview();
+			
+			if (bmp.bitmapData != this._valEditorClass.iconBitmapData)
+			{
+				bmp.bitmapData = this._valEditorClass.iconBitmapData;
+				change = true;
+			}
 		}
 		else
 		{
@@ -402,8 +433,104 @@ class ObjectCreationWindow extends PanelWindow
 			this._constructorCollection = null;
 			this._valEditorClass = null;
 			this._idInput.prompt = null;
+			
+			if (bmp.bitmapData != null)
+			{
+				bmp.bitmapData = null;
+				change = true;
+			}
 		}
+		
+		if (change)
+		{
+			this._classInput.setInvalid(InvalidationFlag.LAYOUT);
+		}
+		
 		checkValid();
+	}
+	
+	private function onClassFocusOut(evt:FocusEvent):Void
+	{
+		var item:ValEditorClass = this._classPicker.selectedItem;
+		var bmp:Bitmap = cast this._classInput.leftView;
+		var change:Bool = false;
+		
+		if (item == null)
+		{
+			if (bmp.bitmapData != null)
+			{
+				bmp.bitmapData = null;
+				change = true;
+			}
+		}
+		else
+		{
+			if (bmp.bitmapData != item.iconBitmapData)
+			{
+				bmp.bitmapData = item.iconBitmapData;
+				change = true;
+			}
+		}
+		
+		if (change)
+		{
+			this._classInput.setInvalid(InvalidationFlag.LAYOUT);
+		}
+	}
+	
+	private function onClassInputKeyUp(evt:KeyboardEvent):Void
+	{
+		var item:ValEditorClass;
+		var bmp:Bitmap = cast this._classInput.leftView;
+		var change:Bool = false;
+		
+		if (evt.keyCode == Keyboard.ESCAPE)
+		{
+			item = this._classPicker.selectedItem;
+			if (item == null)
+			{
+				if (bmp.bitmapData != null)
+				{
+					bmp.bitmapData = null;
+					change = true;
+				}
+			}
+			else
+			{
+				if (bmp.bitmapData != item.iconBitmapData)
+				{
+					bmp.bitmapData = item.iconBitmapData;
+					change = true;
+				}
+			}
+		}
+		else
+		{
+			var txt:String = this._classInput.text;
+			item = this._textToClass.get(txt);
+			
+			if (item == null)
+			{
+				if (bmp.bitmapData != null)
+				{
+					bmp.bitmapData = null;
+					change = true;
+				}
+			}
+			else
+			{
+				if (bmp.bitmapData != item.iconBitmapData)
+				{
+					bmp.bitmapData = item.iconBitmapData;
+					change = true;
+				}
+			}
+		}
+		
+		if (change)
+		{
+			this._classInput.setInvalid(InvalidationFlag.LAYOUT);
+		}
 	}
 	
 	private function onCancelButton(evt:TriggerEvent):Void
@@ -468,11 +595,6 @@ class ObjectCreationWindow extends PanelWindow
 		checkValid();
 	}
 	
-	private function onIDInputChange(evt:Event):Void
-	{
-		checkValid();
-	}
-	
 	private function onConstructorDefaultsButton(evt:TriggerEvent):Void
 	{
 		this._constructorCollection.restoreDefaultValues();
@@ -488,12 +610,17 @@ class ObjectCreationWindow extends PanelWindow
 		evt.stopPropagation();
 	}
 	
-	private function onInputKeyDown(evt:KeyboardEvent):Void
+	private function onIDInputChange(evt:Event):Void
+	{
+		checkValid();
+	}
+	
+	private function onIDInputKeyDown(evt:KeyboardEvent):Void
 	{
 		evt.stopPropagation();
 	}
 	
-	private function onInputKeyUp(evt:KeyboardEvent):Void
+	private function onIDInputKeyUp(evt:KeyboardEvent):Void
 	{
 		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
 		{
