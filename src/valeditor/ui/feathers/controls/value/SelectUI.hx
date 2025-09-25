@@ -5,7 +5,10 @@ import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.ListView;
 import feathers.controls.PopUpListView;
+import feathers.controls.dataRenderers.ItemRenderer;
+import feathers.core.InvalidationFlag;
 import feathers.data.ArrayCollection;
+import feathers.data.ListViewItemState;
 import feathers.events.ListViewEvent;
 import feathers.events.TriggerEvent;
 import feathers.layout.HorizontalAlign;
@@ -14,12 +17,15 @@ import feathers.layout.HorizontalLayoutData;
 import feathers.layout.VerticalAlign;
 import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalListLayout;
+import feathers.utils.DisplayObjectRecycler;
+import openfl.display.Bitmap;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
 import valeditor.editor.action.MultiAction;
 import valeditor.editor.action.value.ValueChange;
 import valeditor.editor.action.value.ValueUIUpdate;
+import valeditor.ui.feathers.controls.TextInputIcon;
 import valeditor.ui.feathers.controls.ValueWedge;
 import valeditor.ui.feathers.controls.value.base.ValueUI;
 import valeditor.ui.feathers.theme.variant.LabelVariant;
@@ -154,6 +160,20 @@ class SelectUI extends ValueUI
 			lv.addEventListener(MouseEvent.RIGHT_MOUSE_UP, onListMouseEvent);
 			return lv;
 		};
+		
+		var recycler = DisplayObjectRecycler.withFunction(() -> {
+			var itemRenderer:ItemRenderer = new ItemRenderer();
+			
+			itemRenderer.icon = new Bitmap();
+			
+			return itemRenderer;
+		});
+		
+		recycler.update = (itemRenderer:ItemRenderer, state:ListViewItemState) -> {
+			itemRenderer.text = state.data.text;
+			cast(itemRenderer.icon, Bitmap).bitmapData = state.data.icon;
+		};
+		this._list.itemRendererRecycler = recycler;
 		this._mainGroup.addChild(this._list);
 		
 		this._nullGroup = new LayoutGroup();
@@ -179,6 +199,8 @@ class SelectUI extends ValueUI
 		
 		this._label.text = this._exposedValue.name;
 		
+		this._list.prompt = this._select.prompt;
+		
 		this._listLayout.contentJustify = this._select.contentJustify;
 		this._listLayout.requestedMaxRowCount = this._select.requestedMaxRowCount;
 		this._listLayout.requestedMinRowCount = this._select.requestedMinRowCount;
@@ -186,16 +208,17 @@ class SelectUI extends ValueUI
 		cast(this._list.layoutData, HorizontalLayoutData).percentWidth = this._select.listPercentWidth;
 		
 		this._collection.removeAll();
-		if (this._select.isConstructor && this._select.choiceList.length == 0)
+		if (this._select.isConstructor)// && this._select.choiceList.length == 0)
 		{
-			this._select.retrieveChoiceList(this._select.object);
-			this._select.retrieveValueList(this._select.object);
+			if (this._select.choiceList.length == 0) this._select.retrieveChoiceList(this._select.object);
+			if (this._select.valueList.length == 0) this._select.retrieveValueList(this._select.object);
+			if (this._select.iconList.length == 0) this._select.retrieveIconList(this._select.object);
 		}
 		
 		var count:Int = this._select.choiceList.length;
 		for (i in 0...count)
 		{
-			this._collection.add({text:this._select.choiceList[i], value:this._select.valueList[i]});
+			this._collection.add({text:this._select.choiceList[i], value:this._select.valueList[i], icon:this._select.iconList[i]});
 		}
 		
 		if (this._nullGroup.parent != null) removeChild(this._nullGroup);
