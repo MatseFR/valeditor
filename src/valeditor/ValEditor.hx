@@ -1703,34 +1703,12 @@ class ValEditor
 		layer.timeLine.insertKeyFrame();
 	}
 	
-	#if starling
-	static public function createContainerRoot():ValEditorContainerRoot
-	{
-		var container:ValEditorContainerRoot = ValEditorContainerRoot.fromPool();
-		container.autoIncreaseNumFrames = fileSettings.numFramesAutoIncrease;
-		container.numFrames = fileSettings.numFramesDefault;
-		container.frameIndex = 0;
-		var layer:ITimeLineLayerEditable = container.createLayer();
-		container.addLayer(layer);
-		return container;
-	}
-	#end
-	
 	static public function createKeyFrame():ValEditorKeyFrame
 	{
 		var keyFrame:ValEditorKeyFrame = ValEditorKeyFrame.fromPool();
 		keyFrame.transition = fileSettings.tweenTransitionDefault;
 		return keyFrame;
 	}
-	
-	//static public function createLayer():LayerOpenFLStarlingEditable
-	//{
-		//var layer:LayerOpenFLStarlingEditable = LayerOpenFLStarlingEditable.fromPool();
-		//layer.timeLine.numFrames = fileSettings.numFramesDefault;
-		//layer.timeLine.frameIndex = 0;
-		//layer.timeLine.insertKeyFrame();
-		//return layer;
-	//}
 	
 	static public function copy(?action:MultiAction):Void
 	{
@@ -2026,8 +2004,9 @@ class ValEditor
 	{
 		#if !SWC
 		isLoadingFile = true;
-		var rootObject:ValEditorObject = createObjectWithClass(ValEditorContainerRoot, "root");
-		var container:ValEditorContainerRoot = rootObject.object;
+		var rootObject:ValEditorObject = createObjectWithClassName(json.rootClass, "root");
+		rootObject.fromJSONSave(json.rootObject);
+		var container:IContainerEditable = rootObject.object;
 		
 		var clss:ValEditorClass;
 		var classList:Array<Dynamic> = json.classes;
@@ -2162,6 +2141,8 @@ class ValEditor
 		templateSave.clear();
 		templateSave = null;
 		
+		json.rootClass = _rootContainerObject.clss.className;
+		json.rootObject = _rootContainerObject.toJSONSave();
 		json.root = _rootContainer.toJSONSave();
 		
 		return json;
