@@ -296,6 +296,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		var clss:ValEditorClass;
 		#if starling
 		clss = ValEditor.getClassByType(TimeLineContainerOpenFLStarlingEditable);
+		//clss = ValEditor.getClassByType(SpriteContainerOpenFLStarlingEditable);
 		ValEditor.rootContainerClassDefault = clss;
 		#else
 		clss = ValEditor.getClassByType(TimeLineContainerOpenFLEditable);
@@ -1298,8 +1299,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.isContainer = true;
 		settings.isContainerOpenFL = true;
 		settings.isContainerStarling = true;
-		settings.collection = ContainerData.exposeSpriteContainerOpenFLEditable();
-		settings.visibilityCollection = ContainerData.getSpriteContainerOpenFLEditableVisibility();
+		settings.collection = ContainerData.exposeSpriteContainerOpenFLStarlingEditable();
+		settings.visibilityCollection = ContainerData.getSpriteContainerOpenFLStarlingEditableVisibility();
 		settings.useBounds = true;
 		clss = ValEditor.registerClass(SpriteContainerOpenFLStarlingEditable, settings);
 		settings.clear();
@@ -1367,7 +1368,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		clss = ValEditor.registerClass(TimeLineContainerOpenFLEditable, settings);
 		settings.clear();
-		//ValEditor.addRootContainerClass(clss);
+		ValEditor.addRootContainerClass(clss);
 		
 		#if starling
 		// TimeLineContainerStarling
@@ -1389,7 +1390,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		clss = ValEditor.registerClass(TimeLineContainerStarlingEditable, settings);
 		settings.clear();
-		//ValEditor.addRootContainerClass(clss);
+		ValEditor.addRootContainerClass(clss);
 		#end
 		
 		#if starling
@@ -1412,7 +1413,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		clss = ValEditor.registerClass(TimeLineContainerStarling3DEditable, settings);
 		settings.clear();
-		//ValEditor.addRootContainerClass(clss);
+		ValEditor.addRootContainerClass(clss);
 		#end
 		
 		#if starling
@@ -1438,25 +1439,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.useBounds = true;
 		clss = ValEditor.registerClass(TimeLineContainerOpenFLStarlingEditable, settings);
 		settings.clear();
-		//ValEditor.addRootContainerClass(clss);
-		#end
-		
-		#if starling
-		// ValEditorContainerRoot
-		settings.canBeCreated = false;
-		settings.creationFunction = ValEditor.createContainerRoot;
-		settings.creationFunctionForLoading = ValEditorContainerRoot.fromPool;
-		settings.disposeFunctionName = "pool";
-		settings.exportClassName = Type.getClassName(TimeLineContainerOpenFLStarling);
-		settings.isContainer = true;
-		settings.isContainerOpenFL = true;
-		settings.isContainerStarling = true;
-		settings.isTimeLineContainer = true;
-		settings.collection = ContainerData.exposeValEditorContainerRoot();
-		settings.visibilityCollection = ContainerData.getValEditorContainerRootVisibility();
-		settings.useBounds = true;
-		ValEditor.registerClass(ValEditorContainerRoot, settings);
-		settings.clear();
+		ValEditor.addRootContainerClass(clss);
 		#end
 		
 		// ValEditorObject
