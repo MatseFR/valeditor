@@ -33,11 +33,12 @@ import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
  */
 class SimpleEditView extends LayoutGroup
 {
+	public var displayArea(get, never):LayoutGroup;
 	public var displayCenter(default, null):Point = new Point();
-	
 	public var displayRect(default, null):Rectangle = new Rectangle();
-	
 	public var editContainer(default, null):ScrollContainer;
+	
+	private function get_displayArea():LayoutGroup { return this._displayAreaBox; }
 	
 	private var _menuBar:LayoutGroup;
 	
