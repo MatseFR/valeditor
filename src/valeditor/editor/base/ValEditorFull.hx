@@ -27,10 +27,10 @@ import valedit.TimeLineContainerOpenFL;
 import valedit.ValEdit;
 import valedit.asset.AssetLib;
 import valedit.asset.AssetType;
-import valedit.data.openfl.display.DisplayData;
-import valedit.data.openfl.filters.FiltersData;
-import valedit.data.openfl.geom.GeomData;
-import valedit.data.openfl.text.TextData;
+import valedit.data.openfl.display.OpenFLDisplayData;
+import valedit.data.openfl.filters.OpenFLFiltersData;
+import valedit.data.openfl.geom.OpenFLGeomData;
+import valedit.data.openfl.text.OpenFLTextData;
 import valedit.data.starling.text.StarlingTextData;
 import valedit.data.valedit.ShapeData;
 import valedit.data.valeditor.ContainerData;
@@ -53,7 +53,6 @@ import valeditor.ValEditorClass;
 import valeditor.ValEditorClassSettings;
 import valeditor.ValEditorKeyFrame;
 import valeditor.ValEditorObject;
-import valeditor.container.ITimeLineContainerEditable;
 import valeditor.container.SpriteContainerOpenFLEditable;
 import valeditor.container.TimeLineContainerOpenFLEditable;
 import valeditor.editor.UIAssets;
@@ -918,8 +917,8 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.addCategory(CategoryID.OPENFL_DISPLAY);
 		settings.isDisplayObject = true;
 		settings.isDisplayObjectOpenFL = true;
-		settings.collection = DisplayData.exposeSprite();
-		settings.visibilityCollection = DisplayData.getSpriteVisibility();
+		settings.collection = OpenFLDisplayData.exposeSprite();
+		settings.visibilityCollection = OpenFLDisplayData.getSpriteVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(Sprite, settings);
 		settings.clear();
@@ -931,9 +930,9 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.isDisplayObjectOpenFL = true;
-		settings.collection = DisplayData.exposeBitmap();
-		settings.visibilityCollection = DisplayData.getBitmapVisibility();
-		settings.constructorCollection = DisplayData.exposeBitmapConstructor();
+		settings.collection = OpenFLDisplayData.exposeBitmap();
+		settings.visibilityCollection = OpenFLDisplayData.getBitmapVisibility();
+		settings.constructorCollection = OpenFLDisplayData.exposeBitmapConstructor();
 		settings.interactiveFactory = InteractiveFactories.openFL_default;
 		ValEditor.registerClass(Bitmap, settings);
 		settings.clear();
@@ -1147,16 +1146,16 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.clear();
 		
 		// OpenFL Filters
-		ValEditor.registerClassSimple(BlurFilter, false, FiltersData.exposeBlurFilter(), FiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(DropShadowFilter, false, FiltersData.exposeDropShadowFilter(), FiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
-		ValEditor.registerClassSimple(GlowFilter, false, FiltersData.exposeGlowFilter(), FiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(BlurFilter, false, OpenFLFiltersData.exposeBlurFilter(), OpenFLFiltersData.exposeBlurFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(DropShadowFilter, false, OpenFLFiltersData.exposeDropShadowFilter(), OpenFLFiltersData.exposeDropShadowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
+		ValEditor.registerClassSimple(GlowFilter, false, OpenFLFiltersData.exposeGlowFilter(), OpenFLFiltersData.exposeGlowFilterConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_FILTER]);
 		
 		// OpenFL Geom
-		ValEditor.registerClassSimple(ColorTransform, false, GeomData.exposeColorTransform());
-		ValEditor.registerClassSimple(Matrix, false, GeomData.exposeMatrix());
-		ValEditor.registerClassSimple(Transform, false, GeomData.exposeTransform());
-		ValEditor.registerClassSimple(Point, false, GeomData.exposePoint(), GeomData.exposePointConstructor());
-		ValEditor.registerClassSimple(Rectangle, false, GeomData.exposeRectangle(), GeomData.exposeRectangleConstructor());
+		ValEditor.registerClassSimple(ColorTransform, false, OpenFLGeomData.exposeColorTransform());
+		ValEditor.registerClassSimple(Matrix, false, OpenFLGeomData.exposeMatrix());
+		ValEditor.registerClassSimple(Transform, false, OpenFLGeomData.exposeTransform());
+		ValEditor.registerClassSimple(Point, false, OpenFLGeomData.exposePoint(), OpenFLGeomData.exposePointConstructor());
+		ValEditor.registerClassSimple(Rectangle, false, OpenFLGeomData.exposeRectangle(), OpenFLGeomData.exposeRectangleConstructor());
 		
 		// OpenFL Text
 		// TextField
@@ -1166,15 +1165,15 @@ class ValEditorFull extends ValEditorBaseFeathers
 		settings.iconBitmapData = Assets.getBitmapData("valeditor/icon/openfl.png");
 		settings.isDisplayObject = true;
 		settings.isDisplayObjectOpenFL = true;
-		settings.collection = TextData.exposeTextField();
-		settings.visibilityCollection = TextData.getTextFieldVisibility();
+		settings.collection = OpenFLTextData.exposeTextField();
+		settings.visibilityCollection = OpenFLTextData.getTextFieldVisibility();
 		settings.interactiveFactory = InteractiveFactories.openFL_visible;
 		settings.useBounds = true;
 		ValEditor.registerClass(TextField, settings);
 		settings.clear();
 		
-		ValEditor.registerClassSimple(Font, false, TextData.exposeFont());
-		ValEditor.registerClassSimple(TextFormat, false, TextData.exposeTextFormat(), TextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
+		ValEditor.registerClassSimple(Font, false, OpenFLTextData.exposeFont());
+		ValEditor.registerClassSimple(TextFormat, false, OpenFLTextData.exposeTextFormat(), OpenFLTextData.exposeTextFormatConstructor(), [CategoryID.OPENFL, CategoryID.OPENFL_TEXT]);
 		
 		settings.pool();
 	}
