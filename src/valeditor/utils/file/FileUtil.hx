@@ -1,7 +1,7 @@
 package valeditor.utils.file;
-import haxe.Json;
 
 #if (desktop || air)
+import haxe.Json;
 import openfl.filesystem.File;
 import openfl.filesystem.FileMode;
 import openfl.filesystem.FileStream;
@@ -75,7 +75,7 @@ class FileUtil
 		fileStream.close();
 		#else
 		var so:SharedObject = SharedObject.getLocal("valEditor");
-		so.data.editorSettings = ValEditor.editorSettings.toJSON();
+		so.data.editorSettings = json;
 		so.flush();
 		#end
 	}
