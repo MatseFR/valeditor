@@ -38,7 +38,7 @@ import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
  * ...
  * @author Matse
  */
-class BaseEditView extends LayoutGroup 
+class EditViewBase extends LayoutGroup 
 {
 	public var propertiesContainer(get, never):ScrollContainer;
 	private function get_propertiesContainer():ScrollContainer { return this._propertiesContainer; }
