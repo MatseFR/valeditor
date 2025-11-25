@@ -1,6 +1,5 @@
 package valeditor.editor.settings;
 import valedit.ExposedCollection;
-import valeditor.ValEditorClass;
 import valeditor.editor.visibility.ClassVisibilitiesCollection;
 import valeditor.editor.visibility.ClassVisibilityCollection;
 

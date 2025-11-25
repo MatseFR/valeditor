@@ -1,5 +1,4 @@
 package valeditor.container;
-import valeditor.ValEditorObjectLibrary;
 #if starling
 import feathers.data.ArrayCollection;
 import haxe.ds.ObjectMap;
@@ -21,6 +20,7 @@ import valeditor.events.TimeLineActionEvent;
 import valeditor.ui.UIConfig;
 import valeditor.ui.shape.PivotIndicator;
 import valeditor.utils.MathUtil;
+import valeditor.ValEditorObjectLibrary;
 
 /**
  * ...
