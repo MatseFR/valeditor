@@ -23,10 +23,64 @@ class ScrollContainerStyles
 				container.autoHideScrollBars = !isDesktop;
 				container.fixedScrollBars = isDesktop;
 				
+				//if (container.backgroundSkin == null)
+				//{
+					//var backgroundSkin = new RectangleSkin();
+					//backgroundSkin.fill = theme.getLightFill();
+					//container.backgroundSkin = backgroundSkin;
+				//}
+				
+				if (container.focusRectSkin == null)
+				{
+					var focusRectSkin = new RectangleSkin();
+					focusRectSkin.fill = null;
+					focusRectSkin.border = theme.getFocusBorder();
+					container.focusRectSkin = focusRectSkin;
+				}
+			});
+		}
+		
+		if (styleProvider.getStyleFunction(ScrollContainer, ScrollContainerVariant.WITH_BACKGROUND) == null)
+		{
+			styleProvider.setStyleFunction(ScrollContainer, ScrollContainerVariant.WITH_BACKGROUND, function(container:ScrollContainer):Void
+			{
+				var isDesktop = DeviceUtil.isDesktop();
+				
+				container.autoHideScrollBars = !isDesktop;
+				container.fixedScrollBars = isDesktop;
+				
 				if (container.backgroundSkin == null)
 				{
 					var backgroundSkin = new RectangleSkin();
 					backgroundSkin.fill = theme.getLightFill();
+					//backgroundSkin.border =  theme.getContrastBorderLight();
+					container.backgroundSkin = backgroundSkin;
+				}
+				
+				if (container.focusRectSkin == null)
+				{
+					var focusRectSkin = new RectangleSkin();
+					focusRectSkin.fill = null;
+					focusRectSkin.border = theme.getFocusBorder();
+					container.focusRectSkin = focusRectSkin;
+				}
+			});
+		}
+		
+		if (styleProvider.getStyleFunction(ScrollContainer, ScrollContainerVariant.WITH_BACKGROUND_AND_BORDER) == null)
+		{
+			styleProvider.setStyleFunction(ScrollContainer, ScrollContainerVariant.WITH_BACKGROUND_AND_BORDER, function(container:ScrollContainer):Void
+			{
+				var isDesktop = DeviceUtil.isDesktop();
+				
+				container.autoHideScrollBars = !isDesktop;
+				container.fixedScrollBars = isDesktop;
+				
+				if (container.backgroundSkin == null)
+				{
+					var backgroundSkin = new RectangleSkin();
+					backgroundSkin.fill = theme.getLightFill();
+					backgroundSkin.border =  theme.getContrastBorderLight();
 					container.backgroundSkin = backgroundSkin;
 				}
 				
@@ -52,7 +106,7 @@ class ScrollContainerStyles
 				if (container.backgroundSkin == null)
 				{
 					var backgroundSkin = new RectangleSkin();
-					backgroundSkin.fill = theme.getLightFill();
+					backgroundSkin.fill = null;//theme.getLightFill();
 					backgroundSkin.border =  theme.getContrastBorderLight();
 					container.backgroundSkin = backgroundSkin;
 				}
