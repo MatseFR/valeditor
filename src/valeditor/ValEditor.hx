@@ -617,10 +617,20 @@ class ValEditor
 		}
 	}
 	
+	static public function hasClass(type:Class<Dynamic>):Bool
+	{
+		return hasClassWithName(Type.getClassName(type));
+	}
+	
+	static public function hasClassWithName(className:String):Bool
+	{
+		return _classMap.exists(className);
+	}
+	
 	static public function registerClass(type:Class<Dynamic>, settings:ValEditorClassSettings):ValEditorClass
 	{
 		var className:String = Type.getClassName(type);
-		if (_classMap.exists(className))
+		if (hasClassWithName(className))
 		{
 			trace("ValEditor.registerClass ::: Class " + className + " already registered");
 			return null;
