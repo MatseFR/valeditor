@@ -1,35 +1,56 @@
 package valeditor.editor.base;
 
-import feathers.controls.navigators.StackItem;
-import valeditor.ui.feathers.view.EditView;
+import feathers.layout.AutoSizeMode;
+import openfl.display.Sprite;
+import valeditor.data.Data;
+import valeditor.ui.feathers.view.SimpleEditView;
 
 /**
  * ...
  * @author Matse
  */
-class ValEditorSimple extends ValEditorBaseFeathers 
+class ValEditorSimple extends Sprite 
 {
-	public var editView(default, null):EditView;
+	public var editView(default, null):SimpleEditView;
+	
+	private var _starter:ValEditorStarter;
 
-	public function new() 
+	public function new(starter:ValEditorStarter = null) 
 	{
 		super();
+		
+		this._starter = starter;
+		if (this._starter == null)
+		{
+			this._starter = new ValEditorStarter();
+		}
 	}
 	
-	override function ready():Void 
+	public function start():Void
 	{
-		var item:StackItem;
+		if (this.editView == null)
+		{
+			this.editView = new SimpleEditView();
+			this.editView.autoSizeMode = AutoSizeMode.STAGE;
+		}
 		
-		super.ready();
-		
-		this.editView = new EditView();
+		this._starter.start(ready, exposeData, this.editView, true);
+	}
+	
+	/**
+	   Calls valeditor.data.Data.exposeAll()
+	   override if needed
+	**/
+	private function exposeData():Void
+	{
+		Data.exposeAll();
+	}
+	
+	private function ready():Void 
+	{
 		this.editView.initializeNow();
-		ValEditor.uiContainerDefault = this.editView.valEditContainer;
-		
-		item = StackItem.withDisplayObject(EditView.ID, this.editView);
-		this.screenNavigator.addItem(item);
-		
-		this.screenNavigator.rootItemID = EditView.ID;
+		ValEditor.uiContainerDefault = this.editView.editContainer;
+		addChild(this.editView);
 	}
 	
 }
