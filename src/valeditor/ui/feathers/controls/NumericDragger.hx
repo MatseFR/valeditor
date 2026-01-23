@@ -16,6 +16,7 @@ import feathers.utils.ExclusivePointer;
 import feathers.utils.MathUtil;
 import haxe.ds.Map;
 import openfl.display.DisplayObject;
+import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.FocusEvent;
 import openfl.events.KeyboardEvent;
@@ -381,6 +382,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		if (this._input == null)
 		{
 			this._input = new TextInput();
+			this._input.focusEnabled = false;
 			this._input.variant = CHILD_VARIANT_INPUT;
 		}
 		this._input.addEventListener(Event.CHANGE, input_changeHandler);
@@ -469,7 +471,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		}
 		if (this._currentState == state) return;
 		
-		if (this._debug) trace("changeState " + state);
+		if (this._debug) trace(this.name + " changeState " + state);
 		
 		this._currentState = state;
 		this.setInvalid(STATE);
@@ -497,7 +499,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function refreshState():Void
 	{
-		if (this._debug) trace("refreshState");
+		if (this._debug) trace(this.name + " refreshState");
 		
 		if (this._currentState == INPUT)
 		{
@@ -586,6 +588,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function startDragging():Void
 	{
+		if (this._isDragging)
+		{
+			throw new Error("already dragging !");
+		}
+		
+		if (this._debug) trace(this.name + " startDragging");
+		
 		this.stage.addEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
 		this.stage.addEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler, false, 500);
 		if (this._cancelDragWithRightClick)
@@ -606,6 +615,9 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private function stopDragging():Void
 	{
 		if (!this._isDragging) return;
+		
+		if (this._debug) trace(this.name + " stopDragging");
+		
 		this.stage.removeEventListener(MouseEvent.MOUSE_MOVE, dragLabel_stage_mouseMoveHandler);
 		this.stage.removeEventListener(MouseEvent.MOUSE_UP, dragLabel_stage_mouseUpHandler);
 		if (this._cancelDragWithRightClick)
@@ -628,7 +640,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	{
 		if (!this._enabled || this._currentState != HOVER) return;
 		
-		if (this._debug) trace("dragLabel_mouseOutHandler");
+		if (this._debug) trace(this.name + " dragLabel_mouseOutHandler");
 		
 		changeState(UP);
 	}
@@ -641,9 +653,11 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		var result = exclusivePointer.claimMouse(this);
 		if (!result) return;
 		
-		if (this._debug) trace("dragLabel_clickHandler");
+		if (this._debug) trace(this.name + " dragLabel_clickHandler");
 		
 		changeState(INPUT);
+		
+		exclusivePointer.removeMouseClaim();
 	}
 	
 	private function dragLabel_mouseDownHandler(evt:MouseEvent):Void
@@ -654,7 +668,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		var result = exclusivePointer.claimMouse(this);
 		if (!result) return;
 		
-		if (this._debug) trace("dragLabel_mouseDownHandler");
+		if (this._debug) trace(this.name + " dragLabel_mouseDownHandler");
 		
 		startDragging();
 	}
@@ -706,7 +720,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function dragLabel_stage_mouseUpHandler(evt:MouseEvent):Void
 	{
-		if (this._debug) trace("dragLabel_stage_mouseUpHandler");
+		if (this._debug) trace(this.name + " dragLabel_stage_mouseUpHandler");
+		
+		var exclusivePointer = ExclusivePointer.forStage(this.stage);
+		if (exclusivePointer.getMouseClaim() == this)
+		{
+			exclusivePointer.removeMouseClaim();
+		}
 		
 		stopDragging();
 		
@@ -735,7 +755,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function dragLabel_stage_rightClickHandler(evt:MouseEvent):Void
 	{
-		if (this._debug) trace("dragLabel_stage_rightClickHandler");
+		if (this._debug) trace(this.name + " dragLabel_stage_rightClickHandler");
 		
 		stopDragging();
 		
@@ -758,27 +778,29 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function focusInHandler(evt:FocusEvent):Void
 	{
-		if (this._debug) trace("focusInHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
+		if (this._debug) trace(this.name + " focusInHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
+		
+		//if (evt.relatedObject == null || evt.relatedObject == this.stage) return;
 		
 		changeState(INPUT);
 	}
 	
 	private function focusOutHandler(evt:FocusEvent):Void
 	{
-		if (this._debug) trace("focusOutHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
+		if (this._debug) trace(this.name + " focusOutHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
 		
 		changeState(UP);
 	}
 	
 	private function keyFocusChangeHandler(evt:FocusEvent):Void
 	{
-		if (this._debug) trace("keyFocusChangeHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
+		if (this._debug) trace(this.name + " keyFocusChangeHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
 		//evt.preventDefault();
 	}
 	
 	private function mouseFocusChangeHandler(evt:FocusEvent):Void
 	{
-		if (this._debug) trace("mouseFocusChangeHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
+		if (this._debug) trace(this.name + " mouseFocusChangeHandler relatedObject=" + evt.relatedObject + " target=" + evt.target);
 		//evt.preventDefault();
 	}
 	
@@ -792,7 +814,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function input_focusInHandler(evt:FocusEvent):Void
 	{
-		if (this._debug) trace("input_focusInHandler");
+		if (this._debug) trace(this.name + " input_focusInHandler");
 		
 		this._inputHasFocus = true;
 		
@@ -801,10 +823,10 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	
 	private function input_focusOutHandler(evt:FocusEvent):Void
 	{
-		//if (!this._inputHasFocus) return;
+		if (!this._inputHasFocus) return;
 		this._inputHasFocus = false;
 		
-		if (this._debug) trace("input_focusOutHandler");
+		if (this._debug) trace(this.name + " input_focusOutHandler");
 		
 		//changeState(UP);
 		if (!this.liveTyping)
