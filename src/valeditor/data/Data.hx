@@ -1,11 +1,8 @@
 package valeditor.data;
+
 import openfl.Assets;
 import openfl.utils.AssetType;
-#if massive
-import valedit.data.massive.data.MassiveData;
-import valedit.data.massive.display.MassiveDisplayData;
-import valedit.data.massive.particle.MassiveParticleData;
-#end
+import valedit.data.massive.util.MassiveUtilData;
 import valedit.data.openfl.display.OpenFLDisplayData;
 import valedit.data.openfl.display3D.OpenFLDisplay3DData;
 import valedit.data.openfl.filesystem.OpenFLFileSystemData;
@@ -20,6 +17,11 @@ import valeditor.ValEditor;
 import valeditor.ValEditorClassSettings;
 import valeditor.editor.CategoryID;
 import valeditor.ui.InteractiveFactories;
+#if massive
+import valedit.data.massive.data.MassiveData;
+import valedit.data.massive.display.MassiveDisplayData;
+import valedit.data.massive.particle.MassiveParticleData;
+#end
 #if starling
 import valedit.data.starling.animation.StarlingAnimationData;
 import valedit.data.starling.core.StarlingCoreData;
@@ -62,6 +64,7 @@ class Data
 		exposeMassive_data();
 		exposeMassive_display();
 		exposeMassive_particle();
+		exposeMassive_util();
 	}
 	
 	static public function exposeMassive_data():Void
@@ -99,16 +102,16 @@ class Data
 		ValEditor.registerClass(massive.display.MassiveDisplay, settings);
 		settings.clear();
 		
-		// MassiveImageLayer
+		// ImageLayer
 		settings.canBeCreated = false;
 		settings.collection = MassiveDisplayData.exposeMassiveImageLayer();
-		ValEditor.registerClass(massive.display.MassiveImageLayer, settings);
+		ValEditor.registerClass(massive.display.ImageLayer, settings);
 		settings.clear();
 		
-		// MassiveQuadLayer
+		// QuadLayer
 		settings.canBeCreated = false;
 		settings.collection = MassiveDisplayData.exposeMassiveQuadLayer();
-		ValEditor.registerClass(massive.display.MassiveQuadLayer, settings);
+		ValEditor.registerClass(massive.display.QuadLayer, settings);
 		settings.clear();
 		
 		settings.pool();
@@ -126,6 +129,8 @@ class Data
 		settings.canBeCreated = false;
 		settings.collection = MassiveParticleData.exposeParticleSystem();
 		ValEditor.registerClass(massive.particle.ParticleSystem, settings);
+		var clss:Class<Dynamic> = Type.resolveClass("massive.particle.ParticleSystem_massive_particle_Particle");
+		ValEditor.registerClass(clss, settings);
 		settings.clear();
 		
 		// ParticleSystemOptions
@@ -135,6 +140,19 @@ class Data
 		settings.clear();
 		
 		settings.pool();
+	}
+	
+	static public function exposeMassive_util():Void
+	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		
+		// MassiveTint
+		settings.canBeCreated = false;
+		settings.collection = MassiveUtilData.exposeMassiveTint();
+		ValEditor.registerClass(massive.util.MassiveTint, settings);
+		settings.clear();
+		
+		settings.pool;
 	}
 	#end
 	//################################################################################
@@ -229,31 +247,39 @@ class Data
 		ValEditor.registerClass(openfl.display.MovieClip, settings);
 		settings.clear();
 		
+		#if desktop
 		// NativeWindow
 		settings.canBeCreated = false;
 		settings.collection = OpenFLDisplayData.exposeNativeWindow();
 		settings.constructorCollection = OpenFLDisplayData.exposeNativeWindowConstructor();
 		ValEditor.registerClass(openfl.display.NativeWindow, settings);
 		settings.clear();
+		#end
 		
+		#if desktop
 		// NativeWindowInitOptions
 		settings.canBeCreated = false;
 		settings.collection = OpenFLDisplayData.exposeNativeWindowInitOptions();
 		ValEditor.registerClass(openfl.display.NativeWindowInitOptions, settings);
 		settings.clear();
+		#end
 		
+		#if desktop
 		// Screen
 		settings.canBeCreated = false;
 		settings.collection = OpenFLDisplayData.exposeScreen();
 		ValEditor.registerClass(openfl.display.Screen, settings);
 		settings.clear();
+		#end
 		
+		#if desktop
 		#if (!air || air >= 31)
 		// ScreenMode
 		settings.canBeCreated = false;
 		settings.collection = OpenFLDisplayData.exposeScreenMode();
 		ValEditor.registerClass(openfl.display.ScreenMode, settings);
 		settings.clear();
+		#end
 		#end
 		
 		// Shape
@@ -1355,6 +1381,32 @@ class Data
 	#end
 	//################################################################################
 	//\Starling
+	//################################################################################
+	
+	//################################################################################
+	// ValEditor
+	//################################################################################
+	static public function exposeValEditor():Void
+	{
+		
+	}
+	
+	static public function exposeValEditor_container():Void
+	{
+		
+	}
+	
+	static public function exposeValEditor_core():Void
+	{
+		
+	}
+	
+	static public function exposeValEditor_settings():Void
+	{
+		
+	}
+	//################################################################################
+	//\ValEditor
 	//################################################################################
 	
 }
