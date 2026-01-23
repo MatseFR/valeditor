@@ -2,7 +2,6 @@ package valeditor.data;
 
 import openfl.Assets;
 import openfl.utils.AssetType;
-import valedit.data.massive.util.MassiveUtilData;
 import valedit.data.openfl.display.OpenFLDisplayData;
 import valedit.data.openfl.display3D.OpenFLDisplay3DData;
 import valedit.data.openfl.filesystem.OpenFLFileSystemData;
@@ -17,10 +16,11 @@ import valeditor.ValEditor;
 import valeditor.ValEditorClassSettings;
 import valeditor.editor.CategoryID;
 import valeditor.ui.InteractiveFactories;
-#if massive
+#if massive_starling
 import valedit.data.massive.data.MassiveData;
 import valedit.data.massive.display.MassiveDisplayData;
 import valedit.data.massive.particle.MassiveParticleData;
+import valedit.data.massive.util.MassiveUtilData;
 #end
 #if starling
 import valedit.data.starling.animation.StarlingAnimationData;
@@ -46,7 +46,7 @@ class Data
 	
 	static public function exposeAll():Void
 	{
-		#if massive
+		#if massive_starling
 		exposeMassive();
 		#end
 		exposeOpenFL();
@@ -58,7 +58,7 @@ class Data
 	//################################################################################
 	// Massive
 	//################################################################################
-	#if massive
+	#if massive_starling
 	static public function exposeMassive():Void
 	{
 		exposeMassive_data();
