@@ -3,6 +3,7 @@ import feathers.core.PopUpManager;
 import feathers.data.ArrayCollection;
 import openfl.Lib;
 import openfl.display.DisplayObject;
+import openfl.errors.Error;
 import openfl.events.MouseEvent;
 import valedit.ExposedCollection;
 import valedit.asset.BinaryAsset;
@@ -24,6 +25,7 @@ import valeditor.ui.feathers.theme.ValEditorTheme;
 import valeditor.ui.feathers.window.ActivityWindow;
 import valeditor.ui.feathers.window.ClassVisibilitiesWindow;
 import valeditor.ui.feathers.window.ClassVisibilityWindow;
+import valeditor.ui.feathers.window.CollectionEditWindow;
 import valeditor.ui.feathers.window.CreditsWindow;
 import valeditor.ui.feathers.window.EditorSettingsWindow;
 import valeditor.ui.feathers.window.ExportSettingsWindow;
@@ -92,6 +94,8 @@ class FeathersWindows
 	static private var _messageWindow:MessageWindow;
 	static private var _messageConfirmWindow:MessageConfirmWindow;
 	
+	static private var _collectionEdit:CollectionEditWindow;
+	
 	static private var _objectAdd:ObjectAddWindow;
 	static private var _objectCreate:ObjectCreationWindow;
 	static private var _objectEdit:ObjectEditWindow;
@@ -146,6 +150,45 @@ class FeathersWindows
 		PopUpManager.removePopUp(window);
 	}
 	
+	static private function setWindowSize(window:DisplayObject, hSize:WindowSize, vSize:WindowSize):Void
+	{
+		switch (hSize)
+		{
+			case WindowSize.VERY_SMALL :
+				window.width = getVerySmallWindowWidth();
+			
+			case WindowSize.SMALL :
+				window.width = getSmallWindowWidth();
+			
+			case WindowSize.MEDIUM :
+				window.width = getMediumWindowWidth();
+			
+			case WindowSize.LARGE :
+				window.width = getLargeWindowWidth();
+			
+			default :
+				throw new Error("FeathersWindows.setWindowSize ::: unknown WindowSize");
+		}
+		
+		switch (vSize)
+		{
+			case WindowSize.VERY_SMALL :
+				window.height = getVerySmallWindowHeight();
+			
+			case WindowSize.SMALL :
+				window.height = getSmallWindowHeight();
+			
+			case WindowSize.MEDIUM :
+				window.height = getMediumWindowHeight();
+			
+			case WindowSize.LARGE :
+				window.height = getLargeWindowHeight();
+			
+			default :
+				throw new Error("FeathersWindows.setWindowSize ::: unknown WindowSize");
+		}
+	}
+	
 	static private function getLargeWindowWidth():Float
 	{
 		// was Lib.current.stage.stageWidth - UIConfig.POPUP_STAGE_PADDING * 2.0;
@@ -178,6 +221,16 @@ class FeathersWindows
 	static private function getSmallWindowHeight():Float
 	{
 		return Lib.current.stage.stageHeight * 0.33;
+	}
+	
+	static private function getVerySmallWindowWidth():Float
+	{
+		return Lib.current.stage.stageWidth * 0.25;
+	}
+	
+	static private function getVerySmallWindowHeight():Float
+	{
+		return Lib.current.stage.stageHeight * 0.25;
 	}
 	
 	static public function showActivityWindow(title:String):Void
@@ -505,6 +558,28 @@ class FeathersWindows
 		_messageConfirmWindow.validateNow();
 		
 		openWindow(_messageConfirmWindow);
+	}
+	
+	static public function showCollectionEditWindow(collection:ExposedCollection, ?confirmCallback:Void->Void, ?cancelCallback:Void->Void, ?title:String, ?hSize:WindowSize, ?vSize:WindowSize):Void
+	{
+		if (_collectionEdit == null)
+		{
+			_collectionEdit = new CollectionEditWindow();
+		}
+		
+		if (hSize == null) hSize = WindowSize.MEDIUM;
+		if (vSize == null) vSize = WindowSize.MEDIUM;
+		
+		_collectionEdit.title = title;
+		_collectionEdit.editCollection = collection;
+		_collectionEdit.cancelCallback = cancelCallback;
+		_collectionEdit.confirmCallback = confirmCallback;
+		
+		//_collectionEdit.width = getMediumWindowWidth();
+		//_collectionEdit.height = getLargeWindowHeight();
+		setWindowSize(_collectionEdit, hSize, vSize);
+		
+		openWindow(_collectionEdit);
 	}
 	
 	static public function showObjectAddWindow(reusableObjects:Array<ValEditorObject>, newObjectCallback:Void->Void, reuseObjectCallback:Dynamic->Void, cancelCallback:Void->Void, title:String = "Add Object"):Void
