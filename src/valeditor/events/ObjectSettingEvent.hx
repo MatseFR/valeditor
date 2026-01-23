@@ -17,8 +17,8 @@ class ObjectSettingEvent extends Event
 	
 	static private function fromPool(type:String, object:ValEditorObject, bubbles:Bool, cancelable:Bool):ObjectSettingEvent
 	{
-		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, propertyNames, bubbles, cancelable);
-		return new ObjectSettingEvent(type, object, propertyNames, bubbles, cancelable);
+		if (_POOL.length != 0) return _POOL.pop().setTo(type, object, bubbles, cancelable);
+		return new ObjectSettingEvent(type, object, bubbles, cancelable);
 	}
 	#end
 	
@@ -64,7 +64,7 @@ class ObjectSettingEvent extends Event
 		_POOL[_POOL.length] = this;
 	}
 	
-	private function setTo(type:String, object:ValEditorObject, bubbles:Bool, cancelable:Bool):ObjectPropertyEvent
+	private function setTo(type:String, object:ValEditorObject, bubbles:Bool, cancelable:Bool):ObjectSettingEvent
 	{
 		this.type = type;
 		this.object = object;

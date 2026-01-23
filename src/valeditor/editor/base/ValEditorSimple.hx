@@ -2,6 +2,7 @@ package valeditor.editor.base;
 
 import feathers.layout.AutoSizeMode;
 import openfl.display.Sprite;
+import openfl.events.Event;
 import valeditor.data.Data;
 import valeditor.ui.feathers.view.SimpleEditView;
 
@@ -49,8 +50,14 @@ class ValEditorSimple extends Sprite
 	private function ready():Void 
 	{
 		this.editView.initializeNow();
+		this.editView.displayAreaGroup.addEventListener(Event.RESIZE, onDisplayResize);
 		ValEditor.uiContainerDefault = this.editView.editContainer;
 		addChild(this.editView);
+	}
+	
+	private function onDisplayResize(evt:Event):Void
+	{
+		
 	}
 	
 }

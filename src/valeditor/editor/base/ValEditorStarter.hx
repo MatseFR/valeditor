@@ -1,6 +1,8 @@
 package valeditor.editor.base;
 import feathers.style.Theme;
+import openfl.Lib;
 import openfl.display.DisplayObjectContainer;
+import openfl.events.Event;
 import valedit.ExposedCollection;
 import valedit.data.feathers.themes.SimpleThemeData;
 import valedit.data.valeditor.SettingsData;
@@ -81,6 +83,18 @@ class ValEditorStarter
 	
 	private function initComplete():Void
 	{
+		Lib.application.window.stage.addEventListener(Event.EXIT_FRAME, onNextFrame);
+		//registerExposedValuesFactories();
+		//registerExposedValuesUI();
+		//exposeData();
+		//loadEditorSettings();
+		//
+		//this._completeCallback();
+	}
+	
+	private function onNextFrame(evt:Event):Void
+	{
+		Lib.application.window.stage.removeEventListener(Event.EXIT_FRAME, onNextFrame);
 		registerExposedValuesFactories();
 		registerExposedValuesUI();
 		exposeData();

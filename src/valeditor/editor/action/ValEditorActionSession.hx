@@ -186,6 +186,14 @@ class ValEditorActionSession extends EventDispatcher
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED, this);
 	}
 	
+	public function redoAll():Void
+	{
+		while (this._undoneActions.length != 0)
+		{
+			redo();
+		}
+	}
+	
 	public function undo():Void
 	{
 		if (this._doneActions.length == 0) return;
@@ -207,6 +215,14 @@ class ValEditorActionSession extends EventDispatcher
 			if (action.isStepAction) break;
 		}
 		ActionStackEvent.dispatch(this, ActionStackEvent.CHANGED, this);
+	}
+	
+	public function undoAll():Void
+	{
+		while (this._doneActions.length != 0)
+		{
+			undo();
+		}
 	}
 	
 	public function changesSaved():Void

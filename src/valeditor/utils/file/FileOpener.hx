@@ -33,7 +33,7 @@ class FileOpener
 		this._errorCallback = null;
 	}
 	
-	public function start(completeCallback:FileReference->Void, cancelCallback:Void->Void, ?errorCallback:IOErrorEvent->Void, ?filterList:Array<FileFilter>):Void
+	public function start(completeCallback:FileReference->Void, ?cancelCallback:Void->Void, ?errorCallback:IOErrorEvent->Void, ?filterList:Array<FileFilter>):Void
 	{
 		if (this._isRunning)
 		{
@@ -86,7 +86,10 @@ class FileOpener
 		this._fileReference.removeEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
 		
 		this._isRunning = false;
-		this._errorCallback(evt);
+		if (this._errorCallback != null)
+		{
+			this._errorCallback(evt);
+		}
 	}
 	
 	private function onFileCancelled(evt:Event):Void
@@ -95,7 +98,10 @@ class FileOpener
 		this._fileReference.removeEventListener(Event.CANCEL, onFileCancelled);
 		
 		this._isRunning = false;
-		this._cancelCallback();
+		if (this._cancelCallback != null)
+		{
+			this._cancelCallback();
+		}
 	}
 	
 }

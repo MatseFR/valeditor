@@ -25,8 +25,6 @@ class SimpleEditView extends SimpleEditViewBase
 	{
 		super.initialize();
 		
-		//var vLayout:VerticalLayout;
-		
 		// right group
 		this.rightGroup = new LayoutGroup();
 		this.rightGroup.variant = LayoutGroupVariant.CONTENT;
@@ -40,8 +38,6 @@ class SimpleEditView extends SimpleEditViewBase
 		this.editContainer = createEditContainer_scroll();
 		this.editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		this.rightGroup.addChild(this.editContainer);
+		this.defaultEditContainer = this.editContainer;
 	}
-	
-	
-	
 }

@@ -52,7 +52,10 @@ class FileSaver
 		this._fileReference.removeEventListener(Event.CANCEL, onFileCancelled);
 		this._fileReference.removeEventListener(Event.COMPLETE, onFileCompleted);
 		
-		this._cancelCallback();
+		if (this._cancelCallback != null)
+		{
+			this._cancelCallback();
+		}
 	}
 	
 	private function onFileCompleted(evt:Event):Void

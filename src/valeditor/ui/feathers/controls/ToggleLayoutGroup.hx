@@ -147,6 +147,7 @@ class ToggleLayoutGroup extends LayoutGroup
 		addChild(this._toggle);
 		
 		this._contentGroup.layout = this._contentLayout;
+		this._contentGroup.layoutData = this._contentLayoutData;
 		this._contentGroup.variant = this._contentVariant;
 		if (this._isOpen) addChild(this._contentGroup);
 	}

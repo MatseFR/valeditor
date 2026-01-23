@@ -1,9 +1,7 @@
 package valeditor.editor.file;
-import openfl.filesystem.FileMode;
-import openfl.utils.ByteArray;
+import openfl.net.FileFilter;
 #if (desktop || air)
 import openfl.filesystem.File;
-import openfl.filesystem.FileStream;
 import valeditor.utils.file.FileOpenerDesktop;
 import valeditor.utils.file.FileSaverDesktop;
 #else
@@ -21,7 +19,6 @@ class FileController
 	#if (desktop || air)
 	static private var _fileOpener:FileOpenerDesktop = new FileOpenerDesktop();
 	static private var _fileSaver:FileSaverDesktop = new FileSaverDesktop();
-	static private var _fileStream:FileStream = new FileStream();
 	#else
 	static private var _fileOpener:FileOpener = new FileOpener(true);
 	static private var _fileSaver:FileSaver = new FileSaver();
@@ -30,101 +27,27 @@ class FileController
 	static private var _completeCallback:String->Void;
 	static private var _cancelCallback:Void->Void;
 	
-	static public function open(?completeCallback:String->Void, ?cancelCallback:Void->Void):Void
-	{
-		_completeCallback = completeCallback;
-		_cancelCallback = cancelCallback;
-		#if (desktop || air)
-		_fileOpener.start(onOpenComplete, onOpenCancel);
-		#else
-		_fileOpener.start(onOpenComplete, onOpenCancel);
-		#end
-	}
-	
 	#if (desktop || air)
-	static public function openFile(file:File, ?completeCallback:String->Void):Void
+	static public function open(completeCallback:File->Void, ?cancelCallback:Void->Void, ?filterList:Array<FileFilter>, ?path:String, dialogTitle:String = "Select file"):Void
 	{
-		_completeCallback = completeCallback;
-		onOpenComplete(file);
+		_fileOpener.start(completeCallback, cancelCallback, filterList, path, dialogTitle);
 	}
 	#else
-	static public function openFile(file:FileReference, ?completeCallback:String->Void):Void
+	static public function open(completeCallback:FileReference->Void, ?cancelCallback:Void->Void, ?filterList:Array<FileFilter>):Void
 	{
-		_completeCallback = completeCallback;
-		onOpenComplete(file);
+		_fileOpener.start(completeCallback, cancelCallback, filterList);
 	}
 	#end
 	
 	#if (desktop || air)
-	static private function onOpenComplete(file:File):Void
+	static public function save(data:Dynamic, completeCallback:String->Void, ?cancelCallback:Void->Void, ?path:String, forceBrowse:Bool = false, ?forcedExtenstion:String, dialogTitle:String = "Save as"):Void
 	{
-		var ba:ByteArray = new ByteArray();
-		_fileStream.open(file, FileMode.READ);
-		_fileStream.readBytes(ba, 0, _fileStream.bytesAvailable);
-		_fileStream.close();
-		ValEditor.fromZipSave(ba);
-		
-		if (_completeCallback != null)
-		{
-			_completeCallback(file.nativePath);
-		}
-		
-		_fileOpener.clear();
+		_fileSaver.start(data, completeCallback, cancelCallback, path, path == null || forceBrowse, forcedExtenstion, dialogTitle);
 	}
 	#else
-	static private function onOpenComplete(file:FileReference):Void
+	static public function save(data:Dynamic, completeCallback:String->Void, ?cancelCallback:Void->Void, ?fileName:String):Void
 	{
-		ValEditor.fromZipSave(file.data);
-		
-		if (_completeCallback != null)
-		{
-			_completeCallback(file.name);
-		}
-		
-		_fileOpener.clear();
+		_fileSaver.start(data, completeCallback, cancelCallback, fileName);
 	}
 	#end
-	
-	static private function onOpenCancel():Void
-	{
-		if (_cancelCallback != null)
-		{
-			_cancelCallback();
-		}
-		
-		_fileOpener.clear();
-	}
-	
-	static public function save(forceBrowse:Bool = false):Void
-	{
-		var data:Dynamic = ValEditor.toZipSave();
-		
-		#if (desktop || air)
-		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fullPath, ValEditor.fileSettings.filePath == null || forceBrowse, ValEditor.fileExtension);
-		#else
-		_fileSaver.start(data, onSaveComplete, onSaveCancel, ValEditor.fileSettings.fileName);
-		#end
-	}
-	
-	#if (desktop || air)
-	static private function onSaveComplete(path:String):Void
-	{
-		ValEditor.fileSettings.fullPath = path;
-		ValEditor.fileSaved();
-		_fileSaver.clear();
-	}
-	#else
-	static private function onSaveComplete(fileName:String):Void
-	{
-		ValEditor.fileSettings.fileName = fileName;
-		ValEditor.fileSaved();
-		_fileSaver.clear();
-	}
-	#end
-	
-	static private function onSaveCancel():Void
-	{
-		_fileSaver.clear();
-	}
-	
 }

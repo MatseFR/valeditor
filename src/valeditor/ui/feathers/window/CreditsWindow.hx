@@ -5,10 +5,8 @@ import feathers.controls.Header;
 import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
-import feathers.controls.ScrollContainer;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
-import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.HorizontalLayoutData;
@@ -20,7 +18,6 @@ import openfl.display.Bitmap;
 import openfl.net.URLRequest;
 import openfl.utils.Assets;
 import valeditor.ui.feathers.theme.simple.variants.HeaderVariant;
-import valeditor.ui.feathers.theme.variant.LabelVariant;
 
 /**
  * ...
@@ -32,8 +29,6 @@ class CreditsWindow extends Panel
 	
 	private var _footerGroup:LayoutGroup;
 	private var _closeButton:Button;
-	
-	private var _container:ScrollContainer;
 	
 	private var _authorGroup:LayoutGroup;
 	private var _authorLogo:Bitmap;
@@ -106,8 +101,8 @@ class CreditsWindow extends Panel
 		
 		this.layout = new AnchorLayout();
 		
-		this._container = new ScrollContainer();
-		this._container.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		//this._container = new ScrollContainer();
+		//this._container.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.MIDDLE;
@@ -115,8 +110,8 @@ class CreditsWindow extends Panel
 		vLayout.paddingTop = Padding.DEFAULT * 4;
 		vLayout.paddingBottom = Padding.DEFAULT * 8;
 		vLayout.gap = Spacing.BIG * 2;
-		this._container.layout = vLayout;
-		addChild(this._container);
+		this.layout = vLayout;
+		//addChild(this._container);
 		
 		// Author
 		this._authorGroup = new LayoutGroup();
@@ -125,7 +120,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._authorGroup.layout = vLayout;
-		this._container.addChild(this._authorGroup);
+		addChild(this._authorGroup);
 		
 		this._authorLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/matse_logo.png"));
 		this._authorLogo.smoothing = true;
@@ -160,7 +155,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._haxeGroup.layout = vLayout;
-		this._container.addChild(this._haxeGroup);
+		addChild(this._haxeGroup);
 		
 		this._haxeLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/haxe_logo.png"));
 		this._haxeLogo.smoothing = true;
@@ -194,7 +189,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._openflGroup.layout = vLayout;
-		this._container.addChild(this._openflGroup);
+		addChild(this._openflGroup);
 		
 		this._openflLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/openfl_logo.png"));
 		this._openflLogo.smoothing = true;
@@ -229,7 +224,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._starlingGroup.layout = vLayout;
-		this._container.addChild(this._starlingGroup);
+		addChild(this._starlingGroup);
 		
 		this._starlingLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/starling_logo.png"));
 		this._starlingLogo.smoothing = true;
@@ -264,7 +259,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._feathersGroup.layout = vLayout;
-		this._container.addChild(this._feathersGroup);
+		addChild(this._feathersGroup);
 		
 		this._feathersLogo = new Bitmap(Assets.getBitmapData("valeditor/credits/feathers_logo.png"));
 		this._feathersLogo.smoothing = true;
@@ -298,7 +293,7 @@ class CreditsWindow extends Panel
 		vLayout.verticalAlign = VerticalAlign.TOP;
 		vLayout.gap = Spacing.DEFAULT;
 		this._thanksGroup.layout = vLayout;
-		this._container.addChild(this._thanksGroup);
+		addChild(this._thanksGroup);
 		
 		this._thanksTitle = new Label("Special Thanks");
 		this._thanksTitle.variant = Label.VARIANT_HEADING;

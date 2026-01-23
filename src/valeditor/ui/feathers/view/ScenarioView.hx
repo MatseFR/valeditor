@@ -327,6 +327,7 @@ class ScenarioView extends LayoutGroup implements IAnimatable
 		this._timeLineTopControlsGroup.addChild(this._timeLineNumberList);
 		
 		this._timeLineGroup = new LayoutGroup();
+		this._timeLineGroup.variant = LayoutGroupVariant.CONTENT;
 		this._timeLineGroup.layoutData = new VerticalLayoutData(null, 100);
 		this._timeLineGroup.layout = new AnchorLayout();
 		this._timeLineMainGroup.addChild(this._timeLineGroup);

@@ -75,14 +75,14 @@ class FileSettingsWindow extends Panel
 			this._backupSettings.clear();
 			this._settings.clone(this._backupSettings);
 			
-			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+			this._settingsCollection = ValEditor.edit(this._settings, null, this);
 			this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 			var val:ExposedValue = this._settingsCollection.getValue("rootContainerClass");
 			val.isReadOnly = !this._isNewFile;
 		}
 		else
 		{
-			ValEditor.edit(null, null, this._editContainer);
+			ValEditor.edit(null, null, this);
 			this._settingsCollection = null;
 		}
 		
@@ -104,7 +104,6 @@ class FileSettingsWindow extends Panel
 	}
 	
 	private var _headerGroup:Header;
-	private var _editContainer:ScrollContainer;
 	private var _footerGroup:LayoutGroup;
 	private var _restoreDefaultsButton:Button;
 	private var _cancelButton:Button;
@@ -126,8 +125,6 @@ class FileSettingsWindow extends Panel
 		
 		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
-		
-		this.layout = new AnchorLayout();
 		
 		this._headerGroup = new Header(this._title);
 		this._headerGroup.variant = HeaderVariant.THEME;
@@ -152,8 +149,6 @@ class FileSettingsWindow extends Panel
 		this._confirmButton.enabled = false;
 		this._footerGroup.addChild(this._confirmButton);
 		
-		this._editContainer = new ScrollContainer();
-		this._editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -161,8 +156,7 @@ class FileSettingsWindow extends Panel
 		vLayout.paddingTop = Padding.DEFAULT;
 		vLayout.paddingBottom = Padding.DEFAULT;
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
-		this._editContainer.layout = vLayout;
-		addChild(this._editContainer);
+		this.layout = vLayout;
 	}
 	
 	private function checkValid():Void

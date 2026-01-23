@@ -235,6 +235,7 @@ class EditorView extends LayoutGroup
 		addChild(this._mainBox);
 		
 		this._leftBox = new LayoutGroup();
+		this._leftBox.variant = LayoutGroupVariant.CONTENT;
 		this._leftBox.minWidth = UIConfig.LEFT_MIN_WIDTH;
 		this._leftBox.maxWidth = UIConfig.LEFT_MAX_WIDTH;
 		startWidth = Lib.current.stage.stageWidth / 5;
@@ -249,6 +250,7 @@ class EditorView extends LayoutGroup
 		this._mainBox.addChild(this._centerBox);
 		
 		this._rightBox = new LayoutGroup();
+		this._rightBox.variant = LayoutGroupVariant.CONTENT;
 		this._rightBox.minWidth = UIConfig.VALUE_MIN_WIDTH;
 		this._rightBox.maxWidth = UIConfig.VALUE_MAX_WIDTH;
 		startWidth = Lib.current.stage.stageWidth / 5;

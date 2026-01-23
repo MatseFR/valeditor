@@ -22,6 +22,11 @@ import openfl.text.TextField;
 import openfl.text.TextFormat;
 import openfl.ui.Keyboard;
 import openfl.utils.Assets;
+#if (desktop || air)
+import openfl.filesystem.FileMode;
+import openfl.filesystem.FileStream;
+import openfl.utils.ByteArray;
+#end
 import valedit.SpriteContainerOpenFL;
 import valedit.TimeLineContainerOpenFL;
 import valedit.ValEdit;
@@ -115,6 +120,10 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private var _fileSettings:FileSettings = new FileSettings();
 	private var _isStartUp:Bool = true;
+	
+	#if (desktop || air)
+	private var _fileStream:FileStream = new FileStream();
+	#end
 	
 	#if html5
 	private var _fileReaderLoader:FileReaderLoader = new FileReaderLoader();
@@ -390,10 +399,30 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onLoadFile():Void
 	{
-		FileController.open(onLoadFileConfirm, onLoadFileCancel);
+		FileController.open(openFile, onLoadFileCancel);
 	}
 	
-	private function onLoadFileConfirm(filePath:String):Void
+	#if (desktop || air)
+	private function openFile(file:File):Void
+	{
+		var ba:ByteArray = new ByteArray();
+		this._fileStream.open(file, FileMode.READ);
+		this._fileStream.readBytes(ba, 0, this._fileStream.bytesAvailable);
+		this._fileStream.close();
+		ValEditor.fromZipSave(ba);
+		
+		onLoadFileComplete(file.nativePath);
+	}
+	#else
+	private function openFile(file:FileReference):Void
+	{
+		ValEditor.fromZipSave(file.data);
+		
+		onLoadFileComplete(file.name);
+	}
+	#end
+	
+	private function onLoadFileComplete(filePath:String):Void
 	{
 		if (this._isStartUp)
 		{
@@ -408,6 +437,27 @@ class ValEditorFull extends ValEditorBaseFeathers
 	private function onLoadFileCancel():Void
 	{
 		
+	}
+	
+	private function saveCurrentFile(forceBrowse:Bool = false):Void
+	{
+		var data:Dynamic = ValEditor.toZipSave();
+		
+		#if (desktop || air)
+		FileController.save(data, saveFileComplete, null, ValEditor.fileSettings.fullPath, ValEditor.fileSettings.filePath == null || forceBrowse, ValEditor.fileExtension);
+		#else
+		FileController.save(data, saveFileComplete, null, ValEditor.fileSettings.fileName);
+		#end
+	}
+	
+	private function saveFileComplete(path:String):Void
+	{
+		#if (desktop || air)
+		ValEditor.fileSettings.fullPath = path;
+		#else
+		ValEditor.fileSettings.fileName = fileName;
+		#end
+		ValEditor.fileSaved();
 	}
 	
 	private function onSelectionChange(evt:SelectionEvent):Void
@@ -454,10 +504,12 @@ class ValEditorFull extends ValEditorBaseFeathers
 				onLoadFile();
 			
 			case "save" :
-				FileController.save();
+				//FileController.save();
+				saveCurrentFile();
 			
 			case "save as" :
-				FileController.save(true);
+				//FileController.save(true);
+				saveCurrentFile(true);
 			
 			case "file settings" :
 				FeathersWindows.showFileSettingsWindow(ValEditor.fileSettings, "File Settings", false);
@@ -621,12 +673,14 @@ class ValEditorFull extends ValEditorBaseFeathers
 				if (this._isStartUp) return;
 				if (ValEditor.isNewFile || ValEditor.actionStack.hasChanges)
 				{
-					FileController.save();
+					//FileController.save();
+					saveCurrentFile();
 				}
 			
 			case InputActionID.SAVE_AS :
 				if (this._isStartUp) return;
-				FileController.save(true);
+				//FileController.save(true);
+				saveCurrentFile(true);
 			
 			case InputActionID.SELECT_ALL :
 				if (this._isStartUp) return;
@@ -791,7 +845,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		{
 			if (file.extension == ValEditor.fileExtension)
 			{
-				FileController.openFile(file, onLoadFileConfirm);
+				openFile(file);
 				return;
 			}
 		}
@@ -821,7 +875,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 		if (Path.extension(filePath) == ValEditor.fileExtension)
 		{
 			file = new File(filePath);
-			FileController.openFile(file, onLoadFileConfirm);
+			openFile(file);
 		}
 		else if (!this._isStartUp && ValEdit.assetLib.isValidExtension(Path.extension(filePath)))
 		{
@@ -874,7 +928,7 @@ class ValEditorFull extends ValEditorBaseFeathers
 	
 	private function onSourceFileReady(files:Array<FileReference>):Void
 	{
-		FileController.openFile(files[0], onLoadFileConfirm);
+		openFile(files[0]);
 	}
 	
 	private function onAssetFilesReady(files:Array<FileReference>):Void

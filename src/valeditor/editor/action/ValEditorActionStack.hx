@@ -1,5 +1,4 @@
 package valeditor.editor.action;
-import openfl.errors.Error;
 import openfl.events.EventDispatcher;
 import valeditor.events.ActionStackEvent;
 
@@ -61,6 +60,17 @@ class ValEditorActionStack extends EventDispatcher
 	{
 		clearSessions();
 		this._undoLevels = -1;
+	}
+	
+	/**
+	   Clears all sessions actions
+	**/
+	public function clearActions():Void
+	{
+		for (session in this._sessions)
+		{
+			session.clearActions();
+		}
 	}
 	
 	public function clearSessions():Void

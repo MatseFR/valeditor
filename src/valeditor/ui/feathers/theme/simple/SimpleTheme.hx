@@ -599,7 +599,7 @@ class SimpleTheme extends ClassVariantTheme implements IDarkModeTheme implements
 		this._lightThemeColor = lightThemeColor;
 		this._darkThemeColor = darkThemeColor;
 		this.refreshColors();
-		this.styleProvider = new ClassVariantStyleProvider();
+		//this.styleProvider = new ClassVariantStyleProvider();
 		
 		ActivityIndicatorStyles.initialize(this, this.styleProvider);
 		AlertStyles.initialize(this, this.styleProvider);

@@ -19,6 +19,7 @@ import feathers.layout.VerticalLayout;
 import feathers.layout.VerticalLayoutData;
 import feathers.layout.VerticalListLayout;
 import feathers.utils.DisplayObjectRecycler;
+import openfl.errors.Error;
 import openfl.events.Event;
 import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
@@ -29,6 +30,7 @@ import valeditor.ui.feathers.data.MenuItem;
 import valeditor.ui.feathers.renderers.MenuItemRenderer;
 import valeditor.ui.feathers.theme.variant.LayoutGroupVariant;
 import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
+import valeditor.ui.feathers.theme.variant.ToggleButtonVariant;
 
 /**
  * ...
@@ -37,11 +39,24 @@ import valeditor.ui.feathers.theme.variant.PopUpListViewVariant;
 class SimpleEditViewBase extends LayoutGroup 
 {
 	public var centerBox(default, null):VDividedBox;
+	public var defaultEditContainer(get, set):ScrollContainer;
 	public var displayAreaGroup(default, null):LayoutGroup;
 	public var displayCenter(default, null):Point = new Point();
 	public var displayRect(default, null):Rectangle = new Rectangle();
+	public var editContainerList(default, null):Array<ScrollContainer> = new Array<ScrollContainer>();
+	public var editContainerMap(default, null):Map<String, ScrollContainer> = new Map<String, ScrollContainer>();
 	public var mainBox(default, null):HDividedBox;
 	public var menuGroup(default, null):LayoutGroup;
+	public var toggleGroupList(default, null):Array<ToggleLayoutGroup> = new Array<ToggleLayoutGroup>();
+	public var toggleGroupMap(default, null):Map<String, ToggleLayoutGroup> = new Map<String, ToggleLayoutGroup>();
+	
+	private var _defaultEditContainer:ScrollContainer;
+	private function get_defaultEditContainer():ScrollContainer { return this._defaultEditContainer; }
+	private function set_defaultEditContainer(value:ScrollContainer):ScrollContainer
+	{
+		if (ValEditor.uiContainerDefault == null) ValEditor.uiContainerDefault = value;
+		return this._defaultEditContainer = value;
+	}
 	
 	// menus
 	private var _menuCallbacks:Map<String, MenuItem->Void> = new Map<String, MenuItem->Void>();
@@ -56,6 +71,14 @@ class SimpleEditViewBase extends LayoutGroup
 	{
 		super();
 		
+	}
+	
+	override public function dispose():Void 
+	{
+		this.editContainerMap.clear();
+		this.toggleGroupMap.clear();
+		
+		super.dispose();
 	}
 	
 	override function initialize():Void 
@@ -88,15 +111,6 @@ class SimpleEditViewBase extends LayoutGroup
 		this.mainBox.layoutData = new AnchorLayoutData(new Anchor(0, this.menuGroup), 0, 0, 0);
 		addChild(this.mainBox);
 		
-		// left group
-		//this.leftGroup = new LayoutGroup();
-		//this.leftGroup.variant = LayoutGroupVariant.CONTENT;
-		//this.leftGroup.minWidth = UIConfig.VALUE_MIN_WIDTH;
-		//this.leftGroup.maxWidth = UIConfig.VALUE_MAX_WIDTH;
-		//this.leftGroup.width = this.leftGroup.minWidth;// + (this.leftGroup.maxWidth - this.leftGroup.minWidth) / 2.0;
-		//this.leftGroup.layout = new AnchorLayout();
-		//this.mainBox.addChild(this.leftGroup);
-		
 		// center box
 		this.centerBox = new VDividedBox();
 		this.mainBox.addChild(this.centerBox);
@@ -109,16 +123,33 @@ class SimpleEditViewBase extends LayoutGroup
 		this.displayAreaGroup.addEventListener(Event.RESIZE, onDisplayAreaResize);
 	}
 	
-	private function createEditContainer_toggleGroup():ToggleLayoutGroup
+	public function createEditContainer_toggleGroup(id:String = "default", title:String = null, isOpen:Bool = false):ToggleLayoutGroup
 	{
-		var editContainer:ToggleLayoutGroup = new ToggleLayoutGroup();
-		return editContainer;
+		if (this.toggleGroupMap.exists(id))
+		{
+			throw new Error("a toggle group with id '" + id + "' already exists");
+		}
+		var toggleGroup:ToggleLayoutGroup = new ToggleLayoutGroup();
+		toggleGroup.contentVariant = LayoutGroupVariant.CONTENT;
+		toggleGroup.toggleVariant = ToggleButtonVariant.PANEL;
+		toggleGroup.text = title;
+		toggleGroup.isOpen = isOpen;
+		toggleGroup.contentLayout = new AnchorLayout();
+		var editContainer:ScrollContainer = createEditContainer_scroll(id);
+		editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
+		toggleGroup.addContent(editContainer);
+		this.toggleGroupMap.set(id, toggleGroup);
+		this.toggleGroupList[this.toggleGroupList.length] = toggleGroup;
+		return toggleGroup;
 	}
 	
-	private function createEditContainer_scroll():ScrollContainer
+	public function createEditContainer_scroll(id:String = "default"):ScrollContainer
 	{
+		if (this.editContainerMap.exists(id))
+		{
+			throw new Error("an edit container with id '" + id + "' already exists");
+		}
 		var editContainer:ScrollContainer = new ScrollContainer();
-		//editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		editContainer.scrollPolicyX = ScrollPolicy.OFF;
 		editContainer.scrollPolicyY = ScrollPolicy.ON;
 		editContainer.fixedScrollBars = true;
@@ -128,7 +159,20 @@ class SimpleEditViewBase extends LayoutGroup
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingBottom = vLayout.paddingTop = Spacing.DEFAULT;
 		editContainer.layout = vLayout;
+		this.editContainerMap.set(id, editContainer);
+		this.editContainerList[this.editContainerList.length] = editContainer;
+		if (this.defaultEditContainer == null) this.defaultEditContainer = editContainer;
 		return editContainer;
+	}
+	
+	public function getEditContainer(id:String):ScrollContainer
+	{
+		return this.editContainerMap.get(id);
+	}
+	
+	public function getToggleGroup(id:String):ToggleLayoutGroup
+	{
+		return this.toggleGroupMap.get(id);
 	}
 	
 	public function addMenu(menuID:String, menuText:String, callback:Dynamic->Void, openListener:Event->Void, items:ArrayCollection<MenuItem>, ?itemToText:Dynamic->String, ?itemToEnabled:Dynamic->Bool):Void
@@ -253,7 +297,7 @@ class SimpleEditViewBase extends LayoutGroup
 	
 	private function onKeyboardEvent(evt:KeyboardEvent):Void
 	{
-		evt.stopPropagation();
+		//evt.stopPropagation();
 	}
 	
 	private function onMenuChange(evt:Event):Void
@@ -265,11 +309,12 @@ class SimpleEditViewBase extends LayoutGroup
 		if (!item.enabled) return;
 		var callback:MenuItem->Void = this._menuCallbacks.get(menu.name);
 		if (callback != null) callback(item);
+		this.stage.focus = null;
 	}
 	
 	private function onMouseEvent(evt:MouseEvent):Void
 	{
-		evt.stopPropagation();
+		//evt.stopPropagation();
 	}
 	
 }

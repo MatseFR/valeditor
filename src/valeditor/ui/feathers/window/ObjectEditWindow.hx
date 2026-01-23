@@ -7,7 +7,6 @@ import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.events.TriggerEvent;
 import feathers.layout.AnchorLayout;
-import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
@@ -24,7 +23,6 @@ class ObjectEditWindow extends Panel
 {
 	public var cancelCallback(get, set):Void->Void;
 	public var confirmCallback(get, set):Void->Void;
-	public var editContainer(get, never):ScrollContainer;
 	public var editObject(get, set):Dynamic;
 	public var title(get, set):String;
 	
@@ -42,8 +40,6 @@ class ObjectEditWindow extends Panel
 		return this._confirmCallback = value;
 	}
 	
-	private function get_editContainer():ScrollContainer { return this._contentGroup; }
-	
 	private var _editObject:Dynamic;
 	private function get_editObject():Dynamic { return this._editObject; }
 	private function set_editObject(value:Dynamic):Dynamic
@@ -51,7 +47,7 @@ class ObjectEditWindow extends Panel
 		if (this._editObject == value) return value;
 		if (this._initialized)
 		{
-			ValEditor.edit(value, this._contentGroup);
+			ValEditor.edit(value, this);
 		}
 		return this._editObject = value;
 	}
@@ -74,8 +70,6 @@ class ObjectEditWindow extends Panel
 	private var _confirmButton:Button;
 	private var _cancelButton:Button;
 	
-	private var _contentGroup:ScrollContainer;
-
 	public function new() 
 	{
 		super();
@@ -109,21 +103,18 @@ class ObjectEditWindow extends Panel
 		this._cancelButton = new Button("cancel", onCancelButton);
 		this._footerGroup.addChild(this._cancelButton);
 		
-		this._contentGroup = new ScrollContainer();
-		this._contentGroup.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
-		vLayout.verticalAlign = VerticalAlign.TOP;
+		vLayout.verticalAlign = VerticalAlign.MIDDLE;
 		vLayout.gap = Spacing.VERTICAL_GAP;
 		vLayout.paddingTop = Spacing.DEFAULT;
 		vLayout.paddingBottom = Spacing.DEFAULT;
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
-		this._contentGroup.layout = vLayout;
-		addChild(this._contentGroup);
+		this.layout = vLayout;
 		
 		if (this._editObject != null)
 		{
-			ValEditor.edit(this._editObject, this._contentGroup);
+			ValEditor.edit(this._editObject, this);
 		}
 	}
 	
@@ -138,7 +129,7 @@ class ObjectEditWindow extends Panel
 	{
 		FeathersWindows.closeWindow(this);
 		this.editObject = null;
-		this._confirmCallback();
+		if (this._confirmCallback != null) this._confirmCallback();
 	}
 	
 }

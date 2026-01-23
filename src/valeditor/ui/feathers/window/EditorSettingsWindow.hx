@@ -6,8 +6,6 @@ import feathers.controls.LayoutGroup;
 import feathers.controls.Panel;
 import feathers.controls.ScrollContainer;
 import feathers.events.TriggerEvent;
-import feathers.layout.AnchorLayout;
-import feathers.layout.AnchorLayoutData;
 import feathers.layout.HorizontalAlign;
 import feathers.layout.HorizontalLayout;
 import feathers.layout.VerticalAlign;
@@ -56,7 +54,7 @@ class EditorSettingsWindow extends Panel
 			this._settings.clone(this._backupSettings);
 			if (this._initialized)
 			{
-				this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+				this._settingsCollection = ValEditor.edit(this._settings, null, this);
 				this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 			}
 		}
@@ -64,7 +62,7 @@ class EditorSettingsWindow extends Panel
 		{
 			if (this._initialized)
 			{
-				ValEditor.edit(null, null, this._editContainer);
+				ValEditor.edit(null, null, this);
 				this._settingsCollection.removeEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 				this._settingsCollection = null;
 			}
@@ -107,8 +105,6 @@ class EditorSettingsWindow extends Panel
 		var hLayout:HorizontalLayout;
 		var vLayout:VerticalLayout;
 		
-		this.layout = new AnchorLayout();
-		
 		this._headerGroup = new Header(this._title);
 		this._headerGroup.variant = HeaderVariant.THEME;
 		this.header = this._headerGroup;
@@ -131,8 +127,6 @@ class EditorSettingsWindow extends Panel
 		this._confirmButton = new Button("ok", onConfirmButton);
 		this._footerGroup.addChild(this._confirmButton);
 		
-		this._editContainer = new ScrollContainer();
-		this._editContainer.layoutData = new AnchorLayoutData(0, 0, 0, 0);
 		vLayout = new VerticalLayout();
 		vLayout.horizontalAlign = HorizontalAlign.JUSTIFY;
 		vLayout.verticalAlign = VerticalAlign.TOP;
@@ -140,12 +134,11 @@ class EditorSettingsWindow extends Panel
 		vLayout.paddingTop = Padding.DEFAULT;
 		vLayout.paddingBottom = Padding.DEFAULT;
 		vLayout.paddingLeft = vLayout.paddingRight = Padding.DEFAULT;
-		this._editContainer.layout = vLayout;
-		addChild(this._editContainer);
+		this.layout = vLayout;
 		
 		if (this._settings != null)
 		{
-			this._settingsCollection = ValEditor.edit(this._settings, null, this._editContainer);
+			this._settingsCollection = ValEditor.edit(this._settings, null, this);
 			this._settingsCollection.addEventListener(ValueEvent.VALUE_CHANGE, onValueChange);
 		}
 	}

@@ -30,7 +30,7 @@ class FileOpenerDesktop
 		this._cancelCallback = null;
 	}
 	
-	public function start(completeCallback:File->Void, cancelCallback:Void->Void, filterList:Array<FileFilter> = null, path:String = null, dialogTitle:String = "Select file"):Void
+	public function start(completeCallback:File->Void, ?cancelCallback:Void->Void, ?filterList:Array<FileFilter>, ?path:String, ?dialogTitle:String):Void
 	{
 		if (this._isRunning)
 		{
@@ -38,6 +38,8 @@ class FileOpenerDesktop
 			return;
 		}
 		this._isRunning = true;
+		
+		if (dialogTitle == null) dialogTitle = "Select file";
 		
 		this._completeCallback = completeCallback;
 		this._cancelCallback = cancelCallback;
@@ -67,7 +69,10 @@ class FileOpenerDesktop
 		this._file.removeEventListener(Event.CANCEL, onFileCancelled);
 		
 		this._isRunning = false;
-		this._cancelCallback();
+		if (this._cancelCallback != null)
+		{
+			this._cancelCallback();
+		}
 	}
 	
 }

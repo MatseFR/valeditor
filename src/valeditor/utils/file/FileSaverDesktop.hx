@@ -1,4 +1,5 @@
 package valeditor.utils.file;
+import openfl.errors.Error;
 #if (desktop || air)
 import haxe.io.Path;
 import openfl.events.Event;
@@ -35,7 +36,17 @@ class FileSaverDesktop
 		this._cancelCallback = null;
 	}
 	
-	public function start(data:Dynamic, completeCallback:String->Void, cancelCallback:Void->Void, path:String = null, browseForSave:Bool = true, forcedExtension:String = null, dialogTitle:String = "Save as"):Void
+	/**
+	   
+	   @param	data	either a String or a ByteArray
+	   @param	completeCallback	passes the saved file's nativePath
+	   @param	cancelCallback
+	   @param	path
+	   @param	browseForSave
+	   @param	forcedExtension
+	   @param	dialogTitle
+	**/
+	public function start(data:Dynamic, completeCallback:String->Void, ?cancelCallback:Void->Void, ?path:String, browseForSave:Bool = true, forcedExtension:String = null, dialogTitle:String = "Save as"):Void
 	{
 		this._data = data;
 		this._completeCallback = completeCallback;
@@ -132,6 +143,10 @@ class FileSaverDesktop
 		{
 			this._fileStream.writeBytes(this._data);
 		}
+		else
+		{
+			throw new Error("unsupported data type");
+		}
 		
 		this._fileStream.close();
 		this._data = null;
@@ -146,7 +161,10 @@ class FileSaverDesktop
 		
 		this._data = null;
 		
-		this._cancelCallback();
+		if (this._cancelCallback != null)
+		{
+			this._cancelCallback();
+		}
 	}
 	
 }

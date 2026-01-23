@@ -803,6 +803,17 @@ class ValEditorClass extends EventDispatcher implements IChangeUpdate
 				collection.readAndSetObject(object);
 			}
 		}
+		else
+		{
+			if (checkForValEditorObject && Std.isOfType(object, ValEditorObject))
+			{
+				collection.readAndSetObject(cast(object, ValEditorObject).object);
+			}
+			else
+			{
+				collection.readAndSetObject(object);
+			}
+		}
 		this._containers[uiContainer] = collection;
 		collection.parentValue = parentValue;
 		collection.uiContainer = uiContainer;
