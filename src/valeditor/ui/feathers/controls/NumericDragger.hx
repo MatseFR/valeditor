@@ -4,6 +4,7 @@ import feathers.controls.Label;
 import feathers.controls.LayoutGroup;
 import feathers.controls.TextInput;
 import feathers.core.FocusManager;
+import feathers.core.IFocusContainer;
 import feathers.core.IFocusObject;
 import feathers.events.FeathersEvent;
 import feathers.layout.HorizontalAlign;
@@ -29,12 +30,13 @@ import valeditor.events.ValueUIEvent;
  * @author Matse
  */
 @:styleContext
-class NumericDragger extends LayoutGroup implements IFocusObject
+class NumericDragger extends LayoutGroup implements IFocusObject implements IFocusContainer
 {
 	static public var CHILD_VARIANT_INPUT:String = "valueDragger_input";
 	static public var CHILD_VARIANT_LABEL:String = "valueDragger_label" ;
 	
 	public var cancelDragWithRightClick(get, set):Bool;
+	public var childFocusEnabled(get, set):Bool;
 	public var currentState(get, never):#if flash Dynamic #else NumericDraggerState #end;
 	public var defaultBackgroundSkin:DisplayObject;
 	public var defaultLabelSkin:DisplayObject;
@@ -66,6 +68,13 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 	private function set_cancelDragWithRightClick(value:Bool):Bool
 	{
 		return this._cancelDragWithRightClick = value;
+	}
+	
+	private var _childFocusEnabled:Bool = true;
+	private function get_childFocusEnabled():Bool { return this._childFocusEnabled; }
+	private function set_childFocusEnabled(value:Bool):Bool
+	{
+		return this._childFocusEnabled = value;
 	}
 	
 	private var _currentState:NumericDraggerState = UP;
@@ -382,7 +391,7 @@ class NumericDragger extends LayoutGroup implements IFocusObject
 		if (this._input == null)
 		{
 			this._input = new TextInput();
-			this._input.focusEnabled = false;
+			//this._input.focusEnabled = false;
 			this._input.variant = CHILD_VARIANT_INPUT;
 		}
 		this._input.addEventListener(Event.CHANGE, input_changeHandler);
