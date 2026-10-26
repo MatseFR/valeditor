@@ -36,7 +36,7 @@ class TextAreaStyles
 			backgroundSkin.cornerRadius = 3.0;
 			if (isDesktop) {
 				backgroundSkin.width = 120.0;
-				backgroundSkin.height = 100.0;
+				backgroundSkin.height = 120.0;
 			} else {
 				backgroundSkin.width = 160.0;
 				backgroundSkin.height = 120.0;
