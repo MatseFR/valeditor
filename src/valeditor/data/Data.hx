@@ -20,6 +20,7 @@ import valeditor.ui.InteractiveFactories;
 import valedit.data.massive.data.MassiveData;
 import valedit.data.massive.display.MassiveDisplayData;
 import valedit.data.massive.particle.MassiveParticleData;
+import valedit.data.massive.text.MassiveTextData;
 import valedit.data.massive.util.MassiveUtilData;
 #end
 #if starling
@@ -64,6 +65,7 @@ class Data
 		exposeMassive_data();
 		exposeMassive_display();
 		exposeMassive_particle();
+		exposeMassive_text();
 		exposeMassive_util();
 	}
 	
@@ -72,22 +74,21 @@ class Data
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
 		// Frame
-		settings.canBeCreated = false;
+		settings.canBeCreated = true;
 		settings.collection = MassiveData.exposeFrame();
 		ValEditor.registerClass(massive.data.Frame, settings);
 		settings.clear();
 		
-		// ImageData
-		settings.canBeCreated = false;
-		settings.collection = MassiveData.exposeImageData();
-		ValEditor.registerClass(massive.data.ImageData, settings);
+		// VertexColorData
+		settings.canBeCreated = true;
+		settings.collection = MassiveData.exposeVertexColorData();
+		ValEditor.registerClass(massive.data.VertexColorData, settings);
 		settings.clear();
 		
-		// QuadData
-		settings.canBeCreated = false;
-		settings.collection = MassiveData.exposeQuadData();
-		ValEditor.registerClass(massive.data.QuadData, settings);
-		settings.clear();
+		// VertexPositionData
+		settings.canBeCreated = true;
+		settings.collection = MassiveData.exposeVertexPositionData();
+		ValEditor.registerClass(massive.data.VertexPositionData, settings);
 		
 		settings.pool();
 	}
@@ -97,21 +98,39 @@ class Data
 		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
 		
 		// MassiveDisplay
-		settings.canBeCreated = false;
+		settings.canBeCreated = true;
 		settings.collection = MassiveDisplayData.exposeMassiveDisplay();
 		ValEditor.registerClass(massive.display.MassiveDisplay, settings);
 		settings.clear();
 		
-		// ImageLayer
-		settings.canBeCreated = false;
-		settings.collection = MassiveDisplayData.exposeMassiveImageLayer();
-		ValEditor.registerClass(massive.display.ImageLayer, settings);
+		// ImgContainer
+		settings.canBeCreated = true;
+		settings.collection = MassiveDisplayData.exposeImgContainer();
+		ValEditor.registerClass(massive.display.ImgContainer, settings);
 		settings.clear();
 		
-		// QuadLayer
-		settings.canBeCreated = false;
-		settings.collection = MassiveDisplayData.exposeMassiveQuadLayer();
-		ValEditor.registerClass(massive.display.QuadLayer, settings);
+		// MixedContainer
+		settings.canBeCreated = true;
+		settings.collection = MassiveDisplayData.exposeMixedContainer();
+		ValEditor.registerClass(massive.display.MixedContainer, settings);
+		settings.clear();
+		
+		// Img
+		settings.canBeCreated = true;
+		settings.collection = MassiveDisplayData.exposeImg();
+		ValEditor.registerClass(massive.display.Img, settings);
+		settings.clear();
+		
+		// Clip
+		settings.canBeCreated = true;
+		settings.collection = MassiveDisplayData.exposeClip();
+		ValEditor.registerClass(massive.display.Clip, settings);
+		settings.clear();
+		
+		// EventClip
+		settings.canBeCreated = true;
+		settings.collection = MassiveDisplayData.exposeEventClip();
+		ValEditor.registerClass(massive.display.EventClip, settings);
 		settings.clear();
 		
 		settings.pool();
@@ -129,14 +148,51 @@ class Data
 		settings.canBeCreated = false;
 		settings.collection = MassiveParticleData.exposeParticleSystem();
 		ValEditor.registerClass(massive.particle.ParticleSystem, settings);
-		var clss:Class<Dynamic> = Type.resolveClass("massive.particle.ParticleSystem_massive_particle_Particle");
-		ValEditor.registerClass(clss, settings);
+		//var clss:Class<Dynamic> = Type.resolveClass("massive.particle.ParticleSystem_massive_particle_Particle");
+		//ValEditor.registerClass(clss, settings);
 		settings.clear();
 		
 		// ParticleSystemOptions
 		settings.canBeCreated = false;
 		settings.collection = MassiveParticleData.exposeParticleSystemOptions();
 		ValEditor.registerClass(massive.particle.ParticleSystemOptions, settings);
+		settings.clear();
+		
+		settings.pool();
+	}
+	
+	static public function exposeMassive_text():Void
+	{
+		var settings:ValEditorClassSettings = ValEditorClassSettings.fromPool();
+		
+		// Text
+		settings.canBeCreated = false;
+		settings.collection = MassiveTextData.exposeText();
+		ValEditor.registerClass(massive.text.Text, settings);
+		settings.clear();
+		
+		// TextField
+		settings.canBeCreated = true;
+		settings.collection = MassiveTextData.exposeTextField();
+		ValEditor.registerClass(massive.text.TextField, settings);
+		settings.clear();
+		
+		// TextFormat
+		settings.canBeCreated = true;
+		settings.collection = MassiveTextData.exposeTextFormat();
+		ValEditor.registerClass(massive.text.TextFormat, settings);
+		settings.clear();
+		
+		// TextOptions
+		settings.canBeCreated = true;
+		settings.collection = MassiveTextData.exposeTextOptions();
+		ValEditor.registerClass(massive.text.TextOptions, settings);
+		settings.clear();
+		
+		// TextPart
+		settings.canBeCreated = false;
+		settings.collection = MassiveTextData.exposeTextPart();
+		ValEditor.registerClass(massive.text.TextPartString, settings);
 		settings.clear();
 		
 		settings.pool();
