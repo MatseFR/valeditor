@@ -67,9 +67,6 @@ class ColorUI extends ValueUI
 	private var _preview:LayoutGroup;
 	private var _previewColor:LayoutGroup;
 	private var _previewSkin:RectangleSkin;
-	
-	private var _hexGroup:LayoutGroup;
-	private var _hexLabel:Label;
 	private var _hexInput:TextInput;
 	
 	private var _redGroup:LayoutGroup;
@@ -90,6 +87,8 @@ class ColorUI extends ValueUI
 	
 	private var _action:MultiAction;
 	private var _valueChangeAction:ValueChange;
+	
+	private var _showRGBControls:Bool;
 	
 	/**
 	   
@@ -156,26 +155,13 @@ class ColorUI extends ValueUI
 		this._previewColor.backgroundSkin = this._previewSkin;
 		this._preview.addChild(this._previewColor);
 		
-		// Hexa
-		this._hexGroup = new LayoutGroup();
-		hLayout = new HorizontalLayout();
-		hLayout.horizontalAlign = HorizontalAlign.LEFT;
-		hLayout.verticalAlign = VerticalAlign.MIDDLE;
-		hLayout.gap = Spacing.DEFAULT;
-		this._hexGroup.layout = hLayout;
-		addChild(this._hexGroup);
-		
-		this._hexLabel = new Label("hexa");
-		this._hexLabel.variant = LabelVariant.SUBVALUE_NAME;
-		this._hexGroup.addChild(this._hexLabel);
-		
 		this._hexInput = new TextInput();
 		this._hexInput.variant = TextInputVariant.FULL_WIDTH;
 		this._hexInput.restrict = "0123456789abcdef";
 		this._hexInput.maxChars = 6;
 		this._hexInput.text = "ffffff";
 		this._hexInput.prompt = "null";
-		this._hexGroup.addChild(this._hexInput);
+		this._previewGroup.addChild(this._hexInput);
 		
 		// Red
 		this._redGroup = new LayoutGroup();
@@ -271,7 +257,9 @@ class ColorUI extends ValueUI
 		this._blueDragger.liveDragging = this._colorValue.liveDragging;
 		this._blueDragger.liveTyping = this._colorValue.liveTyping;
 		
-		if (this._readOnly)
+		this._showRGBControls = this._colorValue.showRGBControls;
+		
+		if (!this._showRGBControls || this._readOnly)
 		{
 			if (this._redGroup.parent != null)
 			{
@@ -318,7 +306,6 @@ class ColorUI extends ValueUI
 		this.enabled = enabled;
 		this._label.enabled = enabled;
 		this._preview.enabled = enabled;
-		this._hexLabel.enabled = enabled;
 		this._redLabel.enabled = enabled;
 		this._greenLabel.enabled = enabled;
 		this._blueLabel.enabled = enabled;
