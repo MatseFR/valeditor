@@ -223,24 +223,26 @@ class TextUI extends ValueUI
 			{
 				return;
 			}
+			
+			if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
+			{
+				if (this.focusManager != null)
+				{
+					this.focusManager.focus = null;
+				}
+				else if (this.stage != null)
+				{
+					this.stage.focus = null;
+				}
+				evt.preventDefault();
+			}
 		}
 		evt.stopPropagation();
 	}
 	
 	private function onInputKeyUp(evt:KeyboardEvent):Void
 	{
-		if (evt.keyCode == Keyboard.ENTER || evt.keyCode == Keyboard.NUMPAD_ENTER)
-		{
-			if (this.focusManager != null)
-			{
-				this.focusManager.focus = null;
-			}
-			else if (this.stage != null)
-			{
-				this.stage.focus = null;
-			}
-		}
-		else if (evt.keyCode == Keyboard.ESCAPE)
+		if (evt.keyCode == Keyboard.ESCAPE)
 		{
 			this._exposedValue.value = this._previousValue;
 			this._textArea.text = this._exposedValue.value;
