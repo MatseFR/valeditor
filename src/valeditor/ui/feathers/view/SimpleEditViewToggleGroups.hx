@@ -13,7 +13,7 @@ import valeditor.ui.feathers.theme.simple.variants.ScrollContainerVariant;
  */
 class SimpleEditViewToggleGroups extends SimpleEditViewBase 
 {
-	public var rightGroup(default, null):LayoutGroup;
+	//public var rightGroup(default, null):LayoutGroup;
 	public var rightContainer(default, null):ScrollContainer;
 	
 	public function new() 
@@ -44,7 +44,6 @@ class SimpleEditViewToggleGroups extends SimpleEditViewBase
 	public function addToggleGroup(id:String = "default", title:String = null, isOpen:Bool = false):ToggleLayoutGroup
 	{
 		var toggleGroup:ToggleLayoutGroup = createEditContainer_toggleGroup(id, title, isOpen);
-		
 		this.rightContainer.addChild(toggleGroup);
 		return toggleGroup;
 	}
